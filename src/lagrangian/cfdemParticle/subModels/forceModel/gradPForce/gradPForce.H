@@ -26,7 +26,7 @@ License
 
 Description
     This code is designed to realize coupled CFD-DEM simulations using LIGGGHTS
-    and OpenFOAM. Note: this code is not part of OpenFOAM (see DISCLAIMER).
+    and OpenFOAM(R). Note: this code is not part of OpenFOAM(R) (see DISCLAIMER).
 
     -grad(p)*Vp * rho  ... if p is normalized with pressure
     -grad(p)*Vp        ... if p is real pressure

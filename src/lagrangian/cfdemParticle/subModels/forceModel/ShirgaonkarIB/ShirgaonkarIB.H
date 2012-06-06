@@ -26,7 +26,7 @@ License
 
 Description
     This code is designed to realize coupled CFD-DEM simulations using LIGGGHTS
-    and OpenFOAM. Note: this code is not part of OpenFOAM (see DISCLAIMER).
+    and OpenFOAM(R). Note: this code is not part of OpenFOAM(R) (see DISCLAIMER).
 
     drag law for ficticious domain method calculating: sum(mu*nabla*u-laplace*p)
     contribution from Alice Hager

@@ -26,7 +26,7 @@ License
 
 Description
     This code is designed to realize coupled CFD-DEM simulations using LIGGGHTS
-    and OpenFOAM. Note: this code is not part of OpenFOAM (see DISCLAIMER).
+    and OpenFOAM(R). Note: this code is not part of OpenFOAM(R) (see DISCLAIMER).
 
     Di Felice drag law (Zhou et al. (2010), JFM)
 

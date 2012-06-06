@@ -26,7 +26,7 @@ License
 
 Description
     This code is designed to realize coupled CFD-DEM simulations using LIGGGHTS
-    and OpenFOAM. Note: this code is not part of OpenFOAM (see DISCLAIMER).
+    and OpenFOAM(R). Note: this code is not part of OpenFOAM(R) (see DISCLAIMER).
 
     Koch, Hill drag law
     based on Koch Hill 2001,"Inertial effects in suspensions and porous-media flows", Annual Review of fluid mechanics.

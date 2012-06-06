@@ -26,7 +26,7 @@ License
 
 Description
     This code is designed to realize coupled CFD-DEM simulations using LIGGGHTS
-    and OpenFOAM. Note: this code is not part of OpenFOAM (see DISCLAIMER).
+    and OpenFOAM(R). Note: this code is not part of OpenFOAM(R) (see DISCLAIMER).
 
     ArchimedesIB buoyancy force for sphere / cylinder (2d)
     basic "on-off" handling of buoyancy at the interface

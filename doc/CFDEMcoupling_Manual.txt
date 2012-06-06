@@ -33,6 +33,15 @@ its modular approach allows users to easily implement new models :ulb,l
 its MPI parallelization enables to use it for large scale problems :l
 the "forum"_lws on CFD-DEM gives the possibility to exchange with other users / developers :l
 the use of GIT allows to easily update to the latest version :l
+basic documentation is provided :l
+:ule
+
+The file structure:
+
+{src} directory including the source files of the coupling toolbox and models :ulb,l
+{applications} directory including the solver files for coupled CFD-DEM simulations :l
+{doc} directory including the documentation of CFDEMcoupling :l
+{tutorials} directory including basic tutorial cases showing the functionality  :l
 :ule
 
 Details on installation are given on the "CFDEMproject WWW Site"_lws .
