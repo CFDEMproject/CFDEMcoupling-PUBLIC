@@ -22,6 +22,7 @@ Basically the following steps have to be performed:
 update your repositories by {git pull} :l
 set environment variables :l
 compile LIGGGHTS and CFDEMcoupling :l
+run your own cases :l
 :ule
 
 [{git clone} the desired repository:]
@@ -55,8 +56,10 @@ git clone https://github.com/CFDEMproject/CFDEMcoupling-PUBLIC.git :pre
 [Update your repositories by {git pull}:]
 
 To get the latest version, open a terminal, go to the location of your local installation and type:
+{Warning: git stash will remove your changes in $HOME/CFDEM/CFDEMcoupling-PUBLIC-$WM_PROJECT_VERSION !}
 
 cd $HOME/CFDEM/CFDEMcoupling-PUBLIC-$WM_PROJECT_VERSION
+git stash
 git pull :pre
 
 [set environment variables:]
@@ -113,3 +116,9 @@ You can run the tutorial cases by executing .../etc/testTutorial.sh through the 
 Alternatively you can run each tutorial using the {Allrun.sh} scripts in the tutorial directories.
 
 In case questions concerning the installation arise, please feel free to contact our forum at www.cfdem.com.
+
+[run your own cases:]
+
+When you want to run your own cases, please do so in $CFDEM_PROJECT_USER_DIR/run which is automatically being generated. E.g. copy one of the tutorial cases there, adapt it to your needs.
+Changes in $CFDEM_TUT_DIR will be lost after every {git stash}!
+
