@@ -40,6 +40,8 @@ The bigParticle voidFraction model is supposed to be used when a particle (or it
 
 The region of influence of a particle can be increased artificially by "scaleUpVol", which  blows up the particles, but keeps their volume (for voidfraction calculation) constant.
 
+Code of this sub-model contributed by Alice Hager, JKU.  
+
 [Restrictions:] none.
 
 [Related commands:]
