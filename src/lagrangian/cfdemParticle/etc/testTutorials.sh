@@ -2,7 +2,7 @@
 
 #===================================================================#
 # script to run the basic examples
-# Christoph Goniva - June 2012
+# Christoph Goniva - June 2012, DCS Computing GmbH
 #===================================================================#
 
 whitelist="tutorial-list.txt"
@@ -10,6 +10,8 @@ whitelist="tutorial-list.txt"
 CWD="$(dirname "$(readlink -f ${BASH_SOURCE[0]})")"
 NOW="$(date +"%Y-%m-%d-%H:%M")"
 
+echo ""
+echo "This routine will execute the CFDEMcoupling tutorial cases specified in tutorial-list.txt"
 echo ""
 echo "Are the variables CFDEM_TUT_DIR=$CFDEM_TUT_DIR"
 echo "and CFDEM_SRC_DIR=$CFDEM_SRC_DIR correct? (y/n)"

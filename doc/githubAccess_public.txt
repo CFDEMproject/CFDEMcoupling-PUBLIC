@@ -109,3 +109,7 @@ and you can then compile CFDEMcoupling by typing:
 
 cfdemCompCFDEM :pre
 
+You can run the tutorial cases by executing .../etc/testTutorial.sh through the alias {cfdemTestTUT}.
+Alternatively you can run each tutorial using the {Allrun.sh} scripts in the tutorial directories.
+
+In case questions concerning the installation arise, please feel free to contact our forum at www.cfdem.com.

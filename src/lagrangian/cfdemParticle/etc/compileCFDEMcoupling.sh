@@ -2,7 +2,7 @@
 
 #===================================================================#
 # compile routine for CFDEMcoupling, part of CFDEMproject 
-# Christoph Goniva - May. 2012
+# Christoph Goniva - May. 2012, DCS Computing GmbH
 #===================================================================
 
 #- include functions

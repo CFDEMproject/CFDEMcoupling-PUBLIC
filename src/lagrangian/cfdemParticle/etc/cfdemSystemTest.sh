@@ -2,8 +2,8 @@
 
 #===================================================================#
 # sytsem settings test routine for cfdem project 
-# Christoph Goniva - May. 2011
-#===================================================================
+# Christoph Goniva - May. 2011, DCS Computing GmbH
+#===================================================================#
 
 #- include functions
 source $CFDEM_SRC_DIR/etc/functions.sh
