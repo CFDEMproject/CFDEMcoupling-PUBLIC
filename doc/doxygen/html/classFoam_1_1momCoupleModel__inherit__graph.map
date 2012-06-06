@@ -1,0 +1,5 @@
+<map id="G" name="G">
+<area shape="rect" href="$classFoam_1_1explicitCouple.html" title="Foam::explicitCouple" alt="" coords="5,83,149,112"/>
+<area shape="rect" href="$classFoam_1_1implicitCouple.html" title="Foam::implicitCouple" alt="" coords="173,83,317,112"/>
+<area shape="rect" href="$classFoam_1_1noCouple.html" title="Foam::noCouple" alt="" coords="341,83,456,112"/>
+</map>
