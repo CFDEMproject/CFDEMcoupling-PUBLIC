@@ -119,6 +119,6 @@ In case questions concerning the installation arise, please feel free to contact
 
 [run your own cases:]
 
-When you want to run your own cases, please do so in $CFDEM_PROJECT_USER_DIR/run which is automatically being generated. E.g. copy one of the tutorial cases there, adapt it to your needs.
+If you want to run your own cases, please do so in $CFDEM_PROJECT_USER_DIR/run which is automatically being generated. E.g. copy one of the tutorial cases there, adapt it to your needs.
 Changes in $CFDEM_TUT_DIR will be lost after every {git stash}!
 
