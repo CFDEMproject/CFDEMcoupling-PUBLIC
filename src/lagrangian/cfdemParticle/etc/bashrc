@@ -45,7 +45,7 @@ export CFDEM_LIB_NAME=lagrangianCFDEM
 export CFDEM_PIZZA_DIR=$HOME/LIGGGHTS/PIZZA/gran_pizza_17Aug10/src
 
 #- path to test harness
-export CFDEM_TEST_HARNESS_PATH=$HOME/scripts/testCFDEM/logFilesCFDEM-$CFDEM_VERSION-$WM_PROJECT_VERSION
+export CFDEM_TEST_HARNESS_PATH=$CFDEM_PROJECT_USER_DIR/log/logFilesCFDEM-$CFDEM_VERSION-$WM_PROJECT_VERSION
 
 #------------------------------------------------------------------------------
 #- aliases for easy navigation (no changes necessary)
@@ -98,6 +98,7 @@ else
             mkdir $LOGNAME-$CFDEM_VERSION-$WM_PROJECT_VERSION
             cd $LOGNAME-$CFDEM_VERSION-$WM_PROJECT_VERSION
             mkdir run
+            mkdir -p log/logFilesCFDEM-$CFDEM_VERSION-$WM_PROJECT_VERSION
         else
             echo "aborted by user."
             exit
