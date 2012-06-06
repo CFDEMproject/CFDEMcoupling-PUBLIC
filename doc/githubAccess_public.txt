@@ -26,7 +26,7 @@ compile LIGGGHTS and CFDEMcoupling :l
 
 [{git clone} the desired repository:]
 
-If not allready done, open a terminal and create a directory for LIGGGHTS in $HOME:
+If not already done, open a terminal and create a directory for LIGGGHTS in $HOME:
 
 cd :pre
 mkdir LIGGGHTS :pre
@@ -36,13 +36,13 @@ To clone the public LIGGGHTS repository, open a terminal and execute:
 
 git clone git://cfdem.git.sourceforge.net/gitroot/cfdem/liggghtsdev LIGGGHTS-PUBLIC :pre,h6
 
-If not allready done, open a terminal and create a directory for CFDEMcoupling in $HOME:
+If not already done, open a terminal and create a directory for CFDEMcoupling in $HOME:
 
 cd :pre
 mkdir CFDEM :pre
 cd CFDEM :pre
 
-Make sure that OpenFOAM(R)-2.1.x is allready set up correctly!
+Make sure that OpenFOAM(R)-2.1.x is already set up correctly!
 
 To clone the public CFDEMcoupling repository, open a terminal and execute:
 
