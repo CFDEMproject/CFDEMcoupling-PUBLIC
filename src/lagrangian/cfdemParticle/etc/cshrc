@@ -45,7 +45,7 @@ setenv CFDEM_LIB_NAME lagrangianCFDEM
 setenv CFDEM_PIZZA_DIR $HOME/LAMMPS/pizza-16Mar09/src/
 
 #- path to test harness
-setenv CFDEM_TEST_HARNESS_PATH $HOME/scripts/testCFDEM/logFilesCFDEM-$CFDEM_VERSION-$WM_PROJECT_VERSION
+setenv CFDEM_TEST_HARNESS_PATH $CFDEM_PROJECT_USER_DIR/log/logFilesCFDEM-$CFDEM_VERSION-$WM_PROJECT_VERSION
 
 #------------------------------------------------------------------------------
 #- aliases for easy navigation (no changes necessary)
@@ -67,6 +67,12 @@ alias cfdemUt 'cd $CFDEM_UT_DIR'
 
 #- shortcut to run path
 alias cfdemRun 'cd $CFDEM_PROJECT_USER_DIR/run'
+
+#- shortcut to documentation path
+alias cfdemDoc 'cd $CFDEM_DOC_DIR'
+
+#- shortcut to open the doxygen with firefox
+alias cfdemDox 'firefox $CFDEM_DOC_DIR/doxygen/html/index.html'
 
 #- shortcut to LIGGGHTS path
 alias cfdemLIG 'cd $CFDEM_LIGGGHTS_SRC_DIR'
@@ -98,6 +104,7 @@ else
             mkdir $LOGNAME-$CFDEM_VERSION-$WM_PROJECT_VERSION
             cd $LOGNAME-$CFDEM_VERSION-$WM_PROJECT_VERSION
             mkdir run
+            mkdir -p log/logFilesCFDEM-$CFDEM_VERSION-$WM_PROJECT_VERSION
         else
             echo "aborted by user."
             exit

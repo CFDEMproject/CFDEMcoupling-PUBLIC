@@ -32,7 +32,7 @@ couplingInterval 10;
 
 depth 0;
 
-voidFractionModel bigParticle;//centre; //
+voidFractionModel IB;//bigParticle;//centre; //
 
 locateModel engineIB;//standard;//
 
@@ -75,6 +75,7 @@ ArchimedesIBProps
 {
     densityFieldName "rho";
     gravityFieldName "g";
+    voidfractionFieldName "voidfractionNext";
 }
 
 twoWayFilesProps
@@ -87,6 +88,13 @@ twoWayMPIProps
 {
     maxNumberOfParticles 10100;
     liggghtsPath "../DEM/in.liggghts_init";
+}
+
+IBProps
+{
+    maxCellsPerParticle 1000;
+    alphaMin 0.30;
+    scaleUpVol 1.0;
 }
 
 bigParticleProps

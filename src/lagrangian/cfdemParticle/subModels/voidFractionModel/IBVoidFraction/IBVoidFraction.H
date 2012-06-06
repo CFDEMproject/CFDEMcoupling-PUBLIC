@@ -28,23 +28,22 @@ Description
     This code is designed to realize coupled CFD-DEM simulations using LIGGGHTS
     and OpenFOAM(R). Note: this code is not part of OpenFOAM(R) (see DISCLAIMER).
 
-    ArchimedesIB buoyancy force for sphere / cylinder (2d)
-    basic "on-off" handling of buoyancy at the interface
-
-	Contribution by Alice Hager.
+    void fraction model for the smooth representation of spheres with 
+    radius > cell length.
+    contribution from Alice Hager
 
 Class
-    ArchimedesIB
+    IBVoidFraction
 
 SourceFiles
-    ArchimedesIB.C
+    IBVoidFraction.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef ArchimedesIB_H
-#define ArchimedesIB_H
+#ifndef IBVoidFraction_H
+#define IBVoidFraction_H
 
-#include "forceModel.H"
+#include "voidFractionModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -52,46 +51,33 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class ArchimedesIB Declaration
+                           Class noDrag Declaration
 \*---------------------------------------------------------------------------*/
 
-class ArchimedesIB
+class IBVoidFraction
 :
-    public forceModel
+    public voidFractionModel
 {
+
 private:
+        dictionary propsDict_;
 
-    dictionary propsDict_;
+        const scalar alphaMin_;          //NP min value of voidFraction
 
-    bool twoDimensional_;
+	mutable bool alphaLimited_;
 
-    word densityFieldName_;
-
-    const volScalarField& rho_;    // ref to fluid density
-
-    word voidfractionFieldName_;
-
-    const volScalarField& voidfractions_;
-
-    word gravityFieldName_;
-
-    #ifdef version16
-        const uniformDimensionedVectorField& g_;    // ref to gravity
-    #else
-        const dimensionedVector& g_;    // ref to gravity
-    #endif
-
+        const scalar scaleUpVol_;        //NP scaling radius, keeping volume of particle
 
 public:
 
     //- Runtime type information
-    TypeName("ArchimedesIB");
+    TypeName("IB");
 
 
     // Constructors
 
         //- Construct from components
-        ArchimedesIB
+        IBVoidFraction
         (
             const dictionary& dict,
             cfdemCloud& sm
@@ -99,16 +85,18 @@ public:
 
     // Destructor
 
-        ~ArchimedesIB();
+        ~IBVoidFraction();
 
 
     // Member Functions
-        void setForce
+        void setvoidFraction(double** const& ,double**&, double**&, double**&) const;
+
+        void buildLabelHashSet
         (
-            double** const& mask,
-            double**&,
-            double**&,
-            double**&
+            const scalar radius,
+            const vector position,
+            const label cellID,
+            labelHashSet& hashSett
         ) const;
 };
 

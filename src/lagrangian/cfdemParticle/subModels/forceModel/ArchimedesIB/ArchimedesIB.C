@@ -28,7 +28,6 @@ Description
     This code is designed to realize coupled CFD-DEM simulations using LIGGGHTS
     and OpenFOAM(R). Note: this code is not part of OpenFOAM(R) (see DISCLAIMER).
 \*---------------------------------------------------------------------------*/
-
 #include "error.H"
 
 #include "ArchimedesIB.H"
@@ -66,6 +65,8 @@ ArchimedesIB::ArchimedesIB
     twoDimensional_(false),
     densityFieldName_(propsDict_.lookup("densityFieldName")),
     rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_)),
+    voidfractionFieldName_(propsDict_.lookup("voidfractionFieldName")), //mod by alice
+    voidfractions_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),//mod by alice
     gravityFieldName_(propsDict_.lookup("gravityFieldName")),
     #ifdef version16
         g_(sm.mesh().lookupObject<uniformDimensionedVectorField> (gravityFieldName_))
@@ -116,11 +117,11 @@ void ArchimedesIB::setForce
             for(int subCell=0;subCell<particleCloud_.voidFractionM().cellsPerParticle()[index][0];subCell++)
             {
                 label cellI = particleCloud_.cellIDs()[index][subCell];
-
                 if (cellI > -1) // particle Found
                 {
-                    force += -g_.value()*rho_[cellI]*rho_.mesh().V()[cellI];
-        	}
+                    //force += -g_.value()*rho_[cellI]*rho_.mesh().V()[cellI]*(1-particleCloud_.voidfractions()[index][subCell]);//mod by alice
+                	force += -g_.value()*rho_[cellI]*rho_.mesh().V()[cellI]*(1-voidfractions_[cellI]);//mod by alice
+        	    }
             }
             // set force on particle
             if(twoDimensional_) Warning<<"ArchimedesIB model doesn't work for 2D right now!!\n"<< endl;

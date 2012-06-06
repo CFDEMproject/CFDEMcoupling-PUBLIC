@@ -6,12 +6,12 @@
 # Christoph Goniva - June. 2011, DCS Computing GmbH
 #===================================================================#
 
-cfdemSolverPiso/settlingTestMPI/dir
+#cfdemSolverPiso/settlingTestMPI/dir
 
-cfdemSolverPiso/ErgunTestMPI/dir
+#cfdemSolverPiso/ErgunTestMPI/dir
 
-cfdemSolverPiso/ErgunTestMPI_restart/dir
+#cfdemSolverPiso/ErgunTestMPI_restart/dir
 
 cfdemSolverIB/twoSpheresGlowinskiMPI/dir
 
-cfdemSolverPisoScalar/packedBedTemp/dir
+#cfdemSolverPisoScalar/packedBedTemp/dir

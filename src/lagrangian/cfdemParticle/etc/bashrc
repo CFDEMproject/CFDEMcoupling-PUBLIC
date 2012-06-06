@@ -68,6 +68,12 @@ alias cfdemUt='cd $CFDEM_UT_DIR'
 #- shortcut to run path
 alias cfdemRun='cd $CFDEM_PROJECT_USER_DIR/run'
 
+#- shortcut to documentation path
+alias cfdemDoc='cd $CFDEM_DOC_DIR'
+
+#- shortcut to open the doxygen with firefox
+alias cfdemDox='firefox $CFDEM_DOC_DIR/doxygen/html/index.html'
+
 #- shortcut to LIGGGHTS path
 alias cfdemLIG='cd $CFDEM_LIGGGHTS_SRC_DIR'
 

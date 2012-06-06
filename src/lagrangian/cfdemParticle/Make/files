@@ -42,6 +42,7 @@ $(voidFractionModels)/centreVoidFraction/centreVoidFraction.C
 $(voidFractionModels)/dividedVoidFraction/dividedVoidFraction.C
 $(voidFractionModels)/bigParticleVoidFraction/bigParticleVoidFraction.C
 $(voidFractionModels)/GaussVoidFraction/GaussVoidFraction.C
+$(voidFractionModels)/IBVoidFraction/IBVoidFraction.C
 
 $(locateModels)/locateModel/locateModel.C
 $(locateModels)/locateModel/newLocateModel.C
