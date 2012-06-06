@@ -1,0 +1,54 @@
+"CFDEMproject WWW Site"_lws - "CFDEM Commands"_lc :c
+
+:link(lws,http://www.cfdem.com)
+:link(lc,CFDEMcoupling_Manual.html#comm)
+
+:line
+
+forceModel_SchirgaonkarIB command :h3
+
+[Syntax:]
+
+Defined in couplingProperties dictionary.
+
+forceModels
+(
+    SchirgaonkarIB
+);
+SchirgaonkarIBProps
+\{
+    velFieldName "U";
+    densityFieldName "density";
+    pressureFieldName "pressure";
+\}; :pre
+
+{U} = name of the finite volume fluid velocity field :ulb,l
+{density} = name of the finite volume density field :l
+{pressure} = name of the finite volume pressure field :l
+:ule
+
+[Examples:]
+
+forceModels
+(
+    SchirgaonkarIB
+);
+SchirgaonkarIBProps
+\{
+    velFieldName "U";
+    densityFieldName "rho";
+    pressureFieldName "p";
+\} :pre
+
+[Description:]
+
+The force model performs the calculation of forces (e.g. fluid-particle interaction forces) acting on each DEM particle. The SchirgaonkarIB model calculates the drag force (viscous and pressure force) acting on each particle in a resolved manner (see Shirgaonkar et al. (2009): "A new mathematical formulation and fast algorithm for fully resolved simulation of self-propulsion", Journal of Comp. Physics). This model is only suited for resolved CFD-DEM simulations where the particle is represented by immersed boundrary method.
+
+[Restrictions:]
+
+Only for immersed boundary solvers.
+
+[Related commands:]
+
+"forceModel"_forceModel.html
+

@@ -1,0 +1,29 @@
+"CFDEMproject WWW Site"_lws - "CFDEM Commands"_lc :c
+
+:link(lws,http://www.cfdem.com)
+:link(lc,CFDEMcoupling_Manual.html#comm)
+
+:line
+
+clockModel_standardClock command :h3
+
+[Syntax:]
+
+Defined in couplingProperties dictionary.
+
+clockModel standardClock; :pre
+
+[Examples:]
+
+clockModel standardClock; :pre
+
+[Description:]
+
+The "standardClock" model is a basic clockModel model which measures the run time between every ".start(name)" and ".stop()" statement placed in the code. If a ".start(name)" is called more than once (e.g. in a loop) the accumulated times are calculated.  After the simulation has finished, the data is stored in $caseDir/CFD/clockData/$startTime/*.txt .
+
+[Restrictions:] none.
+
+[Related commands:]
+
+"clockModel"_clockModel.html
+

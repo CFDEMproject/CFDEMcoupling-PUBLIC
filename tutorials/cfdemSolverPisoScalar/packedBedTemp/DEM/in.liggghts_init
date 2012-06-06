@@ -1,0 +1,82 @@
+
+# read packed bed and calc convective heat transfer
+
+atom_style	granular
+atom_modify	map array
+communicate	single vel yes
+boundary	m m m
+newton		off
+echo		both
+units		si
+processors	1 1 2
+
+#read the restart file
+read_restart 	../DEM/liggghts.restart
+
+#region		reg block 0 0.1 0 0.1 0 0.1 units box
+#create_box	1 reg
+
+neighbor	0.003 bin
+neigh_modify	delay 0 binsize 0.01
+
+
+#Material properties required for new pair styles
+
+fix 		m1 all property/global youngsModulus peratomtype 5.e6
+fix 		m2 all property/global poissonsRatio peratomtype 0.45
+fix 		m3 all property/global coefficientRestitution peratomtypepair 1 0.3
+fix 		m4 all property/global coefficientFriction peratomtypepair 1 0.5
+
+#pair style
+pair_style 	gran/hertz/history 1 0  #Hertzian without cohesion
+pair_coeff	* *
+
+#timestep, gravity
+timestep	0.00001
+fix		gravi all gravity 9.81 vector 0. 0. -1.
+
+#walls
+fix		xwalls all wall/gran/hertz/history 1 0 xplane 0. 0.1 1
+fix		ywalls all wall/gran/hertz/history 1 0 yplane 0. 0.1 1
+fix		zwalls all wall/gran/hertz/history 1 0 zplane 0. 1.1 1 #temperature 283
+
+
+#heat transfer
+fix 		ftco all property/global thermalConductivity peratomtype 5. # lambda in [W/(K*m)]
+fix 		ftca all property/global thermalCapacity peratomtype 0.1    # cp in [J/(kg*K)]
+fix             heattransfer all heat/gran 600.
+
+#set particle temperature for the bed
+run 0
+region		total block INF INF INF INF INF INF units box
+set             region total property/atom Temp 600.  # former property/paratom
+
+#cfd coupling
+fix		cfd all couple/cfd couple_every 100 mpi
+fix		cfd2 all couple/cfd/force
+
+#this one invokes heat transfer calculation, transfers per-particle temperature and adds convective heat flux to particles
+fix		cfd3 all couple/cfd/convection T0 600
+
+#variable       vx equal vx[1]
+#variable       vy equal vy[1]
+#variable       vz equal vz[1]
+#variable       time equal step*dt
+#fix            extra all print 500 "${time} ${vx} ${vy} ${vz}" file ../DEM/post/velocity.txt title "%" screen no
+
+#apply nve integration to all particles that are inserted as single particles
+fix		integr all nve/sphere
+
+
+#screen output
+compute		1 all erotate/sphere
+thermo_style	custom step atoms ke c_1 vol
+thermo		1000
+thermo_modify	lost ignore norm no
+compute_modify	thermo_temp dynamic yes
+
+#insert the first particles so that dump is not empty
+run		1
+dump		dmp all custom 10000 ../DEM/post/dump.liggghts_init id type type x y z ix iy iz vx vy vz fx fy fz omegax omegay omegaz radius f_Temp[0] f_heatFlux[0]
+
+run             1

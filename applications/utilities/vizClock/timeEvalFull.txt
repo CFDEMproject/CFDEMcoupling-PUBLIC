@@ -1,0 +1,13 @@
+Parallel Measurements in CPU-seconds of all Processors:
+Name 	 avgdeltaT 	 maxdeltaT 	 nOfRuns 	 level 	 parentNr 	 parentName 
+X	5.000000e-06	5.000000e-06	1	0	-1	none
+A	3.240000e-04	3.240000e-04	1	0	-1	none
+B	1.680000e-04	1.680000e-04	1	1	1	A
+C	9.000000e-06	9.000000e-06	3	2	2	B
+D	6.000000e-06	6.000000e-06	3	3	3	C
+E	1.500000e-04	1.500000e-04	3	2	2	B
+F	2.400000e-05	2.400000e-05	3	1	1	A
+G	6.000000e-06	6.000000e-06	3	1	1	A
+X	6.000000e-06	6.000000e-06	3	2	7	G
+H	4.000000e-05	4.000000e-05	5	1	1	A
+I	2.000000e-05	2.000000e-05	1	1	1	A

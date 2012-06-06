@@ -1,0 +1,54 @@
+<HTML>
+<CENTER><A HREF = "http://www.cfdem.com">CFDEMproject WWW Site</A> - <A HREF = "CFDEMcoupling_Manual.html#comm">CFDEM Commands</A> 
+</CENTER>
+
+
+
+
+<HR>
+
+<H3>voidfractionModel_bigParticleVoidFraction command 
+</H3>
+<P><B>Syntax:</B>
+</P>
+<P>Defined in couplingProperties dictionary.
+</P>
+<PRE>voidfractionModel bigParticle;
+bigParticleProps
+{
+    maxCellsPerParticle number1;
+    alphaMin number2;
+    scaleUpVol number3;
+} 
+</PRE>
+<UL><LI><I>number1</I> = max number of cells covered by a partilce (search will fail when more than <I>number1</I> cells are covered by the particle) 
+
+<LI><I>number2</I> = mininmum limit for voidfraction 
+
+<LI><I>number3</I> = diameter of the particle's representation is artificially increased according to <I>number3</I> * Vparticle, volume remains unaltered! 
+
+
+</UL>
+<P><B>Examples:</B>
+</P>
+<PRE>voidfractionModel bigParticle;
+bigParticleProps
+{
+    maxCellsPerParticle 1000;
+    alphaMin 0.10;
+    scaleUpVol 5.0;
+} 
+</PRE>
+<P><B>Description:</B>
+</P>
+<P>The bigParticle voidFraction model is supposed to be used when a particle (or it's representation) is bigger than a CFD cell. The voidfraction field is set in those cell whose centres are inside the particle.
+</P>
+<P>The region of influence of a particle can be increased artificially by "scaleUpVol", which  blows up the particles, but keeps their volume (for voidfraction calculation) constant.
+</P>
+<P><B>Restrictions:</B> none.
+</P>
+<P><B>Related commands:</B>
+</P>
+<P><A HREF = "voidfractionModel.html">voidfractionModel</A>
+</P>
+</HTML>

@@ -1,0 +1,37 @@
+"CFDEMproject WWW Site"_lws - "CFDEM Commands"_lc :c
+
+:link(lws,http://www.cfdem.com)
+:link(lc,CFDEMcoupling_Manual.html#comm)
+
+:line
+
+forceModel_noDrag command :h3
+
+[Syntax:]
+
+Defined in couplingProperties dictionary.
+
+forceModels
+(
+    off
+); :pre
+
+[Examples:]
+
+forceModels
+(
+    off
+); :pre
+
+[Description:]
+
+The force model performs the calculation of forces (e.g. fluid-particle interaction forces) acting on each DEM particle. The noDrag model sets the forces acting on the particle to zero. If several force models are selected and noDrag is the last model being executed, the fluid particle force will be set to zero.
+
+[Restrictions:]
+
+None.
+
+[Related commands:]
+
+"forceModel"_forceModel.html
+

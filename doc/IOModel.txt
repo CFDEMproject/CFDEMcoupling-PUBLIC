@@ -1,0 +1,36 @@
+"CFDEMproject WWW Site"_lws - "CFDEM Commands"_lc :c
+
+:link(lws,http://www.cfdem.com)
+:link(lc,CFDEMcoupling_Manual.html#comm)
+
+:line
+
+IOModel command :h3
+
+[Syntax:]
+
+Defined in couplingProperties dictionary.
+
+IOModel "model"; :pre
+
+model = name of IO-model to be applied :ul
+
+[Examples:]
+
+IOModel "off";
+
+Note: This examples list might not be complete - please look for other models (IOModel_XY) in this documentation.
+
+[Description:]
+
+The IO-model is the base class to write data (e.g. particle properties) to files.
+
+[Restrictions:]
+
+none.
+
+[Related commands:]
+
+Note: This examples list may be incomplete - please look for other models (IOModel_XY) in this documentation.
+
+[Default:] none.

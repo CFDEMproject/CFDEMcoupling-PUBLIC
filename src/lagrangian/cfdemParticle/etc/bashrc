@@ -1,0 +1,109 @@
+#----------------------------------*-sh-*--------------------------------------
+# CFDEMcoupling
+# Christoph Goniva
+# June 2012
+#------------------------------------------------------------------------------
+#
+# Script
+#     etc/bashrc
+#
+# Description
+#     Startup file for cfdem exporting environment variables
+#     Sourced  ~/.bashrc
+#
+#- adapt this and add to ./bashrc 
+#- you can test the correctness using cfdemSystemTest.sh
+
+##================================================#
+##- source cfdem env vars
+#export CFDEM_VERSION=PUBLIC
+#export CFDEM_PROJECT_DIR=$HOME/CFDEM/CFDEMcoupling-$CFDEM_VERSION-$WM_PROJECT_VERSION
+#export CFDEM_SRC_DIR=$CFDEM_PROJECT_DIR/src/lagrangian/cfdemParticle
+#export CFDEM_SOLVER_DIR=$CFDEM_PROJECT_DIR/applications/solvers
+#export CFDEM_DOC_DIR=$CFDEM_PROJECT_DIR/doc
+#export CFDEM_UT_DIR=$CFDEM_PROJECT_DIR/applications/utilities
+#export CFDEM_TUT_DIR=$CFDEM_PROJECT_DIR/tutorials
+#export CFDEM_PROJECT_USER_DIR=$HOME/CFDEM/$LOGNAME-$CFDEM_VERSION-$WM_PROJECT_VERSION
+#export CFDEM_bashrc=$CFDEM_SRC_DIR/etc/bashrc
+#export CFDEM_LIGGGHTS_SRC_DIR=$HOME/LIGGGHTS/LIGGGHTS-PUBLIC/src
+#export CFDEM_LIGGGHTS_MAKEFILE_NAME=fedora_fpic
+#. $CFDEM_bashrc
+#================================================#
+#------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------
+#- export environment variables (adapt to your paths)
+#------------------------------------------------------------------------------
+
+#- LIGGGHTS lib name
+export CFDEM_LIGGGHTS_LIB_NAME=lmp_$CFDEM_LIGGGHTS_MAKEFILE_NAME
+
+#- CFDEM lib name
+export CFDEM_LIB_NAME=lagrangianCFDEM
+
+#- PIZZA src directory
+export CFDEM_PIZZA_DIR=$HOME/LIGGGHTS/PIZZA/gran_pizza_17Aug10/src
+
+#- path to test harness
+export CFDEM_TEST_HARNESS_PATH=$HOME/scripts/testCFDEM/logFilesCFDEM-$CFDEM_VERSION-$WM_PROJECT_VERSION
+
+#------------------------------------------------------------------------------
+#- aliases for easy navigation (no changes necessary)
+#------------------------------------------------------------------------------
+#- shortcut to cfdem path
+alias cfdem='cd $CFDEM_PROJECT_DIR'
+
+#- shortcut to src path
+alias cfdemSrc='cd $CFDEM_SRC_DIR'
+
+#- shortcut to tutorial path
+alias cfdemTut='cd $CFDEM_TUT_DIR'
+
+#- shortcut to solver path
+alias cfdemSol='cd $CFDEM_SOLVER_DIR'
+
+#- shortcut to utilities path
+alias cfdemUt='cd $CFDEM_UT_DIR'
+
+#- shortcut to run path
+alias cfdemRun='cd $CFDEM_PROJECT_USER_DIR/run'
+
+#- shortcut to LIGGGHTS path
+alias cfdemLIG='cd $CFDEM_LIGGGHTS_SRC_DIR'
+
+#- shortcut to system test
+alias cfdemSysTest='bash $CFDEM_SRC_DIR/etc/cfdemSystemTest.sh'
+
+#- shortcut to compile LIGGGHTS
+alias cfdemCompLIG='bash $CFDEM_SRC_DIR/etc/compileLIGGGHTS.sh'
+
+#- shortcut to compile CFDEMcoupling
+alias cfdemCompCFDEM='bash $CFDEM_SRC_DIR/etc/compileCFDEMcoupling.sh'
+
+#- shortcut to test basic tutorials
+alias cfdemTestTUT='bash $CFDEM_SRC_DIR/etc/testTutorials.sh'
+
+#- shortcut to run liggghts
+alias liggghts='$CFDEM_LIGGGHTS_SRC_DIR/lmp_$CFDEM_LIGGGHTS_MAKEFILE_NAME'
+
+# check if the directory exists
+if [ -d "$CFDEM_PROJECT_USER_DIR" ]; then
+    :
+else
+    if [ -d "$CFDEM_PROJECT_DIR" ]; then
+        cd $CFDEM_PROJECT_DIR/..
+        echo "make new dirs $CFDEM_PROJECT_DIR/../$LOGNAME-$CFDEM_VERSION-$WM_PROJECT_VERSION ? (y/n)"
+        read YN
+        if [ $YN=="y" ]; then
+            mkdir $LOGNAME-$CFDEM_VERSION-$WM_PROJECT_VERSION
+            cd $LOGNAME-$CFDEM_VERSION-$WM_PROJECT_VERSION
+            mkdir run
+        else
+            echo "aborted by user."
+            exit
+        fi
+    else
+        echo "error in CFDEMcoupling's bashrc."
+        exit
+    fi
+fi

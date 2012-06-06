@@ -1,0 +1,527 @@
+/*---------------------------------------------------------------------------*\
+    CFDEMcoupling - Open Source CFD-DEM coupling
+
+    CFDEMcoupling is part of the CFDEMproject
+    www.cfdem.com
+                                Christoph Goniva, christoph.goniva@cfdem.com
+                                Copyright 2009-2012 JKU Linz
+                                Copyright 2012-     DCS Computing GmbH, Linz
+-------------------------------------------------------------------------------
+License
+    This file is part of CFDEMcoupling.
+
+    CFDEMcoupling is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 3 of the License, or (at your
+    option) any later version.
+
+    CFDEMcoupling is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with CFDEMcoupling; if not, write to the Free Software Foundation,
+    Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+
+Description
+    This code is designed to realize coupled CFD-DEM simulations using LIGGGHTS
+    and OpenFOAM. Note: this code is not part of OpenFOAM (see DISCLAIMER).
+\*---------------------------------------------------------------------------*/
+
+#include "cfdemCloud.H"
+#include "forceModel.H"
+#include "locateModel.H"
+#include "momCoupleModel.H"
+#include "regionModel.H"
+#include "meshMotionModel.H"
+#include "voidFractionModel.H"
+#include "dataExchangeModel.H"
+#include "IOModel.H"
+#include "averagingModel.H"
+#include "clockModel.H"
+#include "liggghtsCommandModel.H"
+
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+Foam::cfdemCloud::cfdemCloud
+(
+    const fvMesh& mesh
+)
+:
+    mesh_(mesh),
+    couplingProperties_
+    (
+        IOobject
+        (
+            "couplingProperties",
+            mesh_.time().constant(),
+            mesh_,
+            IOobject::MUST_READ,
+            IOobject::NO_WRITE
+        )
+    ),
+    liggghtsCommandDict_
+    (
+        IOobject
+        (
+            "liggghtsCommands",
+            mesh_.time().constant(),
+            mesh_,
+            IOobject::MUST_READ,
+            IOobject::NO_WRITE
+        )
+    ),
+    verbose_(false),
+    ignore_(false),
+    modelType_(couplingProperties_.lookup("modelType")),
+    positions_(NULL),
+    velocities_(NULL),
+    impForces_(NULL),
+    expForces_(NULL),
+    DEMForces_(NULL),
+    radii_(NULL),
+    voidfractions_(NULL),
+    cellIDs_(NULL),
+    particleWeights_(NULL),
+    particleVolumes_(NULL),
+    numberOfParticles_(0),
+    numberOfParticlesChanged_(false),
+    arraysReallocated_(false),
+    forceModels_(couplingProperties_.lookup("forceModels")),
+    momCoupleModels_(couplingProperties_.lookup("momCoupleModels")),
+    liggghtsCommandModelList_(liggghtsCommandDict_.lookup("liggghtsCommandModels")),
+    turbulenceModelType_(couplingProperties_.lookup("turbulenceModelType")),
+    turbulence_
+    (
+        #ifdef version16
+            mesh.lookupObject<incompressible::turbulenceModel> // 1.6
+        #endif
+        #ifdef version16comp
+            mesh.lookupObject<compressible::turbulenceModel> // 1.6 comp
+        #endif
+        #ifdef version15
+            mesh.lookupObject<incompressible::RASModel> // 1.5-dev
+        #endif
+        (
+            turbulenceModelType_
+        )
+    ),
+    locateModel_
+    (
+        locateModel::New
+        (
+            couplingProperties_,
+            *this
+        )
+    ),
+    /*momCoupleModel_
+    (
+        momCoupleModel::New
+        (
+            couplingProperties_,
+            *this
+        )
+    ),*/
+    dataExchangeModel_
+    (
+        dataExchangeModel::New
+        (
+            couplingProperties_,
+            *this
+        )
+    ),
+    IOModel_
+    (
+        IOModel::New
+        (
+            couplingProperties_,
+            *this
+        )
+    ),
+    voidFractionModel_
+    (
+        voidFractionModel::New
+        (
+            couplingProperties_,
+            *this
+        )
+    ),
+    averagingModel_
+    (
+        averagingModel::New
+        (
+            couplingProperties_,
+            *this
+        )
+    ),
+    clockModel_
+    (
+        clockModel::New
+        (
+            couplingProperties_,
+            *this
+        )
+    ),
+    regionModel_
+    (
+        regionModel::New
+        (
+            couplingProperties_,
+            *this
+        )
+    ),
+    meshMotionModel_
+    (
+        meshMotionModel::New
+        (
+            couplingProperties_,
+            *this
+        )
+    )
+{
+    #include "versionInfo.H"
+
+    Info << "If BC are important, please provide volScalarFields -imp/expParticleForces-" << endl;
+
+    if (couplingProperties_.found("verbose")) verbose_=true;
+    if (couplingProperties_.found("ignore")) ignore_=true;
+    if (turbulenceModelType_=="LESProperties")
+        Info << "WARNING - LES functionality not yet tested!" << endl;
+
+    forceModel_ = new autoPtr<forceModel>[nrForceModels()];
+    for (int i=0;i<nrForceModels();i++)
+    {
+        forceModel_[i] = forceModel::New
+        (
+            couplingProperties_,
+            *this,
+            forceModels_[i]
+        );
+    }
+
+    momCoupleModel_ = new autoPtr<momCoupleModel>[momCoupleModels_.size()];
+    for (int i=0;i<momCoupleModels_.size();i++)
+    {
+        momCoupleModel_[i] = momCoupleModel::New
+        (
+            couplingProperties_,
+            *this,
+            momCoupleModels_[i]
+        );
+    }
+
+    // run liggghts commands from cfdem
+    liggghtsCommand_ = new autoPtr<liggghtsCommandModel>[liggghtsCommandModelList_.size()];
+    for (int i=0;i<liggghtsCommandModelList_.size();i++)
+    {
+        liggghtsCommand_[i] = liggghtsCommandModel::New
+        (
+            liggghtsCommandDict_,
+            *this,
+            liggghtsCommandModelList_[i],
+            i
+        );
+    }
+}
+
+// * * * * * * * * * * * * * * * * Destructors  * * * * * * * * * * * * * * //
+Foam::cfdemCloud::~cfdemCloud()
+{
+    clockM().evalPar();
+    delete positions_;
+    delete velocities_;
+    delete impForces_;
+    delete expForces_;
+    delete DEMForces_;
+    delete radii_;
+    delete voidfractions_;
+    delete cellIDs_;
+    delete particleWeights_;
+    delete particleVolumes_;
+}
+// * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
+void Foam::cfdemCloud::getDEMdata()
+{
+    dataExchangeM().getData("x","vector-atom",positions_);
+    dataExchangeM().getData("v","vector-atom",velocities_);
+    dataExchangeM().getData("radius","scalar-atom",radii_);
+}
+
+void Foam::cfdemCloud::giveDEMdata()
+{
+    for(int index = 0;index <  numberOfParticles(); ++index){
+        for(int i=0;i<3;i++){
+            impForces_[index][i] += expForces_[index][i] + DEMForces_[index][i];
+        }
+    }
+    if(forceM(0).coupleForce()) dataExchangeM().giveData("dragforce","vector-atom",impForces_);
+    if(verbose_) Info << "giveDEMdata done." << endl;
+}
+
+// * * *   write top level fields   * * * //
+
+// * * * * * * * * * * * * * * * protected Member Functions  * * * * * * * * * * * * * //
+
+void Foam::cfdemCloud::setNumberOfParticles(int nP)
+{
+    if(nP != numberOfParticles())
+    {
+        numberOfParticlesChanged_ = true;
+        numberOfParticles_ = nP;
+    }
+}
+
+void Foam::cfdemCloud::findCells()
+{
+    locateM().findCell(regionM().inRegion(),positions_,cellIDs_,numberOfParticles());
+}
+
+void Foam::cfdemCloud::setForces()
+{
+    resetArray(impForces_,numberOfParticles(),3);
+    resetArray(expForces_,numberOfParticles(),3);
+    resetArray(DEMForces_,numberOfParticles(),3);
+    for (int i=0;i<cfdemCloud::nrForceModels();i++) cfdemCloud::forceM(i).setForce(regionM().inRegion(),impForces_,expForces_,DEMForces_);
+}
+// * * * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * * //
+
+
+// * * * * * * * * * * * * * * * ACCESS  * * * * * * * * * * * * * //
+
+label Foam::cfdemCloud::particleCell(int index)
+{
+    label cellI = cellIDs()[index][0];
+    return cellI;
+}
+
+double Foam::cfdemCloud::d(int index)
+{
+    return 2*radii()[index][0];
+}
+
+vector Foam::cfdemCloud::position(int index)
+{
+    vector pos;
+    for(int i=0;i<3;i++) pos[i] = positions()[index][i];
+    return pos;
+}
+
+vector Foam::cfdemCloud::velocity(int index)
+{
+    vector vel;
+    for(int i=0;i<3;i++) vel[i] = velocities()[index][i];
+    return vel;
+}
+
+const forceModel& Foam::cfdemCloud::forceM(int i)
+{
+    return forceModel_[i];
+}
+
+int Foam::cfdemCloud::nrForceModels()
+{
+    return forceModels_.size();
+}
+
+scalar Foam::cfdemCloud::radius(int index)
+{
+    scalar r = radii()[index][0];
+    return r;
+}
+
+scalar Foam::cfdemCloud::voidfraction(int index)
+{
+    return voidfractions()[index][0];
+}
+
+label Foam::cfdemCloud::liggghtsCommandModelIndex(word name)
+{
+    int index=-1;
+    forAll(liggghtsCommandModelList_,i)
+    {
+        if(liggghtsCommand()[i]().name() == name)
+        {
+            index = i;
+            break;
+        }
+    }
+    return index;
+}
+
+// * * * * * * * * * * * * * * * WRITE  * * * * * * * * * * * * * //
+
+// * * *   write cfdemCloud internal data   * * * //
+
+bool Foam::cfdemCloud::evolve
+(
+    volScalarField& alpha,
+    volVectorField& Us,
+    volVectorField& U
+)
+{
+    numberOfParticlesChanged_ = false;
+    arraysReallocated_=false;
+    bool doCouple=false;
+
+    if(!ignore())
+    {
+        if (dataExchangeM().couple())
+        {
+            Info << "\n timeStepFraction() = " << dataExchangeM().timeStepFraction() << endl;
+            doCouple=true;
+
+            if(verbose_) Info << "- defineRegion()" << endl;
+            regionM().defineRegion();
+            if(verbose_) Info << "defineRegion done." << endl;
+
+            // reset vol Fields
+            if(verbose_) Info << "- resetVolFields()" << endl;
+            regionM().resetVolFields(Us);
+            if(verbose_) Info << "resetVolFields done." << endl;
+
+            if(verbose_) Info << "- getDEMdata()" << endl;
+            clockM().start(4,"getDEMdata");
+            getDEMdata();
+            clockM().stop();
+            if(verbose_) Info << "- getDEMdata done." << endl;
+
+            // search cellID of particles
+            clockM().start(5,"findCell");
+            if(verbose_) Info << "- findCell()" << endl;
+            findCells();
+            if(verbose_) Info << "findCell done." << endl;
+            clockM().stop("findCell");
+
+            // set void fraction field
+            if(verbose_) Info << "- setvoidFraction()" << endl;
+            voidFractionM().setvoidFraction(regionM().inRegion(),voidfractions_,particleWeights_,particleVolumes_);
+            if(verbose_) Info << "setvoidFraction done." << endl;
+
+            // set particles velocity field
+            if(verbose_) Info << "- setVectorAverage(Us,velocities_,weights_)" << endl;
+            averagingM().setVectorAverage
+            (
+                averagingM().UsNext(),
+                velocities_,
+                particleWeights_,
+                averagingM().UsWeightField(),
+                regionM().inRegion()
+            );
+            if(verbose_) Info << "setVectorAverage done." << endl;
+
+            // set particles forces
+            if(verbose_) Info << "- setForce(forces_)" << endl;
+            setForces();
+            if(verbose_) Info << "setForce done." << endl;
+
+            // get next force field
+            if(verbose_) Info << "- setParticleForceField()" << endl;
+            averagingM().setVectorSum
+            (
+                forceM(0).impParticleForces(),
+                impForces_,
+                particleWeights_,
+                regionM().inRegion()
+            );
+            averagingM().setVectorSum
+            (
+                forceM(0).expParticleForces(),
+                expForces_,
+                particleWeights_,
+                regionM().inRegion()
+            );
+
+            if(verbose_) Info << "- setParticleForceField done." << endl;
+
+            // write DEM data
+            if(verbose_) Info << " -giveDEMdata()" << endl;
+            clockM().start(6,"getDEMdata");
+            giveDEMdata();
+            clockM().stop("getDEMdata");
+
+            // expand region - call for new particles
+            if(verbose_) Info << "- expandRegion()" << endl;
+            regionM().expandRegion(U);
+            if(verbose_) Info << "expandRegion done." << endl;
+        }
+
+        // update voidFractionField
+        alpha.internalField() = voidFractionM().voidFractionInterp();
+        alpha.correctBoundaryConditions();
+
+        // update particle velocity Field
+        Us.internalField() = averagingM().UsInterp();
+        Us.correctBoundaryConditions();
+
+        if(verbose_){
+            #include "debugInfo.H"
+        }
+        // do particle IO
+        IOM().dumpDEMdata();
+
+    }//end ignore
+    return doCouple;
+}
+
+bool Foam::cfdemCloud::reAllocArrays() const
+{
+    if(numberOfParticlesChanged_ && !arraysReallocated_)
+    {
+        // get arrays of new length
+        dataExchangeM().allocateArray(positions_,0.,3);
+        dataExchangeM().allocateArray(velocities_,0.,3);
+        dataExchangeM().allocateArray(impForces_,0.,3);
+        dataExchangeM().allocateArray(expForces_,0.,3);
+        dataExchangeM().allocateArray(DEMForces_,0.,3);
+        dataExchangeM().allocateArray(radii_,0.,1);
+        dataExchangeM().allocateArray(voidfractions_,1.,voidFractionM().maxCellsPerParticle());
+        dataExchangeM().allocateArray(cellIDs_,0.,voidFractionM().maxCellsPerParticle());
+        dataExchangeM().allocateArray(particleWeights_,0.,voidFractionM().maxCellsPerParticle());
+        dataExchangeM().allocateArray(particleVolumes_,0.,voidFractionM().maxCellsPerParticle());
+        arraysReallocated_ = true;
+        return true;
+    }
+    return false;
+}
+
+tmp<fvVectorMatrix> cfdemCloud::divVoidfractionTau(volVectorField& U,volScalarField& voidfraction) const
+{
+    return
+    (
+      - fvm::laplacian(voidfractionNuEff(voidfraction), U)
+      - fvc::div(voidfractionNuEff(voidfraction)*dev(fvc::grad(U)().T()))
+    );
+}
+
+void cfdemCloud::resetArray(double**& array,int length,int width,double resetVal)
+{
+    for(int index = 0;index < length; ++index){
+        for(int i=0;i<width;i++){
+            array[index][i] = resetVal;
+        }
+    }
+}
+
+tmp<volScalarField> cfdemCloud::voidfractionNuEff(volScalarField& voidfraction) const
+{
+    if (modelType_=="A")
+    {
+        return tmp<volScalarField>
+        (
+            new volScalarField("viscousTerm", (turbulence_.nut() + turbulence_.nu()))
+        );
+    }
+    else
+    {
+        return tmp<volScalarField>
+        (
+            new volScalarField("viscousTerm", voidfraction*(turbulence_.nut() + turbulence_.nu()))
+        );
+    }
+}
+
+// * * * * * * * * * * * * * * * *  IOStream operators * * * * * * * * * * * //
+
+#include "cfdemCloudIO.C"
+
+// ************************************************************************* //

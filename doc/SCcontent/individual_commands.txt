@@ -1,0 +1,4 @@
+1.6 Models/Solvers :h4,link(cmd_5),link(comm)
+
+This section lists all CFDEMcoupling sub-models and solvers alphabetically, with a separate
+listing below of styles within certain commands.

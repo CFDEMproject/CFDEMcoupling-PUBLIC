@@ -1,0 +1,6 @@
+d=dump("post/dump.liggghts_init")
+#d.scale()
+v=vtk(d)
+v.manyGran("post/vtk_out")
+exit()
+

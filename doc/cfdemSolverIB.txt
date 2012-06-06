@@ -1,0 +1,26 @@
+"CFDEMproject WWW Site"_lws - "CFDEM Commands"_lc :c
+
+:link(lws,http://www.cfdem.com)
+:link(lc,CFDEMcoupling_Manual.html#comm)
+
+:line
+
+cfdemSolverIB command :h3
+
+[Description:]
+
+"cfdemSolverIB" is a coupled CFD-DEM solver using CFDEMcoupling, an open source parallel coupled CFD-DEM framework, for calculating
+the dynamics between immersed bodies and the surrounding fluid. Being an implementation of an immersed boundary method it allows tackling problems where the body diameter exceeds the maximal size of a fluid cell. Usung the toolbox of OpenFOAM(R)(*) the governing equations of the fluid are computed and the corrections of velocity and pressure field with respect to the body-movement information, gained from LIGGGHTS, are incorporated.   
+
+see:
+
+GONIVA, C., KLOSS, C., HAGER,A., WIERINK, G. and PIRKER, S. (2011): "A MULTI-PURPOSE OPEN SOURCE CFD-DEM APPROACH", Proc. of the 8th Int. Conf. on CFD in Oil and Gas, Metallurgical and Process Industries, Trondheim, Norway
+
+and
+
+HAGER, A., KLOSS, C. and GONIVA, C. (2011): "TOWARDS AN EFFICIENT IMMERSED BOUNDARY METHOD WITHIN AN OPEN SOURCE FRAMEWORK", Proc. of the 8th Int. Conf. on CFD in Oil and Gas, Metallurgical and Process Industries, Trondheim, Norway
+
+:line
+(*) "OpenFOAM(R)"_of is a registered trade mark of Silicon Graphics International Corp. This offering is not affiliated, approved or endorsed by Silicon Graphics International Corp., the producer of the OpenFOAM(R) software and owner of the OpenFOAM(R) trademark.
+
+:line

@@ -1,0 +1,72 @@
+<HTML>
+<CENTER><A HREF = "http://www.cfdem.com">CFDEMproject WWW Site</A> - <A HREF = "CFDEMcoupling_Manual.html#comm">CFDEM Commands</A> 
+</CENTER>
+
+
+
+
+<HR>
+
+<H3>locateModel_engineSearchIB command 
+</H3>
+<P><B>Syntax:</B>
+</P>
+<P>Defined in couplingProperties dictionary.
+</P>
+<PRE>locateModel engineIB;
+engineIBProps
+{
+    engineProps
+    {
+        faceDecomp false;
+        treeSearch false;
+    }
+    zSplit value1;
+    xySplit value2;
+}  
+</PRE>
+<UL><LI><I>switch1</I> = time to start the averaging (default 0) 
+
+<LI><I>switch2</I> = names of the finite volume scalar fields to be temporally averaged 
+
+<LI><I>value1</I> = number of z-normal layers for satellite points 
+
+<LI><I>value2</I> = number of satellite points in each layer 
+
+
+</UL>
+<P><B>Examples:</B>
+</P>
+<PRE>locateModel engineIB;
+engineIBProps
+{
+    engineProps
+    {
+        faceDecomp false;
+        treeSearch false;
+    }
+    zSplit 8;
+    xySplit 16;
+} 
+</PRE>
+<P><B>Description:</B>
+</P>
+<P>The locateModel "engine" locates the CFD cell and cellID corresponding to a given position. This locate model is especially designed for parallel immersed boundary method. Each particle is represented by "satellite points" if it is distributed over several processors.
+</P>
+<P>The engineSearchIB locate Model can be used with different settings to use different algorithms:
+</P>
+<UL><LI>faceDecomp false; treeSearch false;     will execute some geometric (linear) search using the last known cellID (recommended) 
+
+<LI>faceDecomp false; treeSearch true;      will use a recursive tree structure to find the cell. 
+
+
+</UL>
+<P><B>Restrictions:</B> 
+</P>
+<P>Only for immersed boundary solvers!
+</P>
+<P><B>Related commands:</B>
+</P>
+<P><A HREF = "locateModel.html">locateModel</A>
+</P>
+</HTML>

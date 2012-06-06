@@ -1,0 +1,32 @@
+<HTML>
+<CENTER><A HREF = "http://www.cfdem.com">CFDEMproject WWW Site</A> - <A HREF = "CFDEMcoupling_Manual.html#comm">CFDEM Commands</A> 
+</CENTER>
+
+
+
+
+<HR>
+
+<H3>clockModel_standardClock command 
+</H3>
+<P><B>Syntax:</B>
+</P>
+<P>Defined in couplingProperties dictionary.
+</P>
+<PRE>clockModel standardClock; 
+</PRE>
+<P><B>Examples:</B>
+</P>
+<PRE>clockModel standardClock; 
+</PRE>
+<P><B>Description:</B>
+</P>
+<P>The "standardClock" model is a basic clockModel model which measures the run time between every ".start(name)" and ".stop()" statement placed in the code. If a ".start(name)" is called more than once (e.g. in a loop) the accumulated times are calculated.  After the simulation has finished, the data is stored in $caseDir/CFD/clockData/$startTime/*.txt .
+</P>
+<P><B>Restrictions:</B> none.
+</P>
+<P><B>Related commands:</B>
+</P>
+<P><A HREF = "clockModel.html">clockModel</A>
+</P>
+</HTML>

@@ -1,0 +1,158 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.6                                   |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+application     interDyMFoam;
+
+startFrom       startTime;
+
+startTime       0;
+
+stopAt          endTime;
+
+endTime         0.7;
+
+deltaT          0.0001;
+
+writeControl    adjustableRunTime;
+
+writeInterval   0.1;//0.002;
+
+purgeWrite      0;
+
+writeFormat     ascii;
+
+writePrecision  6;
+
+writeCompression uncompressed;
+
+timeFormat      general;
+
+timePrecision   6;
+
+runTimeModifiable yes;
+
+adjustTimeStep  no;
+
+maxCo           1;
+
+maxDeltaT       1;
+
+functions
+(
+
+    probes
+    {
+        type        probes;
+        // Where to load it from
+        functionObjectLibs ( "libsampling.so" );  
+        // Name of the directory for probe data
+        name        probes;
+        probeLocations
+        (
+            (0.05 0.05 -0.099)
+            (0.05 0.05 1.099)
+        );
+
+        // Fields to be probed
+        fields ( p T);
+
+        // Write at same frequency as fields
+        outputControl   timeStep;//outputTime;
+        outputInterval  1;
+    }
+
+/*
+// simpleFunctionObjects
+   heatFlux
+   {
+     type patchHeatFlux;
+     functionObjectLibs
+     (
+         "libsimpleFunctionObjects.so"
+     );
+     verbose true;
+     patches
+     (
+         inlet
+         outlet
+     );
+     fields    // name of temp field
+     (
+         T
+     );
+     cp 1007;       // cp in [J/(kg*K)]
+     factor  1.188; // density for incomp solvers!
+   }
+
+   massFlux
+   {
+     type patchMassFlow;
+     functionObjectLibs
+     (
+         "libsimpleFunctionObjects.so"
+     );
+     verbose true;
+     patches
+     (
+         inlet
+         outlet
+     );
+     factor  1.188; // density for incomp solvers!
+   }
+
+   pressureDrop
+   {
+     type patchAverage;
+     functionObjectLibs
+     (
+         "libsimpleFunctionObjects.so"
+     );
+     verbose true;
+     patches
+     (
+         inlet
+         outlet
+     );
+     fields
+     (
+         p
+     );
+     factor  1;
+   }
+
+   T
+   {
+     type patchAverage;
+     functionObjectLibs
+     (
+         "libsimpleFunctionObjects.so"
+     );
+     verbose true;
+     patches
+     (
+         inlet
+         outlet
+     );
+     fields    // name of temp field
+     (
+         T
+     );
+     factor  1;
+   }*/
+);
+
+// ************************************************************************* //

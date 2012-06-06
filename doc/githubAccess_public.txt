@@ -1,0 +1,111 @@
+"CFDEMproject WWW Site"_lws - "CFDEM Commands"_lc :c
+
+:link(lws,http://www.cfdem.com)
+:link(lc,CFDEMcoupling_Manual.html#comm)
+:link(github,http://github.com)
+:link(gitHelp,http://help.github.com/linux-set-up-git)
+
+:line
+githubAccess_public :h3
+:line
+
+[Description:]
+
+This routine describes how to setup a github account and pull repositories of the CFDEMproject.
+After setting some environment variables LIGGGHTS and CFDEMcoupling can be compiled
+
+[Procedure:]
+
+Basically the following steps have to be performed:
+
+{git clone} the desired repository :ulb,l
+update your repositories by {git pull} :l
+set environment variables :l
+compile LIGGGHTS and CFDEMcoupling :l
+:ule
+
+[{git clone} the desired repository:]
+
+If not allready done, open a terminal and create a directory for LIGGGHTS in $HOME:
+
+cd :pre
+mkdir LIGGGHTS :pre
+cd LIGGGHTS :pre
+
+To clone the public LIGGGHTS repository, open a terminal and execute:
+
+git clone git://cfdem.git.sourceforge.net/gitroot/cfdem/liggghtsdev LIGGGHTS-PUBLIC :pre,h6
+
+If not allready done, open a terminal and create a directory for CFDEMcoupling in $HOME:
+
+cd :pre
+mkdir CFDEM :pre
+cd CFDEM :pre
+
+Make sure that OpenFOAM(R)-2.1.x is allready set up correctly!
+
+To clone the public CFDEMcoupling repository, open a terminal and execute:
+
+git clone git://github.com/CFDEMproject/CFDEMcoupling-PUBLIC.git CFDEMcoupling-PUBLIC-$WM_PROJECT_VERSION :pre,h6
+
+Note: the git protocol will not work if your computer is behind a firewall which blocks the relevant TCP port, you can use alternatively:
+
+git clone https://github.com/CFDEMproject/CFDEMcoupling-PUBLIC.git :pre
+
+[Update your repositories by {git pull}:]
+
+To get the latest version, open a terminal, go to the location of your local installation and type:
+
+cd $HOME/CFDEM/CFDEMcoupling-PUBLIC-$WM_PROJECT_VERSION
+git pull :pre
+
+[set environment variables:]
+
+Now you need to set some environment variables in ~/.bashrc (if you use c-shell, manipulate ~/.cshrc accordingly). Open ~/.bashrc
+
+gedit ~/.bashrc & :pre
+
+add the lines: 
+
+#================================================#
+#- source cfdem env vars
+export CFDEM_VERSION=PUBLIC
+export CFDEM_PROJECT_DIR=$HOME/CFDEM/CFDEMcoupling-$CFDEM_VERSION-$WM_PROJECT_VERSION
+export CFDEM_SRC_DIR=$CFDEM_PROJECT_DIR/src/lagrangian/cfdemParticle
+export CFDEM_SOLVER_DIR=$CFDEM_PROJECT_DIR/applications/solvers
+export CFDEM_DOC_DIR=$CFDEM_PROJECT_DIR/doc
+export CFDEM_UT_DIR=$CFDEM_PROJECT_DIR/applications/utilities
+export CFDEM_TUT_DIR=$CFDEM_PROJECT_DIR/tutorials
+export CFDEM_PROJECT_USER_DIR=$HOME/CFDEM/$LOGNAME-$CFDEM_VERSION-$WM_PROJECT_VERSION
+export CFDEM_bashrc=$CFDEM_SRC_DIR/etc/bashrc
+export CFDEM_LIGGGHTS_SRC_DIR=$HOME/LIGGGHTS/LIGGGHTS-PUBLIC/src
+export CFDEM_LIGGGHTS_MAKEFILE_NAME=fedora_fpic
+. $CFDEM_bashrc
+#================================================# :pre
+
+Save the ~/.bashrc, open a new terminal and test the settings. The commands:
+
+$CFDEM_PROJECT_DIR
+$CFDEM_SRC_DIR
+$CFDEM_LIGGGHTS_SRC_DIR :pre
+
+should give "...: is a directory" otherwise something went wrong and the environment variables in ~/bashrc are not set correctly.
+
+To specify the paths of pizza, please check the settings in $CFDEM_SRC_DIR/etc/bashrc.
+
+If $CFDEM_SRC_DIR is set correctly, you can type 
+
+cfdemSysTest :pre
+
+to get some information if the paths are set correctly.
+
+[compile LIGGGHTS and CFDEMcoupling:]
+
+If above settings were done correctly, you can compile LIGGGHTS by typing:
+
+cfdemCompLIG :pre
+
+and you can then compile CFDEMcoupling by typing:
+
+cfdemCompCFDEM :pre
+

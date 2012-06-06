@@ -1,0 +1,102 @@
+echo both
+
+# Pour granular particles into chute container, then induce flow
+
+atom_style	granular
+atom_modify	map array sort 0 0
+communicate	single vel yes
+#processors	1 1 2
+
+boundary	f f f
+newton		off
+
+units		si
+
+region		reg block 0 0.1 0 0.1 0 0.1 units box
+create_box	1 reg
+
+neighbor	0.003 bin
+neigh_modify	delay 0 binsize 0.01
+
+
+#Material properties required for new pair styles
+
+fix 		m1 all property/global youngsModulus peratomtype 5.e6
+fix 		m2 all property/global poissonsRatio peratomtype 0.45
+fix 		m3 all property/global coefficientRestitution peratomtypepair 1 0.3
+fix 		m4 all property/global coefficientFriction peratomtypepair 1 0.5
+fix 		m5 all property/global characteristicVelocity scalar 2.0
+
+#pair style
+pair_style 	gran/hooke 1 0  #Hookean without cohesion
+pair_coeff	* *
+
+#timestep, gravity
+timestep	0.00001
+fix		gravi all gravity 9.81 vector 0.0 -1.0 0.0
+
+#walls
+fix		xwalls all wall/gran/hooke 1 0 xplane 0.0 0.1 1
+fix		ywalls all wall/gran/hooke 1 0 yplane 0 0.1 1
+fix		zwalls all wall/gran/hooke 1 0 zplane 0 0.01 1
+
+#-import mesh from cad:
+#fix		cad1 all mesh/gran hopperGenauerSALOME.stl 1 1.0 0. 0. 0. 0. 180. 0. 
+
+#-use the imported mesh as granular wall
+#fix		bucket_wall all wall/gran/hertz/history 1 0 mesh/gran 1 cad1
+
+
+#particle insertion
+
+#- distributions for insertion using pour
+#fix		pts1 all particletemplate/sphere 1 atom_type 1 density constant 2500 radius constant 0.001
+#fix		pts2 all particletemplate/sphere 1 atom_type 1 density constant 2500 radius constant 0.002
+#fix		pdd1 all particledistribution/discrete 1.  2 pts1 0.3 pts2 0.7
+#variable	alphastart equal 0.05
+#region		bc block 0.01 0.09 0.05 0.09 0.001 0.009 units box
+#fix		ins all pour/dev/packing 1 distributiontemplate pdd1 vol ${alphastart} 200 region bc
+
+#- create single partciles
+#create_atoms    1 single 0.05 0.04 0.05 units box
+create_atoms    1 single 0.05 0.04  0.046 units box  
+set group all diameter 0.0001 density 3000
+
+
+#cfd coupling
+fix		cfd all couple/cfd couple_every 10 mpi
+fix		cfd2 all couple/cfd/force
+
+#fix		cfd all couple/cfd/force couple_every 1000000 mpi 
+#fix		cfd all couple/cfd/force couple_every 100 file ../CFD/couplingFiles/ 
+
+variable       vx equal vx[1]
+variable       vy equal vy[1]
+variable       vz equal vz[1]
+variable       time equal step*dt
+fix            extra all print 100 "${time} ${vx} ${vy} ${vz}" file ../DEM/post/velocity.txt title "%" screen no
+
+#apply nve integration to all particles that are inserted as single particles
+fix		integr all nve/sphere
+
+
+#screen output
+compute		1 all erotate/sphere
+thermo_style	custom step atoms ke c_1 vol
+thermo		1000
+thermo_modify	lost ignore norm no
+compute_modify	thermo_temp dynamic yes
+
+#insert the first particles so that dump is not empty
+#dump 		myDump all stl 1 post/dump.stl
+run		1
+dump		dmp all custom 1000 ../DEM/post/dump.liggghts_init id type type x y z ix iy iz vx vy vz fx fy fz omegax omegay omegaz radius 
+#undump		myDump
+
+#force : f_couple_cfd[0] f_couple_cfd[1] f_couple_cfd[2]
+#node : f_couple_cfd[6]
+#cell id : f_couple_cfd[7]
+
+run		1 upto       #MPI coupling
+#run		15000 upto  #file coupling
+#write_restart 	liggghts.restart
