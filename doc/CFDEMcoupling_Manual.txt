@@ -313,6 +313,8 @@ Reasonable example settings for the "liggghtsCommands" dictionary are given in t
 
 
 
+
+
 1.6 Models/Solvers :h4,link(cmd_5),link(comm)
 
 This section lists all CFDEMcoupling sub-models and solvers alphabetically, with a separate
@@ -336,26 +338,19 @@ listing below of styles within certain commands.
 "dataExchangeModel_twoWayFiles"_dataExchangeModel_twoWayFiles.html,
 "dataExchangeModel_twoWayMPI"_dataExchangeModel_twoWayMPI.html,
 "forceModel"_forceModel.html,
-"forceModelMS"_forceModelMS.html,
-"forceModelMS_DiFeliceDragMS"_forceModelMS_DiFeliceDragMS.html,
 "forceModel_Archimedes"_forceModel_Archimedes.html,
 "forceModel_ArchimedesIB"_forceModel_ArchimedesIB.html,
 "forceModel_DiFeliceDrag"_forceModel_DiFeliceDrag.html,
 "forceModel_GidaspowDrag"_forceModel_GidaspowDrag.html,
 "forceModel_KochHillDrag"_forceModel_KochHillDrag.html,
-"forceModel_LaEuScalarDust"_forceModel_LaEuScalarDust.html,
 "forceModel_LaEuScalarTemp"_forceModel_LaEuScalarTemp.html,
 "forceModel_MeiLift"_forceModel_MeiLift.html,
 "forceModel_SchillerNaumannDrag"_forceModel_SchillerNaumannDrag.html,
 "forceModel_SchirgaonkarIB"_forceModel_ShirgaonkarIB.html,
-"forceModel_fieldTimeAverage"_forceModel_fieldTimeAverage.html,
 "forceModel_gradPForce"_forceModel_gradPForce.html,
-"forceModel_interface"_forceModel_interface.html,
 "forceModel_noDrag"_forceModel_noDrag.html,
-"forceModel_totalMomentumExchange"_forceModel_totalMomentumExchange.html,
 "forceModel_virtualMassForce"_forceModel_virtualMassForce.html,
 "forceModel_viscForce"_forceModel_viscForce.html,
-"forceModel_volWeightedAverage"_forceModel_volWeightedAverage.html,
 "liggghtsCommandModel"_liggghtsCommandModel.html,
 "liggghtsCommandModel_execute"_liggghtsCommandModel_execute.html,
 "liggghtsCommandModel_readLiggghtsData"_liggghtsCommandModel_readLiggghtsData.html,
@@ -365,9 +360,7 @@ listing below of styles within certain commands.
 "locateModel_engineSearch"_locateModel_engineSearch.html,
 "locateModel_engineSearchIB"_locateModel_engineSearchIB.html,
 "locateModel_standardSearch"_locateModel_standardSearch.html,
-"locateModel_turboEngineSearch"_locateModel_turboEngineSearch.html,
 "meshMotionModel"_meshMotionModel.html,
-"meshMotionModel_DEMdrivenMeshMotion"_meshMotionModel_DEMdrivenMeshMotion.html,
 "meshMotionModel_noMeshMotion"_meshMotionModel_noMeshMotion.html,
 "momCoupleModel"_momCoupleModel.html,
 "momCoupleModel_explicitCouple"_momCoupleModel_explicitCouple.html,
@@ -375,10 +368,8 @@ listing below of styles within certain commands.
 "momCoupleModel_noCouple"_momCoupleModel_noCouple.html,
 "regionModel"_regionModel.html,
 "regionModel_allRegion"_regionModel_allRegion.html,
-"regionModel_differentialRegion"_regionModel_differentialRegion.html,
 "voidfractionModel"_voidFractionModel.html,
 "voidfractionModel_GaussVoidFraction"_voidFractionModel_GaussVoidFraction.html,
 "voidfractionModel_bigParticleVoidFraction"_voidFractionModel_bigParticleVoidFraction.html,
 "voidfractionModel_centreVoidFraction"_voidFractionModel_centreVoidFraction.html,
-"voidfractionModel_dividedMSVoidFractionMS"_voidFractionModel_dividedVoidFractionMS.html,
-"voidfractionModel_dividedVoidFraction"_voidFractionModel_dividedVoidFraction.html :tb(c=6,ea=c)
+"voidfractionModel_dividedVoidFraction"_voidFractionModel_dividedVoidFraction.html :tb(c=2,ea=c)
