@@ -3,6 +3,7 @@ EXE_INC = \
     -I$(LIB_SRC)/transportModels \
     -I$(LIB_SRC)/transportModels/incompressible/singlePhaseTransportModel \
     -I$(LIB_SRC)/finiteVolume/lnInclude \
+    -I$(CFDEM_SRC_DIR)/lnInclude \
     -I$(CFDEM_SRC_DIR)/cfdTools \
     -I$(LIB_SRC)/meshTools/lnInclude \
 
