@@ -17,6 +17,7 @@ model = name of averaging model to be applied :ul
 
 [Examples:]
 
+test
 averagingModel dense;
 averagingModel dilute; :pre
 

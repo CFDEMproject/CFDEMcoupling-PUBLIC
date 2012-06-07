@@ -30,7 +30,7 @@ Application
 Description
     Transient solver for incompressible flow.
     Turbulence modelling is generic, i.e. laminar, RAS or LES may be selected.
-    The code is an evolution of the solver pisoFoam in OpenFOAM 1.6,
+    The code is an evolution of the solver pisoFoam in OpenFOAM(R) 1.6,
     where additional functionality for CFD-DEM coupling is added.
 \*---------------------------------------------------------------------------*/
 

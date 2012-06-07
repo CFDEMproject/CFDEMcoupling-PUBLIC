@@ -29,7 +29,8 @@ Description
     and OpenFOAM(R). Note: this code is not part of OpenFOAM(R) (see DISCLAIMER).
 
     Koch, Hill drag law
-    based on Koch Hill 2001,"Inertial effects in suspensions and porous-media flows", Annual Review of fluid mechanics.
+    based on Koch Hill 2001,"Inertial effects in suspensions and porous-media 
+    flows", Annual Review of fluid mechanics.
     including interpolation of the velocity to the exact position
 
 Class

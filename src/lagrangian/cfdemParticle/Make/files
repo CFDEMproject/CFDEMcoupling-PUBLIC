@@ -30,6 +30,9 @@ $(forceModels)/virtualMassForce/virtualMassForce.C
 $(forceModels)/gradPForce/gradPForce.C
 $(forceModels)/viscForce/viscForce.C
 $(forceModels)/MeiLift/MeiLift.C
+$(forceModels)/DiFeliceDragNLift/DiFeliceDragNLift.C
+$(forceModels)/gradULiftForce/gradULiftForce.C
+$(forceModels)/KochHillDragNLift/KochHillDragNLift.C
 
 $(IOModels)/IOModel/IOModel.C
 $(IOModels)/IOModel/newIOModel.C
