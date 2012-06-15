@@ -29,6 +29,7 @@ Description
     and OpenFOAM(R). Note: this code is not part of OpenFOAM(R) (see DISCLAIMER).
 \*---------------------------------------------------------------------------*/
 
+#include "fileName.H"
 #include "cfdemCloud.H"
 #include "forceModel.H"
 #include "locateModel.H"
@@ -93,14 +94,14 @@ Foam::cfdemCloud::cfdemCloud
     turbulenceModelType_(couplingProperties_.lookup("turbulenceModelType")),
     turbulence_
     (
-        #ifdef version16
-            mesh.lookupObject<incompressible::turbulenceModel> // 1.6
-        #endif
-        #ifdef version16comp
-            mesh.lookupObject<compressible::turbulenceModel> // 1.6 comp
-        #endif
-        #ifdef version15
-            mesh.lookupObject<incompressible::RASModel> // 1.5-dev
+        #if defined(version21) || defined(version16ext)
+            #ifdef comp
+                mesh.lookupObject<compressible::turbulenceModel>
+            #else
+                mesh.lookupObject<incompressible::turbulenceModel>
+            #endif
+        #elif defined(version15)
+            mesh.lookupObject<incompressible::RASModel>
         #endif
         (
             turbulenceModelType_

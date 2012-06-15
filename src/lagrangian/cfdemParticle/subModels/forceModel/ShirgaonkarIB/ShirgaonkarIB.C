@@ -105,7 +105,7 @@ void ShirgaonkarIB::setForce
     label cellI;
     vector drag;
 
-    #ifdef version16comp
+    #ifdef comp
         // get viscosity field
         const volScalarField& mufField = particleCloud_.turbulence().mu();
         volVectorField h = (mufField*fvc::laplacian(U_)-fvc::grad(p_));

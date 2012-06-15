@@ -7,7 +7,7 @@
 
 <HR>
 
-<H3>forceModel_SchirgaonkarIB command 
+<H3>forceModel_ShirgaonkarIB command 
 </H3>
 <P><B>Syntax:</B>
 </P>
@@ -15,9 +15,9 @@
 </P>
 <PRE>forceModels
 (
-    SchirgaonkarIB
+    ShirgaonkarIB
 );
-SchirgaonkarIBProps
+ShirgaonkarIBProps
 {
     velFieldName "U";
     densityFieldName "density";
@@ -36,9 +36,9 @@ SchirgaonkarIBProps
 </P>
 <PRE>forceModels
 (
-    SchirgaonkarIB
+    ShirgaonkarIB
 );
-SchirgaonkarIBProps
+ShirgaonkarIBProps
 {
     velFieldName "U";
     densityFieldName "rho";
@@ -47,7 +47,11 @@ SchirgaonkarIBProps
 </PRE>
 <P><B>Description:</B>
 </P>
-<P>The force model performs the calculation of forces (e.g. fluid-particle interaction forces) acting on each DEM particle. The SchirgaonkarIB model calculates the drag force (viscous and pressure force) acting on each particle in a resolved manner (see Shirgaonkar et al. (2009): "A new mathematical formulation and fast algorithm for fully resolved simulation of self-propulsion", Journal of Comp. Physics). This model is only suited for resolved CFD-DEM simulations where the particle is represented by immersed boundrary method.
+<P>The force model performs the calculation of forces (e.g. fluid-particle interaction forces) acting on each DEM particle. The ShirgaonkarIB model calculates the drag force (viscous and pressure force) acting on each particle in a resolved manner (see Shirgaonkar et al. (2009): "A new mathematical formulation and fast algorithm for fully resolved simulation of self-propulsion", Journal of Comp. Physics). This model is only suited for resolved CFD-DEM simulations where the particle is represented by immersed boundrary method.
+</P>
+<P><B>References:</B>
+</P>
+<P>SHIRGAONKAR, A.A., MACIVER, M.A. and PATANKAR, N.A., (2009), “A new mathematical formulation and fast algorithm for fully resolved simulation of self-propulsion”, J. Comput. Phys., 228, 2366-2390.
 </P>
 <P><B>Restrictions:</B>
 </P>

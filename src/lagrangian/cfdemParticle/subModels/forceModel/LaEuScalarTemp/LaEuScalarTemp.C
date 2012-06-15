@@ -130,7 +130,7 @@ void LaEuScalarTemp::manipulateScalarField(volScalarField& EuField) const
     particleCloud_.dataExchangeM().getData(partTempName_,"scalar-atom",partTemp_);
 
     // get viscosity field
-    #ifdef version16comp
+    #ifdef comp
         const volScalarField& nufField = particleCloud_.turbulence().mu() / rho_;
     #else
         const volScalarField& nufField = particleCloud_.turbulence().nu();

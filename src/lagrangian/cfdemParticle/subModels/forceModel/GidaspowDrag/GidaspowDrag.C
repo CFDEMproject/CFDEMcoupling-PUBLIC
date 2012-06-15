@@ -91,7 +91,7 @@ void GidaspowDrag::setForce
 ) const
 {
     // get viscosity field
-    #ifdef version16comp
+    #ifdef comp
         const volScalarField& nufField = particleCloud_.turbulence().mu() / rho_;
     #else
         const volScalarField& nufField = particleCloud_.turbulence().nu();

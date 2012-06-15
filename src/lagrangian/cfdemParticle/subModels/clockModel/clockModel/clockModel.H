@@ -126,7 +126,7 @@ public:
 	    virtual void evalFile() const;
 	    virtual void evalPar() const;
 	    void initElems();
-
+	    std::vector<int> calcShift() const;			//detects empty indices in vector, when times are evaluated
 };
 
 

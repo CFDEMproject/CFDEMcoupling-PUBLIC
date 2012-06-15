@@ -273,10 +273,11 @@ bool Foam::twoWayMPI::couple() const
     return coupleNow;
 }
 
-/*int Foam::twoWayMPI::getNumberOfClumps() const
+int Foam::twoWayMPI::getNumberOfClumps() const
 {
+    //Warning << "Foam::twoWayMPI::getNumberOfClumps() - changes necessary here" << endl;
     return liggghts_get_maxtag_ms(lmp);
-}*/
+}
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam

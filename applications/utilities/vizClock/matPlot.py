@@ -35,33 +35,31 @@ for row in reader:
 		parentName.append(row[6])
 	i+=1
 
-print identifier
-print deltaT
-print maxdeltaT
-print nOfRuns
-print level
-print parentNr
-print parentName
-
-
 bottom = []
-brotherheight = []
+childheight = []
+
 for i in range(len(identifier)):
 	bottom.append(0)
-	brotherheight.append(0)
+	childheight.append(0)
 
-for i in range(len(identifier)):
-	if i != 0:
-		if level[i]<level[i-1]:
-			brotherheight[level[i-1]]=0
-	if parentNr[i] != -1:
-		bottom[i] = bottom[parentNr[i]]
-	bottom[i] += brotherheight[level[i]]
-	brotherheight[level[i]] += deltaT[i]
+levelZero = 0.0
 
+#loop levels
+for j in range(len(identifier)):
+	#loop indices
+	for i in range(len(identifier)):
+		if level[i] == j:
+			if parentNr[i] != -1:
+				bottom[i] = bottom[parentNr[i]] + childheight[parentNr[i]]
+				childheight[parentNr[i]] += deltaT[i]
+			else:
+				bottom[i] = levelZero
+				levelZero += deltaT[i]
+
+#Output
 for i in range(len(identifier)):
 	plt.bar(level[i],deltaT[i],width = 0.2, bottom=bottom[i])
-	plt.text(level[i]+0.22,bottom[i]+deltaT[i]/2,identifier[i]+" "+str(nOfRuns[i])+"x")
+	plt.text(level[i]+0.22,bottom[i]+deltaT[i]/2,identifier[i]+" "+str(nOfRuns[i])+"x",verticalalignment='center')
 plt.xlabel('run level')
 plt.ylabel('CPU time in s')
 plt.title('time measurement')

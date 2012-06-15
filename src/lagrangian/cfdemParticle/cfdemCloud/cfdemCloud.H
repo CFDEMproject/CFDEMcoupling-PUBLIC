@@ -42,20 +42,21 @@ SourceFiles
 #ifndef cfdemCloud_H
 #define cfdemCloud_H
 
-#define version16
-//#define version16comp
+// choose version
+//#define version21
+#define version16ext
+//#define version15
+
+// choose comp/incomp
+//#define comp
 
 #include "fvCFD.H"
 #include "IFstream.H"
 
-#ifdef version16
-    #include "turbulenceModel.H" // 1.6
-#endif
-#ifdef version16comp
-    #include "turbulenceModel.H" // 1.6 comp
-#endif
-#ifdef version15
-    #include "RASModel.H"      // 1.5-dev
+#if defined(version21) || defined(version16ext)
+    #include "turbulenceModel.H"
+#elif defined(version15)
+    #include "RASModel.H"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -131,14 +132,14 @@ protected:
 
     const word turbulenceModelType_;
 
-    #ifdef version16
-        const incompressible::turbulenceModel& turbulence_; // 1.6
-    #endif
-    #ifdef version16comp
-        const compressible::turbulenceModel& turbulence_; // 1.6 comp
-    #endif
-    #ifdef version15
-        const incompressible::RASModel& turbulence_;        // 1.5-dev
+    #if defined(version21) || defined(version16ext)
+        #ifdef comp
+            const compressible::turbulenceModel& turbulence_;
+        #else
+            const incompressible::turbulenceModel& turbulence_;
+        #endif
+    #elif defined(version15)
+        const incompressible::RASModel& turbulence_;
     #endif
 
     autoPtr<forceModel>* forceModel_;
@@ -276,14 +277,14 @@ public:
 
        inline autoPtr<liggghtsCommandModel>* liggghtsCommand() const;
 
-       #ifdef version16
-           inline const incompressible::turbulenceModel& turbulence() const;  // 1.6
-       #endif
-       #ifdef version16comp
-           inline const compressible::turbulenceModel& turbulence() const;  // 1.6 comp
-       #endif
-       #ifdef version15
-           inline const incompressible::RASModel& turbulence() const;  // 1.5-dev
+       #if defined(version21) || defined(version16ext)
+            #ifdef comp
+                inline const compressible::turbulenceModel& turbulence() const;
+            #else
+                inline const incompressible::turbulenceModel& turbulence() const;
+            #endif
+       #elif defined(version15)
+           inline const incompressible::RASModel& turbulence() const;
        #endif
 
     // Write

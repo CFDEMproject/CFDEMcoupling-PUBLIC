@@ -16,13 +16,10 @@
 <PRE>locateModel engine;
 engineProps
 {
-    faceDecomp switch1;
-    treeSearch switch2;
+    treeSearch switch1;
 } 
 </PRE>
-<UL><LI><I>switch1</I> = time to start the averaging (default 0) 
-
-<LI><I>switch2</I> = names of the finite volume scalar fields to be temporally averaged 
+<UL><LI><I>switch1</I> = names of the finite volume scalar fields to be temporally averaged 
 
 
 </UL>
@@ -31,7 +28,6 @@ engineProps
 <PRE>locateModel engine;
 engineProps
 {
-    faceDecomp false;
     treeSearch false;
 } 
 </PRE>
@@ -40,9 +36,9 @@ engineProps
 <P>The locateModel "engine" locates the CFD cell and cellID corresponding to a given position.
 The engineSearch locate Model can be used with different settings to use different algorithms:
 </P>
-<UL><LI>faceDecomp false; treeSearch false;     will execute some geometric (linear) search using the last known cellID (recommended) 
+<UL><LI>treeSearch false;     will execute some geometric (linear) search using the last known cellID (recommended) 
 
-<LI>faceDecomp false; treeSearch true;      will use a recursive tree structure to find the cell. 
+<LI>treeSearch true;      will use a recursive tree structure to find the cell. 
 
 
 </UL>

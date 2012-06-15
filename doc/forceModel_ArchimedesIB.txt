@@ -19,10 +19,12 @@ ArchimedesIBProps
 \{
     densityFieldName "density";
     gravityFieldName "gravity";
+    voidfractionFieldName "voidfraction";
 \}; :pre
 
 {density} = name of the finite volume density field :ulb,l
 {gravity} = name of the finite volume gravity field :l
+{voidfraction} = name of the finite volume voidfraction field :l
 :ule
 
 [Examples:]
@@ -35,6 +37,7 @@ ArchimedesIBProps
 \{
     densityFieldName "rho";
     gravityFieldName "g";
+    voidfractionFieldName "voidfractionNext";
 \} :pre
 
 [Description:]

@@ -14,12 +14,10 @@ Defined in couplingProperties dictionary.
 locateModel engine;
 engineProps
 \{
-    faceDecomp switch1;
-    treeSearch switch2;
+    treeSearch switch1;
 \} :pre
 
-{switch1} = time to start the averaging (default 0) :ulb,l
-{switch2} = names of the finite volume scalar fields to be temporally averaged :l
+{switch1} = names of the finite volume scalar fields to be temporally averaged :ulb,l
 :ule
 
 [Examples:]
@@ -27,7 +25,6 @@ engineProps
 locateModel engine;
 engineProps
 \{
-    faceDecomp false;
     treeSearch false;
 \} :pre
 
@@ -36,8 +33,8 @@ engineProps
 The locateModel "engine" locates the CFD cell and cellID corresponding to a given position.
 The engineSearch locate Model can be used with different settings to use different algorithms:
 
-faceDecomp false; treeSearch false;     will execute some geometric (linear) search using the last known cellID (recommended) :ulb,l
-faceDecomp false; treeSearch true;      will use a recursive tree structure to find the cell. :l
+treeSearch false;     will execute some geometric (linear) search using the last known cellID (recommended) :ulb,l
+treeSearch true;      will use a recursive tree structure to find the cell. :l
 :ule
 
 [Restrictions:] none.

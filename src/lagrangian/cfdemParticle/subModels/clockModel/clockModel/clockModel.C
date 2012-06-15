@@ -114,6 +114,8 @@ std::string Foam::clockModel::eval() const
 	msg.append("Name \t deltaT \t nOfRuns \t level \t parentNr \t parentName \n");
 	std::ostringstream strs;
 	strs.setf(std::ios_base::scientific);
+	std::vector<int> shifts = calcShift();
+
 	for (int i=0;i<n_;i++)
 	{
 		if (parent_[i] != -2)
@@ -135,7 +137,14 @@ std::string Foam::clockModel::eval() const
 			msg.append("\t");
 			strs.str("");
 
-			strs << parent_[i];
+			if (parent_[i] >= 0)
+			{
+				strs << (shifts[parent_[i]]);
+			}
+			else
+			{
+				strs << parent_[i];
+			}
 			msg.append(strs.str());
 			msg.append("\t");
 			strs.str("");
@@ -193,6 +202,7 @@ void Foam::clockModel::evalPar() const
 	msg.append("\n");
 	msg.append("Name \t avgdeltaT \t maxdeltaT \t nOfRuns \t level \t parentNr \t parentName \n");
 	double buffOut, buffIn;
+	std::vector<int> shifts = calcShift();
 
 	for (int i=0;i<n_;i++)
 	{
@@ -227,7 +237,14 @@ void Foam::clockModel::evalPar() const
 			msg.append("\t");
 			strs.str("");
 
-			strs << parent_[i];
+			if (parent_[i] >= 0)
+			{
+				strs << (shifts[parent_[i]]);
+			}
+			else
+			{
+				strs << parent_[i];
+			}
 			msg.append(strs.str());
 			msg.append("\t");
 			strs.str("");
@@ -271,6 +288,24 @@ void Foam::clockModel::initElems()
     	level_[i] = -1;
     	parent_[i] = -2;
     }
+}
+
+std::vector<int> Foam::clockModel::calcShift() const
+{
+	std::vector<int> shifts = std::vector<int> (n_);
+	shifts[0]=0;
+	for (int i=1;i<n_;i++)
+	{
+		if (parent_[i] == -2)
+		{
+			shifts[i] = shifts[i-1];
+		}
+		else
+		{
+			shifts[i] = shifts[i-1]+1;
+		}
+	}
+	return shifts;
 }
 // * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * //
 

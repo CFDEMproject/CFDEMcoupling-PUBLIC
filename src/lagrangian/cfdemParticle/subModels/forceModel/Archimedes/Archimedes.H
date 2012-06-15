@@ -69,9 +69,9 @@ private:
 
     word gravityFieldName_;
 
-    #ifdef version16
+    #ifdef version21
         const uniformDimensionedVectorField& g_;    // ref to gravity
-    #else
+    #elif defined(version16ext) || defined(version15)
         const dimensionedVector& g_;    // ref to gravity
     #endif
 

@@ -154,7 +154,7 @@ public:
 
         bool couple() const;
 
-        //int getNumberOfClumps() const;
+        int getNumberOfClumps() const;
 };
 
 

@@ -105,7 +105,7 @@ void viscForce::setForce
 {
 
     // get viscosity field
-    #ifdef version16comp
+    #ifdef comp
         const volScalarField& mufField = particleCloud_.turbulence().mu();
 
         // calc div(Tau)

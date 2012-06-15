@@ -18,16 +18,13 @@ engineIBProps
 {
     engineProps
     {
-        faceDecomp false;
-        treeSearch false;
+        treeSearch switch1;
     }
     zSplit value1;
     xySplit value2;
 }  
 </PRE>
-<UL><LI><I>switch1</I> = time to start the averaging (default 0) 
-
-<LI><I>switch2</I> = names of the finite volume scalar fields to be temporally averaged 
+<UL><LI><I>switch1</I> = names of the finite volume scalar fields to be temporally averaged 
 
 <LI><I>value1</I> = number of z-normal layers for satellite points 
 
@@ -42,7 +39,6 @@ engineIBProps
 {
     engineProps
     {
-        faceDecomp false;
         treeSearch false;
     }
     zSplit 8;
@@ -55,12 +51,14 @@ engineIBProps
 </P>
 <P>The engineSearchIB locate Model can be used with different settings to use different algorithms:
 </P>
-<UL><LI>faceDecomp false; treeSearch false;     will execute some geometric (linear) search using the last known cellID (recommended) 
+<UL><LI>treeSearch false;     will execute some geometric (linear) search using the last known cellID (recommended) 
 
-<LI>faceDecomp false; treeSearch true;      will use a recursive tree structure to find the cell. 
+<LI>treeSearch true;      will use a recursive tree structure to find the cell. 
 
 
 </UL>
+<P>This model is a modification of the engine search model. Instead of using the centre-cell as starting point for the engine search, further satellite points located on the surface of the sphere are checked. This makes sure that (parts of) spheres can be located even when their centre is on another processor. This is especially important for parallel computations, when a sphere is about to move from one processor to another.
+</P>
 <P><B>Restrictions:</B> 
 </P>
 <P>Only for immersed boundary solvers!

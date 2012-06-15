@@ -29,6 +29,7 @@ Description
     and OpenFOAM(R). Note: this code is not part of OpenFOAM(R) (see DISCLAIMER).
 \*---------------------------------------------------------------------------*/
 
+#include "fileName.H"
 #include "cfdemCloudIB.H"
 #include "voidFractionModel.H"
 #include "forceModel.H"

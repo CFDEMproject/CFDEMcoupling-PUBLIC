@@ -30,7 +30,6 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "error.H"
-
 #include "standardSearch.H"
 #include "addToRunTimeSelectionTable.H"
 
@@ -92,7 +91,11 @@ label standardSearch::findCell
             for(int i=0;i<3;i++) position[i] = positions[index][i];
 
             // find cell
-            cellIDs[index][0] = particleCloud_.mesh().findCell(position, polyMesh::FACEPLANES);
+            #ifdef version16ext
+                cellIDs[index][0] = particleCloud_.mesh().findCell(position);
+            #elif defined(version21)
+                cellIDs[index][0] = particleCloud_.mesh().findCell(position, polyMesh::FACEPLANES);
+            #endif
         }
     }
 
@@ -106,7 +109,11 @@ label standardSearch::findSingleCell
 ) const
 {
     // find cell
-    return particleCloud_.mesh().findCell(position, polyMesh::FACEPLANES);
+    #ifdef version16ext
+        return particleCloud_.mesh().findCell(position);
+    #elif defined(version21)
+        return particleCloud_.mesh().findCell(position, polyMesh::FACEPLANES);
+    #endif
 }
 
 
