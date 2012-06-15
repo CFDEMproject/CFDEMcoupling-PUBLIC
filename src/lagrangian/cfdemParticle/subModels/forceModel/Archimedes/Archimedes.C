@@ -66,9 +66,9 @@ Archimedes::Archimedes
     densityFieldName_(propsDict_.lookup("densityFieldName")),
     rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_)),
     gravityFieldName_(propsDict_.lookup("gravityFieldName")),
-    #ifdef version21
+    #if defined(version21) || defined(version16ext)
         g_(sm.mesh().lookupObject<uniformDimensionedVectorField> (gravityFieldName_))
-    #elif defined(version16ext) || defined(version15)
+    #elif defined(version15)
         g_(dimensionedVector(sm.mesh().lookupObject<IOdictionary>("environmentalProperties").lookup(gravityFieldName_)).value())
     #endif
 {
