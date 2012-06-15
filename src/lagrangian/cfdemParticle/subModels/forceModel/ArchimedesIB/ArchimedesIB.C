@@ -68,7 +68,7 @@ ArchimedesIB::ArchimedesIB
     voidfractionFieldName_(propsDict_.lookup("voidfractionFieldName")), //mod by alice
     voidfractions_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),//mod by alice
     gravityFieldName_(propsDict_.lookup("gravityFieldName")),
-    #if version21 || defined(version16ext)
+    #if defined(version21) || defined(version16ext)
         g_(sm.mesh().lookupObject<uniformDimensionedVectorField> (gravityFieldName_))
     #elif  defined(version15)
         g_(dimensionedVector(sm.mesh().lookupObject<IOdictionary>("environmentalProperties").lookup(gravityFieldName_)).value())
