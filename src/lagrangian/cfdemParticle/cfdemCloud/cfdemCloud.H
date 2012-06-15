@@ -43,8 +43,8 @@ SourceFiles
 #define cfdemCloud_H
 
 // choose version
-//#define version21
-#define version16ext
+#define version21
+//#define version16ext
 //#define version15
 
 // choose comp/incomp
