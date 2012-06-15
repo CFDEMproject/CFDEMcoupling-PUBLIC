@@ -1,6 +1,5 @@
 cfdemCloud = cfdemCloud
 forceModels = subModels/forceModel
-forceModelsMS = subModels/forceModelMS
 IOModels = subModels/IOModel
 voidFractionModels = subModels/voidFractionModel
 locateModels = subModels/locateModel
@@ -14,36 +13,23 @@ liggghtsCommandModels = subModels/liggghtsCommandModel
 
 $(cfdemCloud)/cfdemCloud.C
 derived/cfdemCloudIB/cfdemCloudIB.C
-derived/cfdemCloudMS/cfdemCloudMS.C
 
 $(forceModels)/forceModel/forceModel.C
 $(forceModels)/forceModel/newForceModel.C
 $(forceModels)/noDrag/noDrag.C
 $(forceModels)/DiFeliceDrag/DiFeliceDrag.C
-$(forceModels)/DiFeliceDragNLift/DiFeliceDragNLift.C
 $(forceModels)/GidaspowDrag/GidaspowDrag.C
 $(forceModels)/SchillerNaumannDrag/SchillerNaumannDrag.C
 $(forceModels)/Archimedes/Archimedes.C
 $(forceModels)/ArchimedesIB/ArchimedesIB.C
 $(forceModels)/interface/interface.C
 $(forceModels)/ShirgaonkarIB/ShirgaonkarIB.C
-$(forceModels)/fieldTimeAverage/fieldTimeAverage.C
-$(forceModels)/fieldBound/fieldBound.C
-$(forceModels)/volWeightedAverage/volWeightedAverage.C
-$(forceModels)/totalMomentumExchange/totalMomentumExchange.C
 $(forceModels)/KochHillDrag/KochHillDrag.C
 $(forceModels)/LaEuScalarTemp/LaEuScalarTemp.C
-$(forceModels)/LaEuScalarDust/LaEuScalarDust.C
 $(forceModels)/virtualMassForce/virtualMassForce.C
 $(forceModels)/gradPForce/gradPForce.C
-$(forceModels)/gradULiftForce/gradULiftForce.C
 $(forceModels)/viscForce/viscForce.C
 $(forceModels)/MeiLift/MeiLift.C
-$(forceModels)/KochHillDragNLift/KochHillDragNLift.C
-
-$(forceModelsMS)/forceModelMS/forceModelMS.C
-$(forceModelsMS)/forceModelMS/newForceModelMS.C
-$(forceModelsMS)/DiFeliceDragMS/DiFeliceDragMS.C
 
 $(IOModels)/IOModel/IOModel.C
 $(IOModels)/IOModel/newIOModel.C
@@ -54,7 +40,6 @@ $(voidFractionModels)/voidFractionModel/voidFractionModel.C
 $(voidFractionModels)/voidFractionModel/newVoidFractionModel.C
 $(voidFractionModels)/centreVoidFraction/centreVoidFraction.C
 $(voidFractionModels)/dividedVoidFraction/dividedVoidFraction.C
-$(voidFractionModels)/dividedVoidFractionMS/dividedVoidFractionMS.C
 $(voidFractionModels)/bigParticleVoidFraction/bigParticleVoidFraction.C
 $(voidFractionModels)/GaussVoidFraction/GaussVoidFraction.C
 $(voidFractionModels)/IBVoidFraction/IBVoidFraction.C
@@ -63,14 +48,12 @@ $(locateModels)/locateModel/locateModel.C
 $(locateModels)/locateModel/newLocateModel.C
 $(locateModels)/standardSearch/standardSearch.C
 $(locateModels)/engineSearch/engineSearch.C
-$(locateModels)/turboEngineSearch/turboEngineSearch.C
 $(locateModels)/engineSearchIB/engineSearchIB.C
 
 
 $(meshMotionModels)/meshMotionModel/meshMotionModel.C
 $(meshMotionModels)/meshMotionModel/newMeshMotionModel.C
 $(meshMotionModels)/noMeshMotion/noMeshMotion.C
-$(meshMotionModels)/DEMdrivenMeshMotion/DEMdrivenMeshMotion.C
 
 $(momCoupleModels)/momCoupleModel/momCoupleModel.C
 $(momCoupleModels)/momCoupleModel/newMomCoupleModel.C
@@ -81,7 +64,6 @@ $(momCoupleModels)/noCouple/noCouple.C
 $(regionModels)/regionModel/regionModel.C
 $(regionModels)/regionModel/newRegionModel.C
 $(regionModels)/allRegion/allRegion.C
-$(regionModels)/differentialRegion/differentialRegion.C
 
 $(dataExchangeModels)/dataExchangeModel/dataExchangeModel.C
 $(dataExchangeModels)/dataExchangeModel/newDataExchangeModel.C
