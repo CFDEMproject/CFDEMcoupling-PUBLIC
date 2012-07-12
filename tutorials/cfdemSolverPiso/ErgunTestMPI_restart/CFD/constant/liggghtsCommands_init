@@ -29,9 +29,12 @@ liggghtsCommandModels
     writeLiggghts
 );
 
+/*
+//- optional
 writeLiggghtsProps
 {
-    overwrite on;
-}
+    writeLast on;   // off is not recommended
+    overwrite on;   
+}*/
 
 // ************************************************************************* //

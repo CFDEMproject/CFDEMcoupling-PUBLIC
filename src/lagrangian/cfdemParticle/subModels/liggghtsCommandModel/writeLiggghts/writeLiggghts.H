@@ -66,6 +66,8 @@ private:
 
     fileName writeName_;
 
+    Switch writeLast_;
+
     Switch overwrite_;
 
 public:

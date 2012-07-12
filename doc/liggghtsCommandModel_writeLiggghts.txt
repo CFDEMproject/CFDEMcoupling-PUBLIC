@@ -15,14 +15,17 @@ liggghtsCommandModels
 (
    writeLiggghts
 );
+//- optional
 writeLiggghtsProps
 \{
+    writeLast switch1;
     writeName "name";
-    overwrite switch;
+    overwrite switch2;
 \} :pre
 
-{name} = name of the restart file to be written in /$caseDir/DEM/  :ulb,l
-{switch} = switch (choose on/off) to select if only one restart file $name or many files $name_$timeStamp are written :l
+{switch1} = switch (choose on/off) to select if only last step is stored or every write step. "off" is not recommended (DEM data might get lost) :ulb,l
+{name} = name of the restart file to be written in /$caseDir/DEM/  default default "liggghts.restartCFDEM" :l
+{switch2} = switch (choose on/off) to select if only one restart file $name or many files $name_$timeStamp are written :l
 :ule
 
 [Examples:]
@@ -31,12 +34,7 @@ liggghtsCommandModels
 (
    runLiggghts
    writeLiggghts
-);
-writeLiggghtsProps
-\{
-    writeName "liggghts_restart";
-    overwrite off;
-\}  :pre
+); :pre
 
 [Description:]
 

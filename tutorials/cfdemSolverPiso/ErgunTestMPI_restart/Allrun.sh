@@ -106,7 +106,7 @@ rm -rf $casePath/CFD/probes
 rm -rf $casePath/CFD/particles
 rm -r $casePath/CFD/log.*
 rm $casePath/log.liggghts
-rm $casePath/DEM/liggghts.restartCFDEM
+rm $casePath/DEM/liggghts.restartCFDEM*
 rm $casePath/DEM/post/dump.*
 rm -r $casePath/DEM/log.*
 

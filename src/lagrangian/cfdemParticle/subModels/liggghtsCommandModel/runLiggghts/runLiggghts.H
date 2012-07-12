@@ -57,8 +57,11 @@ class runLiggghts
     public liggghtsCommandModel
 {
 private:
+    dictionary propsDict_;
 
     word command_;
+
+    bool preNo_;
 
 public:
 
@@ -84,6 +87,8 @@ public:
     // Member Functions
 
     const char* command();
+
+    string createCommand(word="",word="",word="");
 
     bool runCommand(int);
 

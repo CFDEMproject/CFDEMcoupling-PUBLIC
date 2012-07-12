@@ -90,6 +90,7 @@ rm -r $casePath/CFD/processor*
 rm -r $casePath/CFD/couplingFiles/*
 rm -r $casePath/DEM/post/*
 rm -r $casePath/DEM/log.*
+rm -r $casePath/DEM/liggghts.restartCFDEM*
 rm -r $casePath/CFD/probes
 rm -r $casePath/CFD/particles
 rm -r $casePath/CFD/clockData

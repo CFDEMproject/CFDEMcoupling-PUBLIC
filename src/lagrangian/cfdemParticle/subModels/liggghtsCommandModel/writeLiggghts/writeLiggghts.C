@@ -62,13 +62,36 @@ writeLiggghts::writeLiggghts
 )
 :
     liggghtsCommandModel(dict,sm,i),
-    propsDict_(dict.subDict(typeName + "Props")),
+    propsDict_(dict),
     command_("write_restart"),
     path_(word("..")/word("DEM")),
     writeName_("liggghts.restartCFDEM"),
-    overwrite_(propsDict_.lookup("overwrite"))
+    writeLast_(true),
+    overwrite_(true)
 {
-    runEveryWriteStep_=true;
+    if (dict.found(typeName + "Props"))    
+    {
+        propsDict_=dictionary(dict.subDict(typeName + "Props"));
+
+        if(propsDict_.found("writeLast"))
+        {
+            writeLast_=Switch(propsDict_.lookup("writeLast"));
+        }
+
+        if (!writeLast_ && propsDict_.found("overwrite"))
+        {
+            overwrite_=Switch(propsDict_.lookup("overwrite"));
+        }
+    }
+
+    if(writeLast_)
+        runLast_=true;
+    else
+    {
+        Warning << "Using invalid options of writeLiggghts, please use 'writeLast' option." << endl;
+        runEveryWriteStep_=true;
+    }    
+
 
     command_ += " " + path_ + "/" + writeName_;
     if(overwrite_)
