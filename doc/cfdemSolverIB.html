@@ -1,0 +1,53 @@
+<HTML>
+<CENTER><A HREF = "http://www.cfdem.com">CFDEMproject WWW Site</A> - <A HREF = "CFDEMcoupling_Manual.html#comm">CFDEM Commands</A> 
+</CENTER>
+
+
+
+
+<HR>
+
+<H3>cfdemSolverIB command 
+</H3>
+<P><B>Description:</B>
+</P>
+<P>"cfdemSolverIB" is a coupled CFD-DEM solver using CFDEMcoupling, an open source parallel coupled CFD-DEM framework, for calculating
+the dynamics between immersed bodies and the surrounding fluid. Being an implementation of an immersed boundary method it allows tackling problems where the body diameter exceeds the maximal size of a fluid cell. Using the toolbox of OpenFOAM(R)(*) the governing equations of the fluid are computed and the corrections of velocity and pressure field with respect to the body-movement information, gained from LIGGGHTS, are incorporated. 
+</P>
+<P>Code of this solver contributions by Alice Hager, JKU.  
+</P>
+<P><B>Algorithm:</B>
+</P>
+<P>For each time step ...
+</P>
+<UL><LI>the motion of the spheres is calculated (position, velocity, angular velocity, force...) with LIGGGHTS using the velocity and pressure-field from the previous time step (initial condition for t=0). 
+
+<LI>the Navier-Stokes equations are solved on the whole computational domain, disregarding the solid phase. 
+
+<LI>the spheres are located within the mesh: each sphere is represented by a cluster of cells, which are either totally or partially covered by the body, depending on its exact position. 
+
+<LI>the correction of the velocity and pressure field of the fluid phase takes place, using the information about the location of the spheres and their (angular) velocity. 
+
+
+</UL>
+<P><B>Use:</B>
+</P>
+<P>The solver is realized within the Open Source framework CFDEMcoupling. Just as for the unresolved CFD-DEM solver cfdemSolverPiso the file CFD/constant/couplingProperties contains information about the settings for the different models. While IOmodel, DataExchangeModel etc. are applicable for all CFDEMcoupling-solvers, special locate-, force- and void fraction models were designed for the present case:
+</P>
+<P><A HREF = "locateModel_engineSearchIB.html">engineSearchIB</A>, <A HREF = "forceModel_ArchimedesIB.html">ArchimedesIB</A>, <A HREF = "forceModel_ShirgaonkarIB.html">ShirgaonkarIB</A>, <A HREF = "voidFractionModel_IBVoidFraction.html">IBVoidfraction</A>
+</P>
+<P><B>References:</B>
+</P>
+<P>GONIVA, C., KLOSS, C., HAGER,A., WIERINK, G. and PIRKER, S. (2011): "A MULTI-PURPOSE OPEN SOURCE CFD-DEM APPROACH", Proc. of the 8th Int. Conf. on CFD in Oil and Gas, Metallurgical and Process Industries, Trondheim, Norway
+</P>
+<P>and
+</P>
+<P>HAGER, A., KLOSS, C. and GONIVA, C. (2011): "TOWARDS AN EFFICIENT IMMERSED BOUNDARY METHOD WITHIN AN OPEN SOURCE FRAMEWORK", Proc. of the 8th Int. Conf. on CFD in Oil and Gas, Metallurgical and Process Industries, Trondheim, Norway
+</P>
+<HR>
+
+<P>(*) <A HREF = "of">OpenFOAM(R)</A> is a registered trade mark of Silicon Graphics International Corp. This offering is not affiliated, approved or endorsed by Silicon Graphics International Corp., the producer of the OpenFOAM(R) software and owner of the OpenFOAM(R) trademark.
+</P>
+<HR>
+
+</HTML>

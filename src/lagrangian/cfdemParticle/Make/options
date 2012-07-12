@@ -1,0 +1,27 @@
+sinclude $(GENERAL_RULES)/mplib$(WM_MPLIB)
+sinclude $(RULES)/mplib$(WM_MPLIB)
+
+
+EXE_INC = \
+     $(PFLAGS) \
+     $(PINC) \
+    -I ./cfdemParticle \
+    -I$(LIB_SRC)/finiteVolume/lnInclude \
+    -I$(LIB_SRC)/transportModels \
+    -I$(LIB_SRC)/turbulenceModels/incompressible/turbulenceModel \
+    -I$(LIB_SRC)/meshTools/lnInclude \
+    -I$(LIB_SRC)/lagrangian/basic/lnInclude \
+    -I$(LIB_SRC)/OpenFOAM/containers/HashTables/labelHashSet \
+    -I$(CFDEM_LIGGGHTS_SRC_DIR) \
+
+LIB_LIBS = \
+     $(PLIBS) \
+    -L$(FOAM_USER_LIBBIN) \
+    -lfiniteVolume \
+    -lincompressibleRASModels \
+    -lincompressibleLESModels \
+    -lmeshTools \
+    -llagrangian \
+    -lmpi_cxx \
+    -L$(CFDEM_LIGGGHTS_SRC_DIR) \
+    -l$(CFDEM_LIGGGHTS_LIB_NAME) \

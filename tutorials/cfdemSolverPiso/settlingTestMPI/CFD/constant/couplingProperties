@@ -1,0 +1,149 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.4                                   |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+
+    root            "";
+    case            "";
+    instance        "";
+    local           "";
+
+    class           dictionary;
+    object          couplingProperties;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+//===========================================================================//
+// sub-models & settings
+
+modelType B; // A or B
+
+couplingInterval 100;
+
+voidFractionModel divided;//centre;//bigParticle;//
+
+locateModel standard;
+
+meshMotionModel noMeshMotion;
+
+regionModel allRegion;
+
+IOModel basicIO;
+
+dataExchangeModel twoWayMPI;//twoWayFiles;//oneWayVTK;//
+
+averagingModel dense;//dilute;//
+
+clockModel standardClock;//off; //
+
+forceModels
+(
+    DiFeliceDrag
+    //SchillerNaumannDrag
+    //KochHillDrag
+    //MeiLift
+    //virtualMassForce
+    Archimedes
+);
+
+momCoupleModels
+(
+    implicitCouple
+);
+
+turbulenceModelType RASProperties;//LESProperties;//
+
+//===========================================================================//
+// sub-model properties
+
+implicitCoupleProps
+{
+    velFieldName "U";
+    granVelFieldName "Us";
+    voidfractionFieldName "voidfraction";
+}
+
+DiFeliceDragProps
+{
+    velFieldName "U";
+    densityFieldName "rho";
+    voidfractionFieldName "voidfraction";
+}
+
+SchillerNaumannDragProps
+{
+    velFieldName "U";
+    densityFieldName "rho";
+}
+
+KochHillDragProps
+{
+    velFieldName "U";
+    densityFieldName "rho";
+}
+
+MeiLiftProps
+{
+    velFieldName "U";
+    densityFieldName "rho";
+}
+
+ArchimedesProps
+{
+    densityFieldName "rho";
+    gravityFieldName "g";
+    treatDEM;
+}
+
+virtualMassForceProps
+{
+    velFieldName "U";
+    densityFieldName "rho";
+}
+
+oneWayVTKProps
+{
+    couplingFilename "vtk_out%4.4d.vtk";
+    maxNumberOfParticles 30000;
+}
+
+twoWayMPIProps
+{
+    liggghtsPath "../DEM/in.liggghts_init";
+}
+
+twoWayFilesProps
+{
+    maxNumberOfParticles 10000;
+    DEMts 0.00001;
+}
+
+centreProps
+{
+    alphaMin 0.30;
+}
+
+dividedProps
+{
+    alphaMin 0.3;
+    scaleUpVol 1.0;
+}
+
+bigParticleProps
+{
+    maxCellsPerParticle 1000;
+    alphaMin 0.30;
+    scaleUpVol 1.0;
+}
+
+// ************************************************************************* //

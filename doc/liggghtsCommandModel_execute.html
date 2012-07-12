@@ -1,0 +1,94 @@
+<HTML>
+<CENTER><A HREF = "http://www.cfdem.com">CFDEMproject WWW Site</A> - <A HREF = "CFDEMcoupling_Manual.html#comm">CFDEM Commands</A> 
+</CENTER>
+
+
+
+
+<HR>
+
+<H3>liggghtsCommandModel_execute command 
+</H3>
+<P><B>Syntax:</B>
+</P>
+<P>Defined in liggghtsCommmands dictionary.
+</P>
+<PRE>liggghtsCommandModels
+(
+   execute
+);
+executeProps0
+{
+    command
+    (
+        run
+        $couplingInterval
+    );
+    runFirst switch1; 
+    runLast switch2;
+    runEveryCouplingStep switch3;
+    runEveryWriteStep switch4;
+} 
+</PRE>
+<UL><LI><I>command</I> = LIGGGHTS command to be executed. Each word in a new line, numbers and symbols need special treatment (e.g. $couplingInterval will be replaced by correct coupling interval in the simulation)  
+
+<LI><I>switch1</I> = switch (choose on/off) if the command is executed only at first time step 
+
+<LI><I>switch2</I> = switch (choose on/off) if the command is executed only at last time step 
+
+<LI><I>switch3</I> = switch (choose on/off) if the command is executed at every coupling step 
+
+<LI><I>switch4</I> = switch (choose on/off) if the command is executed at every writing step 
+
+
+</UL>
+<P><B>Examples:</B>
+</P>
+<PRE>liggghtsCommandModels
+(
+   execute
+   execute
+);
+executeProps0
+{
+    command
+    (
+        run
+        $couplingInterval
+    );
+    runFirst off;
+    runLast off;
+    runEveryCouplingStep on;
+}
+executeProps1
+{
+    command
+    (
+        write_restart
+        noBlanks
+        dotdot
+        slash
+        DEM
+        slash
+        liggghts.restart_
+        timeStamp
+    );
+    runFirst off;
+    runLast off;
+    runEveryCouplingStep off;
+    runEveryWriteStep on;
+} 
+</PRE>
+<P><B>Description:</B>
+</P>
+<P>The execute liggghtsCommand Model can be used to execute a LIGGGHTS command during a CFD run. In above example execute_0 for instance executes "run $couplingInterval" every coupling step. $couplingInterval is automatically replaced by the correct number of DEM steps. Additionally execute_1 executes "write_restart ../DEM/liggghts.restart_$timeStamp" every writing step, where $timeStamp is automatically set.
+</P>
+<H4>These rather complex execute commands can be replaced by the "readLiggghts" and "writeLiggghts" commands! 
+</H4>
+<P><B>Restrictions:</B> None.
+</P>
+<P><B>Related commands:</B>
+</P>
+<P><A HREF = "liggghtsCommandModel.html">liggghtsCommandModel</A>
+</P>
+</HTML>

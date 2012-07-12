@@ -1,0 +1,48 @@
+"CFDEMproject WWW Site"_lws - "CFDEM Commands"_lc :c
+
+:link(lws,http://www.cfdem.com)
+:link(lc,CFDEMcoupling_Manual.html#comm)
+
+:line
+
+liggghtsCommandModel_readLiggghtsData command :h3
+
+[Syntax:]
+
+Defined in liggghtsCommmands dictionary.
+
+liggghtsCommandModels
+(
+   readLiggghtsData
+);
+readLiggghtsDataProps0
+\{
+    ???
+\} :pre
+
+
+[Examples:]
+
+liggghtsCommandModels
+(
+   readLiggghtsData
+   readLiggghtsData
+);
+readLiggghtsDataProps0
+\{
+    ???
+\} :pre
+
+[Description:]
+
+The readLiggghtsData liggghtsCommand Model can be used to ??? 
+
+
+[Restrictions:] 
+
+Note: Model is not up to date.
+
+[Related commands:]
+
+"liggghtsCommandModel"_liggghtsCommandModel.html
+

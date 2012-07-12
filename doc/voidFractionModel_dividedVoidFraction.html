@@ -1,0 +1,50 @@
+<HTML>
+<CENTER><A HREF = "http://www.cfdem.com">CFDEMproject WWW Site</A> - <A HREF = "CFDEMcoupling_Manual.html#comm">CFDEM Commands</A> 
+</CENTER>
+
+
+
+
+<HR>
+
+<H3>voidfractionModel_dividedVoidFraction command 
+</H3>
+<P><B>Syntax:</B>
+</P>
+<P>Defined in couplingProperties dictionary.
+</P>
+<PRE>voidfractionModel divided;
+dividedProps
+{
+    alphaMin number1;
+    scaleUpVol number2;
+} 
+</PRE>
+<UL><LI><I>number1</I> = mininmum limit for voidfraction 
+
+<LI><I>number2</I> = diameter of the particle's representation is artificially increased according to <I>number2</I> * Vparticle, volume remains unaltered! 
+
+
+</UL>
+<P><B>Examples:</B>
+</P>
+<PRE>voidfractionModel divided;
+dividedProps
+{
+    alphaMin 0.2;
+    scaleUpVol 1.0;
+} 
+</PRE>
+<P><B>Description:</B>
+</P>
+<P>The divided voidFraction model is supposed to be used when a particle (or it's representation) is in the size range of a CFD cell. Satellite points are used to divide the particle's volume to the touched cells.
+</P>
+<P>The region of influence of a particle can be increased artificially by "scaleUpVol", which  blows up the particles, but keeps their volume (for voidfraction calculation) constant.
+</P>
+<P><B>Restrictions:</B> none.
+</P>
+<P><B>Related commands:</B>
+</P>
+<P><A HREF = "voidfractionModel.html">voidfractionModel</A>
+</P>
+</HTML>

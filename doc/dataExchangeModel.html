@@ -1,0 +1,41 @@
+<HTML>
+<CENTER><A HREF = "http://www.cfdem.com">CFDEMproject WWW Site</A> - <A HREF = "CFDEMcoupling_Manual.html#comm">CFDEM Commands</A> 
+</CENTER>
+
+
+
+
+<HR>
+
+<H3>dataExchangeModel command 
+</H3>
+<P><B>Syntax:</B>
+</P>
+<P>Defined in couplingProperties dictionary.
+</P>
+<PRE>dataExchangeModel model; 
+</PRE>
+<UL><LI>model = name of data exchange model to be applied 
+</UL>
+<P><B>Examples:</B>
+</P>
+<PRE>dataExchangeModel twoWayFiles;
+dataExchangeModel twoWayMPI; 
+</PRE>
+<P>Note: This examples list might not be complete - please look for other models (dataExchangeModel_XY) in this documentation.
+</P>
+<P><B>Description:</B>
+</P>
+<P>The data exchange model performs the data exchange between the DEM code and the CFD code.
+</P>
+<P><B>Restrictions:</B>
+</P>
+<P>None.
+</P>
+<P><B>Related commands:</B>
+</P>
+<P><A HREF = "dataExchangeModel_noDataExchange.html">noDataExchange</A>, <A HREF = "dataExchangeModel_oneWayVTK.html">oneWayVTK</A>, <A HREF = "dataExchangeModel_twoWayFiles.html">twoWayFiles</A>, <A HREF = "dataExchangeModel_twoWayMPI.html">twoWayMPI</A>
+</P>
+<P><B>Default:</B> none
+</P>
+</HTML>
