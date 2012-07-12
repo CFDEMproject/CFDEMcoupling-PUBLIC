@@ -1,0 +1,51 @@
+"CFDEMproject WWW Site"_lws - "CFDEM Commands"_lc :c
+
+:link(lws,http://www.cfdem.com)
+:link(lc,CFDEMcoupling_Manual.html#comm)
+
+:line
+
+forceModel_MeiLift command :h3
+
+[Syntax:]
+
+Defined in couplingProperties dictionary.
+
+forceModels
+(
+    MeiLift
+);
+MeiLiftProps
+\{
+    velFieldName "U";
+    densityFieldName "density";
+\}; :pre
+
+{U} = name of the finite volume fluid velocity field :ulb,l
+{density} = name of the finite volume fluid density field :l
+:ule
+
+[Examples:]
+
+forceModels
+(
+    MeiLift
+);
+MeiLiftProps
+\{
+    velFieldName "U";
+    densityFieldName "rho";
+\} :pre
+
+[Description:]
+
+The force model performs the calculation of forces (e.g. fluid-particle interaction forces) acting on each DEM particle. The MeiLift model calculates the lift force for each particle based on Loth and Dorgan (2009)
+
+[Restrictions:]
+
+None.
+
+[Related commands:]
+
+"forceModel"_forceModel.html
+

@@ -1,0 +1,55 @@
+<HTML>
+<CENTER><A HREF = "http://www.cfdem.com">CFDEMproject WWW Site</A> - <A HREF = "CFDEMcoupling_Manual.html#comm">CFDEM Commands</A> 
+</CENTER>
+
+
+
+
+<HR>
+
+<H3>liggghtsCommandModel_writeLiggghts command 
+</H3>
+<P><B>Syntax:</B>
+</P>
+<P>Defined in liggghtsCommmands dictionary.
+</P>
+<PRE>liggghtsCommandModels
+(
+   writeLiggghts
+);
+writeLiggghtsProps
+{
+    writeName "name";
+    overwrite switch;
+} 
+</PRE>
+<UL><LI><I>name</I> = name of the restart file to be written in /$caseDir/DEM/  
+
+<LI><I>switch</I> = switch (choose on/off) to select if only one restart file $name or many files $name_$timeStamp are written 
+
+
+</UL>
+<P><B>Examples:</B>
+</P>
+<PRE>liggghtsCommandModels
+(
+   runLiggghts
+   writeLiggghts
+);
+writeLiggghtsProps
+{
+    writeName "liggghts_restart";
+    overwrite off;
+}  
+</PRE>
+<P><B>Description:</B>
+</P>
+<P>The liggghtsCommand models can be used to execute a LIGGGHTS command during a CFD write. The "writeLiggghts" command executes the command "write_restart $name", where $name is the name of the restart file, every write step.
+</P>
+<P><B>Restrictions:</B> None.
+</P>
+<P><B>Related commands:</B>
+</P>
+<P><A HREF = "liggghtsCommandModel.html">liggghtsCommandModel</A>
+</P>
+</HTML>

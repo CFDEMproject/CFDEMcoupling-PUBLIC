@@ -1,0 +1,40 @@
+"CFDEMproject WWW Site"_lws - "CFDEM Commands"_lc :c
+
+:link(lws,http://www.cfdem.com)
+:link(lc,CFDEMcoupling_Manual.html#comm)
+
+:line
+
+voidfractionModel_centreVoidFraction command :h3
+
+[Syntax:]
+
+Defined in couplingProperties dictionary.
+
+voidfractionModel centre;
+centreProps
+\{
+    alphaMin value;
+\} :pre
+
+{value} = mininmum limit for voidfraction :ulb,l
+:ule
+
+[Examples:]
+
+voidfractionModel centre;
+centreProps
+\{
+    alphaMin 0.1;
+\} :pre
+
+[Description:]
+
+The centre voidFraction model calculates the voidfraction in a CFD cell accounting for the volume of the particles whose centres are inside the cell.
+
+[Restrictions:] none.
+
+[Related commands:]
+
+"voidfractionModel"_voidfractionModel.html
+

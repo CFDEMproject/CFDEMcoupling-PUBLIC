@@ -1,0 +1,63 @@
+<HTML>
+<CENTER><A HREF = "http://www.cfdem.com">CFDEMproject WWW Site</A> - <A HREF = "CFDEMcoupling_Manual.html#comm">CFDEM Commands</A> 
+</CENTER>
+
+
+
+
+<HR>
+
+<H3>forceModel_KochHillDrag command 
+</H3>
+<P><B>Syntax:</B>
+</P>
+<P>Defined in couplingProperties dictionary.
+</P>
+<PRE>forceModels
+(
+    KochHillDrag
+);
+KochHillDragProps
+{
+    velFieldName "U";
+    densityFieldName "density";
+    voidfractionFieldName "voidfraction"; 
+    interpolation;
+}; 
+</PRE>
+<UL><LI><I>U</I> = name of the finite volume fluid velocity field 
+
+<LI><I>density</I> = name of the finite volume gravity field 
+
+<LI><I>voidfraction</I> = name of the finite volume voidfraction field 
+
+<LI><I>interpolation</I> = flag to use interolate interpolated voidfraction and fluid velocity values (normally off) 
+
+
+</UL>
+<P><B>Examples:</B>
+</P>
+<PRE>forceModels
+(
+    KochHillDrag
+);
+KochHillDragProps
+{
+    velFieldName "U";
+    densityFieldName "rho";
+    voidfractionFieldName "voidfraction"; 
+} 
+</PRE>
+<P><B>Description:</B>
+</P>
+<P>The force model performs the calculation of forces (e.g. fluid-particle interaction forces) acting on each DEM particle. The KochHillDrag model is a model that calculates the particle based drag force following the correlation of Koch & Hill (2001)  (see van Buijtenen et al. (2011): "Numerical and experimental study on multiple-spout fluidized beds" ,ChemEngScience).
+</P>
+<P><B>Restrictions:</B>
+</P>
+<P>none.
+</P>
+<P><B>Related commands:</B>
+</P>
+<P><A HREF = "forceModel.html">forceModel</A>
+</P>
+</HTML>

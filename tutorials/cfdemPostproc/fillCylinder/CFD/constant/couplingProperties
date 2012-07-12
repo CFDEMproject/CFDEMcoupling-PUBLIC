@@ -1,0 +1,77 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.4                                   |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+
+    root            "";
+    case            "";
+    instance        "";
+    local           "";
+
+    class           dictionary;
+    object          couplingProperties;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+//===========================================================================//
+// sub-models & settings
+
+modelType A;
+
+couplingInterval 10;
+
+voidFractionModel centre;
+
+locateModel standard;
+
+meshMotionModel noMeshMotion;
+
+regionModel allRegion;
+
+IOModel off;
+
+dataExchangeModel oneWayVTK;
+
+averagingModel dense;
+
+clockModel off;
+
+forceModels
+(
+    off
+);
+
+momCoupleModels
+(
+    off
+);
+
+turbulenceModelType RASProperties;
+
+//===========================================================================//
+// sub-model properties
+
+oneWayVTKProps
+{
+    DEMts 0.0001;
+    relativePath "../DEM/post";
+    couplingFilename "liggghts_init%4.4d.vtk";
+    maxNumberOfParticles 30000;
+}
+
+centreProps
+{
+    alphaMin 0.10;
+}
+
+// ************************************************************************* //

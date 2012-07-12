@@ -1,0 +1,57 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.4                                   |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+
+    root            "";
+    case            "";
+    instance        "";
+    local           "";
+
+    class           dictionary;
+    object          liggghtsCommands;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+liggghtsCommandModels
+(
+   runLiggghts
+   execute
+);
+
+// reset particle temperature every coupling step
+executeProps1
+{
+    command
+    (
+        set
+        region
+        total
+        noBlanks
+        property
+        slash
+        atom  // former peratom
+        blanks
+        Temp
+        number
+    );
+    scalars
+    (
+        600
+    );
+    runFirst off; 
+    runLast off;
+    runEveryCouplingStep on;
+}
+
+// ************************************************************************* //

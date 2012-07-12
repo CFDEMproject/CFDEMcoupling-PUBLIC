@@ -1,0 +1,424 @@
+"CFDEMproject WWW Site"_lws :c
+
+:link(lws,http://www.cfdem.com)
+:link(lc,CFDEMcoupling_Manual.html#comm)
+:link(of,http://www.openfoam.com)
+:link(lig,http://www.cfdem.com)
+
+:line
+CFDEMcoupling Documentation :h2,c
+:line
+:c,image(Portfolio_CFDEMcoupling.png)
+:line
+1. Contents :h3
+
+The CFDEMcoupling documentation is organized into the following sections. If you find errors or omissions in this manual or have suggestions for useful information to add, please send an email to the developers so we can improve the CFDEMcoupling documentation. 
+
+1.1 "About CFDEMcoupling"_#1_1
+1.2 "Installation"_#1_2
+1.3 "Tutorials"_#1_3
+1.4 "couplingProperties dictionary"_#1_4
+1.5 "liggghtsCommands dictionary"_#1_5
+1.6 "Models and solvers"_#cmd_5 :all(b)
+
+:line
+
+1.1 About CFDEMcoupling :link(1_1),h4
+
+CFDEM coupling provides an open source parallel coupled CFD-DEM framework combining the strengths of "LIGGGHTS"_lig DEM code and the Open Source CFD package "OpenFOAM(R)(*)"_of. The CFDEMcoupling toolbox allows to expand standard CFD solvers of "OpenFOAM(R)(*)"_of to include a coupling to the DEM code "LIGGGHTS"_lig. In this toolbox the particle representation within the CFD solver is organized by "cloud" classes. Key functionalities are organised in sub-models (e.g. force models, data exchange models, etc.) which can easily be selected and combined by dictionary settings.
+
+The coupled solvers run fully parallel on distributed-memory clusters. Features are:
+
+its modular approach allows users to easily implement new models :ulb,l
+its MPI parallelization enables to use it for large scale problems :l
+the "forum"_lws on CFD-DEM gives the possibility to exchange with other users / developers :l
+the use of GIT allows to easily update to the latest version :l
+basic documentation is provided :l
+:ule
+
+The file structure:
+
+{src} directory including the source files of the coupling toolbox and models :ulb,l
+{applications} directory including the solver files for coupled CFD-DEM simulations :l
+{doc} directory including the documentation of CFDEMcoupling :l
+{tutorials} directory including basic tutorial cases showing the functionality  :l
+:ule
+
+Details on installation are given on the "CFDEMproject WWW Site"_lws .
+The functionality of this CFD-DEM framwork is described via "tutorial cases"_#_1_2 showing how to use different solvers and models.
+
+CFDEMcoupling stands for Computational Fluid Dynamics (CFD) -Discrete Element Method (DEM) coupling.
+
+CFDEMcoupling is an open-source code, distributed freely under the terms of the GNU Public License (GPL). 
+
+Core development of CFDEMcoupling is done by Christoph Goniva and Christoph Kloss, both at DCS Computing GmbH, 2012
+
+This documentation was written by Christoph Goniva, DCS Computing GmbH, 2012
+
+:line
+(*) "OpenFOAM(R)"_of is a registered trade mark of Silicon Graphics International Corp. This offering is not affiliated, approved or endorsed by Silicon Graphics International Corp., the producer of the OpenFOAM(R) software and owner of the OpenFOAM(R) trademark.
+
+:line
+
+1.2 Installation :link(1_2),h4
+
+Please follow the installation routine provided at www.cfdem.com.
+In order to get the latest code version, please use the git repository at http://github.com ("githubAccess"_githubAccess_public.html). 
+
+:line
+
+1.3 Tutorials :link(1_3),h4
+
+[General:]
+
+Each solver of the CFDEMcoupling is comes with at least one tutorial example, showing its functionality and correct useage. Provided that the installation is correct, the tutorials can be run via "Allrun.sh" shell scripts. These scripts perform all necessary steps (preprocessing, run, postprocessing, visualization).
+
+[Location:]
+
+The tutorials can be found in the directory $CFDEM_PROJECT_DIR/tutorials, which can be reached by typing "cfdemTut"
+
+[Structure:]
+
+Each case is structured in a directory called "CFD" covering the CFD relevant settings and data, and a dirctory called "DEM" covering the DEM relevant settings and data. This allows to easily expand a pure CFD or DEM simulation case to a coupled case.
+
+[Usage:]
+
+Provided that the installation is correct, the tutorials can be run via "Allrun.sh" shell script, executed by typing "./Allrun.sh". The successful run of the script might need some third party software (e.g. octave, evince, etc.).
+
+[Settings:]
+
+The main settings of a simulation are done via dictionaries:
+
+The DEM setup of each case is defined by a "LIGGGHTS"_lig input file located in $caseDir/DEM (e.g. in.liggghts_init). For details on the "LIGGGHTS"_lig setup, please have a look in the "LIGGGHTS"_lig manual.
+
+Standard CFD settings are defined in $caseDir/CFD/constant (e.g. transportProperties, RASproperties, etc.) and $caseDir/CFD/system (e.g. fvSchemes, controlDict). You can find more information on that in "OpenFOAM(R)(*)"_of documentations (www.openFoam.com)(*).
+
+Settings of the coupling routines are defined in $caseDir/CFD/constant/"couplingProperies"_#1_3 (e.g. force models, data exchange model, etc.) and $caseDir/CFD/constant/"liggghtsCommands"_#1_3 (allows to execute a LIGGGHTS command during a coupled simulation).
+
+:line
+
+1.4 "couplingProperties" dictionary :link(1_4),h4
+
+[General:]
+
+In the "couplingProperties" dictionary the setup of the coupling routines of the CFD-DEM simulation are defined.
+
+[Location:] $caseDir/CFD/constant
+
+[Structure:]
+
+The dictionary is divided into two parts, "sub-models & settings" and "sub-model properties".
+
+In "sub-models & settings" the following routines must be specified:
+
+modelType :ulb,l
+couplingInterval :l
+voidFractionModel :l
+locateModel :l
+meshMotionModel :l
+regionModel :l
+IOModel :l
+dataExchangeModel :l
+averagingModel :l
+forceModels :l
+momCoupleModels :l
+turbulenceModelType :l
+:ule
+
+In "sub-model properties" sub-dictionaries might be defined to specify model specific parameters.
+
+[Settings:]
+
+Reasonable example settings for the "couplingProperties" dictionary are given in the tutorial cases.
+
+:line
+
+1.5 "liggghtsCommands" dictionary :h4,link(1_5)
+
+[General:]
+
+In the "liggghtsCommands" dictionary liggghts commands being executed during a coupled CFD-DEM simulation are specified.
+
+[Location:] $caseDir/CFD/constant
+
+[Structure:]
+
+The dictionary is divided into two parts, first a list of "liggghtsCommandModels" is defined, then the settings for each model must be specified.
+
+[Settings:]
+
+Reasonable example settings for the "liggghtsCommands" dictionary are given in the tutorial cases.
+
+:line
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1.6 Models/Solvers :h4,link(cmd_5),link(comm)
+
+This section lists all CFDEMcoupling sub-models and solvers alphabetically, with a separate
+listing below of styles within certain commands.
+
+
+"IOModel"_IOModel.html,
+"IOModel_basicIO"_IOModel_basicIO.html,
+"IOModel_noIO"_IOModel_noIO.html,
+"averagingModel"_averagingModel.html,
+"averagingModel_dilute"_averagingModel_dilute.html,
+"cfdemSolverIB"_cfdemSolverIB.html,
+"cfdemSolverPiso"_cfdemSolverPiso.html,
+"cfdemSolverPisoScalar"_cfdemSolverPisoScalar.html,
+"clockModel"_clockModel.html,
+"clockModel_noClock"_clockModel_noClock.html,
+"clockModel_standardClock"_clockModel_standardClock.html,
+"dataExchangeModel"_dataExchangeModel.html,
+"dataExchangeModel_noDataExchange"_dataExchangeModel_noDataExchange.html,
+"dataExchangeModel_oneWayVTK"_dataExchangeModel_oneWayVTK.html,
+"dataExchangeModel_twoWayFiles"_dataExchangeModel_twoWayFiles.html,
+"dataExchangeModel_twoWayMPI"_dataExchangeModel_twoWayMPI.html,
+"forceModel"_forceModel.html,
+"forceModel_Archimedes"_forceModel_Archimedes.html,
+"forceModel_ArchimedesIB"_forceModel_ArchimedesIB.html,
+"forceModel_DiFeliceDrag"_forceModel_DiFeliceDrag.html,
+"forceModel_GidaspowDrag"_forceModel_GidaspowDrag.html,
+"forceModel_KochHillDrag"_forceModel_KochHillDrag.html,
+"forceModel_LaEuScalarTemp"_forceModel_LaEuScalarTemp.html,
+"forceModel_MeiLift"_forceModel_MeiLift.html,
+"forceModel_SchillerNaumannDrag"_forceModel_SchillerNaumannDrag.html,
+"forceModel_ShirgaonkarIB"_forceModel_ShirgaonkarIB.html,
+"forceModel_gradPForce"_forceModel_gradPForce.html,
+"forceModel_noDrag"_forceModel_noDrag.html,
+"forceModel_virtualMassForce"_forceModel_virtualMassForce.html,
+"forceModel_viscForce"_forceModel_viscForce.html,
+"liggghtsCommandModel"_liggghtsCommandModel.html,
+"liggghtsCommandModel_execute"_liggghtsCommandModel_execute.html,
+"liggghtsCommandModel_readLiggghtsData"_liggghtsCommandModel_readLiggghtsData.html,
+"liggghtsCommandModel_runLiggghts"_liggghtsCommandModel_runLiggghts.html,
+"liggghtsCommandModel_writeLiggghts"_liggghtsCommandModel_writeLiggghts.html,
+"locateModel"_locateModel.html,
+"locateModel_engineSearch"_locateModel_engineSearch.html,
+"locateModel_engineSearchIB"_locateModel_engineSearchIB.html,
+"locateModel_standardSearch"_locateModel_standardSearch.html,
+"meshMotionModel"_meshMotionModel.html,
+"meshMotionModel_noMeshMotion"_meshMotionModel_noMeshMotion.html,
+"momCoupleModel"_momCoupleModel.html,
+"momCoupleModel_explicitCouple"_momCoupleModel_explicitCouple.html,
+"momCoupleModel_implicitCouple"_momCoupleModel_implicitCouple.html,
+"momCoupleModel_noCouple"_momCoupleModel_noCouple.html,
+"regionModel"_regionModel.html,
+"regionModel_allRegion"_regionModel_allRegion.html,
+"voidfractionModel"_voidFractionModel.html,
+"voidfractionModel_GaussVoidFraction"_voidFractionModel_GaussVoidFraction.html,
+"voidfractionModel_IBVoidFraction"_voidFractionModel_IBVoidFraction.html,
+"voidfractionModel_bigParticleVoidFraction"_voidFractionModel_bigParticleVoidFraction.html,
+"voidfractionModel_centreVoidFraction"_voidFractionModel_centreVoidFraction.html,
+"voidfractionModel_dividedVoidFraction"_voidFractionModel_dividedVoidFraction.html :tb(c=2,ea=c)

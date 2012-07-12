@@ -1,0 +1,50 @@
+<HTML>
+<CENTER><A HREF = "http://www.cfdem.com">CFDEMproject WWW Site</A> - <A HREF = "CFDEMcoupling_Manual.html#comm">CFDEM Commands</A> 
+</CENTER>
+
+
+
+
+<HR>
+
+<H3>forceModel command 
+</H3>
+<P><B>Syntax:</B>
+</P>
+<P>Defined in couplingProperties dictionary.
+</P>
+<PRE>forceModels
+(
+    model_x
+    model_y
+); 
+</PRE>
+<UL><LI>model = name of force model to be applied 
+</UL>
+<P><B>Examples:</B>
+</P>
+<PRE>forceModels
+(
+    Archimedes
+    DiFeliceDrag
+); 
+</PRE>
+<P>Note: This examples list might not be complete - please look for other models (forceModel_XY) in this documentation.
+</P>
+<P><B>Description:</B>
+</P>
+<P>The force model performs the calculation of forces (e.g. fluid-particle interaction forces) acting on each DEM particle. All force models selected are executed sequentially and the forces on the particles are superposed.
+</P>
+<P><B>Restrictions:</B>
+</P>
+<P>None.
+</P>
+<P><B>Related commands:</B>
+</P>
+<P><A HREF = "forceModel_Archimedes.html">Archimedes</A>, <A HREF = "forceModel_DiFeliceDrag.html">DiFeliceDrag</A>, <A HREF = "forceModel_gradPForce.html">gradPForce</A>, <A HREF = "forceModel_viscForce.html">viscForce</A>
+</P>
+<P>Note: This examples list may be incomplete - please look for other models (forceModel_XY) in this documentation.
+</P>
+<P><B>Default:</B> none.
+</P>
+</HTML>

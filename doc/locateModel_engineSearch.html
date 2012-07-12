@@ -1,0 +1,51 @@
+<HTML>
+<CENTER><A HREF = "http://www.cfdem.com">CFDEMproject WWW Site</A> - <A HREF = "CFDEMcoupling_Manual.html#comm">CFDEM Commands</A> 
+</CENTER>
+
+
+
+
+<HR>
+
+<H3>locateModel_engineSearch command 
+</H3>
+<P><B>Syntax:</B>
+</P>
+<P>Defined in couplingProperties dictionary.
+</P>
+<PRE>locateModel engine;
+engineProps
+{
+    treeSearch switch1;
+} 
+</PRE>
+<UL><LI><I>switch1</I> = names of the finite volume scalar fields to be temporally averaged 
+
+
+</UL>
+<P><B>Examples:</B>
+</P>
+<PRE>locateModel engine;
+engineProps
+{
+    treeSearch false;
+} 
+</PRE>
+<P><B>Description:</B>
+</P>
+<P>The locateModel "engine" locates the CFD cell and cellID corresponding to a given position.
+The engineSearch locate Model can be used with different settings to use different algorithms:
+</P>
+<UL><LI>treeSearch false;     will execute some geometric (linear) search using the last known cellID (recommended) 
+
+<LI>treeSearch true;      will use a recursive tree structure to find the cell. 
+
+
+</UL>
+<P><B>Restrictions:</B> none.
+</P>
+<P><B>Related commands:</B>
+</P>
+<P><A HREF = "locateModel.html">locateModel</A>
+</P>
+</HTML>
