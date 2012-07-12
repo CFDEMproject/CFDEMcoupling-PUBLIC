@@ -95,7 +95,7 @@ voidFractionModel::voidFractionModel
 
 voidFractionModel::~voidFractionModel()
 {
-    delete cellsPerParticle_;
+    free(cellsPerParticle_);
 }
 
 // * * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * * //

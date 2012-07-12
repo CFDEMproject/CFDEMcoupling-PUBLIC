@@ -201,7 +201,8 @@ void Foam::clockModel::evalPar() const
 	std::string msg = "Parallel Measurements in CPU-seconds of all Processors:";
 	msg.append("\n");
 	msg.append("Name \t avgdeltaT \t maxdeltaT \t nOfRuns \t level \t parentNr \t parentName \n");
-	double buffOut, buffIn;
+	double buffOut=0.;
+    double buffIn=0.;
 	std::vector<int> shifts = calcShift();
 
 	for (int i=0;i<n_;i++)

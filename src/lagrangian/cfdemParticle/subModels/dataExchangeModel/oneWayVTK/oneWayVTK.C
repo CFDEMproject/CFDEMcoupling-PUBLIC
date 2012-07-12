@@ -97,7 +97,7 @@ void oneWayVTK::getData
 if (type == "scalar-atom")
 {
     // get path to particle VTK files
-    char index[20];
+    char index[100];
     sprintf(index, charFilename_, step);
     //fileName H(particleCloud_.mesh().time().path()/".."/"DEM"/"post"/index);
     fileName H(particleCloud_.mesh().time().path()/relativePath_/index);
@@ -140,7 +140,7 @@ if (type == "scalar-atom")
 } else if (type == "vector-atom")
 {
     // get path to particle VTK files
-    char index[20];
+    char index[100];
     sprintf(index, charFilename_, step);
     //fileName H(particleCloud_.mesh().time().path()/".."/"DEM"/"post"/index);
     fileName H(particleCloud_.mesh().time().path()/relativePath_/index);

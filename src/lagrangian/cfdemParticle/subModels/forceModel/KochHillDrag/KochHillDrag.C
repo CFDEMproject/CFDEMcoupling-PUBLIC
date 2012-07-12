@@ -34,6 +34,7 @@ Description
 #include "KochHillDrag.H"
 #include "addToRunTimeSelectionTable.H"
 
+#include "mpi.h"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -95,57 +96,68 @@ void KochHillDrag::setForce
 {
     // get viscosity field
     #ifdef comp
-        const volScalarField& nufField = particleCloud_.turbulence().mu() / rho_;
+        const volScalarField nufField = particleCloud_.turbulence().mu()/rho_;
     #else
         const volScalarField& nufField = particleCloud_.turbulence().nu();
     #endif
 
+    vector position(0,0,0);
+    scalar voidfraction(1);
+    vector Ufluid(0,0,0);
+    vector drag(0,0,0);
+    label cellI=0;
+
+    vector Us(0,0,0);
+    vector Ur(0,0,0);
+    scalar ds(0);
+    scalar nuf(0);
+    scalar rho(0);
+    scalar magUr(0);
+    scalar Rep(0);
+	scalar Vs(0);
+	scalar volumefraction(0);
+
     interpolationCellPoint<scalar> voidfractionInterpolator_(voidfraction_);
     interpolationCellPoint<vector> UInterpolator_(U_);
-
 
     for(int index = 0;index <  particleCloud_.numberOfParticles(); index++)
     {
         if(mask[index][0])
         {
-            vector drag(0,0,0);
-            label cellI = particleCloud_.cellIDs()[index][0];
+
+            cellI = particleCloud_.cellIDs()[index][0];
+            drag = vector(0,0,0);
 
             if (cellI > -1) // particle Found
             {
-
-                vector position = particleCloud_.position(index);
-                scalar voidfraction;
-                vector Ufluid;
-
-                if(interpolation_) // use intepolated values for alpha (normally off!!!)
+                if(interpolation_)
                 {
+	                position = particleCloud_.position(index);
                     voidfraction = voidfractionInterpolator_.interpolate(position,cellI);
                     Ufluid = UInterpolator_.interpolate(position,cellI);
                 }else
                 {
-                    voidfraction = voidfraction_[cellI];
+					voidfraction = particleCloud_.voidfraction(index);
                     Ufluid = U_[cellI];
                 }
 
-                vector Us = particleCloud_.velocity(index);
-                vector Ur = Ufluid-Us;
-                scalar ds = 2*particleCloud_.radius(index);
-                scalar Vs = ds*ds*ds*M_PI/6;
-                scalar nuf = nufField[cellI];
-                scalar rho = rho_[cellI];
-
-                scalar volumefraction = 1-voidfraction+SMALL;
-                scalar magUr = mag(Ur);
-                scalar Rep = 0;
+                Us = particleCloud_.velocity(index);
+                Ur = Ufluid-Us;
+                ds = 2*particleCloud_.radius(index);
+                nuf = nufField[cellI];
+                rho = rho_[cellI];
+                magUr = mag(Ur);
+				Rep = 0;
+                Vs = ds*ds*ds*M_PI/6;
+                volumefraction = 1-voidfraction+SMALL;
 
                 if (magUr > 0)
                 {
                     // calc particle Re Nr
-                    Rep = ds*voidfraction*magUr/nuf;
+                    Rep = ds*voidfraction*magUr/(nuf+SMALL);
 
                     // calc model coefficient F0
-                    scalar F0;
+                    scalar F0=0.;
                     if(volumefraction < 0.4)
                     {
                         F0 = (1+3*sqrt((volumefraction)/2)+135/64*volumefraction*log(volumefraction)+16.14*volumefraction)/
@@ -181,14 +193,11 @@ void KochHillDrag::setForce
                     Info << "drag = " << drag << endl;
                 }
             }
-
             // set force on particle
             if(treatExplicit_) for(int j=0;j<3;j++) expForces[index][j] += drag[j];
             else  for(int j=0;j<3;j++) impForces[index][j] += drag[j];
-
         }
     }
-
 }
 
 

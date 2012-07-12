@@ -43,6 +43,7 @@ Description
 #include "clockModel.H"
 #include "liggghtsCommandModel.H"
 
+#include "mpi.h"
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 Foam::cfdemCloud::cfdemCloud
 (
@@ -229,16 +230,16 @@ Foam::cfdemCloud::cfdemCloud
 Foam::cfdemCloud::~cfdemCloud()
 {
     clockM().evalPar();
-    delete positions_;
-    delete velocities_;
-    delete impForces_;
-    delete expForces_;
-    delete DEMForces_;
-    delete radii_;
-    delete voidfractions_;
-    delete cellIDs_;
-    delete particleWeights_;
-    delete particleVolumes_;
+    free(positions_);
+    free(velocities_);
+    free(impForces_);
+    free(expForces_);
+    free(DEMForces_);
+    free(radii_);
+    free(voidfractions_);
+    free(cellIDs_);
+    free(particleWeights_);
+    free(particleVolumes_);
 }
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
 void Foam::cfdemCloud::getDEMdata()
@@ -417,6 +418,7 @@ bool Foam::cfdemCloud::evolve
 
             // get next force field
             if(verbose_) Info << "- setParticleForceField()" << endl;
+
             averagingM().setVectorSum
             (
                 forceM(0).impParticleForces(),
@@ -436,9 +438,9 @@ bool Foam::cfdemCloud::evolve
 
             // write DEM data
             if(verbose_) Info << " -giveDEMdata()" << endl;
-            clockM().start(6,"getDEMdata");
+            clockM().start(6,"giveDEMdata");
             giveDEMdata();
-            clockM().stop("getDEMdata");
+            clockM().stop("giveDEMdata");
 
             // expand region - call for new particles
             if(verbose_) Info << "- expandRegion()" << endl;
@@ -509,14 +511,22 @@ tmp<volScalarField> cfdemCloud::voidfractionNuEff(volScalarField& voidfraction) 
     {
         return tmp<volScalarField>
         (
-            new volScalarField("viscousTerm", (turbulence_.nut() + turbulence_.nu()))
+            #ifdef comp
+                new volScalarField("viscousTerm", (turbulence_.mut() + turbulence_.mu()))
+            #else
+                new volScalarField("viscousTerm", (turbulence_.nut() + turbulence_.nu()))
+            #endif
         );
     }
     else
     {
         return tmp<volScalarField>
         (
-            new volScalarField("viscousTerm", voidfraction*(turbulence_.nut() + turbulence_.nu()))
+            #ifdef comp
+                new volScalarField("viscousTerm", voidfraction*(turbulence_.mut() + turbulence_.mu()))
+            #else
+                new volScalarField("viscousTerm", voidfraction*(turbulence_.nut() + turbulence_.nu()))
+            #endif
         );
     }
 }

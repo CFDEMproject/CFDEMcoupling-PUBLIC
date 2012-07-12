@@ -25,7 +25,7 @@ Note: This examples list might not be complete - please look for other models (c
 
 The clockModel is the base class for models to examine the code/algorithm with respect to run time.
 
-Main parts of this model are written by Josef Kerbl, JKU.
+Main parts of the clockModel classes are written by Josef Kerbl, JKU.
 
 [Restrictions:] none.
 

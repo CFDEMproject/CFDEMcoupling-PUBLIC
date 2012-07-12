@@ -83,8 +83,8 @@ regionModel::regionModel
 
 regionModel::~regionModel()
 {
-    delete inRegion_;
-    delete outRegion_;
+    free(inRegion_);
+    free(outRegion_);
 }
 
 

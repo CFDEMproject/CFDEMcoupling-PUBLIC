@@ -9,7 +9,7 @@
 source $CFDEM_SRC_DIR/etc/functions.sh
 
 #- show gcc settings
-checkGPP="false"
+checkGPP="true"
 
 #- system settings
 echo "*******************"

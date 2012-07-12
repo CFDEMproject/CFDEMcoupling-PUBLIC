@@ -273,10 +273,16 @@ bool Foam::twoWayMPI::couple() const
     return coupleNow;
 }
 
+int Foam::twoWayMPI::getNumberOfParticles() const
+{
+    return liggghts_get_maxtag(lmp);
+}
+
 int Foam::twoWayMPI::getNumberOfClumps() const
 {
     Warning << "Foam::twoWayMPI::getNumberOfClumps() - changes necessary here" << endl;
     //return liggghts_get_maxtag_ms(lmp);
+    return 1;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

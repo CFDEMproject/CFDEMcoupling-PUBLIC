@@ -53,17 +53,35 @@ cfdemCloudIB::cfdemCloudIB
     const fvMesh& mesh
 )
 :
-    cfdemCloud(mesh)
+    cfdemCloud(mesh),
+    angularVelocities_(NULL)
 {}
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 cfdemCloudIB::~cfdemCloudIB()
-{}
+{
+    delete angularVelocities_;
+}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+void Foam::cfdemCloudIB::getDEMdata()
+{
+    cfdemCloud::getDEMdata();
+    Info << "=== cfdemCloudIB::getDEMdata() === particle rotation not considered in CFD" << endl;
+    //dataExchangeM().getData("omega","vector-atom",angularVelocities_);
+}
+
+bool Foam::cfdemCloudIB::reAllocArrays() const
+{
+    if(cfdemCloud::reAllocArrays())
+    {
+        dataExchangeM().allocateArray(angularVelocities_,0,3);
+    }
+    return true;
+}
 
 bool Foam::cfdemCloudIB::evolve()
 {
@@ -128,6 +146,9 @@ void Foam::cfdemCloudIB::calcVelocityCorrection
 {
     label cellI=0;
     vector uParticle(0,0,0);
+    vector rVec(0,0,0);
+    vector velRot(0,0,0);
+    vector angVel(0,0,0);
     for(int index=0; index< numberOfParticles(); index++)
     {
         if(regionM().inRegion()[index][0])
@@ -139,8 +160,14 @@ void Foam::cfdemCloudIB::calcVelocityCorrection
 
                 if (cellI >= 0)
                 {
-                    for(int i=0;i<3;i++) uParticle[i] = velocities()[index][i];
-                    U[cellI] = uParticle;
+                    // calc particle velocity
+                    for(int i=0;i<3;i++) rVec[i]=U.mesh().C()[cellI][i]-position(index)[i];
+                    for(int i=0;i<3;i++) angVel[i]=angularVelocities()[index][i];
+                    velRot=angVel^rVec;
+                    for(int i=0;i<3;i++) uParticle[i] = velocities()[index][i]+velRot[i];
+
+                    // impose field velocity
+                    U[cellI]=(1-voidfractions_[index][subCell])*uParticle+voidfractions_[index][subCell]*U[cellI];
                 }
             }
         }
@@ -157,6 +184,12 @@ void Foam::cfdemCloudIB::calcVelocityCorrection
     p.correctBoundaryConditions();
 }
 
+vector Foam::cfdemCloudIB::angularVelocity(int index)
+{
+    vector vel;
+    for(int i=0;i<3;i++) vel[i] = angularVelocities_[index][i]; 
+    return vel;
+}
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

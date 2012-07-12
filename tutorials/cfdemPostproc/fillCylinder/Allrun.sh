@@ -7,7 +7,7 @@
 
 #- define variables
 casePath="$(dirname "$(readlink -f ${BASH_SOURCE[0]})")"
-pizzaPath="$CFDEM_PIZZA_DIR"
+pizzaPath="/home/cfdem/LIGGGHTS/PIZZA/gran_pizza_17Aug10/src"
 
 liggghtsSim="true"
 cfdemPostProc="true"
@@ -28,8 +28,11 @@ if [ $liggghtsSim == "true" ]
     liggghts < in.liggghts_init
 
     #- get VTK data from liggghts dump file
-    cd $casePath/DEM
-    python $pizzaPath/pizza.py -f pizzaScriptInit
+    #cd $casePath/DEM
+    #python $pizzaPath/pizza.py -f pizzaScriptInit
+
+    cd $casePath/DEM/post
+    python -i $CFDEM_LPP_DIR/lpp.py  dump.liggghts_init
 
 fi
 

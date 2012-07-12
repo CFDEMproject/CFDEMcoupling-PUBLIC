@@ -56,7 +56,9 @@ class cfdemCloudIB
 :
     private cfdemCloud
 {
-private:
+protected:
+
+    mutable double **angularVelocities_;
 
 public:
 
@@ -74,9 +76,21 @@ public:
 
 
     // Member Functions
+        void getDEMdata();
+
+        bool reAllocArrays() const;
+    
         bool evolve();
 
         void calcVelocityCorrection(volScalarField&,volVectorField&,volScalarField&); // this could be moved to an IB mom couple model
+
+      // Access
+        vector angularVelocity(int);
+
+        inline double ** angularVelocities() const
+        {
+            return angularVelocities_;
+        };
 
 };
 

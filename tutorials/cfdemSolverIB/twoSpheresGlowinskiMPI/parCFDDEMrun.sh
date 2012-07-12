@@ -24,6 +24,7 @@ machineFileName="none"   # yourMachinefileName | none
 debugMode="off"          # on | off
 testHarnessPath="$CFDEM_TEST_HARNESS_PATH"
 runOctave="true"
+postproc="false"
 #--------------------------------------------------------------------------------#
 
 #- call function to run a parallel CFD-DEM case
@@ -38,6 +39,25 @@ if [ $runOctave == "true" ]
     evince vel_y_two_part_rec_glow.eps 
     #display pos_y_two_part_rec_glow.png &
     #display vel_y_two_part_rec_glow.png &
+fi
+
+if [ $postproc == "true" ]
+  then
+    #- get VTK data from liggghts dump file
+    cd $casePath/DEM/post
+    python -i $CFDEM_LPP_DIR/lpp.py  dump.liggghts_init
+
+    #- get VTK data from CFD sim
+    cd $casePath/CFD
+    foamToVTK
+
+    #- start paraview
+    paraview
+
+    #- keep terminal open (if started in new terminal)
+    echo "...press enter to clean up case"
+    echo "press Ctr+C to keep data"
+    read
 fi
 
 #- copy log file to test harness

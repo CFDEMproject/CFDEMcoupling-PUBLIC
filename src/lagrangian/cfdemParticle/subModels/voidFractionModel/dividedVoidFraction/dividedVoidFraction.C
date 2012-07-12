@@ -37,6 +37,7 @@ Description
 #include "regionModel.H"
 #include "dataExchangeModel.H"
 
+//#include "mpi.h"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam

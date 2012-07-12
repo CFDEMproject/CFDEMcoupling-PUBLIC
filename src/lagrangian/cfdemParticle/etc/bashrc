@@ -39,9 +39,12 @@
 export CFDEM_LIGGGHTS_LIB_NAME=lmp_$CFDEM_LIGGGHTS_MAKEFILE_NAME
 
 #- CFDEM lib name
-export CFDEM_LIB_NAME=lagrangianCFDEM
+export CFDEM_LIB_NAME=lagrangianCFDEM-$CFDEM_VERSION-$WM_PROJECT_VERSION
 
-#- PIZZA src directory
+#- LPP src directory
+export CFDEM_LPP_DIR=$HOME/LIGGGHTS/mylpp/src
+
+#- pizza src directory
 export CFDEM_PIZZA_DIR=$HOME/LIGGGHTS/PIZZA/gran_pizza_17Aug10/src
 
 #- path to test harness
@@ -89,8 +92,16 @@ alias cfdemCompCFDEM='bash $CFDEM_SRC_DIR/etc/compileCFDEMcoupling.sh'
 #- shortcut to test basic tutorials
 alias cfdemTestTUT='bash $CFDEM_SRC_DIR/etc/testTutorials.sh'
 
-#- shortcut to run liggghts
-alias liggghts='$CFDEM_LIGGGHTS_SRC_DIR/lmp_$CFDEM_LIGGGHTS_MAKEFILE_NAME'
+#- shortcut to run liggghts in serial
+cfdemLiggghts() { $CFDEM_LIGGGHTS_SRC_DIR/lmp_$CFDEM_LIGGGHTS_MAKEFILE_NAME < $1; }
+export -f cfdemLiggghts
+
+#- shortcut to run liggghts in parallel
+cfdemLiggghtsPar() { mpirun -np $2 $CFDEM_LIGGGHTS_SRC_DIR/lmp_$CFDEM_LIGGGHTS_MAKEFILE_NAME < $1; }
+export -f cfdemLiggghtsPar
+
+#- shortcut to run lpp
+alias lpp='python -i $CFDEM_LPP_DIR/lpp.py'
 
 # check if the directory exists
 if [ -d "$CFDEM_PROJECT_USER_DIR" ]; then

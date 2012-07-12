@@ -61,5 +61,7 @@
         }
         if(!found)
             FatalError <<"viscForce model not found!\n" << abort(FatalError);
-    }else
+    }else if (modelType=="none")
+        Warning << "You chose model type -none- you might get erroneous results!" << endl;
+    else
         FatalError <<"no suitable model type specified:" << modelType << "\n" << abort(FatalError);

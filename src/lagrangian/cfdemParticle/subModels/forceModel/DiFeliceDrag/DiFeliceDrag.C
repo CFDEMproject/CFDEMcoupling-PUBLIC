@@ -101,16 +101,17 @@ void DiFeliceDrag::setForce
 {
     // get viscosity field
     #ifdef comp
-        const volScalarField& nufField = particleCloud_.turbulence().mu() / rho_;
+        const volScalarField nufField = particleCloud_.turbulence().mu() / rho_;
     #else
         const volScalarField& nufField = particleCloud_.turbulence().nu();
     #endif
 
-    interpolationCellPoint<vector> UInterpolator(U_);
-    interpolationCellPoint<scalar> voidfractionInterpolator(voidfraction_);
-    vector U(0,0,0);
     vector position(0,0,0);
     scalar voidfraction(1);
+    vector Ufluid(0,0,0);
+    vector drag(0,0,0);
+    label cellI=0;
+
     vector Us(0,0,0);
     vector Ur(0,0,0);
     scalar ds(0);
@@ -118,30 +119,34 @@ void DiFeliceDrag::setForce
     scalar rho(0);
     scalar magUr(0);
     scalar Rep(0);
-    scalar Cd(0);
+	scalar Cd(0);
+
+    interpolationCellPoint<scalar> voidfractionInterpolator_(voidfraction_);
+    interpolationCellPoint<vector> UInterpolator_(U_);
 
     for(int index = 0;index <  particleCloud_.numberOfParticles(); index++)
     {
         if(mask[index][0])
         {
-            vector drag(0,0,0);
-            label cellI = particleCloud_.cellIDs()[index][0];
+
+            cellI = particleCloud_.cellIDs()[index][0];
+            drag = vector(0,0,0);
 
             if (cellI > -1) // particle Found
             {
                 if(interpolation_)
                 {
-                    position = particleCloud_.position(index);
-                    U = UInterpolator.interpolate(position,cellI);
-                    voidfraction = voidfractionInterpolator.interpolate(position,cellI);
+	                position = particleCloud_.position(index);
+                    voidfraction = voidfractionInterpolator_.interpolate(position,cellI);
+                    Ufluid = UInterpolator_.interpolate(position,cellI);
                 }else
                 {
-                    U = U_[cellI];
                     voidfraction = particleCloud_.voidfraction(index);
+                    Ufluid = U_[cellI];
                 }
 
                 Us = particleCloud_.velocity(index);
-                Ur = U-Us;
+                Ur = Ufluid-Us;
                 ds = 2*particleCloud_.radius(index);
                 nuf = nufField[cellI];
                 rho = rho_[cellI];
@@ -152,7 +157,7 @@ void DiFeliceDrag::setForce
                 if (magUr > 0)
                 {
                     // calc particle Re Nr
-                    Rep = ds*voidfraction*magUr/nuf;
+                    Rep = ds*voidfraction*magUr/(nuf+SMALL);
 
                     // calc fluid drag Coeff
                     Cd = sqr(0.63 + 4.8/sqrt(Rep));
@@ -186,7 +191,6 @@ void DiFeliceDrag::setForce
             else  for(int j=0;j<3;j++) impForces[index][j] += drag[j];
         }
     }
-
 }
 
 

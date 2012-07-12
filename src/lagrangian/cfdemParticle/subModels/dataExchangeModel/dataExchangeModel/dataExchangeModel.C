@@ -145,6 +145,11 @@ scalar Foam::dataExchangeModel::timeStepFraction() const
     scalar frac = ( ( particleCloud_.mesh().time().value()-particleCloud_.mesh().time().startTime().value() ) - (couplingStep_-1) * DEMts_ * couplingInterval_) / (DEMts_ * couplingInterval_ );
     return frac;
 }
+int Foam::dataExchangeModel::getNumberOfParticles() const
+{
+    Warning << "ask for nr of clumps - which is not supported for this dataExchange model" << endl;
+    return -1;
+}
 
 int Foam::dataExchangeModel::getNumberOfClumps() const
 {

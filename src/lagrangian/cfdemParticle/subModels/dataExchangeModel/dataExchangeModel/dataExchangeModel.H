@@ -177,6 +177,8 @@ public:
 
         inline int couplingInterval() const {return couplingInterval_;};
 
+        inline scalar couplingTime() const {return couplingInterval_*DEMts_;};
+
         inline void checkTSsize() const
         {
             if(particleCloud_.mesh().time().deltaT().value() >  couplingInterval_ * DEMts_ + SMALL)
@@ -209,6 +211,7 @@ public:
             }
         }
 
+        virtual int getNumberOfParticles() const;
         virtual int getNumberOfClumps() const;
 };
 

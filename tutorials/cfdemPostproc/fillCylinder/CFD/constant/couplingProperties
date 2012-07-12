@@ -65,7 +65,7 @@ oneWayVTKProps
 {
     DEMts 0.0001;
     relativePath "../DEM/post";
-    couplingFilename "vtk_out%4.4d.vtk";
+    couplingFilename "liggghts_init%4.4d.vtk";
     maxNumberOfParticles 30000;
 }
 

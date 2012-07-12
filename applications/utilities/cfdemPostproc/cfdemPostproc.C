@@ -59,6 +59,7 @@ int main(int argc, char *argv[])
     Info<< "\nStarting time loop\n" << endl;
 
     int count=0;
+    int DEM_dump_Interval=1000;
 
     double **positions_;
     double **velocities_;
@@ -79,6 +80,9 @@ int main(int argc, char *argv[])
     while (runTime.loop())
     {
         Info<< "Time = " << runTime.timeName() << nl << endl;
+        count+=DEM_dump_Interval;// proceed loading new data
+
+
 
         particleCloud.regionM().resetVolFields(Us);
 
@@ -112,7 +116,6 @@ int main(int argc, char *argv[])
         );
 
         runTime.write();
-        count++;  // proceed loading new data
 
         Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
             << "  ClockTime = " << runTime.elapsedClockTime() << " s"

@@ -8,7 +8,7 @@ boundary	m m m
 newton		off
 
 units		si
-processors	2 1 1
+processors	2 2 2
 
 #read the restart file
 read_restart 	../DEM/liggghts.restart
@@ -66,7 +66,7 @@ compute_modify	thermo_temp dynamic yes
 #insert the first particles so that dump is not empty
 dump 		myDump all stl 1 post/dump_*.stl
 #run		1
-dump		dmp all custom 5000 ../DEM/post/dump.liggghts_restart id type type x y z ix iy iz vx vy vz fx fy fz omegax omegay omegaz radius 
+dump		dmp all custom 5000 ../DEM/post/dump*.liggghts_restart id type type x y z ix iy iz vx vy vz fx fy fz omegax omegay omegaz radius 
 undump		myDump
 
 run		1

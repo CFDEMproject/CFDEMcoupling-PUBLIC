@@ -23,46 +23,72 @@ nrProcs="2"
 machineFileName="none"   # yourMachinefileName | none
 debugMode="off"          # on | off
 testHarnessPath="$CFDEM_TEST_HARNESS_PATH"
+runOctave="true"
+postproc="false"
 #--------------------------------------------------------------------------------#
 
 #- call function to run a parallel CFD-DEM case
 parCFDDEMrun $logpath $logfileName $casePath $headerText $solverName $nrProcs $machineFileName $debugMode
 
-#------------------------------#
-#  octave
+if [ $runOctave == "true" ]
+    then
+        #- change path
+        cd octave
 
-#- change path
-cd octave
+        #- rmove old graph
+        rm cfdemSolverPiso_settlingTestMPI.eps
 
-#- rmove old graph
-rm cfdemSolverPiso_settlingTestMPI.eps
+        #- run octave
+        octave settlingVelocity.m
 
-#- run octave
-octave settlingVelocity.m
+        #- show plot 
+        evince cfdemSolverPiso_settlingTestMPI.eps
 
-#- show plot 
-evince cfdemSolverPiso_settlingTestMPI.eps
-#------------------------------#
+        #- copy log file to test harness
+        cp ../../$logfileName $testHarnessPath
+        cp cfdemSolverPiso_settlingTestMPI.eps $testHarnessPath
+fi
 
-#- copy log file to test harness
-cp ../../$logfileName $testHarnessPath
-cp cfdemSolverPiso_settlingTestMPI.eps $testHarnessPath
+if [ $postproc == "true" ]
+  then
 
-    #- clean up case
-    echo "deleting data at: $casePath :\n"
-    rm -r $casePath/CFD/0.*
-    rm -r $casePath/CFD/log.*
-    rm -r $casePath/log_*
-    rm -r $casePath/CFD/octave/octave-core
-    rm -r $casePath/CFD/VTK
-    rm -r $casePath/CFD/clockData
-    rm -r $casePath/CFD/processor*
-    rm -r $casePath/CFD/particles
-    rm -r $casePath/CFD/couplingFiles/*
-    rm -r $casePath/DEM/post/*
-    rm -r $casePath/DEM/log.*
-    rm -r $casePath/CFD/probes
-    echo "done"
+    #- keep terminal open (if started in new terminal)
+    echo "simulation finished? ...press enter to proceed"
+    read
+
+    #- get VTK data from liggghts dump file
+    cd $casePath/DEM/post
+    python -i $CFDEM_LPP_DIR/lpp.py  dump.liggghts_init
+
+    #- get VTK data from CFD sim
+    cd $casePath/CFD
+    foamToVTK                                                   #- serial run of foamToVTK
+    #source $CFDEM_SRC_DIR/etc/functions.sh                       #- include functions
+    #pseudoParallelRun "foamToVTK" $nrPostProcProcessors          #- pseudo parallel run of foamToVTK
+
+    #- start paraview
+    paraview
+
+    #- keep terminal open (if started in new terminal)
+    echo "...press enter to clean up case"
+    echo "press Ctr+C to keep data"
+    read
+fi
+
+#- clean up case
+echo "deleting data at: $casePath :\n"
+rm -r $casePath/CFD/0.*
+rm -r $casePath/CFD/log.*
+rm -r $casePath/CFD/octave/octave-core
+rm -r $casePath/CFD/VTK
+rm -r $casePath/CFD/processor*
+rm -r $casePath/CFD/couplingFiles/*
+rm -r $casePath/DEM/post/*
+rm -r $casePath/DEM/log.*
+rm -r $casePath/CFD/probes
+rm -r $casePath/CFD/particles
+rm -r $casePath/CFD/clockData
+echo "done"
 
 #- preserve post directory
 echo "dummyfile" >> $casePath/DEM/post/dummy

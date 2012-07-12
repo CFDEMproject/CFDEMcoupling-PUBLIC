@@ -24,10 +24,10 @@
 #setenv CFDEM_UT_DIR $CFDEM_PROJECT_DIR/applications/utilities
 #setenv CFDEM_TUT_DIR $CFDEM_PROJECT_DIR/tutorials
 #setenv CFDEM_PROJECT_USER_DIR $HOME/CFDEM/$LOGNAME-$CFDEM_VERSION-$WM_PROJECT_VERSION
-#setenv CFDEM_bashrc $CFDEM_SRC_DIR/etc/bashrc
-#export CFDEM_LIGGGHTS_SRC_DIR $HOME/LIGGGHTS/LIGGGHTS-PUBLIC/src
-#export CFDEM_LIGGGHTS_MAKEFILE_NAME fedora_fpic
-#. $CFDEM_bashrc
+#setenv CFDEM_bashrc $CFDEM_SRC_DIR/etc/cshrc
+#setenv CFDEM_LIGGGHTS_SRC_DIR $HOME/LIGGGHTS/LIGGGHTS-PUBLIC/src
+#setenv CFDEM_LIGGGHTS_MAKEFILE_NAME fedora_fpic
+#source $CFDEM_bashrc
 #================================================#
 #------------------------------------------------------------------------------
 
@@ -39,10 +39,13 @@
 setenv CFDEM_LIGGGHTS_LIB_NAME lmp_$CFDEM_LIGGGHTS_MAKEFILE_NAME
 
 #- CFDEM lib name
-setenv CFDEM_LIB_NAME lagrangianCFDEM
+setenv CFDEM_LIB_NAME lagrangianCFDEM-$CFDEM_VERSION-$WM_PROJECT_VERSION
 
-#- PIZZA src directory
-setenv CFDEM_PIZZA_DIR $HOME/LAMMPS/pizza-16Mar09/src/
+#- LPP src directory
+setenv CFDEM_LPP_DIR $HOME/LIGGGHTS/mylpp/src
+
+#- pizza src directory
+setenv CFDEM_PIZZA_DIR=$HOME/LIGGGHTS/PIZZA/gran_pizza_17Aug10/src
 
 #- path to test harness
 setenv CFDEM_TEST_HARNESS_PATH $CFDEM_PROJECT_USER_DIR/log/logFilesCFDEM-$CFDEM_VERSION-$WM_PROJECT_VERSION
@@ -81,26 +84,29 @@ alias cfdemLIG 'cd $CFDEM_LIGGGHTS_SRC_DIR'
 alias cfdemSysTest 'bash $CFDEM_SRC_DIR/etc/cfdemSystemTest.sh'
 
 #- shortcut to compile LIGGGHTS
-alias cfdemCompLIG 'bash $CFDEM_SRC_DIR/etc/compileLiggghts.sh'
+alias cfdemCompLIG 'bash $CFDEM_SRC_DIR/etc/compileLIGGGHTS.sh'
 
 #- shortcut to compile CFDEMcoupling
-alias cfdemCompLIG 'bash $CFDEM_SRC_DIR/etc/CFDEMcoupling.sh'
+alias cfdemCompCFDEM 'bash $CFDEM_SRC_DIR/etc/compileCFDEMcoupling.sh'
 
 #- shortcut to test basic tutorials
 alias cfdemTestTUT 'bash $CFDEM_SRC_DIR/etc/testTutorials.sh'
 
-#- shortcut to run liggghts
+#- shortcut to run liggghts in serial
 alias cfdemLiggghts '$CFDEM_LIGGGHTS_SRC_DIR/lmp_$CFDEM_LIGGGHTS_MAKEFILE_NAME'
 
+#- shortcut to run lpp
+alias lpp 'python -i $CFDEM_LPP_DIR/lpp.py \!:1'
+
 # check if the directory exists
-if [ -d "$CFDEM_PROJECT_USER_DIR" ]; then
+if ( -d "$CFDEM_PROJECT_USER_DIR" ) then
     :
 else
-    if [ -d "$CFDEM_PROJECT_DIR" ]; then
+    if ( -d "$CFDEM_PROJECT_DIR" ) then
         cd $CFDEM_PROJECT_DIR/..
         echo "make new dirs $CFDEM_PROJECT_DIR/../$LOGNAME-$CFDEM_VERSION-$WM_PROJECT_VERSION ? (y/n)"
-        read YN
-        if [ $YN=="y" ]; then
+	set YN=$<
+        if ( $YN == "y" ) then
             mkdir $LOGNAME-$CFDEM_VERSION-$WM_PROJECT_VERSION
             cd $LOGNAME-$CFDEM_VERSION-$WM_PROJECT_VERSION
             mkdir run
@@ -108,9 +114,9 @@ else
         else
             echo "aborted by user."
             exit
-        fi
+        endif
     else
         echo "error in CFDEMcoupling's bashrc."
         exit
-    fi
-fi
+    endif
+endif

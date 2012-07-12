@@ -188,7 +188,6 @@ int main(int argc, char *argv[])
     Info<< "End\n" << endl;
 
     particleCloud.clockM().stop("Global");
-
     return 0;
 }
 

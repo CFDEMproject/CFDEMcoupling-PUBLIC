@@ -154,6 +154,7 @@ public:
 
         bool couple() const;
 
+        int getNumberOfParticles() const;
         int getNumberOfClumps() const;
 };
 
