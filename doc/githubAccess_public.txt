@@ -49,9 +49,8 @@ To clone the public CFDEMcoupling repository, open a terminal and execute:
 
 git clone git://github.com/CFDEMproject/CFDEMcoupling-PUBLIC.git CFDEMcoupling-PUBLIC-$WM_PROJECT_VERSION :pre,h6
 
-Note: the git protocol will not work if your computer is behind a firewall which blocks the relevant TCP port, you can use alternatively:
+Troubles? See Troubleshooting section below.
 
-git clone https://github.com/CFDEMproject/CFDEMcoupling-PUBLIC.git :pre
 
 [Update your repositories by {git pull}:]
 
@@ -62,13 +61,13 @@ cd $HOME/CFDEM/CFDEMcoupling-PUBLIC-$WM_PROJECT_VERSION
 git stash
 git pull :pre
 
-[set environment variables:]
+[Set Environment Variables:]
 
 Now you need to set some environment variables in ~/.bashrc (if you use c-shell, manipulate ~/.cshrc accordingly). Open ~/.bashrc
 
 gedit ~/.bashrc & :pre
 
-add the lines: 
+add the lines (you find them also in .../cfdemParticle/etc/bashrc and cshrc respectively): 
 
 #================================================#
 #- source cfdem env vars
@@ -83,6 +82,8 @@ export CFDEM_PROJECT_USER_DIR=$HOME/CFDEM/$LOGNAME-$CFDEM_VERSION-$WM_PROJECT_VE
 export CFDEM_bashrc=$CFDEM_SRC_DIR/etc/bashrc
 export CFDEM_LIGGGHTS_SRC_DIR=$HOME/LIGGGHTS/LIGGGHTS-PUBLIC/src
 export CFDEM_LIGGGHTS_MAKEFILE_NAME=fedora_fpic
+export CFDEM_LPP_DIR=$HOME/LIGGGHTS/mylpp/src
+export CFDEM_PIZZA_DIR=$HOME/LIGGGHTS/PIZZA/gran_pizza_17Aug10/src
 . $CFDEM_bashrc
 #================================================# :pre
 
@@ -102,7 +103,7 @@ cfdemSysTest :pre
 
 to get some information if the paths are set correctly.
 
-[compile LIGGGHTS and CFDEMcoupling:]
+[Compile LIGGGHTS and CFDEMcoupling:]
 
 If above settings were done correctly, you can compile LIGGGHTS by typing:
 
@@ -117,8 +118,24 @@ Alternatively you can run each tutorial using the {Allrun.sh} scripts in the tut
 
 In case questions concerning the installation arise, please feel free to contact our forum at www.cfdem.com.
 
-[run your own cases:]
+[Run Your Own Cases:]
 
 If you want to run your own cases, please do so in $CFDEM_PROJECT_USER_DIR/run which is automatically being generated. E.g. copy one of the tutorial cases there, adapt it to your needs.
 Changes in $CFDEM_TUT_DIR will be lost after every {git stash}!
+
+[Troubleshooting:]
+
+toubles with git clone? :ulb,l
+:ule
+
+[a)] The git protocol will not work if your computer is behind a firewall which blocks the relevant TCP port, you can use alternatively (write command in one line):
+
+git clone https://user@github.com/CFDEMproject/CFDEMcoupling-PUBLIC.git 
+CFDEMcoupling-PUBLIC-$WM_PROJECT_VERSION
+
+[b)] If you face the error: "error: SSL certificate problem, verify that the CA cert is OK. Details: error:14090086:SSL routines:SSL3_GET_SERVER_CERTIFICATE:certificate verify failed while accessing https://github.com/...",
+
+please use: env GIT_SSL_NO_VERIFY=true git clone https://github...
+
+(see http://stackoverflow.com/questions/3777075/https-github-access)
 

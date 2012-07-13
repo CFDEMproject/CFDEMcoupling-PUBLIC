@@ -20,13 +20,15 @@
 #setenv CFDEM_PROJECT_DIR $HOME/CFDEM/CFDEMcoupling-$CFDEM_VERSION-$WM_PROJECT_VERSION
 #setenv CFDEM_SRC_DIR $CFDEM_PROJECT_DIR/src/lagrangian/cfdemParticle
 #setenv CFDEM_SOLVER_DIR $CFDEM_PROJECT_DIR/applications/solvers
-#setenv CFDEM_DOC_DIR=$CFDEM_PROJECT_DIR/doc
+#setenv CFDEM_DOC_DIR $CFDEM_PROJECT_DIR/doc
 #setenv CFDEM_UT_DIR $CFDEM_PROJECT_DIR/applications/utilities
 #setenv CFDEM_TUT_DIR $CFDEM_PROJECT_DIR/tutorials
 #setenv CFDEM_PROJECT_USER_DIR $HOME/CFDEM/$LOGNAME-$CFDEM_VERSION-$WM_PROJECT_VERSION
 #setenv CFDEM_bashrc $CFDEM_SRC_DIR/etc/cshrc
 #setenv CFDEM_LIGGGHTS_SRC_DIR $HOME/LIGGGHTS/LIGGGHTS-PUBLIC/src
 #setenv CFDEM_LIGGGHTS_MAKEFILE_NAME fedora_fpic
+#setenv CFDEM_LPP_DIR $HOME/LIGGGHTS/mylpp/src
+#setenv CFDEM_PIZZA_DIR $HOME/LIGGGHTS/PIZZA/gran_pizza_17Aug10/src
 #source $CFDEM_bashrc
 #================================================#
 #------------------------------------------------------------------------------
@@ -40,12 +42,6 @@ setenv CFDEM_LIGGGHTS_LIB_NAME lmp_$CFDEM_LIGGGHTS_MAKEFILE_NAME
 
 #- CFDEM lib name
 setenv CFDEM_LIB_NAME lagrangianCFDEM-$CFDEM_VERSION-$WM_PROJECT_VERSION
-
-#- LPP src directory
-setenv CFDEM_LPP_DIR $HOME/LIGGGHTS/mylpp/src
-
-#- pizza src directory
-setenv CFDEM_PIZZA_DIR=$HOME/LIGGGHTS/PIZZA/gran_pizza_17Aug10/src
 
 #- path to test harness
 setenv CFDEM_TEST_HARNESS_PATH $CFDEM_PROJECT_USER_DIR/log/logFilesCFDEM-$CFDEM_VERSION-$WM_PROJECT_VERSION

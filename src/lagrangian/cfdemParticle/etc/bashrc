@@ -27,6 +27,8 @@
 #export CFDEM_bashrc=$CFDEM_SRC_DIR/etc/bashrc
 #export CFDEM_LIGGGHTS_SRC_DIR=$HOME/LIGGGHTS/LIGGGHTS-PUBLIC/src
 #export CFDEM_LIGGGHTS_MAKEFILE_NAME=fedora_fpic
+#export CFDEM_LPP_DIR=$HOME/LIGGGHTS/mylpp/src
+#export CFDEM_PIZZA_DIR=$HOME/LIGGGHTS/PIZZA/gran_pizza_17Aug10/src
 #. $CFDEM_bashrc
 #================================================#
 #------------------------------------------------------------------------------
@@ -40,12 +42,6 @@ export CFDEM_LIGGGHTS_LIB_NAME=lmp_$CFDEM_LIGGGHTS_MAKEFILE_NAME
 
 #- CFDEM lib name
 export CFDEM_LIB_NAME=lagrangianCFDEM-$CFDEM_VERSION-$WM_PROJECT_VERSION
-
-#- LPP src directory
-export CFDEM_LPP_DIR=$HOME/LIGGGHTS/mylpp/src
-
-#- pizza src directory
-export CFDEM_PIZZA_DIR=$HOME/LIGGGHTS/PIZZA/gran_pizza_17Aug10/src
 
 #- path to test harness
 export CFDEM_TEST_HARNESS_PATH=$CFDEM_PROJECT_USER_DIR/log/logFilesCFDEM-$CFDEM_VERSION-$WM_PROJECT_VERSION
