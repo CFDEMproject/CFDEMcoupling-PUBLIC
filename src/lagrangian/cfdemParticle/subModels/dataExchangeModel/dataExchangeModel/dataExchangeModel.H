@@ -200,8 +200,9 @@ public:
 
         inline bool doCoupleNow() const
         {
-            if (particleCloud_.mesh().time().value()-(couplingStep_*(DEMts_*couplingInterval_))
-              > particleCloud_.mesh().time().deltaT().value()/2)
+            if (particleCloud_.mesh().time().value()-particleCloud_.mesh().time().startTime().value()
+             - (couplingStep_*(DEMts_*couplingInterval_))
+             > particleCloud_.mesh().time().deltaT().value()/2)
             {
                 return true;
             }

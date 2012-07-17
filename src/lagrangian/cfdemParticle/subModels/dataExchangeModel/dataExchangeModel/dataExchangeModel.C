@@ -131,7 +131,6 @@ bool Foam::dataExchangeModel::couple() const
 {
     bool coupleNow = false;
     if (doCoupleNow())
-    //if (mesh_.time().value() > (couplingStep_*(DEMts_*couplingInterval_)) )
     {
         couplingStep_++;
         coupleNow = true;
@@ -142,7 +141,8 @@ bool Foam::dataExchangeModel::couple() const
 scalar Foam::dataExchangeModel::timeStepFraction() const
 {
     //return fraction between previous coupling TS and actual TS
-    scalar frac = ( ( particleCloud_.mesh().time().value()-particleCloud_.mesh().time().startTime().value() ) - (couplingStep_-1) * DEMts_ * couplingInterval_) / (DEMts_ * couplingInterval_ );
+    scalar DEMtime = DEMts_ * couplingInterval_;
+    scalar frac = ( ( particleCloud_.mesh().time().value()-particleCloud_.mesh().time().startTime().value() ) - (couplingStep_-1) * DEMtime) / DEMtime;
     return frac;
 }
 int Foam::dataExchangeModel::getNumberOfParticles() const

@@ -1,4 +1,4 @@
-word CFDEMversion="cfdem-2.4.1";
+word CFDEMversion="cfdem-2.4.2";
 
 Info << "\ncfdem version: " << CFDEMversion << "\n" <<  endl;
 
