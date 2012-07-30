@@ -5,21 +5,21 @@
 
 :line
 
-IOModel_basicIO command :h3
+IOModel_trackIO command :h3
 
 [Syntax:]
 
 Defined in couplingProperties dictionary.
 
-IOModel "basicIO"; :pre
+IOModel "trackIO"; :pre
 
 [Examples:]
 
-IOModel "basicIO"; :pre
+IOModel "trackIO"; :pre
 
 [Description:]
 
-The basic IO-model writes particle positions velocities and radii to files. The output directory ($casePath/CFD/particles) is created automatically. Data is written every write time of the CFD simulation.
+The basic IO-model writes particle positions, velocities, index and radii to files. The output directories ($casePath/CFD/$timestep) are created automatically. Data is written every write time of the CFD simulation.
 
 [Restrictions:] None.
 
