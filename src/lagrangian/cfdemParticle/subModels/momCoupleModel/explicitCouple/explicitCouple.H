@@ -64,6 +64,8 @@ private:
 
     vector fLimit_;     // limit for for exchange field
 
+    virtual inline vector arrayToField(label) const;
+
 public:
 
     //- Runtime type information
@@ -88,6 +90,7 @@ public:
         tmp<volVectorField> expMomSource() const;
 
         void resetMomSourceField() const;
+
 };
 
 

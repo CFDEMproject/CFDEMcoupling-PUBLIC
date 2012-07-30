@@ -83,7 +83,8 @@ forceModel::forceModel
         dimensionedVector("zero", dimensionSet(1,1,-2,0,0), vector(0,0,0)) // N
     ),
     coupleForce_(true),
-    modelType_(sm.modelType())
+    modelType_(sm.modelType()),
+    scale_(1.)
 {}
 
 

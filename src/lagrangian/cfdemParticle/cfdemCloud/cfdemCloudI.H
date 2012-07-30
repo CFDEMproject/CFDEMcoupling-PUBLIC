@@ -74,6 +74,11 @@ inline double ** cfdemCloud::expForces() const
     return expForces_;
 }
 
+inline double ** cfdemCloud::DEMForces() const
+{
+    return DEMForces_;
+}
+
 inline double ** cfdemCloud::radii() const
 {
     return radii_;

@@ -557,3 +557,18 @@ trackMem()
     done | /usr/bin/sort -n -k2 >> $fileName
 }
 
+#========================================#
+#- remove brackets from file
+removeBracketsFromFile()
+{
+    #--------------------------------------------------------------------------------#
+    #- define variables
+    oldFileName="$1"
+    newFileName="$oldFileName""_noBrackets"
+    #--------------------------------------------------------------------------------#
+
+    sed -e 's/[(,)]//g' $oldFileName > $newFileName
+}
+
+
+

@@ -369,7 +369,7 @@ bool Foam::cfdemCloud::evolve
     {
         if (dataExchangeM().couple())
         {
-            Info << "\n timeStepFraction() = " << dataExchangeM().timeStepFraction() << endl;
+            Info << "\n Coupling..." << endl;
             doCouple=true;
 
             if(verbose_) Info << "- defineRegion()" << endl;
@@ -446,7 +446,9 @@ bool Foam::cfdemCloud::evolve
             if(verbose_) Info << "- expandRegion()" << endl;
             regionM().expandRegion(U);
             if(verbose_) Info << "expandRegion done." << endl;
-        }
+
+        }//end dataExchangeM().couple()
+        Info << "\n timeStepFraction() = " << dataExchangeM().timeStepFraction() << endl;
 
         // update voidFractionField
         alpha.internalField() = voidFractionM().voidFractionInterp();

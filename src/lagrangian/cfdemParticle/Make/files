@@ -35,6 +35,7 @@ $(IOModels)/IOModel/IOModel.C
 $(IOModels)/IOModel/newIOModel.C
 $(IOModels)/noIO/noIO.C
 $(IOModels)/basicIO/basicIO.C
+$(IOModels)/trackIO/trackIO.C
 
 $(voidFractionModels)/voidFractionModel/voidFractionModel.C
 $(voidFractionModels)/voidFractionModel/newVoidFractionModel.C

@@ -38,7 +38,7 @@ meshMotionModel noMeshMotion;
 
 regionModel allRegion;
 
-IOModel basicIO;
+IOModel basicIO; //trackIO; // 
 
 dataExchangeModel twoWayMPI;//twoWayFiles;//oneWayVTK;//
 
@@ -90,6 +90,7 @@ KochHillDragProps
 {
     velFieldName "U";
     densityFieldName "rho";
+    voidfractionFieldName "voidfraction";
 }
 
 MeiLiftProps

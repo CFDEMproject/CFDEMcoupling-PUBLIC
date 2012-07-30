@@ -55,6 +55,15 @@ fileName IOModel::createTimeDir(fileName path) const
     return timeDirPath;
 }
 
+fileName IOModel::createLagrangianDir(fileName path) const
+{
+    fileName lagrangianDirPath(path/"lagrangian");
+    mkDir(lagrangianDirPath,0777);
+    fileName cfdemCloudDirPath(lagrangianDirPath/"cfdemCloud1");
+    mkDir(cfdemCloudDirPath,0777);
+    return cfdemCloudDirPath;
+}
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 // Construct from components

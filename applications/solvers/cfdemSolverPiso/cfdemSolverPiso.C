@@ -50,13 +50,11 @@ int main(int argc, char *argv[])
     #include "createTime.H"
     #include "createMesh.H"
     #include "createFields.H"
-
     #include "initContinuityErrs.H"
 
     // create cfdemCloud
     #include "readGravitationalAcceleration.H"
     cfdemCloud particleCloud(mesh);
-
     #include "checkModelType.H"
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -73,7 +71,6 @@ int main(int argc, char *argv[])
 
         // do particle stuff
         particleCloud.clockM().start(2,"Coupling");
-        Info << "- evolve()" << endl;
         particleCloud.evolve(voidfraction,Us,U);
 
         Info << "update Ksl.internalField()" << endl;
@@ -112,9 +109,6 @@ int main(int argc, char *argv[])
 
             //for (int corr=0; corr<nCorr; corr++)
             int nCorrSoph = nCorr + 5 * pow((1-particleCloud.dataExchangeM().timeStepFraction()),1);
-
-            Info << "nCorrSoph = " << nCorrSoph << endl;
-            Info << "particleCloud.dataExchangeM().timeStepFraction() = " << particleCloud.dataExchangeM().timeStepFraction() << endl;
 
             for (int corr=0; corr<nCorrSoph; corr++)
             {

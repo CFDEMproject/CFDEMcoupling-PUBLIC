@@ -63,9 +63,11 @@ private:
 
     fileName path_;
 
-
     // Member Functions
     fileName buildFilePath(word) const;
+
+protected:
+    mutable fileName lagPath_;
 
     void streamDataToPath(fileName,double**,int,word,word type,word className,word finaliser) const;
 

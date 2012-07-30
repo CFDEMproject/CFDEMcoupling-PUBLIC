@@ -161,7 +161,7 @@ void gradPForce::setForce
                 else
                     force = -Vs*gradP;
 
-                if(verbose_ && index >0 && index <2)
+                if(verbose_ && index >=0 && index <2)
                 {
                     Info << "index = " << index << endl;
                     Info << "gradP = " << gradP << endl;

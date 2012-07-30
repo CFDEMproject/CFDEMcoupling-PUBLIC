@@ -72,6 +72,8 @@ protected:
 
         const word modelType_;
 
+        scalar scale_;
+
 public:
 
     //- Runtime type information

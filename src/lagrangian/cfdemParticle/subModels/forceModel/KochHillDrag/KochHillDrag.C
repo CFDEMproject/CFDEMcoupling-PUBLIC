@@ -75,6 +75,8 @@ KochHillDrag::KochHillDrag
     if (propsDict_.found("verbose")) verbose_=true;
     if (propsDict_.found("treatExplicit")) treatExplicit_=true;
     if (propsDict_.found("interpolation")) interpolation_=true;
+    if (propsDict_.found("scale"))
+        scale_=scalar(readScalar(propsDict_.lookup("scale")));
 }
 
 
@@ -154,7 +156,7 @@ void KochHillDrag::setForce
                 if (magUr > 0)
                 {
                     // calc particle Re Nr
-                    Rep = ds*voidfraction*magUr/(nuf+SMALL);
+                    Rep = ds/scale_*voidfraction*magUr/(nuf+SMALL);
 
                     // calc model coefficient F0
                     scalar F0=0.;
@@ -170,7 +172,7 @@ void KochHillDrag::setForce
                     scalar F3 = 0.0673+0.212*volumefraction+0.0232/pow(voidfraction,5);
 
                     // calc model coefficient beta
-                    scalar beta = 18*nuf*rho*voidfraction*voidfraction*volumefraction/(ds*ds)*
+                    scalar beta = 18*nuf*rho*voidfraction*voidfraction*volumefraction/(ds/scale_*ds/scale_)*
                                   (F0 + 0.5*F3*Rep);
 
                     // calc particle's drag
@@ -180,12 +182,13 @@ void KochHillDrag::setForce
                         drag /= voidfraction;
                 }
 
-                if(verbose_ && index >100 && index <102)
+                if(verbose_ && index >=0 && index <2)
                 {
                     Info << "index = " << index << endl;
                     Info << "Us = " << Us << endl;
                     Info << "Ur = " << Ur << endl;
                     Info << "ds = " << ds << endl;
+                    Info << "ds/scale = " << ds/scale_ << endl;
                     Info << "rho = " << rho << endl;
                     Info << "nuf = " << nuf << endl;
                     Info << "voidfraction = " << voidfraction << endl;

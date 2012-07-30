@@ -63,7 +63,8 @@ basicIO::basicIO
     IOModel(dict,sm),
     //propsDict_(dict.subDict(typeName + "Props")),
     dirName_("particles"),
-    path_("dev/null")
+    path_("dev/null"),
+    lagPath_("dev/null")
 {
     //if (propsDict_.found("dirName")) dirName_=word(propsDict_.lookup("dirName"));
     path_ = buildFilePath(dirName_);
@@ -86,13 +87,13 @@ void basicIO::dumpDEMdata() const
     if (time_.outputTime())
     {
         // make time directory
-        fileName lagPath=createTimeDir(path_);
-        lagPath=createTimeDir(fileName(lagPath/"lagrangian"));
+        lagPath_=createTimeDir(path_);
+        lagPath_=createTimeDir(fileName(lagPath_/"lagrangian"));
 
         // stream data to file
-        streamDataToPath(lagPath, particleCloud_.positions(), particleCloud_.numberOfParticles(), "positions","vector","Cloud<passiveParticle>","0");
-        streamDataToPath(lagPath, particleCloud_.velocities(), particleCloud_.numberOfParticles(), "v","vector","vectorField","");
-        streamDataToPath(lagPath, particleCloud_.radii(), particleCloud_.numberOfParticles(), "r","scalar","scalarField","");
+        streamDataToPath(lagPath_, particleCloud_.positions(), particleCloud_.numberOfParticles(), "positions","vector","Cloud<passiveParticle>","0");
+        streamDataToPath(lagPath_, particleCloud_.velocities(), particleCloud_.numberOfParticles(), "v","vector","vectorField","");
+        streamDataToPath(lagPath_, particleCloud_.radii(), particleCloud_.numberOfParticles(), "r","scalar","scalarField","");
     }
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -111,7 +112,7 @@ fileName basicIO::buildFilePath(word dirName) const
 
 void basicIO::streamDataToPath(fileName path, double** array,int n,word name,word type,word className,word finaliser) const
 {
-    vector position;
+    vector vec;
     OFstream* fileStream = new OFstream(fileName(path/name));
     *fileStream << "FoamFile\n";
     *fileStream << "{version 2.0; format ascii;class "<< className << "; location 0;object  "<< name <<";}\n";
@@ -123,8 +124,8 @@ void basicIO::streamDataToPath(fileName path, double** array,int n,word name,wor
         if (type=="scalar"){
             *fileStream << array[index][0] << " \n";
         }else {
-            for(int i=0;i<3;i++) position[i] = array[index][i];
-            *fileStream <<"( "<< position[0] <<" "<<position[1]<<" "<<position[2]<<" ) "<< finaliser << " \n";
+            for(int i=0;i<3;i++) vec[i] = array[index][i];
+            *fileStream <<"( "<< vec[0] <<" "<<vec[1]<<" "<<vec[2]<<" ) "<< finaliser << " \n";
         }
     }
     *fileStream << ")\n";

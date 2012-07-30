@@ -233,6 +233,8 @@ public:
 
        inline double ** expForces() const;
 
+       inline double ** DEMForces() const;
+
        inline double ** radii() const;
 
        inline double ** voidfractions() const;

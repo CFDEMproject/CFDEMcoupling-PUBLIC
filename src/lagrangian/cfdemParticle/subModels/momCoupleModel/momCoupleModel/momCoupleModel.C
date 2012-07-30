@@ -64,6 +64,11 @@ tmp<volVectorField> momCoupleModel::expMomSource() const
     return tsource;
 }
 
+void momCoupleModel::setSourceField(volVectorField & a) const
+{
+    //do nothing;
+}
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 // Construct from components

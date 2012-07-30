@@ -115,6 +115,8 @@ public:
         virtual tmp<volVectorField> expMomSource() const;
 
         virtual void resetMomSourceField() const=0;
+
+        virtual void setSourceField(volVectorField &) const;
 };
 
 

@@ -123,6 +123,17 @@ In case questions concerning the installation arise, please feel free to contact
 If you want to run your own cases, please do so in $CFDEM_PROJECT_USER_DIR/run which is automatically being generated. E.g. copy one of the tutorial cases there, adapt it to your needs.
 Changes in $CFDEM_TUT_DIR will be lost after every {git stash}!
 
+[Additional Installations:]
+
+Optionally you can install lpp which will help you convert the DEM (dump) data to VTK format. For standard CFD-DEM runs this will not be necessary. To get the DEM postporcessing tool "lpp" you need python-numpy package installed:
+
+sudo apt-get install python-numpy :pre
+
+You can pull the latest version of lpp with:
+
+cd $HOME/LIGGGHTS :pre
+git clone git://cfdem.git.sourceforge.net/gitroot/cfdem/lpp mylpp :pre
+
 [Troubleshooting:]
 
 toubles with git clone? :ulb,l

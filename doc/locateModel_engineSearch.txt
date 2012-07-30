@@ -17,7 +17,7 @@ engineProps
     treeSearch switch1;
 \} :pre
 
-{switch1} = names of the finite volume scalar fields to be temporally averaged :ulb,l
+{switch1} = switch to use tree search algorithm :ulb,l
 :ule
 
 [Examples:]
