@@ -30,7 +30,7 @@ fix 		m3 all property/global coefficientRestitution peratomtypepair 1 0.9
 fix 		m4 all property/global coefficientFriction peratomtypepair 1 0.5
 
 #pair style
-pair_style 	gran/hertz/history 1 0  #Hertzian without cohesion
+pair_style 	gran/hertz/history #Hertzian without cohesion
 pair_coeff	* *
 
 #timestep, gravity
@@ -40,11 +40,12 @@ timestep	0.00003
 fix		gravi all gravity 981 vector 0.0 0.0 -1.0
 
 #walls
-fix		xwalls all wall/gran/hertz/history 1 0 xplane 0 1 1
-#fix		ywalls all wall/gran/hertz/history 1 0 yplane  -1 1f 1
-fix		ywalls all wall/gran/hertz/history 1 0 yplane  0 1 1
-fix		zwalls all wall/gran/hertz/history 1 0 zplane 0 4 1
-#--modified C.K. deleted z-wall
+fix			xwalls1 all wall/gran/hertz/history   primitive type 1  xplane 0.
+fix			xwalls2 all wall/gran/hertz/history   primitive type 1  xplane 1.
+fix			ywalls1 all wall/gran/hertz/history   primitive type 1  yplane 0.
+fix			ywalls2 all wall/gran/hertz/history   primitive type 1  yplane 1.
+fix			zwalls1 all wall/gran/hertz/history   primitive type 1  zplane 0.
+fix			zwalls2 all wall/gran/hertz/history   primitive type 1  zplane 4.
 
 #-import mesh from cad:
 #fix		cad1 all mesh/gran hopperGenauerSALOME.stl 1 1.0 0. 0. 0. 0. 180. 0. 

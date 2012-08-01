@@ -35,7 +35,7 @@ cd LIGGGHTS :pre
 
 To clone the public LIGGGHTS repository, open a terminal and execute:
 
-git clone git://cfdem.git.sourceforge.net/gitroot/cfdem/liggghtsdev LIGGGHTS-PUBLIC :pre,h6
+git clone git://github.com/CFDEMproject/LIGGGHTS-PUBLIC.git LIGGGHTS-PUBLIC  :pre,h6
 
 If not already done, open a terminal and create a directory for CFDEMcoupling in $HOME:
 

@@ -1,5 +1,7 @@
-word CFDEMversion="cfdem-2.4.3";
+word CFDEMversion="cfdem-2.4.4";
+word compatibleLIGGGHTSversion="2.0.4";
 
-Info << "\ncfdem version: " << CFDEMversion << "\n" <<  endl;
+Info << "\nCFDEMcoupling version: " << CFDEMversion << "\n" <<  endl;
+Info << "\n, compatible to LIGGGHTS version: " << compatibleLIGGGHTSversion << "\n" <<  endl;
 
 

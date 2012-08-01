@@ -38,7 +38,7 @@ meshMotionModel noMeshMotion;
 
 regionModel allRegion;
 
-IOModel off;
+IOModel basicIO;
 
 dataExchangeModel twoWayMPI;//twoWayFiles;//oneWayVTK;//
 

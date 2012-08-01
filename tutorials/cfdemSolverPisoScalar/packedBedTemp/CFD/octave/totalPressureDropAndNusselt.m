@@ -13,7 +13,7 @@ clc;
 fprintf('\ncalc Ergun eqn:\n')
 dp = 0.022;			% particle diameter
 phip = 1;			% sphericity
-epsilon = 0.41;		        % voidfraction
+epsilon = 0.4436;		        % voidfraction
 U = 1;    			% superficial velocity
 L = 1;			% length of bed
 rhoG = 1.188;			% density in kg/m
