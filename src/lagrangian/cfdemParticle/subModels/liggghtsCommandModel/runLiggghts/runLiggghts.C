@@ -64,13 +64,13 @@ runLiggghts::runLiggghts
     liggghtsCommandModel(dict,sm,i),
     propsDict_(dict),
     command_("run"),
-    preNo_(false)
+    preNo_(true)
 {
     word myName=word(typeName + "Props");
     if (dict.found(myName))    
     {
         propsDict_=dictionary(dict.subDict(myName));
-        preNo_=bool(propsDict_.lookup("preNo"));
+        preNo_=Switch(propsDict_.lookup("preNo"));
     }
 
     runEveryCouplingStep_=true;
@@ -94,13 +94,13 @@ const char* runLiggghts::command()
     return strCommand_.c_str();
 }
 
-string runLiggghts::createCommand(word command, word appendix, word appendix2)
+string runLiggghts::createCommand(word command, word appendix, word appendix2, word appendix3, word appendix4)
 {
     fileName add;
     char h[50];
     sprintf(h,"%d",particleCloud_.dataExchangeM().couplingInterval());
     add = h;
-    command += " " + add + " " + appendix + " " + appendix2;
+    command += " " + add + " " + appendix + " " + appendix2 + " " + appendix3 + " " + appendix4;
 
     return string(command);
 }
@@ -109,7 +109,7 @@ bool runLiggghts::runCommand(int couplingStep)
 {
     //change command to  "run xxx pre no"
     if (preNo_ && (couplingStep > firstCouplingStep_))
-        strCommand_=createCommand(command_,"pre","no");
+        strCommand_=createCommand(command_,"pre","no","post","no");
 
     return runThisCommand(couplingStep);
 }

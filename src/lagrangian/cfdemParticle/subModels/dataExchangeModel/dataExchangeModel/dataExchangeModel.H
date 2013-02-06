@@ -157,14 +157,26 @@ public:
         //====
         // double **
         virtual void allocateArray(double**&, double, int, int) const;
-
         virtual void allocateArray(double**&, double, int, const char* ="nparticles") const;
+        virtual void destroy(double**,int) const;
 
         //====
         // int **
         virtual void allocateArray(int**&, int, int, int) const;
-
         virtual void allocateArray(int**&, int, int, const char* ="nparticles") const;
+        virtual void destroy(int**,int) const;
+        //====
+
+        //====
+        // int *
+        virtual void allocateArray(int*&, int, int) const;
+        virtual void destroy(int*) const;
+        //====
+
+        //====
+        // double *
+        virtual void allocateArray(double*&, double, int) const;
+        virtual void destroy(double*) const;
         //====
 
         virtual bool couple() const;
@@ -214,6 +226,20 @@ public:
 
         virtual int getNumberOfParticles() const;
         virtual int getNumberOfClumps() const;
+
+        inline void setPositions(label n,double* pos) const
+        {
+            for (int i=0;i<n;i++)
+                for (int j=0;j<3;j++)
+                    particleCloud_.positions_[i][j]=pos[i*3+j];
+        };
+        inline void setCellIDs(label n,int* ID) const
+        {
+            for (int i=0;i<n;i++)
+                particleCloud_.cellIDs_[i][0]=ID[i];
+        };
+
+        virtual word myType() const=0;
 };
 
 

@@ -77,13 +77,14 @@ public:
 
     // Member Functions
 
-	    virtual void start(int pos) const {};
-	    virtual void start(int pos,std::string identifier) const {};
-	    virtual void stop() const {};
-	    virtual void stop(std::string identifier) const {};
-	    virtual std::string eval() const {return "";};
-	    virtual void evalFile() const {};
-	    virtual void evalPar() const {};
+	    void start(int pos) const {};
+	    void start(int pos,std::string identifier) const {};
+	    void stop() const {};
+	    void stop(std::string identifier) const {};
+	    std::string eval() const {return "";};
+	    void evalFile() const {};
+	    void evalPar() const {};
+        void normHist() const {};
 };
 
 

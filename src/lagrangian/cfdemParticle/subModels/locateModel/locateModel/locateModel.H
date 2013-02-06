@@ -118,6 +118,12 @@ public:
             vector& position,
             label& oldCellID
         ) const = 0;
+
+        virtual label intersection
+        (
+                const point& pStart,
+                const point& pEnd
+        ) const {return -1;};
 };
 
 

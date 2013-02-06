@@ -126,14 +126,14 @@ int main(int argc, char *argv[])
             {
                 volScalarField rUA = 1.0/UEqn.A();
                 surfaceScalarField rUAf("(1|A(U))", fvc::interpolate(rUA));
+                volScalarField rUAvoidfraction("(voidfraction2|A(U))",rUA*voidfraction);
 
                 U = rUA*UEqn.H();
 
-                phi = fvc::interpolate(U*voidfraction) & mesh.Sf();
-                                      //+ fvc::ddtPhiCorr(rUA, U, phi)
+                phi = ( fvc::interpolate(U*voidfraction) & mesh.Sf() )
+                      + fvc::ddtPhiCorr(rUAvoidfraction, U, phi);
                 surfaceScalarField phiS(fvc::interpolate(Us*voidfraction) & mesh.Sf());
                 surfaceScalarField phiGes = phi + rUAf*(fvc::interpolate(Ksl/rho) * phiS);
-                volScalarField rUAvoidfraction("(voidfraction2|A(U))",rUA*voidfraction);
                 if (modelType=="A")
                     rUAvoidfraction = volScalarField("(voidfraction2|A(U))",rUA*voidfraction*voidfraction);
 
@@ -167,7 +167,7 @@ int main(int argc, char *argv[])
 
                 } // end non-orthogonal corrector loop
 
-                #include "continuityErrs.H"
+                #include "continuityErrorPhiPU.H"
 
                 if (modelType=="B")
                     U -= rUA*fvc::grad(p) - Ksl/rho*Us*rUA;

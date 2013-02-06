@@ -43,8 +43,24 @@ export CFDEM_LIGGGHTS_LIB_NAME=lmp_$CFDEM_LIGGGHTS_MAKEFILE_NAME
 #- CFDEM lib name
 export CFDEM_LIB_NAME=lagrangianCFDEM-$CFDEM_VERSION-$WM_PROJECT_VERSION
 
+#- LMP M2M lib path
+export CFDEM_M2MLIB_PATH=$CFDEM_SRC_DIR/subModels/dataExchangeModel/twoWayM2M/library
+
 #- path to test harness
 export CFDEM_TEST_HARNESS_PATH=$CFDEM_PROJECT_USER_DIR/log/logFilesCFDEM-$CFDEM_VERSION-$WM_PROJECT_VERSION
+
+#------------------------------------------------------------------------------
+#- settings for lpp postproc tool
+#------------------------------------------------------------------------------
+
+#- nr of procs for lpp tool
+export CFDEM_LPP_NPROCS=1
+
+#- nr of procs for lpp tool
+export CFDEM_LPP_CHUNKSIZE=1
+
+#- shortcut to run lpp
+alias lpp='python -i $CFDEM_LPP_DIR/lpp.py --cpunum $CFDEM_LPP_NPROCS --chunksize $CFDEM_LPP_CHUNKSIZE'
 
 #------------------------------------------------------------------------------
 #- aliases for easy navigation (no changes necessary)
@@ -82,11 +98,26 @@ alias cfdemSysTest='bash $CFDEM_SRC_DIR/etc/cfdemSystemTest.sh'
 #- shortcut to compile LIGGGHTS
 alias cfdemCompLIG='bash $CFDEM_SRC_DIR/etc/compileLIGGGHTS.sh'
 
-#- shortcut to compile CFDEMcoupling
+#- shortcut to compile CFDEMcoupling (src+solvers)
 alias cfdemCompCFDEM='bash $CFDEM_SRC_DIR/etc/compileCFDEMcoupling.sh'
+
+#- shortcut to compile CFDEMcoupling src
+alias cfdemCompCFDEMsrc='bash $CFDEM_SRC_DIR/etc/compileCFDEMcoupling_src.sh'
+
+#- shortcut to compile CFDEMcoupling solvers
+alias cfdemCompCFDEMsol='bash $CFDEM_SRC_DIR/etc/compileCFDEMcoupling_sol.sh'
+
+#- shortcut to compile CFDEMcoupling utilities
+alias cfdemCompCFDEMuti='bash $CFDEM_SRC_DIR/etc/compileCFDEMcoupling_uti.sh'
+
+#- shortcut to compile couple library
+alias cfdemCompM2M='bash $CFDEM_SRC_DIR/etc/compileM2Mlib.sh'
 
 #- shortcut to test basic tutorials
 alias cfdemTestTUT='bash $CFDEM_SRC_DIR/etc/testTutorials.sh'
+
+#- recursive touch of current directory
+alias touchRec='find ./* -exec touch {} \;'
 
 #- shortcut to run liggghts in serial
 cfdemLiggghts() { $CFDEM_LIGGGHTS_SRC_DIR/lmp_$CFDEM_LIGGGHTS_MAKEFILE_NAME < $1; }
@@ -95,9 +126,6 @@ export -f cfdemLiggghts
 #- shortcut to run liggghts in parallel
 cfdemLiggghtsPar() { mpirun -np $2 $CFDEM_LIGGGHTS_SRC_DIR/lmp_$CFDEM_LIGGGHTS_MAKEFILE_NAME < $1; }
 export -f cfdemLiggghtsPar
-
-#- shortcut to run lpp
-alias lpp='python -i $CFDEM_LPP_DIR/lpp.py'
 
 # check if the directory exists
 if [ -d "$CFDEM_PROJECT_USER_DIR" ]; then

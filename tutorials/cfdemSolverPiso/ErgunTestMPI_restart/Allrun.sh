@@ -98,6 +98,8 @@ fi
 
 #- clean up case
 rm -rf $casePath/CFD/0.*
+rm -r $casePath/CFD/callgrind.*
+rm -r $casePath/CFD/*.out
 rm -r $casePath/CFD/clockData
 rm -rf $casePath/CFD/processor*
 rm -r $casePath/CFD/VTK
@@ -105,6 +107,7 @@ rm -rf $casePath/CFD/patchAverage_pressureDrop
 rm -rf $casePath/CFD/probes
 rm -rf $casePath/CFD/particles
 rm -r $casePath/CFD/log.*
+rm -r $casePath/CFD/lagrangian
 rm $casePath/log.liggghts
 rm $casePath/DEM/liggghts.restartCFDEM*
 rm $casePath/DEM/post/dump.*

@@ -23,7 +23,7 @@ writeLiggghtsProps
     overwrite switch2;
 \} :pre
 
-{switch1} = switch (choose on/off) to select if only last step is stored or every write step. "off" is not recommended (DEM data might get lost) :ulb,l
+{switch1} = switch (choose on/off) to select if only last step is stored or every write step. :ulb,l
 {name} = name of the restart file to be written in /$caseDir/DEM/  default default "liggghts.restartCFDEM" :l
 {switch2} = switch (choose on/off) to select if only one restart file $name or many files $name_$timeStamp are written :l
 :ule

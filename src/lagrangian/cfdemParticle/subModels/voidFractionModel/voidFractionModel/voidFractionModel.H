@@ -124,7 +124,7 @@ public:
 
         void resetVoidFractions() const;
 
-        void undoVoidFractions(double**const&) const;
+        //void undoVoidFractions(double**const&) const;
 
         double** const& cellsPerParticle() const;
 

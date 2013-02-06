@@ -1,5 +1,5 @@
 # Pour granular particles into chute container, then induce flow
-
+echo        both
 atom_style	granular
 atom_modify	map array
 communicate	single vel yes
@@ -24,7 +24,7 @@ fix 		m3 all property/global coefficientRestitution peratomtypepair 1 0.3
 fix 		m4 all property/global coefficientFriction peratomtypepair 1 0.5
 
 #pair style
-pair_style 	gran/hertz/history 1 0  #Hertzian without cohesion
+pair_style 	gran/hertz/history
 pair_coeff	* *
 
 #timestep, gravity
@@ -32,19 +32,22 @@ timestep	0.00001
 fix		gravi all gravity 9.81 vector 0.0 0.0 -1.0
 
 #walls
-fix		zwalls all wall/gran/hertz/history 1 0 zplane 0.0 0.0553 1
-fix		cylwalls all wall/gran/hertz/history 1 0 zcylinder 0.01385 1
+fix			zwalls1 all wall/gran/hertz/history   primitive type 1  zplane 0.0
+fix			zwalls2 all wall/gran/hertz/history   primitive type 1  zplane 0.0553
+fix         cylwalls all wall/gran/hertz/history primitive type 1 zcylinder 0.0138 0. 0. tangential_damping off
 
 #cfd coupling
 #fix		cfd all couple/cfd
 
 #particle insertion
-group		nve_group region reg
 region		bc cylinder z 0.0 0.0 0.012 0.02 0.03 units box
-fix		ins nve_group pour 10000 1 1 vol 0.7 100 diam uniform 0.001 0.001 dens uniform 200 200 vel uniform 0. 0. 0. 0. -1.0 region bc
+fix		    pts1 all particletemplate/sphere 1 atom_type 1 density constant 200 radius constant 0.001
+fix		    pdd1 all particledistribution/discrete 1.  1 pts1 1.0
+
+fix		ins all insert/pack seed 100001 distributiontemplate pdd1 vel constant 0. 0. -1. insert_every once overlapcheck yes all_in yes particles_in_region 1000 region bc
 
 #apply nve integration to all particles that are inserted as single particles
-fix		integr nve_group nve/sphere
+fix		integr all nve/sphere
 
 
 #screen output
@@ -57,9 +60,6 @@ compute_modify	thermo_temp dynamic yes
 #insert the first particles so that dump is not empty
 run		1
 dump		dmp all custom 1000 post/dump.liggghts_init id type type x y z ix iy iz vx vy vz fx fy fz omegax omegay omegaz radius 
-#force : f_couple_cfd[0] f_couple_cfd[1] f_couple_cfd[2]
-#node : f_couple_cfd[6]
-#cell id : f_couple_cfd[7]
 
 run		3000 upto
 #write_restart 	liggghts.restart

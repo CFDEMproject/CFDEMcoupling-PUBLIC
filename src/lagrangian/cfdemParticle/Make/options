@@ -13,6 +13,7 @@ EXE_INC = \
     -I$(LIB_SRC)/lagrangian/basic/lnInclude \
     -I$(LIB_SRC)/OpenFOAM/containers/HashTables/labelHashSet \
     -I$(CFDEM_LIGGGHTS_SRC_DIR) \
+    -I$(CFDEM_M2MLIB_PATH) \
 
 LIB_LIBS = \
      $(PLIBS) \
@@ -25,3 +26,5 @@ LIB_LIBS = \
     -lmpi_cxx \
     -L$(CFDEM_LIGGGHTS_SRC_DIR) \
     -l$(CFDEM_LIGGGHTS_LIB_NAME) \
+    -L$(CFDEM_M2MLIB_PATH) \
+    -lcouple

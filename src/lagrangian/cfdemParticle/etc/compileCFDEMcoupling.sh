@@ -19,31 +19,14 @@ mkdir $logDir
 #================================================================================#
 # compile src
 #================================================================================#
-
-#--------------------------------------------------------------------------------#
-#- define variables
-logpath="$(dirname "$(readlink -f ${BASH_SOURCE[0]})")/$logDir"
-logfileName="log_compileCFDEMcoupling_src" #alternative: logfileName="log_compileLIGGGHTS_$NOW"
-casePath="$CFDEM_SRC_DIR"
-headerText="$logfileName""-$NOW"
-#--------------------------------------------------------------------------------#
-compileLib $logpath $logfileName $casePath $headerText
+bash $CFDEM_SRC_DIR/etc/compileCFDEMcoupling_src.sh
 
 #================================================================================#
 # compile solvers
 #================================================================================#
+bash $CFDEM_SRC_DIR/etc/compileCFDEMcoupling_sol.sh
 
-
-for solverName in "cfdemSolverPiso" "cfdemSolverIB" "cfdemSolverPisoScalar"
-do
-    #--------------------------------------------------------------------------------#
-    #- define variables
-    logfileName="log_compileCFDEMcoupling""_$solverName" 
-    casePath="$CFDEM_SOLVER_DIR/$solverName"
-    headerText="$logfileName""_$solverName""-$NOW"
-    #--------------------------------------------------------------------------------#
-    compileSolver $logpath $logfileName $casePath $headerText
-done
-
-echo "Note: the list of solvers compiled might be incomplete."
-echo "please check $CFDEM_SOLVER_DIR for more solvers available"
+#================================================================================#
+# compile utilities
+#================================================================================#
+bash $CFDEM_SRC_DIR/etc/compileCFDEMcoupling_uti.sh

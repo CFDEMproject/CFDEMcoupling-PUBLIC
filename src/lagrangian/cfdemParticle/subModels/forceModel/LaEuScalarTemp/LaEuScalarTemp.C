@@ -150,8 +150,8 @@ void LaEuScalarTemp::manipulateScalarField(volScalarField& EuField) const
 
     for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
     {
-        if(particleCloud_.regionM().inRegion()[index][0])
-        {
+        //if(particleCloud_.regionM().inRegion()[index][0])
+        //{
             label cellI = particleCloud_.cellIDs()[index][0];
 
             if(cellI >= 0)
@@ -200,7 +200,7 @@ void LaEuScalarTemp::manipulateScalarField(volScalarField& EuField) const
                     Info << "ptempField_[cellI] = " << tempField_[cellI] << endl  ;
                 }*/
             }
-        }
+        //}
     }
 
     particleCloud_.averagingM().setScalarSum
@@ -208,7 +208,7 @@ void LaEuScalarTemp::manipulateScalarField(volScalarField& EuField) const
         EuField,
         partHeatFlux_,
         particleCloud_.particleWeights(),
-        particleCloud_.regionM().inRegion()
+        NULL
     );
 
     // scale with -1/(Vcell*rho*Cp)

@@ -89,9 +89,13 @@ inline double ** cfdemCloud::voidfractions() const
     return voidfractions_;
 }
 
-inline void cfdemCloud::set_radii(double **& values) const
+inline void cfdemCloud::get_radii(double **& values) const
 {
-    radii_=values;
+//    Info << "set_radii level=" << numberOfParticles_ << endl;
+    // make a copy of the array entries
+//    for (int i=0;i<numberOfParticles_;i++)
+//        radii_[0][i]=values[0][i];
+    values=radii_;
 }
 
 inline double ** cfdemCloud::cellIDs() const
@@ -99,9 +103,12 @@ inline double ** cfdemCloud::cellIDs() const
     return cellIDs_;
 }
 
-inline void cfdemCloud::set_cellIDs(double **& values) const
+inline void cfdemCloud::get_cellIDs(double **& values) const
 {
-    cellIDs_=values;
+//    // make a copy of the array entries
+//    for (int i=0;i<numberOfParticles_;i++)
+//        cellIDs_[0][i]=values[0][i];
+    values=cellIDs_;
 }
 
 inline double ** cfdemCloud::particleWeights() const
@@ -167,11 +174,6 @@ inline const averagingModel& cfdemCloud::averagingM() const
 inline const clockModel& cfdemCloud::clockM() const
 {
     return clockModel_;
-}
-
-inline const regionModel& cfdemCloud::regionM() const
-{
-    return regionModel_;
 }
 
 inline const meshMotionModel& cfdemCloud::meshMotionM() const

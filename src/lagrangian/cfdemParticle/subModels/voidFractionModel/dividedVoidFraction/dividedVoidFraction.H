@@ -40,6 +40,7 @@ SourceFiles
 #define dividedVoidFraction_H
 
 #include "voidFractionModel.H"
+#include "interpolationCellPoint.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -65,6 +66,8 @@ private:
         mutable scalar tooMuch_;         //NP particle volume which is lost due to voidFraction limitation
 
         const scalar scaleUpVol_;        //NP scaling radius, keeping volume of particle
+
+        bool interpolation_;
 
 public:
 

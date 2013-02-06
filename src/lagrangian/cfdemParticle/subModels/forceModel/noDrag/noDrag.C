@@ -86,12 +86,12 @@ void noDrag::setForce
     Info << "noDrag::setForce" << endl;
     for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
     {
-        if(mask[index][0])
-        {
+        //if(mask[index][0])
+        //{
             // set force on particle
             if(treatExplicit_) for(int j=0;j<3;j++) expForces[index][j] = 0.;
             else  for(int j=0;j<3;j++) impForces[index][j] = 0.;
-        }
+        //}
     }
 }
 

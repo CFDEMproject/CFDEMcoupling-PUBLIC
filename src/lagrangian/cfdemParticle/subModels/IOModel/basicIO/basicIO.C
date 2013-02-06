@@ -62,13 +62,16 @@ basicIO::basicIO
 :
     IOModel(dict,sm),
     //propsDict_(dict.subDict(typeName + "Props")),
-    dirName_("particles"),
+    dirName_("lagrangian"),
     path_("dev/null"),
+    m2mComm_(false),
     lagPath_("dev/null")
 {
+	if (particleCloud_.dataExchangeM().myType()=="twoWayM2M"){m2mComm_=true;} //typeName did not work
+    Info << "particleCloud_.dataExchangeM().typeName=" << particleCloud_.dataExchangeM().myType() << endl;
+
     //if (propsDict_.found("dirName")) dirName_=word(propsDict_.lookup("dirName"));
     path_ = buildFilePath(dirName_);
-
 }
 
 
@@ -87,9 +90,13 @@ void basicIO::dumpDEMdata() const
     if (time_.outputTime())
     {
         // make time directory
-        lagPath_=createTimeDir(path_);
-        lagPath_=createTimeDir(fileName(lagPath_/"lagrangian"));
-
+        if (m2mComm_) lagPath_=buildFilePath(dirName_);
+        else
+        {
+        	lagPath_=createTimeDir(path_);
+        	lagPath_=createTimeDir(fileName(lagPath_/"lagrangian"));
+        }
+        
         // stream data to file
         streamDataToPath(lagPath_, particleCloud_.positions(), particleCloud_.numberOfParticles(), "positions","vector","Cloud<passiveParticle>","0");
         streamDataToPath(lagPath_, particleCloud_.velocities(), particleCloud_.numberOfParticles(), "v","vector","vectorField","");
@@ -102,11 +109,19 @@ void basicIO::dumpDEMdata() const
 fileName basicIO::buildFilePath(word dirName) const
 {
     // create file structure
-    fileName path("."/dirName);
-    mkDir(path,0777);
-    mkDir(fileName(path/"constant"),0777);
-    OFstream* stubFile = new OFstream(fileName(path/"particles.foam"));
-    delete stubFile;
+	fileName path("");
+    if(m2mComm_)
+    {
+    	path=fileName(particleCloud_.mesh().time().path()/particleCloud_.mesh().time().timeName()/dirName/"particleCloud");
+    	mkDir(path,0777);
+    } else
+    {
+		path=fileName("."/dirName);
+    	mkDir(path,0777);
+    	mkDir(fileName(path/"constant"),0777);
+    	OFstream* stubFile = new OFstream(fileName(path/"particles.foam"));
+    	delete stubFile;
+        }
     return path;
 }
 

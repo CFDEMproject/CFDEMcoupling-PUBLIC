@@ -112,6 +112,7 @@ public:
             const char* datatype = ""
         ) const;
 
+        word myType() const{return typeName; };
 };
 
 

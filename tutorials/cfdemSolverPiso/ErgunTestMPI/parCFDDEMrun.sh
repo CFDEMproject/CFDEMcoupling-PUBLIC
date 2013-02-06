@@ -19,9 +19,9 @@ logpath=$casePath
 headerText="run_parallel_cfdemSolverPiso_ErgunTestMPI_CFDDEM"
 logfileName="log_$headerText"
 solverName="cfdemSolverPiso"
-nrProcs="8"
+nrProcs="4"
 machineFileName="none"   # yourMachinefileName | none
-debugMode="off"          # on | off
+debugMode="off"          # on | off| strictdebugMode="off"          # on | off| strict
 testHarnessPath="$CFDEM_TEST_HARNESS_PATH"
 runOctave="true"
 postproc="false"
@@ -83,6 +83,8 @@ fi
 #- clean up case
 echo "deleting data at: $casePath :\n"
 rm -r $casePath/CFD/0.*
+rm -r $casePath/CFD/callgrind.*
+rm -r $casePath/CFD/*.out
 rm -r $casePath/CFD/log.*
 rm -r $casePath/CFD/octave/octave-core
 rm -r $casePath/CFD/VTK
@@ -92,7 +94,7 @@ rm -r $casePath/DEM/post/*
 rm -r $casePath/DEM/log.*
 rm -r $casePath/DEM/liggghts.restartCFDEM*
 rm -r $casePath/CFD/probes
-rm -r $casePath/CFD/particles
+rm -r $casePath/CFD/lagrangian
 rm -r $casePath/CFD/clockData
 echo "done"
 

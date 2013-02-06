@@ -88,8 +88,8 @@ void dilute::setScalarAverage
 
     for(int index=0; index< particleCloud_.numberOfParticles(); index++)
     {
-        if(mask[index][0])
-        {
+        //if(mask[index][0])
+        //{
             for(int subCell=0;subCell<particleCloud_.voidFractionM().cellsPerParticle()[index][0];subCell++)
             {
                 //Info << "subCell=" << subCell << endl;
@@ -104,7 +104,7 @@ void dilute::setScalarAverage
                     field[cellI] = valueScal/weightP;
                 }
             }
-        }
+        //}
     }
 
     // correct cell values to patches
@@ -126,8 +126,8 @@ void dilute::setVectorAverage
 
     for(int index=0; index< particleCloud_.numberOfParticles(); index++)
     {
-        if(mask[index][0])
-        {
+        //if(mask[index][0])
+        //{
             for(int subCell=0;subCell<particleCloud_.voidFractionM().cellsPerParticle()[index][0];subCell++)
             {
                 //Info << "subCell=" << subCell << endl;
@@ -142,7 +142,7 @@ void dilute::setVectorAverage
                     else Warning << "!!! W A R N I N G --- weightP <= 0" << endl;
                 }
             }
-        }
+        //}
     }
 
     // correct cell values to patches

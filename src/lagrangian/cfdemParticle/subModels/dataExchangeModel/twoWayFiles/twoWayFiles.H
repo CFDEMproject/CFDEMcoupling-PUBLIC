@@ -117,6 +117,8 @@ public:
             double ** const& field,
             const char* datatype = ""
         ) const;
+
+        word myType() const{return typeName; };
 };
 
 

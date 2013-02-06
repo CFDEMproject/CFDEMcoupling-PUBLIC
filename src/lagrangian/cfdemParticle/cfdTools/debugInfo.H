@@ -72,8 +72,8 @@
       meanU_field = vector(0,0,0); 
       meanUs_field = vector(0,0,0);
   }
-  meanUs_array /= numberOfParticles();   
-  meanR_array /= numberOfParticles();   
+  meanUs_array /= numberOfParticles()+SMALL;   
+  meanR_array /= numberOfParticles()+SMALL;   
 
   Info <<"=============================================================================" << endl;
   Info << "Debug Info, only serial and not tested!" << endl;

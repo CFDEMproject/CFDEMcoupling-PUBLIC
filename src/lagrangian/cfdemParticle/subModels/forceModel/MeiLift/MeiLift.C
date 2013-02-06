@@ -121,8 +121,8 @@ void MeiLift::setForce
 
     for(int index = 0;index <  particleCloud_.numberOfParticles(); index++)
     {
-        if(mask[index][0])
-        {
+        //if(mask[index][0])
+        //{
             lift=vector::zero;
             label cellI = particleCloud_.cellIDs()[index][0];
 
@@ -173,7 +173,7 @@ void MeiLift::setForce
             if(treatDEM_) for(int j=0;j<3;j++) DEMForces[index][j] += lift[j];
             else if(!treatExplicit_) for(int j=0;j<3;j++) impForces[index][j] += lift[j];
             else  for(int j=0;j<3;j++) expForces[index][j] += lift[j];
-        }
+        //}
     }
 
 }

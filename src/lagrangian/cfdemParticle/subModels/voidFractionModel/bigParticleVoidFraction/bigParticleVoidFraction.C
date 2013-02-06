@@ -34,7 +34,6 @@ Description
 #include "bigParticleVoidFraction.H"
 #include "addToRunTimeSelectionTable.H"
 #include "locateModel.H"
-#include "regionModel.H"
 #include "dataExchangeModel.H"
 
 
@@ -96,8 +95,8 @@ void bigParticleVoidFraction::setvoidFraction(double** const& mask,double**& voi
 
     for(int index=0; index< particleCloud_.numberOfParticles(); index++)
     {
-        if(mask[index][0])
-        {
+        //if(mask[index][0])
+        //{
             //reset
             for(int subcell=0;subcell<cellsPerParticle_[index][0];subcell++)
             {
@@ -181,7 +180,7 @@ void bigParticleVoidFraction::setvoidFraction(double** const& mask,double**& voi
                     //==========================//
                 }//end cells found on this proc
             }// end found cells
-        }// end if masked
+        //}// end if masked
     }// end loop all particles
 
     //bringing eulerian field to particle array

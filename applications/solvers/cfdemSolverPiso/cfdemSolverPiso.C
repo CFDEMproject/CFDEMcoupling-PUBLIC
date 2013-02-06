@@ -59,11 +59,11 @@ int main(int argc, char *argv[])
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-    Info<< "\nStarting time loop\n" << endl;
-    particleCloud.clockM().start(1,"Global");
-
     while (runTime.loop())
     {
+        Info<< "\nStarting time loop\n" << endl;
+            particleCloud.clockM().start(1,"Global");
+
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
         #include "readPISOControls.H"
@@ -80,7 +80,7 @@ int main(int argc, char *argv[])
         #include "solverDebugInfo.H"
         particleCloud.clockM().stop("Coupling");
 
-        particleCloud.clockM().start(10,"Flow");
+        particleCloud.clockM().start(26,"Flow");
         // Pressure-velocity PISO corrector
         {
             // Momentum predictor
@@ -94,16 +94,15 @@ int main(int argc, char *argv[])
               - fvm::Sp(Ksl/rho,U)
             );
 
+            if (modelType=="B")
+                UEqn == - fvc::grad(p) + Ksl/rho*Us;
+            else
+                UEqn == - voidfraction*fvc::grad(p) + Ksl/rho*Us;
+
             UEqn.relax();
 
             if (momentumPredictor)
-            {
-                //solve UEqn
-                if (modelType=="B")
-                    solve(UEqn == - fvc::grad(p) + Ksl/rho*Us);
-                else
-                    solve(UEqn == - voidfraction*fvc::grad(p) + Ksl/rho*Us);
-            }
+                solve(UEqn);
 
             // --- PISO loop
 
@@ -113,16 +112,17 @@ int main(int argc, char *argv[])
             for (int corr=0; corr<nCorrSoph; corr++)
             {
                 volScalarField rUA = 1.0/UEqn.A();
+
                 surfaceScalarField rUAf("(1|A(U))", fvc::interpolate(rUA));
+                volScalarField rUAvoidfraction("(voidfraction2|A(U))",rUA*voidfraction);
 
                 U = rUA*UEqn.H();
 
-                phi = fvc::interpolate(U*voidfraction) & mesh.Sf();
-                                      //+ fvc::ddtPhiCorr(rUA, U, phi)
+                phi = (fvc::interpolate(U*voidfraction) & mesh.Sf() )
+                     + fvc::ddtPhiCorr(rUAvoidfraction, U, phi);
                 surfaceScalarField phiS(fvc::interpolate(Us*voidfraction) & mesh.Sf());
                 surfaceScalarField phiGes = phi + rUAf*(fvc::interpolate(Ksl/rho) * phiS);
 
-                volScalarField rUAvoidfraction("(voidfraction2|A(U))",rUA*voidfraction);
                 if (modelType=="A")
                     rUAvoidfraction = volScalarField("(voidfraction2|A(U))",rUA*voidfraction*voidfraction);
 
@@ -156,7 +156,7 @@ int main(int argc, char *argv[])
 
                 } // end non-orthogonal corrector loop
 
-                #include "continuityErrs.H"
+                #include "continuityErrorPhiPU.H"
 
                 if (modelType=="B")
                     U -= rUA*fvc::grad(p) - Ksl/rho*Us*rUA;
@@ -177,11 +177,11 @@ int main(int argc, char *argv[])
             << nl << endl;
 
         particleCloud.clockM().stop("Flow");
+        particleCloud.clockM().stop("Global");
     }
 
     Info<< "End\n" << endl;
-
-    particleCloud.clockM().stop("Global");
+    
     return 0;
 }
 

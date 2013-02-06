@@ -92,7 +92,8 @@ label engineSearchIB::findCell
     {
         cellIDs[index][0]=-1;
         double radius=particleCloud_.radius(index);
-        if(mask[index][0] && radius > SMALL)
+        //if(mask[index][0] && radius > SMALL)
+        if(radius > SMALL)
         {
             // create pos vector
             for(int i=0;i<3;i++) position[i] = positions[index][i];

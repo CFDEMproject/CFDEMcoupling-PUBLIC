@@ -66,8 +66,8 @@ void averagingModel::undoVectorAverage
 
     for(int index=0; index< particleCloud_.numberOfParticles(); index++)
     {
-        if(mask[index][0])
-        {
+        //if(mask[index][0])
+        //{
             for(int subCell=0;subCell<particleCloud_.voidFractionM().cellsPerParticle()[index][0];subCell++)
             {
                 //Info << "subCell=" << subCell << endl;
@@ -87,7 +87,7 @@ void averagingModel::undoVectorAverage
                     }
                 }
             }
-        }
+        //}
     }
 
     // correct cell values to patches
@@ -108,8 +108,8 @@ void averagingModel::undoVectorSum
 
     for(int index=0; index< particleCloud_.numberOfParticles(); index++)
     {
-        if(mask[index][0])
-        {
+        //if(mask[index][0])
+        //{
             for(int subCell=0;subCell<particleCloud_.voidFractionM().cellsPerParticle()[index][0];subCell++)
             {
                 //Info << "subCell=" << subCell << endl;
@@ -123,7 +123,7 @@ void averagingModel::undoVectorSum
                     field[cellI] -= valueVec*weightP;
                 }
             }//forAllSubPoints
-        }
+        //}
     }
 
     // correct cell values to patches
@@ -144,8 +144,8 @@ void averagingModel::setVectorSum
 
     for(int index=0; index< particleCloud_.numberOfParticles(); index++)
     {
-        if(mask[index][0])
-        {
+        //if(mask[index][0])
+        //{
             for(int subCell=0;subCell<particleCloud_.voidFractionM().cellsPerParticle()[index][0];subCell++)
             {
                 cellI = particleCloud_.cellIDs()[index][subCell];
@@ -157,7 +157,7 @@ void averagingModel::setVectorSum
                     field[cellI] += valueVec*weightP;
                 }
             }//forAllSubPoints
-        }
+        //}
     }
 
     // correct cell values to patches
@@ -178,8 +178,8 @@ void averagingModel::setScalarSum
 
     for(int index=0; index< particleCloud_.numberOfParticles(); index++)
     {
-        if(mask[index][0])
-        {
+        //if(mask[index][0])
+        //{
             for(int subCell=0;subCell<particleCloud_.voidFractionM().cellsPerParticle()[index][0];subCell++)
             {
                 //Info << "subCell=" << subCell << endl;
@@ -192,7 +192,7 @@ void averagingModel::setScalarSum
                     field[cellI] += valueScal*weightP;
                 }
             }//forAllSubPoints
-        }
+        //}
     }
 
     // correct cell values to patches
@@ -215,12 +215,12 @@ void Foam::averagingModel::undoWeightFields(double**const& mask) const
 {
     for(int index=0; index< particleCloud_.numberOfParticles(); index++)
     {
-        if(mask[index][0])
-        {
+        //if(mask[index][0])
+        //{
             // undo voidfraction cause by particle
             label cellI = particleCloud_.cellIDs()[index][0];
             UsWeightField_[cellI] -= particleCloud_.particleWeights()[index][0];
-        }
+        //}
     }
 }
 

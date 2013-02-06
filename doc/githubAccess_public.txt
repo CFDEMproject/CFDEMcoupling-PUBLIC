@@ -150,3 +150,9 @@ please use: env GIT_SSL_NO_VERIFY=true git clone https://github...
 
 (see http://stackoverflow.com/questions/3777075/https-github-access)
 
+
+[c)] If you face the error: "Agent admitted failure to sign using the key. Permission denied (publickey).", after ssh -T git@github.com
+
+please type: "ssh-add"
+
+(see: https://help.github.com/articles/error-agent-admitted-failure-to-sign)

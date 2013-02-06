@@ -38,9 +38,10 @@ Description
 #include "cfdemCloud.H"
 #include "dataExchangeModel.H"
 #include "voidFractionModel.H"
-#include "regionModel.H"
 #include "locateModel.H"
 #include "averagingModel.H"
+#include "momCoupleModel.H"
+#include "forceModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -61,6 +62,7 @@ int main(int argc, char *argv[])
 
     int count=0;
     int DEM_dump_Interval=1000;
+    particleCloud.reAllocArrays();
 
     double **positions_;
     double **velocities_;
@@ -72,20 +74,26 @@ int main(int argc, char *argv[])
     
     particleCloud.dataExchangeM().allocateArray(positions_,0.,3);
     particleCloud.dataExchangeM().allocateArray(velocities_,0.,3);
-    particleCloud.dataExchangeM().allocateArray(radii_,0.,1);
+    particleCloud.get_radii(radii_);  // get ref to radii
+    //particleCloud.dataExchangeM().allocateArray(radii_,0.,1);
     particleCloud.dataExchangeM().allocateArray(voidfractions_,0.,1);
     particleCloud.dataExchangeM().allocateArray(particleWeights_,0.,1);
     particleCloud.dataExchangeM().allocateArray(particleVolumes_,0.,1);
-    particleCloud.dataExchangeM().allocateArray(cellIDs_,0.,1);
+    particleCloud.get_cellIDs(cellIDs_);  // get ref to cellIDs
+    //particleCloud.dataExchangeM().allocateArray(cellIDs_,0.,1);
+    
 
     while (runTime.loop())
     {
         Info<< "Time = " << runTime.timeName() << nl << endl;
         count+=DEM_dump_Interval;// proceed loading new data
 
-
-
-        particleCloud.regionM().resetVolFields(Us);
+        particleCloud.averagingM().resetVectorAverage(particleCloud.averagingM().UsPrev(),particleCloud.averagingM().UsNext());
+        particleCloud.voidFractionM().resetVoidFractions();
+        particleCloud.averagingM().resetVectorAverage(particleCloud.forceM(0).impParticleForces(),particleCloud.forceM(0).impParticleForces(),true);
+        particleCloud.averagingM().resetVectorAverage(particleCloud.forceM(0).expParticleForces(),particleCloud.forceM(0).expParticleForces(),true);
+        particleCloud.averagingM().resetWeightFields();
+        particleCloud.momCoupleM(0).resetMomSourceField();
 
         particleCloud.dataExchangeM().couple();
 
@@ -93,15 +101,11 @@ int main(int argc, char *argv[])
         particleCloud.dataExchangeM().getData("v","vector-atom",velocities_,count);
         particleCloud.dataExchangeM().getData("radius","scalar-atom",radii_,count);
 
-        particleCloud.set_radii(radii_);
-
-        particleCloud.locateM().findCell(particleCloud.regionM().inRegion(),positions_,cellIDs_,particleCloud.numberOfParticles());
-
-        particleCloud.set_cellIDs(cellIDs_);
+        particleCloud.locateM().findCell(NULL,positions_,cellIDs_,particleCloud.numberOfParticles());
 
         particleCloud.voidFractionM().setvoidFraction
         (
-            particleCloud.regionM().inRegion(),voidfractions_,particleWeights_,particleVolumes_
+            NULL,voidfractions_,particleWeights_,particleVolumes_
         );
 
         voidfraction.internalField() = particleCloud.voidFractionM().voidFractionInterp();
@@ -113,7 +117,7 @@ int main(int argc, char *argv[])
             velocities_,
             particleWeights_,
             particleCloud.averagingM().UsWeightField(),
-            particleCloud.regionM().inRegion()
+            NULL
         );
 
         runTime.write();
@@ -124,13 +128,13 @@ int main(int argc, char *argv[])
 
     }
 
-    delete positions_;
-    delete velocities_;
-    delete radii_;
-    delete voidfractions_;
-    delete particleWeights_;
-    delete particleVolumes_;
-    delete cellIDs_;
+    particleCloud.dataExchangeM().destroy(positions_,3);
+    particleCloud.dataExchangeM().destroy(velocities_,3);
+    //particleCloud.dataExchangeM().destroy(radii_); // destroyed in cloud
+    particleCloud.dataExchangeM().destroy(voidfractions_,1);
+    particleCloud.dataExchangeM().destroy(particleWeights_,1);
+    particleCloud.dataExchangeM().destroy(particleVolumes_,1);
+    //particleCloud.dataExchangeM().destroy(cellIDs_); // destroyed in cloud
 
     Info<< "End\n" << endl;
 

@@ -33,7 +33,6 @@ Description
 
 #include "twoWayFiles.H"
 #include "addToRunTimeSelectionTable.H"
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam

@@ -100,8 +100,8 @@ void SchillerNaumannDrag::setForce
 
     for(int index = 0;index <  particleCloud_.numberOfParticles(); index++)
     {
-        if(mask[index][0])
-        {
+        //if(mask[index][0])
+        //{
             vector drag(0,0,0);
             label cellI = particleCloud_.cellIDs()[index][0];
 
@@ -124,7 +124,7 @@ void SchillerNaumannDrag::setForce
                     Rep = ds*magUr/nuf;
 
                     // calc fluid drag Coeff
-                    Cd = 24.0/Rep*(1.0+0.15*pow(Rep,0.687));
+                    Cd = max(0.44,24.0/Rep*(1.0+0.15*pow(Rep,0.687)));
 
                     // calc particle's drag
                     drag = 0.125*Cd*rho*M_PI*ds*ds*magUr*Ur;
@@ -150,7 +150,7 @@ void SchillerNaumannDrag::setForce
             // set force on particle
             if(treatExplicit_) for(int j=0;j<3;j++) expForces[index][j] += drag[j];
             else  for(int j=0;j<3;j++) impForces[index][j] += drag[j];
-        }
+        //}
     }
 
 }

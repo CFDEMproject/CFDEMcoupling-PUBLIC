@@ -105,8 +105,8 @@ void virtualMassForce::setForce
 
     for(int index = 0;index <  particleCloud_.numberOfParticles(); index++)
     {
-        if(mask[index][0])
-        {
+        //if(mask[index][0])
+        //{
             vector virtualMassForce(0,0,0);
             label cellI = particleCloud_.cellIDs()[index][0];
 
@@ -132,7 +132,7 @@ void virtualMassForce::setForce
             // set force on particle
             if(treatExplicit_) for(int j=0;j<3;j++) expForces[index][j] += virtualMassForce[j];
             else  for(int j=0;j<3;j++) impForces[index][j] += virtualMassForce[j];
-        }
+        //}
     }
 
 }

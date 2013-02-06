@@ -89,8 +89,8 @@ void dense::setScalarAverage
 
     for(int index=0; index< particleCloud_.numberOfParticles(); index++)
     {
-        if(mask[index][0])
-        {
+        //if(mask[index][0])
+        //{
             for(int subCell=0;subCell<particleCloud_.voidFractionM().cellsPerParticle()[index][0];subCell++)
             {
                 //Info << "subCell=" << subCell << endl;
@@ -114,7 +114,7 @@ void dense::setScalarAverage
                     }
                 }
             }
-        }
+        //}
     }
 
     // correct cell values to patches
@@ -136,8 +136,8 @@ void dense::setVectorAverage
 
     for(int index=0; index< particleCloud_.numberOfParticles(); index++)
     {
-        if(mask[index][0])
-        {
+        //if(mask[index][0])
+        //{
             for(int subCell=0;subCell<particleCloud_.voidFractionM().cellsPerParticle()[index][0];subCell++)
             {
                 cellI = particleCloud_.cellIDs()[index][subCell];
@@ -160,7 +160,7 @@ void dense::setVectorAverage
                     }
                 }
             }//forAllSubPoints
-        }
+        //}
     }
 
     // correct cell values to patches

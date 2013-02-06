@@ -40,6 +40,7 @@ SourceFiles
 #define basicIO_H
 
 #include "IOModel.H"
+#include "dataExchangeModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -62,6 +63,8 @@ private:
     word dirName_;
 
     fileName path_;
+
+    bool m2mComm_;
 
     // Member Functions
     fileName buildFilePath(word) const;

@@ -34,7 +34,6 @@ Description
 #include "dividedVoidFraction.H"
 #include "addToRunTimeSelectionTable.H"
 #include "locateModel.H"
-#include "regionModel.H"
 #include "dataExchangeModel.H"
 
 //#include "mpi.h"
@@ -69,12 +68,18 @@ dividedVoidFraction::dividedVoidFraction
     alphaMin_(readScalar(propsDict_.lookup("alphaMin"))),
     alphaLimited_(0),
     tooMuch_(0.0),
-    scaleUpVol_(readScalar(propsDict_.lookup("scaleUpVol")))
+    scaleUpVol_(readScalar(propsDict_.lookup("scaleUpVol"))),
+    interpolation_(false)
 {
     maxCellsPerParticle_ = 29;
 
     if(scaleUpVol_ > 1.3 || scaleUpVol_ < 1){ FatalError<< "scaleUpVol shloud be > 1 and < 1.3 !!!" << abort(FatalError); }
     if(alphaMin_ > 1 || alphaMin_ < 0.01){ FatalError<< "alphaMin shloud be > 1 and < 0.01 !!!" << abort(FatalError); }
+    if (propsDict_.found("interpolation")){
+        interpolation_=true;
+        Warning << "interpolation for dividedVoidFraction does not yet work correctly!" << endl;
+        Info << "Using interpolated voidfraction field - do not use this in combination with interpolation in drag model!"<< endl;
+    }
 }
 
 
@@ -90,10 +95,16 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
 {
     reAllocArrays();
 
+    scalar pi = M_PI;
+    vector position(0,0,0);
+    label cellID=-1;
+    scalar radius(-1);
+    scalar cellVol(0);
+
     for(int index=0; index< particleCloud_.numberOfParticles(); index++)
     {
-        if(mask[index][0])
-        {
+        //if(mask[index][0])
+        //{
             // reset
             for(int subcell=0;subcell<cellsPerParticle_[index][0];subcell++){
                 particleWeights[index][subcell]=0;
@@ -101,14 +112,12 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
             }
 
             cellsPerParticle_[index][0]=1;
-
-            scalar pi = M_PI;
-            vector position = particleCloud_.position(index);
-            label cellID = particleCloud_.cellIDs()[index][0];
-            scalar radius = particleCloud_.radii()[index][0];
+            position = particleCloud_.position(index);
+            cellID = particleCloud_.cellIDs()[index][0];
+            radius = particleCloud_.radii()[index][0];
             scalar volume =  4./3.*radius*radius*radius*3.1415;
             radius = radius*pow(scaleUpVol_,1/3);
-            scalar cellVol(0);
+            cellVol=0;
 
             //--variables for sub-search
             int nPoints = 29;
@@ -190,25 +199,58 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
                 }*/
 
             }// end if in cell
-        }// end if in mask
+        //}// end if in mask
         //NP reset counter of lost volume
         if(index == particleCloud_.numberOfParticles()-1) Info << "Total particle volume neglected: " << tooMuch_<< endl;
     }// end loop all particles
 
-    // bring voidfraction from Eulerian Field to particle array
+    // bring voidfraction from Eulerian Field to particle arra
+//    interpolationCellPoint<scalar> voidfractionInterpolator_(voidfractionNext_);
+    scalar voidfractionAtPos(0);
     for(int index=0; index< particleCloud_.numberOfParticles(); index++)
     {
-        for(int subcell=0;subcell<cellsPerParticle_[index][0];subcell++)
+/*        if(interpolation_)
         {
-            label cellID = particleCloud_.cellIDs()[index][subcell];
-
-            if(cellID >= 0)
+            label cellI = particleCloud_.cellIDs()[index][0];
+            if(cellI >= 0)
             {
-                voidfractions[index][subcell] = voidfractionNext_[cellID];
+                position = particleCloud_.position(index);
+                voidfractionAtPos=voidfractionInterpolator_.interpolate(position,cellI);
+            }else{
+                voidfractionAtPos=-1;
             }
-            else
+    
+            for(int subcell=0;subcell<cellsPerParticle_[index][0];subcell++)
             {
-                voidfractions[index][subcell] = -1.;
+                label cellID = particleCloud_.cellIDs()[index][subcell];
+
+                if(cellID >= 0)
+                {
+                    if(voidfractionAtPos > 0)
+                        voidfractions[index][subcell] = voidfractionAtPos;
+                    else
+                        voidfractions[index][subcell] = voidfractionNext_[cellID];
+                } 
+                else
+                {
+                    voidfractions[index][subcell] = -1.;
+                }
+            }
+        }
+        else*/
+        {
+            for(int subcell=0;subcell<cellsPerParticle_[index][0];subcell++)
+            {
+                label cellID = particleCloud_.cellIDs()[index][subcell];
+
+                if(cellID >= 0)
+                {
+                    voidfractions[index][subcell] = voidfractionNext_[cellID];
+                } 
+                else
+                {
+                    voidfractions[index][subcell] = -1.;
+                }
             }
         }
     }

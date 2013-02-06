@@ -31,7 +31,6 @@ Description
 
 #include "error.H"
 #include "voidFractionModel.H"
-#include "regionModel.H"
 #include "dataExchangeModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -95,7 +94,7 @@ voidFractionModel::voidFractionModel
 
 voidFractionModel::~voidFractionModel()
 {
-    free(cellsPerParticle_);
+    particleCloud_.dataExchangeM().destroy(cellsPerParticle_,1);
 }
 
 // * * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * * //
@@ -145,7 +144,7 @@ void Foam::voidFractionModel::resetVoidFractions() const
     voidfractionNext_.internalField() = 1;
 }
 
-void Foam::voidFractionModel::undoVoidFractions(double**const& mask) const
+/*void Foam::voidFractionModel::undoVoidFractions(double**const& mask) const
 {
     voidfractionPrev_.internalField() = voidfractionNext_.internalField();
 
@@ -159,7 +158,7 @@ void Foam::voidFractionModel::undoVoidFractions(double**const& mask) const
             voidfractionNext_[cellI] += particleCloud_.particleVolumes()[index][0]/cellVolume;
         }
     }
-}
+}*/
 
 double** const& Foam::voidFractionModel::cellsPerParticle() const
 {

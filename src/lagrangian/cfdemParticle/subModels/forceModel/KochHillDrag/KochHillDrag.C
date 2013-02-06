@@ -75,6 +75,8 @@ KochHillDrag::KochHillDrag
     if (propsDict_.found("verbose")) verbose_=true;
     if (propsDict_.found("treatExplicit")) treatExplicit_=true;
     if (propsDict_.found("interpolation")) interpolation_=true;
+
+    // Note: dprim=ds/scale_
     if (propsDict_.found("scale"))
         scale_=scalar(readScalar(propsDict_.lookup("scale")));
 }
@@ -124,9 +126,8 @@ void KochHillDrag::setForce
 
     for(int index = 0;index <  particleCloud_.numberOfParticles(); index++)
     {
-        if(mask[index][0])
-        {
-
+        //if(mask[index][0])
+        //{
             cellI = particleCloud_.cellIDs()[index][0];
             drag = vector(0,0,0);
 
@@ -137,6 +138,10 @@ void KochHillDrag::setForce
 	                position = particleCloud_.position(index);
                     voidfraction = voidfractionInterpolator_.interpolate(position,cellI);
                     Ufluid = UInterpolator_.interpolate(position,cellI);
+                    //Ensure interpolated void fraction to be meaningful
+                    // Info << " --> voidfraction: " << voidfraction << endl;
+                    if(voidfraction>1.00) voidfraction = 1.00;
+                    if(voidfraction<0.40) voidfraction = 0.40;
                 }else
                 {
 					voidfraction = particleCloud_.voidfraction(index);
@@ -162,8 +167,12 @@ void KochHillDrag::setForce
                     scalar F0=0.;
                     if(volumefraction < 0.4)
                     {
-                        F0 = (1+3*sqrt((volumefraction)/2)+135/64*volumefraction*log(volumefraction)+16.14*volumefraction)/
-                             (1+0.681*volumefraction-8.48*sqr(volumefraction)+8.16*volumefraction*volumefraction*volumefraction);
+                        F0 = (1+3*sqrt((volumefraction)/2)+135/64*volumefraction*log(volumefraction)
+                              +16.14*volumefraction
+                             )/
+                             (1+0.681*volumefraction-8.48*sqr(volumefraction)
+                              +8.16*volumefraction*volumefraction*volumefraction
+                             );
                     } else {
                         F0 = 10*volumefraction/(voidfraction*voidfraction*voidfraction);
                     }
@@ -171,12 +180,14 @@ void KochHillDrag::setForce
                     // calc model coefficient F3
                     scalar F3 = 0.0673+0.212*volumefraction+0.0232/pow(voidfraction,5);
 
-                    // calc model coefficient beta
-                    scalar beta = 18*nuf*rho*voidfraction*voidfraction*volumefraction/(ds/scale_*ds/scale_)*
-                                  (F0 + 0.5*F3*Rep);
+                    //Calculate F in the formulation of van der Hoef et al. (JFM 528:233-254)
+                    scalar F = voidfraction * (F0 + 0.5*F3*Rep);
+
+                    // calc drag model coefficient betaP
+                    scalar betaP = 18.*nuf*rho/(ds/scale_*ds/scale_)*voidfraction*F;
 
                     // calc particle's drag
-                    drag = Vs*beta/volumefraction*Ur;
+                    drag = Vs*betaP*Ur;
 
                     if (modelType_=="B")
                         drag /= voidfraction;
@@ -199,7 +210,7 @@ void KochHillDrag::setForce
             // set force on particle
             if(treatExplicit_) for(int j=0;j<3;j++) expForces[index][j] += drag[j];
             else  for(int j=0;j<3;j++) impForces[index][j] += drag[j];
-        }
+        //}
     }
 }
 

@@ -131,6 +131,21 @@ In "sub-model properties" sub-dictionaries might be defined to specify model spe
 
 Reasonable example settings for the "couplingProperties" dictionary are given in the tutorial cases.
 
+modelType :pre
+
+"modelType" refers to the formulation of the equations to be solved. Choose "A" or "B", according to Zhou et al. (2010): "Discrete particle simulation of particle-fluid flow: model formulations and their appliccability", JFM. "A" requres the use of the force models gradPForce and viscForce, whereas "B" requires the force model "Archimedes".
+
+couplingInterval :pre
+
+The coupling interval determines the time passing between two CFD-DEM data exchanges. 
+
+A useful procedure would be:
+1) Set the DEM TS in the in.xxx according to the needs of the pure DEM problem.
+2) Set the "couplingInterval", which refers to the DEM timesteps. Depending on the problem you will need to have a close (small couplingInterval) or loose coupling.
+3) Choose the CFD timestep in the controlDict. it must be equal or smaller than the coupling time, otherwise you will get the error: "Error - TS bigger than coupling interval!".
+
+Example: DEMts=0.00001s, couplingInterval=10 exchange data (=couple) will happen every 0.0001s.
+
 :line
 
 1.5 "liggghtsCommands" dictionary :h4,link(1_5)
@@ -150,6 +165,16 @@ The dictionary is divided into two parts, first a list of "liggghtsCommandModels
 Reasonable example settings for the "liggghtsCommands" dictionary are given in the tutorial cases.
 
 :line
+
+
+
+
+
+
+
+
+
+
 
 
 

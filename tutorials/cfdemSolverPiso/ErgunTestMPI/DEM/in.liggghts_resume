@@ -8,7 +8,7 @@ boundary	m m m
 newton		off
 
 units		si
-processors	2 2 2
+processors	2 2 1
 
 #read the restart file
 read_restart 	../DEM/liggghts.restart

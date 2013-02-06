@@ -88,7 +88,7 @@ public:
 
     const char* command();
 
-    string createCommand(word="",word="",word="");
+    string createCommand(word="",word="",word="",word="",word="");
 
     bool runCommand(int);
 

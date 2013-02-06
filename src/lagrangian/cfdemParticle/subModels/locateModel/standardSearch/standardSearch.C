@@ -85,7 +85,8 @@ label standardSearch::findCell
 
         cellIDs[index][0]=-1;
 
-        if(mask[index][0] && particleCloud_.radius(index) > SMALL)
+        //if(mask[index][0] && particleCloud_.radius(index) > SMALL)
+        if(particleCloud_.radius(index) > SMALL)
         {
             // create pos vector
             for(int i=0;i<3;i++) position[i] = positions[index][i];

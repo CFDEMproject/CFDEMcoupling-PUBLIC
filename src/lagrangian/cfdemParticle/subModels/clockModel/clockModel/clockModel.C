@@ -32,6 +32,8 @@ Description
 #include "error.H"
 #include "mpi.h"
 #include "clockModel.H"
+#include <unistd.h>
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -54,56 +56,65 @@ void Foam::clockModel::start(int pos) const
 
 void Foam::clockModel::start(int pos,std::string ident) const
 {
-	if (pos >= n_) // alternatively one fixed size?
-	{
-		n_ = 2*n_;
-		deltaT_.resize(n_,0);
-		identifier_.resize(n_,"");
-		nOfRuns_.resize(n_,0);
-		level_.resize(n_,-1);
-		parent_.resize(n_,-2);
-	}
-	identifier_[pos]=ident;
-	level_[pos] = curLev_;
-	curLev_ += 1;
-	parent_[pos]=curParent_;
-	curParent_ = pos;
-	nOfRuns_[pos] += 1;
-	deltaT_[pos]-=std::clock();
+    if(particleCloud_.mesh().time().value() > startTime_)
+    {
+    	if (pos >= n_) // alternatively one fixed size?
+    	{
+    		n_ = 2*n_;
+	    	deltaT_.resize(n_,0);
+	    	identifier_.resize(n_,"");
+	    	nOfRuns_.resize(n_,0);
+	    	level_.resize(n_,-1);
+	    	parent_.resize(n_,-2);
+	    }
+	    identifier_[pos]=ident;
+	    level_[pos] = curLev_;
+	    curLev_ += 1;
+	    parent_[pos]=curParent_;
+	    curParent_ = pos;
+	    nOfRuns_[pos] += 1;
+	    deltaT_[pos]-=std::clock();
+    }
 	return;
 }
 
 void Foam::clockModel::stop() const
 {
-	deltaT_[curParent_]+=std::clock();
-	curLev_ -= 1;
-	if (curParent_ >= 0)
-	{
-		curParent_ = parent_[curParent_];
-	}
-	else
-	{
-		curParent_ = -1;
-	}
+    if(particleCloud_.mesh().time().value() > startTime_)
+    {
+    	deltaT_[curParent_]+=std::clock();
+	    curLev_ -= 1;
+	    if (curParent_ >= 0)
+	    {
+	    	curParent_ = parent_[curParent_];
+	    }
+	    else
+	    {
+	    	curParent_ = -1;
+	    }
+    }
 	return;
 }
 
 void Foam::clockModel::stop(std::string ident) const
 {
-	deltaT_[curParent_] += std::clock();
-	if (curParent_ > 0 && identifier_[curParent_].compare(ident)!=0)
-	{
-		Pout<<"Warning: stop identifier did not equal start identifier! "<<ident<<" & "<<identifier_[curParent_]<<nl;
-	}
-	curLev_ -= 1;
-	if (curParent_ >= 0)
-	{
-		curParent_ = parent_[curParent_];
-	}
-	else
-	{
-		curParent_ = -1;
-	}
+    if(particleCloud_.mesh().time().value() > startTime_)
+    {
+    	deltaT_[curParent_] += std::clock();
+	    if (curParent_ > 0 && identifier_[curParent_].compare(ident)!=0)
+	    {
+	    	Pout<<"Warning: stop identifier did not equal start identifier! "<<ident<<" & "<<identifier_[curParent_]<<nl;
+	    }
+	    curLev_ -= 1;
+	    if (curParent_ >= 0)
+	    {
+	    	curParent_ = parent_[curParent_];
+	    }
+	    else
+	    {
+	    	curParent_ = -1;
+	    }
+    }
 	return;
 }
 
@@ -198,7 +209,7 @@ void Foam::clockModel::evalPar() const
 	// MPI_REDUCE SUM NODES
 	MPI_Barrier(MPI_COMM_WORLD);
 	strs.str("");
-	std::string msg = "Parallel Measurements in CPU-seconds of all Processors:";
+	std::string msg = "Parallel Measurements in CPU-seconds of all Processors (starting after first t.s.):";
 	msg.append("\n");
 	msg.append("Name \t avgdeltaT \t maxdeltaT \t nOfRuns \t level \t parentNr \t parentName \n");
 	double buffOut=0.;
@@ -308,12 +319,177 @@ std::vector<int> Foam::clockModel::calcShift() const
 	}
 	return shifts;
 }
+
+void Foam::clockModel::normHist() const
+{
+	int myrank=-10;
+	MPI_Comm_rank(MPI_COMM_WORLD,&myrank);
+	int numprocs=-10;
+	MPI_Comm_size(MPI_COMM_WORLD, &numprocs);
+	double buffOut=0.;
+    double buffIn=0.;
+	
+	Info << "==========================" << endl;
+    Info << " PROCESSOR LOAD HISTOGRAM" << endl;
+
+	//Global = 1
+	buffIn = double(deltaT_[1]);
+	MPI_Allreduce(&buffIn, &buffOut, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+    if(buffOut>SMALL) buffIn /= buffOut;
+    plotHist(buffIn,identifier_[1],numprocs,myrank);
+
+	//LIGGGHTS = 3
+	buffIn = double(deltaT_[3]);
+	MPI_Allreduce(&buffIn, &buffOut, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+    if(buffOut>SMALL) buffIn /= buffOut;
+    plotHist(buffIn,identifier_[3],numprocs,myrank);
+
+	//Coupling - LIGGGHTS = 2 - 3
+	buffIn = double(deltaT_[2]) - buffIn;
+	MPI_Allreduce(&buffIn, &buffOut, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+    if(buffOut>SMALL) buffIn /= buffOut;
+    plotHist(buffIn,"Coupling (routines)",numprocs,myrank);
+
+	//Flow = 26
+	buffIn = double(deltaT_[26]);
+	MPI_Allreduce(&buffIn, &buffOut, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+    if(buffOut>SMALL) buffIn /= buffOut;
+    plotHist(buffIn,identifier_[26],numprocs,myrank);
+    Info << "===========================" << endl;
+
+	getRAMUsage();
+	return;
+}
+
+void Foam::clockModel::plotHist(double buffIn,std::string identifier,int numprocs,int myrank) const
+{
+/*  // version using double*, problem: no alloc for double * and MPI
+    double* globalTime=NULL;
+    double* globalTime_all=NULL;
+    particleCloud_.dataExchangeM().allocateArray(globalTime,0.,numprocs);
+    particleCloud_.dataExchangeM().allocateArray(globalTime_all,0.,numprocs);  
+   
+    globalTime[myrank]=buffIn;
+    MPI_Allreduce(globalTime, globalTime_all, numprocs, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+
+    if(myrank==0)
+        for(int j=0;j<numprocs;j++)
+            printf("%4f  ",globalTime_all[j]);
+    Info << "\t" <<identifier << endl;
+
+    particleCloud_.dataExchangeM().destroy(globalTime);
+    particleCloud_.dataExchangeM().destroy(globalTime_all);*/
+
+
+    double** globalTime=NULL;
+    double** globalTime_all=NULL;
+    particleCloud_.dataExchangeM().allocateArray(globalTime,0.,1,numprocs);
+    particleCloud_.dataExchangeM().allocateArray(globalTime_all,0.,1,numprocs);  
+   
+    globalTime[0][myrank]=buffIn;
+    MPI_Allreduce(globalTime[0], globalTime_all[0], numprocs, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+
+    if(myrank==0)
+        for(int j=0;j<numprocs;j++)
+            printf("%4f  ",globalTime_all[0][j]);
+    Info << "\t" <<identifier << endl;
+
+    particleCloud_.dataExchangeM().destroy(globalTime,1);
+    particleCloud_.dataExchangeM().destroy(globalTime_all,1);
+}
+
+void Foam::clockModel::Hist() const
+{
+    int myrank=-10;
+    MPI_Comm_rank(MPI_COMM_WORLD,&myrank);
+
+    //Global = 1 / Coupling = 2 / LIGGGHTS = 3 /Flow = 26
+
+    //Global = 1
+	Pout << "[" << myrank << "]: " << identifier_[1] << " " << (deltaT_[1]/CLOCKS_PER_SEC) << '\n';
+	//LIGGGHTS = 3
+	Pout << "[" << myrank << "]: " << identifier_[3] << " " << (deltaT_[3]/CLOCKS_PER_SEC) << '\n';
+	//Coupling - LIGGGHTS = 2 - 3
+	Pout << "[" << myrank << "]: " << "Coupling - LIGGGHTS" << " " << ((deltaT_[2]-deltaT_[3])/CLOCKS_PER_SEC) << '\n';
+	//Flow = 26
+	Pout << "[" << myrank << "]: " << identifier_[26] << " " << (deltaT_[26]/CLOCKS_PER_SEC) << '\n';
+		
+	return;
+}
+
+void Foam::clockModel::getRAMUsage() const
+{
+	int myrank=-10;
+    	MPI_Comm_rank(MPI_COMM_WORLD,&myrank);
+	int numprocs=-10;
+	MPI_Comm_size(MPI_COMM_WORLD, &numprocs);
+	
+	pid_t myPID = getpid();	//get PID of running process
+	//Pout << myPID << "\n";
+	
+	std::string fileName = "/proc/"; //build path to /proc/PID/smaps and open file
+	std::stringstream strs;
+	strs << myPID;
+
+	fileName.append(strs.str());
+	fileName.append("/smaps");
+	std::ifstream inFile;
+	inFile.open(fileName.data(),ios_base::in);
+
+	std::string line;
+	int RssMem = 0;
+	int SwapMem = 0;
+	int temp = 0;
+	strs.str("");
+	if (inFile.is_open())	//search in File smaps for Rss and Swap entries
+	{
+		while(inFile.good())
+		{
+			getline(inFile,line);
+			strs.str("");
+			if (line.substr(0,4).compare("Rss:") == 0)
+			{
+			strs << line;
+			strs >> line >> temp;
+			RssMem = RssMem + temp;
+			//Pout << temp << " ";
+			}
+			else if (line.substr(0,5).compare("Swap:") == 0)
+			{
+			strs << line;
+			strs >> line >> temp;
+			SwapMem = SwapMem + temp;
+			//Pout << strs.str() << " ";
+			}
+		
+		}
+	}
+	double SwapMB = (double)SwapMem/1024.0; //kB -> MB
+	double RssMB = (double)RssMem/1024.0;
+
+	inFile.close();
+
+	// set up communication between Procs and plot Stuff
+	Info << " RAM USAGE HISTOGRAM in MB" << endl;
+	plotHist(RssMB,"RSS memory used",numprocs,myrank);
+	if (SwapMem > 0) 
+	{
+		plotHist(SwapMB,"WARNING: Swap",numprocs,myrank);
+	}
+	Info << "===========================" << endl;
+
+	//Pout << "SWAP Memory used: " << SwapMem <<"MB\n";
+	//Pout << "Rss Memory used: " << RssMem <<"MB\n";
+	
+
+	return;
+}
 // * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * //
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 // Construct from components
-clockModel::clockModel
+Foam::clockModel::clockModel
 (
     const dictionary& dict,
     cfdemCloud& sm
@@ -322,6 +498,8 @@ clockModel::clockModel
     dict_(dict),
     particleCloud_(sm),
     path_("clockData"),
+    startTime_(sm.mesh().time().startTime().value()+sm.mesh().time().deltaT().value()+SMALL),  // delay start of measurement by deltaT
+    //startTime_(0),                                //no delay
     n_(30),
     deltaT_(std::vector<clock_t> (n_)),
     identifier_(std::vector<std::string> (n_)),
@@ -330,12 +508,15 @@ clockModel::clockModel
     curLev_(0),
     parent_(std::vector<int> (n_)),
     curParent_(0)
-{}
+{
+
+    Info << "start clock measurement at t >"  << startTime_ << endl;
+}
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-clockModel::~clockModel()
+Foam::clockModel::~clockModel()
 {}
 
 

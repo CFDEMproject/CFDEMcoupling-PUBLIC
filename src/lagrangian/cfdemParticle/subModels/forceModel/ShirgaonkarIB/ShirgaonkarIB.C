@@ -117,8 +117,8 @@ void ShirgaonkarIB::setForce
 
     for(int index=0; index< particleCloud_.numberOfParticles(); index++)
     {
-        if(mask[index][0])
-        {
+        //if(mask[index][0])
+        //{
             drag=vector::zero;
 
             for(int subCell=0;subCell<particleCloud_.voidFractionM().cellsPerParticle()[index][0];subCell++)
@@ -139,7 +139,7 @@ void ShirgaonkarIB::setForce
             else  for(int j=0;j<3;j++) impForces[index][j] += drag[j];
 
             if(verbose_) Info << "impForces = " << impForces[index][0]<<","<<impForces[index][1]<<","<<impForces[index][2] << endl;
-        }
+        //}
     }
 }
 

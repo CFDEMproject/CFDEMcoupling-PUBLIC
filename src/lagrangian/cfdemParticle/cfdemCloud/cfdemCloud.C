@@ -34,7 +34,6 @@ Description
 #include "forceModel.H"
 #include "locateModel.H"
 #include "momCoupleModel.H"
-#include "regionModel.H"
 #include "meshMotionModel.H"
 #include "voidFractionModel.H"
 #include "dataExchangeModel.H"
@@ -43,7 +42,6 @@ Description
 #include "clockModel.H"
 #include "liggghtsCommandModel.H"
 
-#include "mpi.h"
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 Foam::cfdemCloud::cfdemCloud
 (
@@ -164,14 +162,6 @@ Foam::cfdemCloud::cfdemCloud
             *this
         )
     ),
-    regionModel_
-    (
-        regionModel::New
-        (
-            couplingProperties_,
-            *this
-        )
-    ),
     meshMotionModel_
     (
         meshMotionModel::New
@@ -230,23 +220,24 @@ Foam::cfdemCloud::cfdemCloud
 Foam::cfdemCloud::~cfdemCloud()
 {
     clockM().evalPar();
-    free(positions_);
-    free(velocities_);
-    free(impForces_);
-    free(expForces_);
-    free(DEMForces_);
-    free(radii_);
-    free(voidfractions_);
-    free(cellIDs_);
-    free(particleWeights_);
-    free(particleVolumes_);
+    clockM().normHist();
+    dataExchangeM().destroy(positions_,3);
+    dataExchangeM().destroy(velocities_,3);
+    dataExchangeM().destroy(impForces_,3);
+    dataExchangeM().destroy(expForces_,3);
+    dataExchangeM().destroy(DEMForces_,3);
+    dataExchangeM().destroy(radii_,1);
+    dataExchangeM().destroy(voidfractions_,1);
+    dataExchangeM().destroy(cellIDs_,1);
+    dataExchangeM().destroy(particleWeights_,1);
+    dataExchangeM().destroy(particleVolumes_,1);
 }
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
 void Foam::cfdemCloud::getDEMdata()
 {
+    dataExchangeM().getData("radius","scalar-atom",radii_);
     dataExchangeM().getData("x","vector-atom",positions_);
     dataExchangeM().getData("v","vector-atom",velocities_);
-    dataExchangeM().getData("radius","scalar-atom",radii_);
 }
 
 void Foam::cfdemCloud::giveDEMdata()
@@ -275,7 +266,7 @@ void Foam::cfdemCloud::setNumberOfParticles(int nP)
 
 void Foam::cfdemCloud::findCells()
 {
-    locateM().findCell(regionM().inRegion(),positions_,cellIDs_,numberOfParticles());
+    locateM().findCell(NULL,positions_,cellIDs_,numberOfParticles());
 }
 
 void Foam::cfdemCloud::setForces()
@@ -283,7 +274,7 @@ void Foam::cfdemCloud::setForces()
     resetArray(impForces_,numberOfParticles(),3);
     resetArray(expForces_,numberOfParticles(),3);
     resetArray(DEMForces_,numberOfParticles(),3);
-    for (int i=0;i<cfdemCloud::nrForceModels();i++) cfdemCloud::forceM(i).setForce(regionM().inRegion(),impForces_,expForces_,DEMForces_);
+    for (int i=0;i<cfdemCloud::nrForceModels();i++) cfdemCloud::forceM(i).setForce(NULL,impForces_,expForces_,DEMForces_);
 }
 // * * * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * * //
 
@@ -372,34 +363,40 @@ bool Foam::cfdemCloud::evolve
             Info << "\n Coupling..." << endl;
             doCouple=true;
 
-            if(verbose_) Info << "- defineRegion()" << endl;
-            regionM().defineRegion();
-            if(verbose_) Info << "defineRegion done." << endl;
-
             // reset vol Fields
+            clockM().start(16,"resetVolFields");
             if(verbose_) Info << "- resetVolFields()" << endl;
-            regionM().resetVolFields(Us);
+            averagingM().resetVectorAverage(averagingM().UsPrev(),averagingM().UsNext());
+            voidFractionM().resetVoidFractions();
+            averagingM().resetVectorAverage(forceM(0).impParticleForces(),forceM(0).impParticleForces(),true);
+            averagingM().resetVectorAverage(forceM(0).expParticleForces(),forceM(0).expParticleForces(),true);
+            averagingM().resetWeightFields();
+            momCoupleM(0).resetMomSourceField();
             if(verbose_) Info << "resetVolFields done." << endl;
+            clockM().stop("resetVolFields");
 
             if(verbose_) Info << "- getDEMdata()" << endl;
-            clockM().start(4,"getDEMdata");
+            clockM().start(17,"getDEMdata");
             getDEMdata();
-            clockM().stop();
+            clockM().stop("getDEMdata");
             if(verbose_) Info << "- getDEMdata done." << endl;
 
             // search cellID of particles
-            clockM().start(5,"findCell");
+            clockM().start(18,"findCell");
             if(verbose_) Info << "- findCell()" << endl;
             findCells();
             if(verbose_) Info << "findCell done." << endl;
             clockM().stop("findCell");
 
             // set void fraction field
+            clockM().start(19,"setvoidFraction");
             if(verbose_) Info << "- setvoidFraction()" << endl;
-            voidFractionM().setvoidFraction(regionM().inRegion(),voidfractions_,particleWeights_,particleVolumes_);
+            voidFractionM().setvoidFraction(NULL,voidfractions_,particleWeights_,particleVolumes_);
             if(verbose_) Info << "setvoidFraction done." << endl;
+            clockM().stop("setvoidFraction");
 
             // set particles velocity field
+            clockM().start(20,"setVectorAverage");
             if(verbose_) Info << "- setVectorAverage(Us,velocities_,weights_)" << endl;
             averagingM().setVectorAverage
             (
@@ -407,49 +404,47 @@ bool Foam::cfdemCloud::evolve
                 velocities_,
                 particleWeights_,
                 averagingM().UsWeightField(),
-                regionM().inRegion()
+                NULL //mask
             );
             if(verbose_) Info << "setVectorAverage done." << endl;
+            clockM().stop("setVectorAverage");
 
             // set particles forces
+            clockM().start(21,"setForce");
             if(verbose_) Info << "- setForce(forces_)" << endl;
             setForces();
             if(verbose_) Info << "setForce done." << endl;
+            clockM().stop("setForce");
 
             // get next force field
+            clockM().start(22,"setParticleForceField");
             if(verbose_) Info << "- setParticleForceField()" << endl;
-
             averagingM().setVectorSum
             (
                 forceM(0).impParticleForces(),
                 impForces_,
                 particleWeights_,
-                regionM().inRegion()
+                NULL //mask
             );
             averagingM().setVectorSum
             (
                 forceM(0).expParticleForces(),
                 expForces_,
                 particleWeights_,
-                regionM().inRegion()
+                NULL //mask
             );
-
             if(verbose_) Info << "- setParticleForceField done." << endl;
+            clockM().stop("setParticleForceField");
 
             // write DEM data
             if(verbose_) Info << " -giveDEMdata()" << endl;
-            clockM().start(6,"giveDEMdata");
+            clockM().start(23,"giveDEMdata");
             giveDEMdata();
             clockM().stop("giveDEMdata");
-
-            // expand region - call for new particles
-            if(verbose_) Info << "- expandRegion()" << endl;
-            regionM().expandRegion(U);
-            if(verbose_) Info << "expandRegion done." << endl;
-
         }//end dataExchangeM().couple()
         Info << "\n timeStepFraction() = " << dataExchangeM().timeStepFraction() << endl;
 
+        clockM().start(24,"interpolateEulerFields");
         // update voidFractionField
         alpha.internalField() = voidFractionM().voidFractionInterp();
         alpha.correctBoundaryConditions();
@@ -457,12 +452,16 @@ bool Foam::cfdemCloud::evolve
         // update particle velocity Field
         Us.internalField() = averagingM().UsInterp();
         Us.correctBoundaryConditions();
+        clockM().stop("interpolateEulerFields");
 
         if(verbose_){
             #include "debugInfo.H"
         }
+
+        clockM().start(25,"dumpDEMdata");
         // do particle IO
         IOM().dumpDEMdata();
+        clockM().stop("dumpDEMdata");
 
     }//end ignore
     return doCouple;

@@ -93,7 +93,7 @@ int main(int argc, char *argv[])
 
             fvVectorMatrix UEqn
             (
-                fvm::ddt(U)
+                fvm::ddt(voidfraction,U)
               + fvm::div(phi, U)
               + turbulence->divDevReff(U)
             );
@@ -123,7 +123,7 @@ int main(int argc, char *argv[])
 
                     fvScalarMatrix pEqn
                     (
-                        fvm::laplacian(rUA, p) == fvc::div(phi)
+                        fvm::laplacian(rUA, p) == fvc::div(phi) + fvc::ddt(voidfraction)
                     );
 
                     pEqn.setReference(pRefCell, pRefValue);
@@ -157,7 +157,8 @@ int main(int argc, char *argv[])
         turbulence->correct();
 
         Info << "particleCloud.calcVelocityCorrection() " << endl;
-        particleCloud.calcVelocityCorrection(p,U,phiIB);
+        volScalarField voidfractionNext=mesh.lookupObject<volScalarField>("voidfractionNext");
+        particleCloud.calcVelocityCorrection(p,U,phiIB,voidfractionNext);
 
         runTime.write();
 

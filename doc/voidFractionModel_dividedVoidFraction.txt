@@ -16,10 +16,12 @@ dividedProps
 \{
     alphaMin number1;
     scaleUpVol number2;
+    interpolation;
 \} :pre
 
 {number1} = mininmum limit for voidfraction :ulb,l
 {number2} = diameter of the particle's representation is artificially increased according to {number2} * Vparticle, volume remains unaltered! :l
+{interpolation} = flag to interpolate voidfraction to particle positions (normally off) :l
 :ule
 
 [Examples:]

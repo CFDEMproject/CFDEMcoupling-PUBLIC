@@ -9,7 +9,7 @@ regionModel command :h3
 
 [Syntax:]
 
-Defined in couplingProperties dictionary.
+Note: In the current CFDEMcoupling version, this model is no longer used. Defined in couplingProperties dictionary.
 
 regionModel model; :pre
 

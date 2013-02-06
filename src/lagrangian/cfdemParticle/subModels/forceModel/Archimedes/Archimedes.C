@@ -110,8 +110,8 @@ void Archimedes::setForce
 
     for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
     {
-        if(mask[index][0])
-        {
+        //if(mask[index][0])
+        //{
             label cellI = particleCloud_.cellIDs()[index][0];
             force=vector::zero;
 
@@ -130,7 +130,7 @@ void Archimedes::setForce
             if(treatDEM_) for(int j=0;j<3;j++) DEMForces[index][j] += force[j];
             else if(treatExplicit_) for(int j=0;j<3;j++) expForces[index][j] += force[j];
             else  for(int j=0;j<3;j++) impForces[index][j] += force[j];
-        }
+        //}
     }
 }
 

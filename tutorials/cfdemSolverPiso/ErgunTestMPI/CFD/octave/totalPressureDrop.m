@@ -55,15 +55,24 @@ fprintf('so the result does not depend on density\n')
 %==================================
 rhoP = 2000                      % particle density in kg/m3
 g = 9.81                        % gravity m/s2
-Umf = dp^2*(rhoP-rhoG)*g/(150*muG)*(epsilon^3*phip^2)/(1-epsilon)
-ReMF = Umf*dp*rhoG/muG 			% must be <20 !!!
-%Umf = sqrt(phip*dp^2/1.75*(rhoP-rhoG)/rhoG*g*epsilon^3) % Re>1000
+
+Umf = dp^2*(rhoP-rhoG)*g/(150*muG)*(epsilon^3*phip^2)/(1-epsilon);
+ReMF = Umf*dp*rhoG/muG;
+if(ReMF<20)
+    fprintf('applying eqn1 for Umf.\n')
+elseif(ReMF>20 && ReMF<1000)
+    fprintf('applying eqn1 for Umf.\n')
+elseif (ReMF>=1000)
+    fprintf('applying eqn2 for Umf.\n')
+    Umf = sqrt(dp*(rhoP-rhoG)*g/(1.75*rhoG)*epsilon^3*phip);
+    ReMF = Umf*dp*rhoG/muG;
+end
 
 dpUmf= L * (
                 150*((1-epsilon)^2/epsilon^3)*((muG.*Umf)/(phip*dp)^2) 
               +1.75*((1-epsilon)/epsilon^3)*((rhoG.*Umf.^2)/(phip*dp))
         )/10000/rhoG;
-
+%dpUmf2=(L*(1-epsilon)*(rhoP-rhoG)*g+pHydr)/10000
 %====================================%
 % plot data
 %====================================%

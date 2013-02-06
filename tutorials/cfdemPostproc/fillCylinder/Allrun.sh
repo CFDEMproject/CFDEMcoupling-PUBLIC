@@ -5,9 +5,14 @@
 # Christoph Goniva - Nov. 2011
 #===================================================================#
 
+#- source CFDEM env vars
+. ~/.bashrc
+
+#- include functions
+source $CFDEM_SRC_DIR/etc/functions.sh
+
 #- define variables
 casePath="$(dirname "$(readlink -f ${BASH_SOURCE[0]})")"
-pizzaPath="/home/cfdem/LIGGGHTS/PIZZA/gran_pizza_17Aug10/src"
 
 liggghtsSim="true"
 cfdemPostProc="true"
@@ -24,33 +29,50 @@ fi
 
 if [ $liggghtsSim == "true" ]
   then
-    cd $casePath/DEM
-    liggghts < in.liggghts_init
+    #--------------------------------------------------------------------------------#
+    #- define variables
+    logpath="$casePath"
+    headerText="run_liggghts_fillCylinder_DEM"
+    logfileName="log_$headerText"
+    solverName="in.liggghts_init"
+    #--------------------------------------------------------------------------------#
 
-    #- get VTK data from liggghts dump file
-    #cd $casePath/DEM
-    #python $pizzaPath/pizza.py -f pizzaScriptInit
+    #- clean up case
+    rm -r $casePath/DEM/post/*
 
+    #- call function to run DEM case
+    DEMrun $logpath $logfileName $casePath $headerText $solverName
+
+
+    #- generate VTK data
     cd $casePath/DEM/post
-    python -i $CFDEM_LPP_DIR/lpp.py  dump.liggghts_init
+    python $CFDEM_LPP_DIR/lpp.py  dump.liggghts_init
 
 fi
 
 if [ $cfdemPostProc == "true" ]
   then
-    cd $casePath/CFD
-    cfdemPostproc
-fi
+    #--------------------------------------------------------------------------------#
+    #- define variables
+    logpath="$casePath"
+    headerText="run_cfdemPostproc_fillCylinder_CFD"
+    logfileName="log_$headerText"
+    solverName="cfdemPostproc"
+    debugMode="off"          # on | off | strict
+    #--------------------------------------------------------------------------------#
 
-#echo "now you can run foamToSurface from 2.0.x to generate *.stl or *.inp files.(press enter)"
-#read
+    #- clean up case
+    rm -r $casePath/CFD/0.*
+
+    #- call function to run CFD cas
+    CFDrun $logpath $logfileName $casePath $headerText $solverName $debugMode
+fi
 
 if [ $postproc == "true" ]
   then
 
     #- get VTK data from CFD sim
-    #cd $casePath/CFD
-    foamToVTK
+    #foamToVTK
     
     #- start paraview
     paraview
@@ -68,7 +90,6 @@ rm -r $casePath/CFD/particles
 rm -r $casePath/CFD/VTK
 rm -r $casePath/DEM/post/*
 rm -r $casePath/DEM/log.*
-rm -r $casePath/log*
 echo "done"
 
 #- preserve post directory

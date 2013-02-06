@@ -45,7 +45,6 @@ SourceFiles
 #define LaEuScalarTemp_H
 
 #include "forceModel.H"
-#include "regionModel.H"
 #include "averagingModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

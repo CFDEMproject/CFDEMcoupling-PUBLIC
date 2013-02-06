@@ -103,8 +103,8 @@ void interface::setForce
 Info << "interface::setForce" << endl;
     for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
     {
-        if(mask[index][0])
-        {
+        //if(mask[index][0])
+        //{
             // definition of spherical particle
             scalar dp = 2*particleCloud_.radius(index);
             vector position = particleCloud_.position(index);
@@ -187,7 +187,7 @@ Info << "interface::setForce" << endl;
                if(treatExplicit_) for(int j=0;j<3;j++) expForces[index][j] += interfaceForce[j];
                else  for(int j=0;j<3;j++) impForces[index][j] += interfaceForce[j];
             } // end if particle found on proc domain
-        }// end if in mask
+        //}// end if in mask
     }// end loop particles
 Info << "interface::setForce - done" << endl;
 }

@@ -11,7 +11,8 @@ units		si
 processors	2 1 1
 
 #read the restart file
-read_restart 	../DEM/liggghts.restartCFDEM
+#read_restart 	../DEM/liggghts.restartCFDEM
+read_restart 	../DEM/liggghts.restartCFDEM_0.050000
 
 #do not do this here, the simulation box is in the restart file!
 #region		reg block -0.015 0.015 -0.015 0.015 -0.001 0.0554 units box

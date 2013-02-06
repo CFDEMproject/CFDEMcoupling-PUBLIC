@@ -25,6 +25,9 @@ checkDirComment "$CFDEM_LIGGGHTS_SRC_DIR" '$CFDEM_LIGGGHTS_SRC_DIR' "yes"
 checkDirComment "$CFDEM_PROJECT_DIR" '$CFDEM_PROJECT_DIR' "yes"
 checkDirComment "$CFDEM_PROJECT_USER_DIR" '$CFDEM_PROJECT_USER_DIR' "no"
 checkDirComment "$CFDEM_SRC_DIR" '$CFDEM_SRC_DIR' "yes"
+checkDirComment "$CFDEM_SOLVER_DIR" '$CFDEM_SOLVER_DIR' "yes"
+checkDirComment "$CFDEM_TUT_DIR" '$CFDEM_TUT_DIR' "yes"
+checkDirComment "$CFDEM_LIGGGHTS_SRC_DIR" '$CFDEM_LIGGGHTS_SRC_DIR' "yes"
 checkDirComment "$CFDEM_LPP_DIR" '$CFDEM_LPP_DIR' "yes"
 checkDirComment "$CFDEM_PIZZA_DIR" '$CFDEM_PIZZA_DIR' "no"
 checkDirComment "$CFDEM_TEST_HARNESS_PATH" '$CFDEM_TEST_HARNESS_PATH' "no"
@@ -51,5 +54,9 @@ if [ $checkGPP == "true" ]
     echo "mpic++:"
     which mpic++
     mpic++ --version
+
+    echo "mpirun:"
+    which mpirun
+    mpirun --version
 fi
 

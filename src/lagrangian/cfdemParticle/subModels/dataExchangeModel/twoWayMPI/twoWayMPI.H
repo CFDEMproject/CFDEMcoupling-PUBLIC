@@ -142,20 +142,27 @@ public:
         //============
         // double **
         void allocateArray(double**&, double, int, int) const;
-
         void allocateArray(double**&, double, int,const char* ="nparticles") const;
-
+        void destroy(double**,int) const;
         //============
         // int **
         void allocateArray(int**&, int, int, int) const;
-
         void allocateArray(int**&, int, int,const char* ="nparticles") const;
+        void destroy(int**,int) const;
+        //==============
+        // double *
+        void destroy(double*) const;
+        //============
+        // int **
+        void destroy(int*) const;
         //==============
 
         bool couple() const;
 
         int getNumberOfParticles() const;
         int getNumberOfClumps() const;
+
+        word myType() const{return typeName; };
 };
 
 

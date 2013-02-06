@@ -21,7 +21,7 @@ logfileName="log_$headerText"
 solverName="cfdemSolverPiso"
 nrProcs="2"
 machineFileName="none"   # yourMachinefileName | none
-debugMode="off"          # on | off
+debugMode="off"          # on | off| strict
 testHarnessPath="$CFDEM_TEST_HARNESS_PATH"
 runOctave="true"
 postproc="false"
@@ -78,6 +78,8 @@ fi
 #- clean up case
 echo "deleting data at: $casePath :\n"
 rm -r $casePath/CFD/0.*
+rm -r $casePath/CFD/callgrind.*
+rm -r $casePath/CFD/*.out
 rm -r $casePath/CFD/log.*
 rm -r $casePath/CFD/octave/octave-core
 rm -r $casePath/CFD/VTK

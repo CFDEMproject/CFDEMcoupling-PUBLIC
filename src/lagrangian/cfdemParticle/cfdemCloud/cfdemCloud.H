@@ -73,7 +73,6 @@ class IOModel;
 class averagingModel;
 class clockModel;
 class momCoupleModel;
-class regionModel;
 class meshMotionModel;
 class liggghtsCommandModel;
 
@@ -158,8 +157,6 @@ protected:
 
     autoPtr<clockModel> clockModel_;
 
-    autoPtr<regionModel> regionModel_;
-
     autoPtr<meshMotionModel> meshMotionModel_;
 
     autoPtr<liggghtsCommandModel>* liggghtsCommand_;
@@ -239,11 +236,11 @@ public:
 
        inline double ** voidfractions() const;
 
-       inline void set_radii(double**&) const;
+       inline void get_radii(double**&) const;
 
        inline double ** cellIDs() const;
 
-       inline void set_cellIDs(double**&) const;
+       inline void get_cellIDs(double**&) const;
 
        inline double ** particleWeights() const;
 
@@ -270,8 +267,6 @@ public:
        inline const averagingModel& averagingM() const;
 
        inline const clockModel& clockM() const;
-
-       inline const regionModel& regionM() const;
 
        inline const meshMotionModel& meshMotionM() const;
 

@@ -33,7 +33,6 @@ Description
 
 #include "noCouple.H"
 #include "addToRunTimeSelectionTable.H"
-#include "regionModel.H"
 #include "voidFractionModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

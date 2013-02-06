@@ -32,15 +32,15 @@ couplingInterval 100;
 
 voidFractionModel divided;
 
-locateModel engine;
+locateModel engine;//turboEngineM2M;//
 
 meshMotionModel noMeshMotion;
 
 regionModel allRegion;
 
-IOModel "off";
+IOModel "basicIO";
 
-dataExchangeModel twoWayMPI;//twoWayFiles;//oneWayVTK;//
+dataExchangeModel twoWayMPI;//twoWayM2M;//twoWayFiles;//oneWayVTK;//
 
 averagingModel dense;//dilute;//
 
@@ -132,6 +132,7 @@ KochHillDragProps
 {
     velFieldName "U";
     densityFieldName "rho";
+    voidfractionFieldName "voidfraction";
 }
 
 virtualMassForceProps
@@ -161,6 +162,14 @@ engineProps
     treeSearch true;
 }
 
+turboEngineM2MProps
+{
+    turboEngineProps
+    {
+        treeSearch true;
+    }
+}
+
 dividedProps
 {
     alphaMin 0.1;
@@ -168,6 +177,11 @@ dividedProps
 }
 
 twoWayMPIProps
+{
+    //maxNumberOfParticles 10100;
+    liggghtsPath "../DEM/in.liggghts_resume";
+}
+twoWayM2MProps
 {
     maxNumberOfParticles 10100;
     liggghtsPath "../DEM/in.liggghts_resume";

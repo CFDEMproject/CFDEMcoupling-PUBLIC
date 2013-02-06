@@ -83,8 +83,8 @@ void centreVoidFraction::setvoidFraction(double** const& mask,double**& voidfrac
 
     for(int index=0; index< particleCloud_.numberOfParticles(); index++)
     {
-        if(mask[index][0])
-        {
+        //if(mask[index][0])
+        //{
             // reset
             particleWeights[index][0]=0;
             cellsPerParticle_[index][0]=1;
@@ -131,7 +131,7 @@ void centreVoidFraction::setvoidFraction(double** const& mask,double**& voidfrac
                      }
                 }*/
             }
-        }
+        //}
     }
 
     // bring voidfraction from Eulerian Field to particle array
