@@ -72,8 +72,7 @@ protected:
 
         const word modelType_;
 
-        scalar scale_;
-
+        mutable scalar cg_;
 public:
 
     //- Runtime type information
@@ -134,6 +133,14 @@ public:
         inline volVectorField& expParticleForces() const { return expParticleForces_;};
 
         inline const bool& coupleForce() const { return coupleForce_;};
+
+        inline const scalar cg() const { return cg_; };
+
+        void const setCG(double cg) const
+        { 
+            cg_ = cg;
+            Info << "cg is set to: " << cg_ << endl;
+        };
 };
 
 

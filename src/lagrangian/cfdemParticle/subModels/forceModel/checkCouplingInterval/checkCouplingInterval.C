@@ -31,9 +31,10 @@ Description
 
 #include "error.H"
 
-#include "virtualMassForce.H"
+#include "checkCouplingInterval.H"
 #include "addToRunTimeSelectionTable.H"
 
+//#include "mpi.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -42,12 +43,12 @@ namespace Foam
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-defineTypeNameAndDebug(virtualMassForce, 0);
+defineTypeNameAndDebug(checkCouplingInterval, 0);
 
 addToRunTimeSelectionTable
 (
     forceModel,
-    virtualMassForce,
+    checkCouplingInterval,
     dictionary
 );
 
@@ -55,7 +56,7 @@ addToRunTimeSelectionTable
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 // Construct from components
-virtualMassForce::virtualMassForce
+checkCouplingInterval::checkCouplingInterval
 (
     const dictionary& dict,
     cfdemCloud& sm
@@ -63,36 +64,21 @@ virtualMassForce::virtualMassForce
 :
     forceModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
-    verbose_(false),
-    velFieldName_(propsDict_.lookup("velFieldName")),
-    U_(sm.mesh().lookupObject<volVectorField> (velFieldName_)),
     densityFieldName_(propsDict_.lookup("densityFieldName")),
     rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_)),
-    UrelOld_(NULL)
-{
-    if (propsDict_.found("verbose")) verbose_=true;
-
-    if (particleCloud_.dataExchangeM().maxNumberOfParticles() > 0)
-    {
-        // get memory for 2d array
-        particleCloud_.dataExchangeM().allocateArray(UrelOld_,0.,3);
-    }
-    if (propsDict_.found("treatExplicit")) treatExplicit_=true;
-    particleCloud_.checkCG(true);
-}
+    rhoP_(readScalar(propsDict_.lookup("rhoP")))
+{}
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-virtualMassForce::~virtualMassForce()
-{
-    delete UrelOld_;
-}
+checkCouplingInterval::~checkCouplingInterval()
+{}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void virtualMassForce::setForce
+void checkCouplingInterval::setForce
 (
     double** const& mask,
     double**& impForces,
@@ -100,50 +86,42 @@ void virtualMassForce::setForce
     double**& DEMForces
 ) const
 {
-    reAllocArrays();
-
-    scalar dt = U_.mesh().time().deltaT().value();
-
-    for(int index = 0;index <  particleCloud_.numberOfParticles(); index++)
+    if(particleCloud_.mesh().time().write())
     {
-        //if(mask[index][0])
-        //{
-            vector virtualMassForce(0,0,0);
+        // get viscosity field
+        #ifdef comp
+            const volScalarField nufField = particleCloud_.turbulence().mu() / rho_;
+        #else
+            const volScalarField& nufField = particleCloud_.turbulence().nu();
+        #endif
+
+        // find min particle relaxation time
+        scalar minTauP = 1000;
+        scalar tauP = -1;
+        scalar scaledRad = -1.;
+        for(int index = 0;index <  particleCloud_.numberOfParticles(); index++)
+        {
             label cellI = particleCloud_.cellIDs()[index][0];
 
             if (cellI > -1) // particle Found
             {
-                vector Us = particleCloud_.velocity(index);
-                vector Ur = U_[cellI]-Us;
-                vector UrelOld;
-                for(int j=0;j<3;j++)
-                {
-                    UrelOld[j] = UrelOld_[index][j];
-                    UrelOld_[index][j] = Ur[j];
-                }
-
-                vector ddtUrel = (Ur-UrelOld)/dt;
-                scalar ds = 2*particleCloud_.radius(index);
-                scalar Vs = ds*ds*ds*M_PI/6;
-                scalar rho = rho_[cellI];
-
-                virtualMassForce = 0.5 * rho * Vs * ddtUrel;
-
+                scaledRad = particleCloud_.radius(index)/cg();
+                tauP = rhoP_*4*scaledRad*scaledRad/
+                        (18 * nufField[cellI] * rho_[cellI]);
+                minTauP = min(minTauP,tauP);
             }
-            // set force on particle
-            if(treatExplicit_) for(int j=0;j<3;j++) expForces[index][j] += virtualMassForce[j];
-            else  for(int j=0;j<3;j++) impForces[index][j] += virtualMassForce[j];
-        //}
-    }
+        }
 
-}
+        // calc max couplingTime/particle relaxation time ratio
+        scalar DEMtime = particleCloud_.dataExchangeM().DEMts()
+                        *particleCloud_.dataExchangeM().couplingInterval();
+        double accNr = DEMtime/minTauP;
+        double accNrAll=-1.;
 
-void Foam::virtualMassForce::reAllocArrays() const
-{
-    if(particleCloud_.numberOfParticlesChanged())
-    {
-        // get arrays of new length
-        particleCloud_.dataExchangeM().allocateArray(UrelOld_,1.,1);
+        MPI_Allreduce(&accNr, &accNrAll, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
+
+        Info << "max. occurring acceleration nr: " << accNrAll << endl;
+        if(accNrAll > 0.1) Warning << "you should use a smaller coupling interval!" << endl;
     }
 }
 

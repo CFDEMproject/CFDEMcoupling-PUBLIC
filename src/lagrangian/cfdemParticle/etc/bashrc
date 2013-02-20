@@ -49,6 +49,11 @@ export CFDEM_M2MLIB_PATH=$CFDEM_SRC_DIR/subModels/dataExchangeModel/twoWayM2M/li
 #- path to test harness
 export CFDEM_TEST_HARNESS_PATH=$CFDEM_PROJECT_USER_DIR/log/logFilesCFDEM-$CFDEM_VERSION-$WM_PROJECT_VERSION
 
+#- path to libraries
+export CFDEM_LIB_DIR=$FOAM_USER_LIBBIN
+
+#- path to apps
+export CFDEM_APP_DIR=$FOAM_USER_APPBIN
 #------------------------------------------------------------------------------
 #- settings for lpp postproc tool
 #------------------------------------------------------------------------------

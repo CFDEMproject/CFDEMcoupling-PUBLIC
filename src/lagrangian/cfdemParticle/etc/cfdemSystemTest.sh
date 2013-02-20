@@ -21,7 +21,6 @@ echo "couple to OF_VERSION=$WM_PROJECT_VERSION"
 
 echo
 echo "check if paths are set correctly"
-checkDirComment "$CFDEM_LIGGGHTS_SRC_DIR" '$CFDEM_LIGGGHTS_SRC_DIR' "yes"
 checkDirComment "$CFDEM_PROJECT_DIR" '$CFDEM_PROJECT_DIR' "yes"
 checkDirComment "$CFDEM_PROJECT_USER_DIR" '$CFDEM_PROJECT_USER_DIR' "no"
 checkDirComment "$CFDEM_SRC_DIR" '$CFDEM_SRC_DIR' "yes"

@@ -84,7 +84,7 @@ forceModel::forceModel
     ),
     coupleForce_(true),
     modelType_(sm.modelType()),
-    scale_(1.)
+    cg_(1.)
 {}
 
 
@@ -128,7 +128,6 @@ void forceModel::manipulateScalarField(volScalarField& field) const
     Info << "no scalar manipulation done" << endl;
     // do nothing
 }
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam

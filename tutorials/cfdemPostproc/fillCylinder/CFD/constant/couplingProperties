@@ -30,7 +30,7 @@ modelType A;
 
 couplingInterval 10;
 
-voidFractionModel centre;
+voidFractionModel divided; // centre; //
 
 locateModel standard;
 
@@ -73,5 +73,13 @@ centreProps
 {
     alphaMin 0.10;
 }
+
+dividedProps
+{
+    alphaMin 0.1;
+    scaleUpVol 1;
+    
+}
+
 
 // ************************************************************************* //

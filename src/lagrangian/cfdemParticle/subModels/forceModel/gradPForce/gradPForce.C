@@ -92,6 +92,8 @@ gradPForce::gradPForce
 
     if(p_.dimensions()==dimensionSet(0,2,-2,0,0))
         useRho_ = true;
+
+    particleCloud_.checkCG(true);
 }
 
 

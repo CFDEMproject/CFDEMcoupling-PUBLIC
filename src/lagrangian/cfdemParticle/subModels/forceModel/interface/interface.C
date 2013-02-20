@@ -81,6 +81,7 @@ interface::interface
     if (propsDict_.found("treatExplicit")) treatExplicit_=true;
 
     Info << "check if interpolation really works - use directly interpolationCellPoint<vector> ???" << endl;
+    particleCloud_.checkCG(false);
 }
 
 

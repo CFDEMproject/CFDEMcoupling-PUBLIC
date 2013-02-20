@@ -91,7 +91,7 @@ figure(1)
 plot(U,dpErgun,U,dp_sim,[Umf,Uend],dpUmf*ones(1,2))
 title("Ergun pressure drop vs. simulation")
 a=strcat("analytical (Ergun), Umf=",num2str(Umf),", dpUmf=",num2str(dpUmf));
-legend(a,"simulation")
+legend(a,"simulation","analyt. deltaP at Umf")
 xlabel("velocity in [m/s]")
 ylabel("pressure drop [bar]")
 axis([0,Uend,0,dpErgun(length(dpErgun))])

@@ -19,11 +19,11 @@ application     pisoFoam;
 
 startFrom       startTime;
 
-startTime       0.05;
+startTime       0;
 
 stopAt          endTime;
 
-endTime         0.1;//0.01;
+endTime         0.05;//0.01;
 
 deltaT          0.001;
 

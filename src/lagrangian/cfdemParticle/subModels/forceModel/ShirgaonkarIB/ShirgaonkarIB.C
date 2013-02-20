@@ -82,6 +82,7 @@ ShirgaonkarIB::ShirgaonkarIB
         Info << "depth of domain is assumed to be :" << depth_ << endl;
     }
     if (propsDict_.found("treatExplicit")) treatExplicit_=true;
+    particleCloud_.checkCG(false);
 }
 
 

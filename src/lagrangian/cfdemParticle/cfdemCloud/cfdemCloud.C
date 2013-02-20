@@ -91,6 +91,7 @@ Foam::cfdemCloud::cfdemCloud
     momCoupleModels_(couplingProperties_.lookup("momCoupleModels")),
     liggghtsCommandModelList_(liggghtsCommandDict_.lookup("liggghtsCommandModels")),
     turbulenceModelType_(couplingProperties_.lookup("turbulenceModelType")),
+    cgOK_(true),
     turbulence_
     (
         #if defined(version21) || defined(version16ext)
@@ -214,6 +215,9 @@ Foam::cfdemCloud::cfdemCloud
             i
         );
     }
+
+    dataExchangeM().setCG();
+    if (!cgOK_ && forceM(0).cg() > 1) FatalError<< "at least one of your models is not fit for cg !!!"<< abort(FatalError); 
 }
 
 // * * * * * * * * * * * * * * * * Destructors  * * * * * * * * * * * * * * //
@@ -276,9 +280,22 @@ void Foam::cfdemCloud::setForces()
     resetArray(DEMForces_,numberOfParticles(),3);
     for (int i=0;i<cfdemCloud::nrForceModels();i++) cfdemCloud::forceM(i).setForce(NULL,impForces_,expForces_,DEMForces_);
 }
+
 // * * * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * * //
-
-
+void Foam::cfdemCloud::checkCG(bool ok)
+{
+    if(!cgOK_) return;
+    if(!ok) cgOK_ = ok;
+}
+void Foam::cfdemCloud::setPos(double**& pos)
+{
+    for(int index = 0;index <  numberOfParticles(); ++index)
+    {
+        for(int i=0;i<3;i++){
+            positions_[index][i] = pos[index][i];
+        }
+    }
+}
 // * * * * * * * * * * * * * * * ACCESS  * * * * * * * * * * * * * //
 
 label Foam::cfdemCloud::particleCell(int index)

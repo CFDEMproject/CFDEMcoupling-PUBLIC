@@ -106,7 +106,8 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
         //if(mask[index][0])
         //{
             // reset
-            for(int subcell=0;subcell<cellsPerParticle_[index][0];subcell++){
+            for(int subcell=0;subcell<cellsPerParticle_[index][0];subcell++)
+            {
                 particleWeights[index][subcell]=0;
                 particleVolumes[index][subcell]=0;
             }
@@ -133,37 +134,36 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
                 for(scalar r = 0.623926*radius;r < radius;r+=0.293976*radius)
                 {
                     //NP try 8 subpoint derived from spherical coordinates
-	            for (scalar zeta=pi/4.;zeta<(2.*pi);zeta+=(pi/2.))
-	            {
-                        for (scalar theta=(pi/4.);theta<pi;theta+=(pi/2.))
+	                for (scalar zeta=pi/4.;zeta<(2.*pi);zeta+=(pi/2.))
 	                {
-	                    offset[0]=double(r)*Foam::sin(theta)*Foam::cos(zeta);
-	                    offset[1]=double(r)*Foam::sin(theta)*Foam::sin(zeta);
-	                    offset[2]=double(r)*Foam::cos(theta);
+                        for (scalar theta=(pi/4.);theta<pi;theta+=(pi/2.))
+	                    {
+	                        offset[0]=double(r)*Foam::sin(theta)*Foam::cos(zeta);
+	                        offset[1]=double(r)*Foam::sin(theta)*Foam::sin(zeta);
+	                        offset[2]=double(r)*Foam::cos(theta);
                             #include "setWeightedSource.H"   // set source terms at position+offset
-	                }
+	                    }
                     }
-	            //NP try 2 more subpoints for each coordinate direction (6 total)
-	            for (int j=-1;j<=1;j+=2)
-	            {
-	    	        offset[0]=double(r)*(double(j));
-	                offset[1]=double(0.);offset[2]=double(0.);
+	                //NP try 2 more subpoints for each coordinate direction (6 total)
+	                for (int j=-1;j<=1;j+=2)
+	                {
+	    	            offset[0]=double(r)*(double(j));
+	                    offset[1]=double(0.);offset[2]=double(0.);
                         #include "setWeightedSource.H"   //NP set source terms at position+offset
-	                offset[1]=double(r)*(double(j));
-	                offset[0]=double(0.);offset[2]=double(0.);
+	                    offset[1]=double(r)*(double(j));
+	                    offset[0]=double(0.);offset[2]=double(0.);
                         #include "setWeightedSource.H"   //NP set source terms at position+offset
 
-	                offset[2]=double(r)*(double(j));
-	                offset[0]=double(0.);offset[1]=double(0.);
-
+	                    offset[2]=double(r)*(double(j));
+	                    offset[0]=double(0.);offset[1]=double(0.);
                         #include "setWeightedSource.H"   //NP set source terms at position+offset
-	            }
+	                }
                 }// end loop radiivoidfractions
 
-	        if(cellsSet>29 || cellsSet<0)
+	            if(cellsSet>29 || cellsSet<0)
                 {
-	            Info << "ERROR  cellsSet =" << cellsSet << endl;
-        	}
+	                Info << "ERROR  cellsSet =" << cellsSet << endl;
+        	    }
 
                 //NP set source for particle center; source 1/nPts+weight of all subpoints that have not been found
                 scalar centreWeight = 1./nPoints*(nPoints-cellsSet);

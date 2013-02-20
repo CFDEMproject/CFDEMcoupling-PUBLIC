@@ -28,41 +28,23 @@ Description
     This code is designed to realize coupled CFD-DEM simulations using LIGGGHTS
     and OpenFOAM(R). Note: this code is not part of OpenFOAM(R) (see DISCLAIMER).
 
-    two way DEM-CFD coupling via MPI
+    check the coupling interval,
+    by comparing couplingTime/particle relaxation time
 
 Class
-    twoWayMPI
+    checkCouplingInterval
 
 SourceFiles
-    twoWayMPI.C
+    checkCouplingInterval.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef twoWayMPI_H
-#define twoWayMPI_H
+#ifndef checkCouplingInterval_H
+#define checkCouplingInterval_H
 
-#include "dataExchangeModel.H"
-#include "liggghtsCommandModel.H"
-#include "OFstream.H"
-#include "sys/stat.h"
-#include "pair.h"
-#include "force.h"
 #include "forceModel.H"
-
-//=================================//
-//LAMMPS/LIGGGHTS
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "dataExchangeModel.H"
 #include "mpi.h"
-#include <lammps.h>         // these are LAMMPS include files
-#include <input.h>
-#include <atom.h>
-#include <library.h>
-#include <error.h>
-#include <library_cfd_coupling.h>
-#include <update.h>
-//=================================//
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -70,43 +52,32 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class noDrag Declaration
+                           Class checkCouplingInterval Declaration
 \*---------------------------------------------------------------------------*/
 
-class twoWayMPI
+class checkCouplingInterval
 :
-    public dataExchangeModel
+    public forceModel
 {
 private:
-
-  // private data
     dictionary propsDict_;
 
-    // variables
-    int me;
+    word densityFieldName_;
 
-    int nprocs;
+    const volScalarField& rho_;
 
-    int liggghts;
-
-    MPI_Comm comm_liggghts;
-
-    LAMMPS_NS::LAMMPS *lmp;
-
-  // private member functions
-
-    char* wordToChar(word&) const;
+    const scalar rhoP_;
 
 public:
 
     //- Runtime type information
-    TypeName("twoWayMPI");
+    TypeName("checkCouplingInterval");
 
 
     // Constructors
 
         //- Construct from components
-        twoWayMPI
+        checkCouplingInterval
         (
             const dictionary& dict,
             cfdemCloud& sm
@@ -114,60 +85,17 @@ public:
 
     // Destructor
 
-        ~twoWayMPI();
+        ~checkCouplingInterval();
 
 
     // Member Functions
-        void getData
+        void setForce
         (
-            word name,
-            word type,
-            double ** const& field,
-            label step
+            double** const& mask,
+            double**&,
+            double**&,
+            double**&
         ) const;
-
-        void getData
-        (
-            word name,
-            word type,
-            int ** const& field,
-            label step
-        ) const;
-
-        void giveData
-        (
-            word name,
-            word type,
-            double ** const& field,
-            const char* datatype
-        ) const;
-
-        //============
-        // double **
-        void allocateArray(double**&, double, int, int) const;
-        void allocateArray(double**&, double, int,const char* ="nparticles") const;
-        void destroy(double**,int) const;
-        //============
-        // int **
-        void allocateArray(int**&, int, int, int) const;
-        void allocateArray(int**&, int, int,const char* ="nparticles") const;
-        void destroy(int**,int) const;
-        //==============
-        // double *
-        void destroy(double*) const;
-        //============
-        // int **
-        void destroy(int*) const;
-        //==============
-
-        bool couple() const;
-
-        int getNumberOfParticles() const;
-        int getNumberOfClumps() const;
-
-        word myType() const{return typeName; };
-
-        void setCG() const { particleCloud_.forceM(0).setCG(lmp->force->cg()); };
 };
 
 

@@ -74,6 +74,7 @@ MeiLift::MeiLift
 {
     if (propsDict_.found("verbose")) verbose_=true;
     if (propsDict_.found("treatExplicit")) treatExplicit_=true;
+    particleCloud_.checkCG(false);
 }
 
 

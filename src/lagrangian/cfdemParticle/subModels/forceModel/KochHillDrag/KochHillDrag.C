@@ -33,6 +33,7 @@ Description
 
 #include "KochHillDrag.H"
 #include "addToRunTimeSelectionTable.H"
+#include "dataExchangeModel.H"
 
 #include "mpi.h"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -75,10 +76,7 @@ KochHillDrag::KochHillDrag
     if (propsDict_.found("verbose")) verbose_=true;
     if (propsDict_.found("treatExplicit")) treatExplicit_=true;
     if (propsDict_.found("interpolation")) interpolation_=true;
-
-    // Note: dprim=ds/scale_
-    if (propsDict_.found("scale"))
-        scale_=scalar(readScalar(propsDict_.lookup("scale")));
+    particleCloud_.checkCG(true);
 }
 
 
@@ -161,7 +159,7 @@ void KochHillDrag::setForce
                 if (magUr > 0)
                 {
                     // calc particle Re Nr
-                    Rep = ds/scale_*voidfraction*magUr/(nuf+SMALL);
+                    Rep = ds/cg()*voidfraction*magUr/(nuf+SMALL);
 
                     // calc model coefficient F0
                     scalar F0=0.;
@@ -184,7 +182,7 @@ void KochHillDrag::setForce
                     scalar F = voidfraction * (F0 + 0.5*F3*Rep);
 
                     // calc drag model coefficient betaP
-                    scalar betaP = 18.*nuf*rho/(ds/scale_*ds/scale_)*voidfraction*F;
+                    scalar betaP = 18.*nuf*rho/(ds/cg()*ds/cg())*voidfraction*F;
 
                     // calc particle's drag
                     drag = Vs*betaP*Ur;
@@ -195,16 +193,16 @@ void KochHillDrag::setForce
 
                 if(verbose_ && index >=0 && index <2)
                 {
-                    Info << "index = " << index << endl;
-                    Info << "Us = " << Us << endl;
-                    Info << "Ur = " << Ur << endl;
-                    Info << "ds = " << ds << endl;
-                    Info << "ds/scale = " << ds/scale_ << endl;
-                    Info << "rho = " << rho << endl;
-                    Info << "nuf = " << nuf << endl;
-                    Info << "voidfraction = " << voidfraction << endl;
-                    Info << "Rep = " << Rep << endl;
-                    Info << "drag = " << drag << endl;
+                    Pout << "index = " << index << endl;
+                    Pout << "Us = " << Us << endl;
+                    Pout << "Ur = " << Ur << endl;
+                    Pout << "ds = " << ds << endl;
+                    Pout << "ds/scale = " << ds/cg() << endl;
+                    Pout << "rho = " << rho << endl;
+                    Pout << "nuf = " << nuf << endl;
+                    Pout << "voidfraction = " << voidfraction << endl;
+                    Pout << "Rep = " << Rep << endl;
+                    Pout << "drag = " << drag << endl;
                 }
             }
             // set force on particle

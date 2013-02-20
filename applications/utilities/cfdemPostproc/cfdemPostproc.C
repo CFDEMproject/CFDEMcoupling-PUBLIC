@@ -102,11 +102,9 @@ int main(int argc, char *argv[])
         particleCloud.dataExchangeM().getData("radius","scalar-atom",radii_,count);
 
         particleCloud.locateM().findCell(NULL,positions_,cellIDs_,particleCloud.numberOfParticles());
+        particleCloud.setPos(positions_);
 
-        particleCloud.voidFractionM().setvoidFraction
-        (
-            NULL,voidfractions_,particleWeights_,particleVolumes_
-        );
+        particleCloud.voidFractionM().setvoidFraction(NULL,voidfractions_,particleWeights_,particleVolumes_);
 
         voidfraction.internalField() = particleCloud.voidFractionM().voidFractionInterp();
         voidfraction.correctBoundaryConditions();

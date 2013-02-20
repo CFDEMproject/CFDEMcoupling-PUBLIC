@@ -240,6 +240,8 @@ public:
         };
 
         virtual word myType() const=0;
+
+        virtual void setCG() const { Warning << "setCG() not executed correctly!" << endl; };
 };
 
 

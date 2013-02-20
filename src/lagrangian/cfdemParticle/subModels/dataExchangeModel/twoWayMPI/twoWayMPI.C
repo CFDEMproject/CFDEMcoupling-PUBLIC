@@ -33,7 +33,9 @@ Description
 #include "twoWayMPI.H"
 #include "addToRunTimeSelectionTable.H"
 #include "clockModel.H"
-
+#include "pair.h"
+#include "force.h"
+#include "forceModel.H"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam

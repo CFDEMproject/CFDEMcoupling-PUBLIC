@@ -84,6 +84,7 @@ viscForce::viscForce
         Info << "using interpolated value of pressure gradient." << endl;
         interpolation_=true;
     }
+    particleCloud_.checkCG(true);
 }
 
 

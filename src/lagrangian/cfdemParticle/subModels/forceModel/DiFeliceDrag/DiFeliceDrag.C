@@ -80,6 +80,7 @@ DiFeliceDrag::DiFeliceDrag
         Info << "using interpolated value of U." << endl;
         interpolation_=true;
     }
+    particleCloud_.checkCG(false);
 }
 
 

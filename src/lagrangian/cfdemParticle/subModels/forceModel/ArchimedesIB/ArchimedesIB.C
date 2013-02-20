@@ -89,6 +89,7 @@ ArchimedesIB::ArchimedesIB
         treatDEM_=false;
         Info << "accounting for Archimedes on DEM and CFD side!" << endl;
     }
+    particleCloud_.checkCG(true);
 }
 
 

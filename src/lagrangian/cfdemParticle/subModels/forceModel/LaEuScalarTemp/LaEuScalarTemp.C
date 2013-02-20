@@ -86,6 +86,7 @@ LaEuScalarTemp::LaEuScalarTemp
         maxSource_=readScalar(propsDict_.lookup ("maxSource"));
         Info << "limiting eulerian source field to: " << maxSource_ << endl;
     }
+    particleCloud_.checkCG(false);
 }
 
 

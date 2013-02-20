@@ -131,6 +131,8 @@ protected:
 
     const word turbulenceModelType_;
 
+    bool cgOK_;
+
     #if defined(version21) || defined(version16ext)
         #ifdef comp
             const compressible::turbulenceModel& turbulence_;
@@ -161,13 +163,11 @@ protected:
 
     autoPtr<liggghtsCommandModel>* liggghtsCommand_;
 
-// Private member functions
+// Protected member functions
     virtual void getDEMdata();
 
     virtual void giveDEMdata();
 
-
-   // Protected member functions used by submodels
     virtual void setNumberOfParticles(int);
 
     virtual void findCells();
@@ -193,6 +193,9 @@ public:
 // public Member Functions
 
     // Access
+       void checkCG(bool);
+
+       void setPos(double **&);
 
        word modelType(){ return modelType_; };
 
