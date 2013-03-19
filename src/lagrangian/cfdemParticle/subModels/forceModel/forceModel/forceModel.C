@@ -58,6 +58,7 @@ forceModel::forceModel
     particleCloud_(sm),
     treatExplicit_(false),
     treatDEM_(false),
+    implDEM_(false),
     impParticleForces_
     (   IOobject
         (

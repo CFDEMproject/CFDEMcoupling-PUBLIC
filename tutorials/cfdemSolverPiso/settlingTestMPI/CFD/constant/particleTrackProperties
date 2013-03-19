@@ -15,7 +15,7 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-cloudName       cfdemCloud1;
+cloudName       particleCloud;
 
 sampleFrequency 1;
 

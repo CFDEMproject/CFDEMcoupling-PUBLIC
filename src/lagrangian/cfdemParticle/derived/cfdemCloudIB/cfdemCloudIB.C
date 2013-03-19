@@ -113,9 +113,10 @@ bool Foam::cfdemCloudIB::evolve()
             for(int i=0;i<3;i++){
                 impForces_[index][i] = 0;
                 expForces_[index][i] = 0;
+                DEMForces_[index][i] = 0;
             }
         }
-        for (int i=0;i<nrForceModels();i++) forceM(i).setForce(NULL,impForces_,expForces_,expForces_);
+        for (int i=0;i<nrForceModels();i++) forceM(i).setForce();
         if(verbose_) Info << "setForce done." << endl;
 
         // write DEM data

@@ -42,6 +42,7 @@ Description
 #include "averagingModel.H"
 #include "momCoupleModel.H"
 #include "forceModel.H"
+#include "IOModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -119,6 +120,8 @@ int main(int argc, char *argv[])
         );
 
         runTime.write();
+
+        particleCloud.IOM().dumpDEMdata();
 
         Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
             << "  ClockTime = " << runTime.elapsedClockTime() << " s"

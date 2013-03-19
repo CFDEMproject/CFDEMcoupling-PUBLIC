@@ -64,11 +64,18 @@ basicIO::basicIO
     //propsDict_(dict.subDict(typeName + "Props")),
     dirName_("lagrangian"),
     path_("dev/null"),
-    m2mComm_(false),
+    parOutput_(true),
+    nPProc_(-1),
     lagPath_("dev/null")
 {
-	if (particleCloud_.dataExchangeM().myType()=="twoWayM2M"){m2mComm_=true;} //typeName did not work
-    Info << "particleCloud_.dataExchangeM().typeName=" << particleCloud_.dataExchangeM().myType() << endl;
+	if (
+            particleCloud_.dataExchangeM().myType()=="oneWayVTK" ||
+            dict_.found("serialOutput")
+       )
+    {
+        parOutput_=false;
+        Warning << "IO model is in serial write mode, only data on proc 0 is written" << endl;
+    }
 
     //if (propsDict_.found("dirName")) dirName_=word(propsDict_.lookup("dirName"));
     path_ = buildFilePath(dirName_);
@@ -90,17 +97,24 @@ void basicIO::dumpDEMdata() const
     if (time_.outputTime())
     {
         // make time directory
-        if (m2mComm_) lagPath_=buildFilePath(dirName_);
+        if (parOutput_) lagPath_=buildFilePath(dirName_);
         else
         {
+            Info << "createTimeDir(path_), path="<<path_ << endl;
+            Info << "lagPath_=createTimeDir(fileName(lagPath_/lagrangian)), lagPath="<<path_ << endl;
         	lagPath_=createTimeDir(path_);
         	lagPath_=createTimeDir(fileName(lagPath_/"lagrangian"));
         }
+        // calc the number of particles on proc
+        int count(0);
+        for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
+            if (particleCloud_.cellIDs()[index][0] > -1) count++;
+        nPProc_=count;
         
         // stream data to file
-        streamDataToPath(lagPath_, particleCloud_.positions(), particleCloud_.numberOfParticles(), "positions","vector","Cloud<passiveParticle>","0");
-        streamDataToPath(lagPath_, particleCloud_.velocities(), particleCloud_.numberOfParticles(), "v","vector","vectorField","");
-        streamDataToPath(lagPath_, particleCloud_.radii(), particleCloud_.numberOfParticles(), "r","scalar","scalarField","");
+        streamDataToPath(lagPath_, particleCloud_.positions(), "positions","vector","Cloud<passiveParticle>","0");
+        streamDataToPath(lagPath_, particleCloud_.velocities(), "v","vector","vectorField","");
+        streamDataToPath(lagPath_, particleCloud_.radii(), "r","scalar","scalarField","");
     }
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -110,7 +124,7 @@ fileName basicIO::buildFilePath(word dirName) const
 {
     // create file structure
 	fileName path("");
-    if(m2mComm_)
+    if(parOutput_)
     {
     	path=fileName(particleCloud_.mesh().time().path()/particleCloud_.mesh().time().timeName()/dirName/"particleCloud");
     	mkDir(path,0777);
@@ -125,25 +139,38 @@ fileName basicIO::buildFilePath(word dirName) const
     return path;
 }
 
-void basicIO::streamDataToPath(fileName path, double** array,int n,word name,word type,word className,word finaliser) const
+void basicIO::streamDataToPath(fileName path, double** array,word name,word type,word className,word finaliser) const
 {
     vector vec;
     OFstream* fileStream = new OFstream(fileName(path/name));
     *fileStream << "FoamFile\n";
     *fileStream << "{version 2.0; format ascii;class "<< className << "; location 0;object  "<< name <<";}\n";
-    *fileStream << n <<"\n";
-    *fileStream << "(\n";
+    *fileStream << nPProc_ <<"\n";
+    //*fileStream << "(\n";
 
-    for(int index = 0;index < n; ++index)
+    if(type!="origProcId")*fileStream << "(\n";
+    else if(type=="origProcId")
     {
-        if (type=="scalar"){
-            *fileStream << array[index][0] << " \n";
-        }else {
-            for(int i=0;i<3;i++) vec[i] = array[index][i];
-            *fileStream <<"( "<< vec[0] <<" "<<vec[1]<<" "<<vec[2]<<" ) "<< finaliser << " \n";
+        if(nPProc_>0) *fileStream <<"{0}"<< "\n";
+        else *fileStream <<"{}"<< "\n";
+    }
+
+    for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
+    {
+        if (particleCloud_.cellIDs()[index][0] > -1) // particle Found
+        {
+            if (type=="scalar"){
+                *fileStream << array[index][0] << " \n";
+            }else if (type=="position" || type=="vector"){
+                for(int i=0;i<3;i++) vec[i] = array[index][i];
+                *fileStream <<"( "<< vec[0] <<" "<<vec[1]<<" "<<vec[2]<<" ) "<< finaliser << " \n";
+            }else if (type=="label"){
+                *fileStream << index << finaliser << " \n";
+            }
         }
     }
-    *fileStream << ")\n";
+    //*fileStream << ")\n";
+    if(type!="origProcId")*fileStream << ")\n";
     delete fileStream;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

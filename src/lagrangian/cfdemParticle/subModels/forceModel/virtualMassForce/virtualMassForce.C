@@ -92,13 +92,7 @@ virtualMassForce::~virtualMassForce()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void virtualMassForce::setForce
-(
-    double** const& mask,
-    double**& impForces,
-    double**& expForces,
-    double**& DEMForces
-) const
+void virtualMassForce::setForce() const
 {
     reAllocArrays();
 
@@ -131,8 +125,9 @@ void virtualMassForce::setForce
 
             }
             // set force on particle
-            if(treatExplicit_) for(int j=0;j<3;j++) expForces[index][j] += virtualMassForce[j];
-            else  for(int j=0;j<3;j++) impForces[index][j] += virtualMassForce[j];
+            if(treatExplicit_) for(int j=0;j<3;j++) expForces()[index][j] += virtualMassForce[j];
+            else  for(int j=0;j<3;j++) impForces()[index][j] += virtualMassForce[j];
+            for(int j=0;j<3;j++) DEMForces()[index][j] += virtualMassForce[j];
         //}
     }
 

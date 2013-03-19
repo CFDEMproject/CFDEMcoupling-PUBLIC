@@ -10,6 +10,8 @@ cfdemSolverPiso/settlingTestMPI/dir
 
 cfdemSolverPiso/ErgunTestMPI/dir
 
+cfdemSolverPiso/ErgunTestMPI_cgs/dir
+
 cfdemSolverPiso/ErgunTestMPI_restart/dir
 
 cfdemSolverIB/twoSpheresGlowinskiMPI/dir

@@ -1,0 +1,33 @@
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+
+    root            "/.automount/werner/Werner/bgschaid/bgschaid-foamStuff/DepositionTests";
+    case            "neutralTest";
+    instance        "system";
+    local           "";
+
+    class           dictionary;
+    object          funkySetFieldsDict;
+}
+
+expressions
+(
+	init
+	{
+		field voidfraction;
+		expression "1";
+                valuePatches 2(inlet outlet); // set value 1 at those patches
+	}
+	setGamma
+	{
+		field voidfraction;
+		expression "0.43";
+		//condition "pow(pow(pos().x-0.2,2) + pow(pos().y-0,2)+ pow(pos().z-0,2),0.5) < 0.04";
+                condition "pos().z < 0.01467 && pos().z > 0.0";
+                keepPatches true;
+                //valuePatches 1(inlet); // set value 1 at those patches
+	}
+	
+);

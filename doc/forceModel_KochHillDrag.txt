@@ -27,6 +27,7 @@ KochHillDragProps
 {density} = name of the finite volume gravity field :l
 {voidfraction} = name of the finite volume voidfraction field :l
 {interpolation} = flag to use interpolated voidfraction and fluid velocity values (normally off) :l
+{implDEM} = flag to use implicit formulation of drag on DEM side (normally off) :l
 :ule
 
 [Examples:]

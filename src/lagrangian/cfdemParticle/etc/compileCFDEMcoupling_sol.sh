@@ -13,7 +13,7 @@ logDir="log"
 
 
 cd $CFDEM_SRC_DIR/etc
-mkdir $logDir
+mkdir -p $logDir
 
 #================================================================================#
 # compile solvers
@@ -32,5 +32,5 @@ do
     compileSolver $logpath $logfileName $casePath $headerText
 done
 
-echo "Note: the list of solvers compiled might be incomplete."
-echo "please check $CFDEM_SOLVER_DIR for more solvers available"
+#echo "Note: the list of solvers compiled might be incomplete."
+#echo "please check $CFDEM_SOLVER_DIR for more solvers available"

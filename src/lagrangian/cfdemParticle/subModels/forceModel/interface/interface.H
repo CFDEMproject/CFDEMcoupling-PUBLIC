@@ -105,13 +105,7 @@ public:
 
 
     // Member Functions
-        void setForce
-        (
-            double** const& mask,
-            double**&,
-            double**&,
-            double**&
-        ) const;
+        void setForce() const;
 };
 
 

@@ -74,13 +74,7 @@ noDrag::~noDrag()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void noDrag::setForce
-(
-    double** const& mask,
-    double**& impForces,
-    double**& expForces,
-    double**& DEMForces
-) const
+void noDrag::setForce() const
 {
     // Do nothing
     Info << "noDrag::setForce" << endl;
@@ -89,8 +83,8 @@ void noDrag::setForce
         //if(mask[index][0])
         //{
             // set force on particle
-            if(treatExplicit_) for(int j=0;j<3;j++) expForces[index][j] = 0.;
-            else  for(int j=0;j<3;j++) impForces[index][j] = 0.;
+            if(treatExplicit_) for(int j=0;j<3;j++) expForces()[index][j] = 0.;
+            else  for(int j=0;j<3;j++) impForces()[index][j] = 0.;
         //}
     }
 }

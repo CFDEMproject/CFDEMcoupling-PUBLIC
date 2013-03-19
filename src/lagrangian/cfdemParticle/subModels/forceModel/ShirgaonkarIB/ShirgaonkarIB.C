@@ -94,13 +94,7 @@ ShirgaonkarIB::~ShirgaonkarIB()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void ShirgaonkarIB::setForce
-(
-    double** const& mask,
-    double**& impForces,
-    double**& expForces,
-    double**& DEMForces
-) const
+void ShirgaonkarIB::setForce() const
 {
 
     label cellI;
@@ -136,10 +130,11 @@ void ShirgaonkarIB::setForce
 
             // set force on particle
             if(twoDimensional_) drag /= depth_;
-            if(treatExplicit_) for(int j=0;j<3;j++) expForces[index][j] += drag[j];
-            else  for(int j=0;j<3;j++) impForces[index][j] += drag[j];
+            if(treatExplicit_) for(int j=0;j<3;j++) expForces()[index][j] += drag[j];
+            else  for(int j=0;j<3;j++) impForces()[index][j] += drag[j];
+            for(int j=0;j<3;j++) DEMForces()[index][j] += drag[j];
 
-            if(verbose_) Info << "impForces = " << impForces[index][0]<<","<<impForces[index][1]<<","<<impForces[index][2] << endl;
+            if(verbose_) Info << "impForces = " << impForces()[index][0]<<","<<impForces()[index][1]<<","<<impForces()[index][2] << endl;
         //}
     }
 }

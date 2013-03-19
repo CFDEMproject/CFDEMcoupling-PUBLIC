@@ -76,9 +76,11 @@ Foam::cfdemCloud::cfdemCloud
     modelType_(couplingProperties_.lookup("modelType")),
     positions_(NULL),
     velocities_(NULL),
+    fluidVel_(NULL),
     impForces_(NULL),
     expForces_(NULL),
     DEMForces_(NULL),
+    Cds_(NULL),
     radii_(NULL),
     voidfractions_(NULL),
     cellIDs_(NULL),
@@ -92,6 +94,7 @@ Foam::cfdemCloud::cfdemCloud
     liggghtsCommandModelList_(liggghtsCommandDict_.lookup("liggghtsCommandModels")),
     turbulenceModelType_(couplingProperties_.lookup("turbulenceModelType")),
     cgOK_(true),
+    impDEMdrag_(false),
     turbulence_
     (
         #if defined(version21) || defined(version16ext)
@@ -227,9 +230,11 @@ Foam::cfdemCloud::~cfdemCloud()
     clockM().normHist();
     dataExchangeM().destroy(positions_,3);
     dataExchangeM().destroy(velocities_,3);
+    dataExchangeM().destroy(fluidVel_,3);
     dataExchangeM().destroy(impForces_,3);
     dataExchangeM().destroy(expForces_,3);
     dataExchangeM().destroy(DEMForces_,3);
+    dataExchangeM().destroy(Cds_,1);
     dataExchangeM().destroy(radii_,1);
     dataExchangeM().destroy(voidfractions_,1);
     dataExchangeM().destroy(cellIDs_,1);
@@ -246,12 +251,16 @@ void Foam::cfdemCloud::getDEMdata()
 
 void Foam::cfdemCloud::giveDEMdata()
 {
-    for(int index = 0;index <  numberOfParticles(); ++index){
-        for(int i=0;i<3;i++){
-            impForces_[index][i] += expForces_[index][i] + DEMForces_[index][i];
+    if(forceM(0).coupleForce())
+    {
+        dataExchangeM().giveData("dragforce","vector-atom",DEMForces_);
+
+        if(impDEMdrag_)
+        {
+            dataExchangeM().giveData("Ksl","scalar-atom",Cds_);
+            dataExchangeM().giveData("uf","vector-atom",fluidVel_);
         }
     }
-    if(forceM(0).coupleForce()) dataExchangeM().giveData("dragforce","vector-atom",impForces_);
     if(verbose_) Info << "giveDEMdata done." << endl;
 }
 
@@ -275,10 +284,12 @@ void Foam::cfdemCloud::findCells()
 
 void Foam::cfdemCloud::setForces()
 {
+    resetArray(fluidVel_,numberOfParticles(),3);
     resetArray(impForces_,numberOfParticles(),3);
     resetArray(expForces_,numberOfParticles(),3);
     resetArray(DEMForces_,numberOfParticles(),3);
-    for (int i=0;i<cfdemCloud::nrForceModels();i++) cfdemCloud::forceM(i).setForce(NULL,impForces_,expForces_,DEMForces_);
+    resetArray(Cds_,numberOfParticles(),1);
+    for (int i=0;i<cfdemCloud::nrForceModels();i++) cfdemCloud::forceM(i).setForce();
 }
 
 // * * * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * * //
@@ -320,6 +331,13 @@ vector Foam::cfdemCloud::velocity(int index)
 {
     vector vel;
     for(int i=0;i<3;i++) vel[i] = velocities()[index][i];
+    return vel;
+}
+
+vector Foam::cfdemCloud::fluidVel(int index)
+{
+    vector vel;
+    for(int i=0;i<3;i++) vel[i] = fluidVels()[index][i];
     return vel;
 }
 
@@ -491,9 +509,11 @@ bool Foam::cfdemCloud::reAllocArrays() const
         // get arrays of new length
         dataExchangeM().allocateArray(positions_,0.,3);
         dataExchangeM().allocateArray(velocities_,0.,3);
+        dataExchangeM().allocateArray(fluidVel_,0.,3);
         dataExchangeM().allocateArray(impForces_,0.,3);
         dataExchangeM().allocateArray(expForces_,0.,3);
         dataExchangeM().allocateArray(DEMForces_,0.,3);
+        dataExchangeM().allocateArray(Cds_,0.,1);
         dataExchangeM().allocateArray(radii_,0.,1);
         dataExchangeM().allocateArray(voidfractions_,1.,voidFractionM().maxCellsPerParticle());
         dataExchangeM().allocateArray(cellIDs_,0.,voidFractionM().maxCellsPerParticle());

@@ -93,13 +93,7 @@ interface::~interface()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void interface::setForce
-(
-    double** const& mask,
-    double**& impForces,
-    double**& expForces,
-    double**& DEMForces
-) const
+void interface::setForce() const
 {
 Info << "interface::setForce" << endl;
     for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
@@ -185,8 +179,9 @@ Info << "interface::setForce" << endl;
                     Info << "interface force is limited to " << interfaceForce << endl;
                 }*/
 
-               if(treatExplicit_) for(int j=0;j<3;j++) expForces[index][j] += interfaceForce[j];
-               else  for(int j=0;j<3;j++) impForces[index][j] += interfaceForce[j];
+               if(treatExplicit_) for(int j=0;j<3;j++) expForces()[index][j] += interfaceForce[j];
+               else  for(int j=0;j<3;j++) impForces()[index][j] += interfaceForce[j];
+               for(int j=0;j<3;j++) DEMForces()[index][j] += interfaceForce[j];
             } // end if particle found on proc domain
         //}// end if in mask
     }// end loop particles

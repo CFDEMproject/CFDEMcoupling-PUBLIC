@@ -39,7 +39,7 @@ SourceFiles
 #ifndef trackIO_H
 #define trackIO_H
 
-#include "IOModel.H"
+#include "sophIO.H"
 #include "interpolationCellPoint.H"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -52,24 +52,12 @@ namespace Foam
 
 class trackIO
 :
-    public IOModel
+    public sophIO
 {
 
 private:
 
-    //dictionary propsDict_;
-
-    word dirName_;
-
-    fileName path_;
-
     // Member Functions
-    fileName buildFilePath(word) const;
-
-protected:
-    mutable fileName lagPath_;
-
-    void streamDataToPath(fileName,double**,int,word,word type,word className,word finaliser) const;
 
 public:
 

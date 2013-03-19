@@ -86,13 +86,7 @@ MeiLift::~MeiLift()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void MeiLift::setForce
-(
-    double** const& mask,
-    double**& impForces,
-    double**& expForces,
-    double**& DEMForces
-) const
+void MeiLift::setForce() const
 {
     // get viscosity field
     #ifdef comp
@@ -171,9 +165,11 @@ void MeiLift::setForce
                 }
             }
             // set force on particle
-            if(treatDEM_) for(int j=0;j<3;j++) DEMForces[index][j] += lift[j];
-            else if(!treatExplicit_) for(int j=0;j<3;j++) impForces[index][j] += lift[j];
-            else  for(int j=0;j<3;j++) expForces[index][j] += lift[j];
+            if(!treatDEM_){
+                if(!treatExplicit_) for(int j=0;j<3;j++) impForces()[index][j] += lift[j];
+                else  for(int j=0;j<3;j++) expForces()[index][j] += lift[j];
+            }
+            for(int j=0;j<3;j++) DEMForces()[index][j] += lift[j];
         //}
     }
 

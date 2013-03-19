@@ -64,6 +64,11 @@ inline double ** cfdemCloud::velocities() const
     return velocities_;
 }
 
+inline double ** cfdemCloud::fluidVels() const
+{
+    return fluidVel_;
+}
+
 inline double ** cfdemCloud::impForces() const
 {
     return impForces_;
@@ -77,6 +82,11 @@ inline double ** cfdemCloud::expForces() const
 inline double ** cfdemCloud::DEMForces() const
 {
     return DEMForces_;
+}
+
+inline double ** cfdemCloud::Cds() const
+{
+    return Cds_;
 }
 
 inline double ** cfdemCloud::radii() const

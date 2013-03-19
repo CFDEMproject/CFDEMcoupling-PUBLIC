@@ -1,0 +1,89 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.6                                   |
+|   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volVectorField;
+    object      U;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 1 -1 0 0 0 0];
+
+internalField   uniform (0 0 0);
+
+boundaryField
+{
+
+    wall
+    {
+        //type            fixedValue;
+        //value           uniform (0 0 0);
+        type            slip;
+    }
+
+    inlet
+    {
+        /*type            flowRateInletVelocity;
+        flowRate        0.001;
+        value           uniform (0 0 0);*/
+
+        /*type            fixedValue;
+        value           uniform (0 0 0.0001);*/
+
+        //type            zeroGradient;
+
+        /*type            groovyBC;
+        variables       "Uend=vector(0,0,2);tEnd=0.1;";
+        valueExpression "((time() < tEnd) ? Uend/tEnd*time():Uend)";
+        value           uniform (0 0 0);*/
+
+        /*// 2.0.x, 1.6,ext
+        type            timeVaryingUniformFixedValue;
+        fileName        "steps_0p1s";
+        outOfBounds     clamp;
+        value           uniform (0 0 0);*/
+
+        // 2.1.x
+        type            uniformFixedValue;
+        uniformValue     table
+        (
+            (0.000 (0 0 0.2))
+            (0.010 (0 0 0.2))
+            (0.011 (0 0 0.4))
+            (0.020 (0 0 0.4))
+            (0.021 (0 0 0.6))
+            (0.030 (0 0 0.6))
+            (0.031 (0 0 0.8))
+            (0.040 (0 0 0.8))
+            (0.041 (0 0 1.0))
+            (0.050 (0 0 1.0))
+            (0.051 (0 0 1.2))
+            (0.060 (0 0 1.2))
+            (0.061 (0 0 1.4))
+            (0.070 (0 0 1.4))
+            (0.071 (0 0 1.6))
+            (0.080 (0 0 1.6))
+            (0.081 (0 0 1.8))
+            (0.090 (0 0 1.8))
+            (0.091 (0 0 2.0))
+            (0.100 (0 0 2.0))
+        );
+    }
+
+    outlet
+    {
+        /*type            fluxCorrectedVelocity; //inletOutlet;
+        value           uniform (0 0 0);
+        inletValue      uniform (0 0 0);*/
+        type            zeroGradient;
+    }
+}
+
+// ************************************************************************* //

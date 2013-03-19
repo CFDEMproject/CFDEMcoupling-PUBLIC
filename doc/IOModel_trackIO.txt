@@ -19,7 +19,7 @@ IOModel "trackIO"; :pre
 
 [Description:]
 
-The basic IO-model writes particle positions, velocities, index and radii to files. The output directories ($casePath/CFD/$timestep) are created automatically. Data is written every write time of the CFD simulation.
+The trackIO-model is based on sophIO model and additionally writes fields necessary to use the particleTracks utility (which needs a particleTrackProperties file in the constant dir). The particleTracks generats tracks of the particles and writes them to a vtk file.
 
 [Restrictions:] None.
 

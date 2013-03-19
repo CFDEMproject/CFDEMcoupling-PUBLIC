@@ -1,4 +1,4 @@
-word CFDEMversion="cfdem-2.5.1";
+word CFDEMversion="cfdem-2.5.2";
 word compatibleLIGGGHTSversion="2.2.4";
 
 Info << "\nCFDEMcoupling version: " << CFDEMversion << "\n" <<  endl;

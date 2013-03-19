@@ -78,13 +78,7 @@ checkCouplingInterval::~checkCouplingInterval()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void checkCouplingInterval::setForce
-(
-    double** const& mask,
-    double**& impForces,
-    double**& expForces,
-    double**& DEMForces
-) const
+void checkCouplingInterval::setForce() const
 {
     if(particleCloud_.mesh().time().write())
     {

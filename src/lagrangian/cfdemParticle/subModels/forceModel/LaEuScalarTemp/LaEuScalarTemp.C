@@ -108,13 +108,7 @@ void LaEuScalarTemp::allocateMyArrays() const
 }
 // * * * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * * //
 
-void LaEuScalarTemp::setForce
-(
-    double** const& mask,
-    double**& impForces,
-    double**& expForces,
-    double**& DEMForces
-) const
+void LaEuScalarTemp::setForce() const
 {
     // do nothing
 }

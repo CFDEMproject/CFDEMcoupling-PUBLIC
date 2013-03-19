@@ -101,11 +101,15 @@ protected:
 
     mutable double **velocities_;
 
+    mutable double **fluidVel_;
+
     mutable double **impForces_;
 
     mutable double **expForces_;
 
     mutable double **DEMForces_;
+
+    mutable double **Cds_;
 
     mutable double **radii_;
 
@@ -132,6 +136,8 @@ protected:
     const word turbulenceModelType_;
 
     bool cgOK_;
+
+    bool impDEMdrag_;
 
     #if defined(version21) || defined(version16ext)
         #ifdef comp
@@ -178,6 +184,7 @@ public:
 
     friend class dataExchangeModel;
     friend class voidFractionModel;
+    friend class forceModel;
 
 // Constructors
 
@@ -207,6 +214,8 @@ public:
 
        vector velocity(int);
 
+       vector fluidVel(int);
+
        virtual const forceModel& forceM(int);
 
        virtual int nrForceModels();
@@ -229,11 +238,15 @@ public:
 
        inline double ** velocities() const;
 
+       inline double ** fluidVels() const;
+
        inline double ** impForces() const;
 
        inline double ** expForces() const;
 
        inline double ** DEMForces() const;
+
+       inline double ** Cds() const;
 
        inline double ** radii() const;
 

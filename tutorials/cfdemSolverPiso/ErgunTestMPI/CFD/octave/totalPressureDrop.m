@@ -5,6 +5,7 @@ clc;
 %====================================%
 % simulation data 1
 %====================================%
+rhoG = 10			% density in kg/m3
 %path = '../probes/0/p';
 path = '../probes/0/p';
 columns=22;
@@ -12,7 +13,7 @@ headerlines=4;
 data = loaddata(path,columns,headerlines);
 data=transpose(data);
 [x,y]=size(data)
-dp_sim = (data(:,2)-data(:,y))/10000;
+dp_sim = (data(:,2)-data(:,y))*rhoG; %conversion to Pa!
 t_sim = data(:,1);
 %fprintf('final pressureDrop of sim = %f Pa\n',dp_sim(length(dp_sim)) )
 
@@ -36,14 +37,13 @@ deltaU=(Uend-Ustart)/((Tend-Tstart)/timeStepSize);
 U = Ustart+deltaU:deltaU:Uend;  % velocity over time
 Ua = U / epsilon;		% physical velocity
 L = 0.0156			% length of bed
-rhoG = 10			% density in kg/m3
 nuG = 1.5*10^-4			% kinemat Visk in m2/s
 muG = nuG*rhoG			% dynam visc in Pa s
 
 dpErgun= L * (
                 150*((1-epsilon)^2/epsilon^3)*((muG.*U)/(phip*dp)^2) 
               +1.75*((1-epsilon)/epsilon^3)*((rhoG.*U.^2)/(phip*dp))
-        )/10000/rhoG;
+        );
 
 fprintf('NOTE: this pressure is divided by density (according to CFD solver)\n')
 fprintf('so the result does not depend on density\n')
@@ -71,20 +71,18 @@ end
 dpUmf= L * (
                 150*((1-epsilon)^2/epsilon^3)*((muG.*Umf)/(phip*dp)^2) 
               +1.75*((1-epsilon)/epsilon^3)*((rhoG.*Umf.^2)/(phip*dp))
-        )/10000/rhoG;
-%dpUmf2=(L*(1-epsilon)*(rhoP-rhoG)*g+pHydr)/10000
+        );
+%dpUmf2=(L*(1-epsilon)*(rhoP-rhoG)*g+pHydr)
 %====================================%
 % plot data
 %====================================%
-length(U)
-length(dp_sim)
 figure(2)
 plot(U,dp_sim)
 title("Ergun pressure drop vs. simulation")
 a=strcat("analytical (Ergun), Umf=",num2str(Umf),", dpUmf=",num2str(dpUmf));
 legend(a,"simulation")
 xlabel("velocity in [m/s]")
-ylabel("pressure drop [bar]")
+ylabel("pressure drop [Pa]")
 axis([0,Uend,0,dpErgun(length(dpErgun))])
 
 figure(1)
@@ -93,7 +91,7 @@ title("Ergun pressure drop vs. simulation")
 a=strcat("analytical (Ergun), Umf=",num2str(Umf),", dpUmf=",num2str(dpUmf));
 legend(a,"simulation","analyt. deltaP at Umf")
 xlabel("velocity in [m/s]")
-ylabel("pressure drop [bar]")
+ylabel("pressure drop [Pa]")
 axis([0,Uend,0,dpErgun(length(dpErgun))])
 
 %print('cfdemSolverPiso_settlingTest.eps','-deps2')

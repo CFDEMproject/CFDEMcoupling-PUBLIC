@@ -81,14 +81,8 @@ ArchimedesIB::ArchimedesIB
     }
 
     if (propsDict_.found("treatExplicit")) treatExplicit_=true;
-    if (modelType_=="A"){
-        treatDEM_=true;
-        Info << "accounting for Archimedes only on DEM side!" << endl;
-    }
-    if (modelType_=="B"){
-        treatDEM_=false;
-        Info << "accounting for Archimedes on DEM and CFD side!" << endl;
-    }
+    treatDEM_=true;
+    Info << "accounting for Archimedes only on DEM side!" << endl;
     particleCloud_.checkCG(true);
 }
 
@@ -101,13 +95,7 @@ ArchimedesIB::~ArchimedesIB()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void ArchimedesIB::setForce
-(
-    double** const& mask,
-    double**& impForces,
-    double**& expForces,
-    double**& DEMForces
-) const
+void ArchimedesIB::setForce() const
 {
     vector force;
     for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
@@ -126,9 +114,12 @@ void ArchimedesIB::setForce
             }
             // set force on particle
             if(twoDimensional_) Warning<<"ArchimedesIB model doesn't work for 2D right now!!\n"<< endl;
-            if(treatDEM_) for(int j=0;j<3;j++) DEMForces[index][j] += force[j];
-            else if(treatExplicit_) for(int j=0;j<3;j++) expForces[index][j] += force[j];
-            else  for(int j=0;j<3;j++) impForces[index][j] += force[j];
+            if(!treatDEM_)
+            {
+                if(treatExplicit_) for(int j=0;j<3;j++) expForces()[index][j] += force[j];
+                else for(int j=0;j<3;j++) impForces()[index][j] += force[j];
+            }
+            for(int j=0;j<3;j++) DEMForces()[index][j] += force[j];
         //}
     }
 }

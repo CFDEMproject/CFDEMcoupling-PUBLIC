@@ -105,13 +105,7 @@ gradPForce::~gradPForce()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void gradPForce::setForce
-(
-    double** const& mask,
-    double**& impForces,
-    double**& expForces,
-    double**& DEMForces
-) const
+void gradPForce::setForce() const
 {
     volVectorField gradPField = fvc::grad(p_);
     /*if (useU_)
@@ -172,9 +166,11 @@ void gradPForce::setForce
             }
 
             // set force on particle
-            if(treatDEM_) for(int j=0;j<3;j++) DEMForces[index][j] += force[j];
-            else if(!treatExplicit_) for(int j=0;j<3;j++) impForces[index][j] += force[j];
-            else  for(int j=0;j<3;j++) expForces[index][j] += force[j];
+            if(!treatDEM_){
+                if(!treatExplicit_) for(int j=0;j<3;j++) impForces()[index][j] += force[j];
+                else  for(int j=0;j<3;j++) expForces()[index][j] += force[j];
+            }
+            for(int j=0;j<3;j++) DEMForces()[index][j] += force[j];
 
         //}
     }

@@ -35,7 +35,7 @@ Description
 #include "addToRunTimeSelectionTable.H"
 #include "dataExchangeModel.H"
 
-#include "mpi.h"
+//#include "mpi.h"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -76,6 +76,13 @@ KochHillDrag::KochHillDrag
     if (propsDict_.found("verbose")) verbose_=true;
     if (propsDict_.found("treatExplicit")) treatExplicit_=true;
     if (propsDict_.found("interpolation")) interpolation_=true;
+    if (propsDict_.found("implDEM"))
+    {
+        treatExplicit_=false;
+        implDEM_=true;
+        setImpDEMdrag();
+        Info << "Using implicit DEM drag formulation." << endl;
+    }
     particleCloud_.checkCG(true);
 }
 
@@ -88,13 +95,7 @@ KochHillDrag::~KochHillDrag()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void KochHillDrag::setForce
-(
-    double** const& mask,
-    double**& impForces,
-    double**& expForces,
-    double**& DEMForces
-) const
+void KochHillDrag::setForce() const
 {
     // get viscosity field
     #ifdef comp
@@ -118,6 +119,7 @@ void KochHillDrag::setForce
     scalar Rep(0);
 	scalar Vs(0);
 	scalar volumefraction(0);
+    scalar betaP(0);
 
     interpolationCellPoint<scalar> voidfractionInterpolator_(voidfraction_);
     interpolationCellPoint<vector> UInterpolator_(U_);
@@ -128,6 +130,9 @@ void KochHillDrag::setForce
         //{
             cellI = particleCloud_.cellIDs()[index][0];
             drag = vector(0,0,0);
+            betaP = 0;
+            Vs = 0;
+            Ufluid =vector(0,0,0);
 
             if (cellI > -1) // particle Found
             {
@@ -182,7 +187,7 @@ void KochHillDrag::setForce
                     scalar F = voidfraction * (F0 + 0.5*F3*Rep);
 
                     // calc drag model coefficient betaP
-                    scalar betaP = 18.*nuf*rho/(ds/cg()*ds/cg())*voidfraction*F;
+                    betaP = 18.*nuf*rho/(ds/cg()*ds/cg())*voidfraction*F;
 
                     // calc particle's drag
                     drag = Vs*betaP*Ur;
@@ -206,8 +211,23 @@ void KochHillDrag::setForce
                 }
             }
             // set force on particle
-            if(treatExplicit_) for(int j=0;j<3;j++) expForces[index][j] += drag[j];
-            else  for(int j=0;j<3;j++) impForces[index][j] += drag[j];
+            if(treatExplicit_) for(int j=0;j<3;j++) expForces()[index][j] += drag[j];
+            else  for(int j=0;j<3;j++) impForces()[index][j] += drag[j];
+
+            // set Cd
+            if(implDEM_)
+            {
+                for(int j=0;j<3;j++) fluidVel()[index][j]=Ufluid[j];
+
+                if (modelType_=="B")
+                    Cds()[index][0] = Vs*betaP/voidfraction;
+                else
+                    Cds()[index][0] = Vs*betaP;
+
+            }else{
+                for(int j=0;j<3;j++) DEMForces()[index][j] += drag[j];
+            }
+
         //}
     }
 }

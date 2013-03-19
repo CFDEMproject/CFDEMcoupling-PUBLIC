@@ -64,7 +64,9 @@ private:
 
     fileName path_;
 
-    bool m2mComm_;
+    bool parOutput_;
+
+    mutable int nPProc_;
 
     // Member Functions
     fileName buildFilePath(word) const;
@@ -72,7 +74,7 @@ private:
 protected:
     mutable fileName lagPath_;
 
-    void streamDataToPath(fileName,double**,int,word,word type,word className,word finaliser) const;
+    void streamDataToPath(fileName,double**,word,word type,word className,word finaliser) const;
 
 public:
 

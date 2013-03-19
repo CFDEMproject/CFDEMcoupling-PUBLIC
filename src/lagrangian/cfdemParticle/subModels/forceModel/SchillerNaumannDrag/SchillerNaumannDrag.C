@@ -84,13 +84,7 @@ SchillerNaumannDrag::~SchillerNaumannDrag()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void SchillerNaumannDrag::setForce
-(
-    double** const& mask,
-    double**& impForces,
-    double**& expForces,
-    double**& DEMForces
-) const
+void SchillerNaumannDrag::setForce() const
 {
     // get viscosity field
     #ifdef comp
@@ -149,8 +143,9 @@ void SchillerNaumannDrag::setForce
                 }
             }
             // set force on particle
-            if(treatExplicit_) for(int j=0;j<3;j++) expForces[index][j] += drag[j];
-            else  for(int j=0;j<3;j++) impForces[index][j] += drag[j];
+            if(treatExplicit_) for(int j=0;j<3;j++) expForces()[index][j] += drag[j];
+            else  for(int j=0;j<3;j++) impForces()[index][j] += drag[j];
+            for(int j=0;j<3;j++) DEMForces()[index][j] += drag[j];
         //}
     }
 

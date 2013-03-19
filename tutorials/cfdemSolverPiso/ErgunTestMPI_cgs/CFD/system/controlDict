@@ -1,0 +1,117 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.6                                   |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+application     pisoFoam;
+
+startFrom       startTime;
+
+startTime       0;
+
+stopAt          endTime;
+
+endTime         0.1;//0.1;
+
+deltaT          0.001;
+
+writeControl    adjustableRunTime;
+
+writeInterval   0.01;
+
+purgeWrite      0;
+
+writeFormat     ascii;
+
+writePrecision  6;
+
+writeCompression uncompressed;
+
+timeFormat      general;
+
+timePrecision   6;
+
+runTimeModifiable yes;
+
+adjustTimeStep  no;
+
+maxCo 0.1;
+
+libs ( "libgroovyBC.so" );
+
+functions
+(
+
+    probes
+    {
+        type        probes;
+        // Where to load it from
+        functionObjectLibs ( "libsampling.so" );  
+        // Name of the directory for probe data
+        name        probes;
+        probeLocations
+        (
+            (0 0 0.01)
+            (0 0 0.26)
+            (0 0 0.51)
+            (0 0 0.76)
+            (0 0 1.01)
+            (0 0 1.26)
+            (0 0 1.51)
+            (0 0 1.76)
+            (0 0 2.01)
+            (0 0 2.26)
+            (0 0 2.51)
+            (0 0 2.76)
+            (0 0 3.01)
+            (0 0 3.26)
+            (0 0 3.51)
+            (0 0 3.75)
+            (0 0 4.01)
+            (0 0 4.26)
+            (0 0 4.51)
+            (0 0 4.76)
+            (0 0 5.29)
+        );
+
+        // Fields to be probed
+        fields ( p U voidfraction volAverage_voidfraction);
+
+        // Write at same frequency as fields
+        outputControl   timeStep;//outputTime;
+        outputInterval  1;
+    }
+
+   /*pressureDrop
+   {
+     type patchAverage;
+     functionObjectLibs
+     (
+         "libsimpleFunctionObjects.so"
+     );
+     verbose true;
+     patches
+     (
+         inlet
+         outlet
+     );
+     fields
+     (
+         p
+     );
+     factor  1;
+   }*/
+);
+// ************************************************************************* //

@@ -13,7 +13,7 @@ logDir="log"
 
 
 cd $CFDEM_SRC_DIR/etc
-mkdir $logDir
+mkdir -p $logDir
 
 
 #================================================================================#

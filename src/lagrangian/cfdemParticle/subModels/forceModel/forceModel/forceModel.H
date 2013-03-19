@@ -64,6 +64,8 @@ protected:
 
         Switch treatDEM_;                           // marker to use the force only on DEM side
 
+        Switch implDEM_;                           // marker to use the implicit force on DEM side
+
         mutable volVectorField impParticleForces_;  // sum of implicit particle forces [N]
 
         mutable volVectorField expParticleForces_;  // sum of explicit particle forces [N]
@@ -119,7 +121,7 @@ public:
 
 
     // Member Functions
-        virtual void setForce(double** const& mask,double**&,double**&,double**&) const = 0;
+        virtual void setForce() const = 0;
 
         //tmp<volScalarField> provideScalarField();
 
@@ -132,6 +134,16 @@ public:
 
         inline volVectorField& expParticleForces() const { return expParticleForces_;};
 
+        inline double ** impForces() const { return particleCloud_.impForces_;};
+
+        inline double ** expForces() const { return particleCloud_.expForces_;};
+
+        inline double ** DEMForces() const { return particleCloud_.DEMForces_;};
+
+        inline double ** Cds() const { return particleCloud_.Cds_;};
+
+        inline double ** fluidVel() const { return particleCloud_.fluidVel_;};
+
         inline const bool& coupleForce() const { return coupleForce_;};
 
         inline const scalar cg() const { return cg_; };
@@ -141,6 +153,10 @@ public:
             cg_ = cg;
             Info << "cg is set to: " << cg_ << endl;
         };
+
+        void const setImpDEMdrag() const {particleCloud_.impDEMdrag_=true;};
+
+
 };
 
 

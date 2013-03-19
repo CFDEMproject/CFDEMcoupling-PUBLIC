@@ -32,6 +32,7 @@ Description
     based on Koch Hill 2001,"Inertial effects in suspensions and porous-media 
     flows", Annual Review of fluid mechanics.
     including interpolation of the velocity to the exact position
+    including drag coefficient for implicit drag for DEM
 
 Class
     KochHillDrag
@@ -100,13 +101,7 @@ public:
 
 
     // Member Functions
-        void setForce
-        (
-            double** const& mask,
-            double**&,
-            double**&,
-            double**&
-        ) const;
+        void setForce() const;
 };
 
 

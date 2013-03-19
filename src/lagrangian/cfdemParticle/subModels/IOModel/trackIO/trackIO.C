@@ -60,16 +60,8 @@ trackIO::trackIO
     cfdemCloud& sm
 )
 :
-    IOModel(dict,sm),
-    //propsDict_(dict.subDict(typeName + "Props")),
-    dirName_(""),
-    path_("dev/null"),
-    lagPath_("dev/null")
-{
-    //if (propsDict_.found("dirName")) dirName_=word(propsDict_.lookup("dirName"));
-    path_ = buildFilePath(dirName_);
-
-}
+    sophIO(dict,sm)
+{}
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
@@ -85,60 +77,16 @@ void trackIO::dumpDEMdata() const
 {
     if (time_.outputTime())
     {
-        // make time directory
-        lagPath_=createTimeDir(path_);
-        lagPath_=createLagrangianDir(fileName(lagPath_));
+        sophIO::dumpDEMdata();
 
         // stream data to file
-        streamDataToPath(lagPath_, particleCloud_.positions(), particleCloud_.numberOfParticles(), "positions","position","Cloud<passiveParticle>","0");
-        streamDataToPath(lagPath_, particleCloud_.velocities(), particleCloud_.numberOfParticles(), "v","vector","vectorField","");
-        streamDataToPath(lagPath_, particleCloud_.velocities(), particleCloud_.numberOfParticles(), "origId","label","labelField","");
-        streamDataToPath(lagPath_, particleCloud_.velocities(), particleCloud_.numberOfParticles(), "origProcId","origProcId","labelField","");
-        streamDataToPath(lagPath_, particleCloud_.radii(), particleCloud_.numberOfParticles(), "r","scalar","scalarField","");
+        streamDataToPath(lagPath_, particleCloud_.velocities(), "origId","label","labelField","");
+        streamDataToPath(lagPath_, particleCloud_.velocities(), "origProcId","origProcId","labelField","");
     }
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 // Private Member Functions
 
-fileName trackIO::buildFilePath(word dirName) const
-{
-    // create file structure
-    fileName path("."/dirName);
-    OFstream* stubFile = new OFstream(fileName(path/"particles.foam"));
-    delete stubFile;
-    return path;
-}
-
-void trackIO::streamDataToPath(fileName path, double** array,int n,word name,word type,word className,word finaliser) const
-{
-    vector vec;
-    OFstream* fileStream = new OFstream(fileName(path/name));
-    *fileStream << "FoamFile\n";
-    *fileStream << "{version 2.0; format ascii;class "<< className << "; location 0;object  "<< name <<";}\n";
-    *fileStream << n <<"\n";
-    if(type!="origProcId")*fileStream << "(\n";
-    else if(type=="origProcId")*fileStream <<"{0}"<< "\n";
-
-    for(int index = 0;index < n; ++index)
-    {
-        if (type=="scalar"){
-            *fileStream << array[index][0] << finaliser << " \n";
-        }else if (type=="position"){
-            for(int i=0;i<3;i++) vec[i] = array[index][i];
-//          You may need to use these two lines if you have cyclics
-//		    if(vec[0]<0)vec[0]+=0.12;if(vec[0]>0.12)vec[0]-=0.12;
-//		    if(vec[1]<0)vec[1]+=0.06;if(vec[1]>0.06)vec[1]-=0.06;
-            *fileStream <<"( "<< vec[0] <<" "<<vec[1]<<" "<<vec[2]<<" ) "<< finaliser << " \n";
-        }else if (type=="label"){
-            *fileStream << index << finaliser << " \n";
-        }else  if (type=="vector"){
-            for(int i=0;i<3;i++)  vec[i] = array[index][i]; 
-            *fileStream <<"( "<< vec[0] <<" "<<vec[1]<<" "<<vec[2]<<" ) " << finaliser << " \n";
-        }
-    }
-    if(type!="origProcId")*fileStream << ")\n";
-    delete fileStream;
-}
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
