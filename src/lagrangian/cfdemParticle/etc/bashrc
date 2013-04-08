@@ -54,12 +54,15 @@ export CFDEM_LIB_DIR=$FOAM_USER_LIBBIN
 
 #- path to apps
 export CFDEM_APP_DIR=$FOAM_USER_APPBIN
+
+#- path to OF version flag file
+export CFDEM_OFVERSION_DIR=$CFDEM_SRC_DIR/etc/OFversion
 #------------------------------------------------------------------------------
 #- settings for lpp postproc tool
 #------------------------------------------------------------------------------
 
 #- nr of procs for lpp tool
-export CFDEM_LPP_NPROCS=1
+export CFDEM_LPP_NPROCS=4
 
 #- nr of procs for lpp tool
 export CFDEM_LPP_CHUNKSIZE=1
@@ -132,7 +135,7 @@ export -f cfdemLiggghts
 cfdemLiggghtsPar() { mpirun -np $2 $CFDEM_LIGGGHTS_SRC_DIR/lmp_$CFDEM_LIGGGHTS_MAKEFILE_NAME < $1; }
 export -f cfdemLiggghtsPar
 
-# check if the directory exists
+# check if the run directory exists
 if [ -d "$CFDEM_PROJECT_USER_DIR" ]; then
     :
 else
@@ -140,7 +143,7 @@ else
         cd $CFDEM_PROJECT_DIR/..
         echo "make new dirs $CFDEM_PROJECT_DIR/../$LOGNAME-$CFDEM_VERSION-$WM_PROJECT_VERSION ? (y/n)"
         read YN
-        if [ $YN=="y" ]; then
+        if [ $YN == "y" ]; then
             mkdir $LOGNAME-$CFDEM_VERSION-$WM_PROJECT_VERSION
             cd $LOGNAME-$CFDEM_VERSION-$WM_PROJECT_VERSION
             mkdir run

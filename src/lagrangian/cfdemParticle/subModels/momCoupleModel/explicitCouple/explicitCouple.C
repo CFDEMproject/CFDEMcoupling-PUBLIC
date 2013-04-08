@@ -130,29 +130,26 @@ tmp<volVectorField> explicitCouple::expMomSource() const
         )
     );
 
-    // calc fNext
-    forAll(fNext_,cellI)
-    {
-        fNext_[cellI] = arrayToField(cellI);
+    scalar tsf = particleCloud_.dataExchangeM().timeStepFraction();
 
-        // limiter
-        for (int i=0;i<3;i++)
+    if(1-tsf < 1e-4) //tsf==1
+    {
+        // calc fNext
+        forAll(fNext_,cellI)
         {
-            if (fNext_[cellI][i] > fLimit_[i]) fNext_[cellI][i] = fLimit_[i];
+            fNext_[cellI] = arrayToField(cellI);
+    
+            // limiter
+            for (int i=0;i<3;i++)
+            {
+                if (fNext_[cellI][i] > fLimit_[i]) fNext_[cellI][i] = fLimit_[i];
+            }
         }
-    }
-
-    // underrelaxation of f
-    if (particleCloud_.dataExchangeM().couplingStep() > 1)
+        tsource() = fPrev_;
+    }else
     {
-        tsource() = (1 - particleCloud_.dataExchangeM().timeStepFraction()) * fPrev_
-                    + particleCloud_.dataExchangeM().timeStepFraction() * fNext_;
+        tsource() = (1 - tsf) * fPrev_ + tsf * fNext_;
     }
-    else
-    {
-        tsource() = fNext_;
-    }
-
     return tsource;
 }
 

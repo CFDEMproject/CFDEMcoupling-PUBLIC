@@ -56,7 +56,7 @@ Core development of CFDEMcoupling is done by Christoph Goniva and Christoph Klos
 This documentation was written by Christoph Goniva, DCS Computing GmbH, 2012
 
 :line
-(*) "OpenFOAM(R)"_of is a registered trade mark of the ESI Group. This offering is not affiliated, approved or endorsed by ESI Group, the producer of the OpenFOAM(R) software and owner of the OpenFOAM(R) trade mark.
+(*) This offering is not approved or endorsed by OpenCFD Limited, the producer of the OpenFOAM software and owner of the OPENFOAM®  and OpenCFD®  trade marks. OPENFOAM® is a registered trade mark of OpenCFD Limited, a wholly owned subsidiary of the ESI Group.
 
 :line
 

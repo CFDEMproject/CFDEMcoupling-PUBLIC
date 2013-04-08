@@ -28,7 +28,7 @@ FoamFile
 
 modelType B; // A or B
 
-couplingInterval 200;
+couplingInterval 500;
 
 voidFractionModel divided;
 
@@ -40,11 +40,11 @@ regionModel allRegion;
 
 IOModel basicIO;
 
-dataExchangeModel twoWayMPI;//twoWayFiles;//oneWayVTK;//
+dataExchangeModel twoWayMPI;
 
-averagingModel dilute;//dense;//
+averagingModel dense;//dilute;//
 
-clockModel off;
+clockModel off;//standardClock;//
 
 forceModels
 (
@@ -107,7 +107,9 @@ gradPForceProps
 {
     pFieldName "p";
     densityFieldName "rho";
-    interpolation;
+    voidfractionFieldName "voidfraction";
+    velocityFieldName "U";
+    //interpolation;
 }
 
 viscForceProps

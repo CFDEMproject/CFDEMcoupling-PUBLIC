@@ -122,6 +122,10 @@ public:
 
         tmp<volScalarField> voidFractionInterp() const;
 
+        inline volScalarField& voidFractionPrev()const { return voidfractionPrev_; }
+
+        inline volScalarField& voidFractionNext()const { return voidfractionNext_; }
+
         void resetVoidFractions() const;
 
         //void undoVoidFractions(double**const&) const;

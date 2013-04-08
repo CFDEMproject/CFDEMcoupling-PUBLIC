@@ -80,6 +80,8 @@ private:
 
     bool interpolation_; // use interpolated field values
 
+    mutable scalar scale_;
+
 public:
 
     //- Runtime type information

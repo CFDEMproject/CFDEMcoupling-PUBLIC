@@ -139,34 +139,32 @@ tmp<volScalarField> implicitCouple::impMomSource() const
         )
     );
 
+    scalar tsf = particleCloud_.dataExchangeM().timeStepFraction();
+
     // calc Ksl
     scalar Ur;
 
-    forAll(KslNext_,cellI)
+    if(1-tsf < 1e-4) //tsf==1
     {
-        Ur = mag(U_[cellI] - Us_[cellI]);
-
-        if(Ur > 0. && (1.-alpha_[cellI]) > SMALL) //momentum exchange switched off if alphaMin=1
+        forAll(KslNext_,cellI)
         {
-            KslNext_[cellI] = mag(particleCloud_.forceM(0).impParticleForces()[cellI])
+            Ur = mag(U_[cellI] - Us_[cellI]);
+
+            if(Ur > 0. && (1.-alpha_[cellI]) > SMALL) //momentum exchange switched off if alphaMin=1
+            {
+                KslNext_[cellI] = mag(particleCloud_.forceM(0).impParticleForces()[cellI])
                             / Ur
                             / particleCloud_.mesh().V()[cellI];
+            }
+            else KslNext_[cellI] = 0;
+
+            // limiter
+            if (KslNext_[cellI] > KslLimit_) KslNext_[cellI] = KslLimit_;
         }
-        else KslNext_[cellI] = 0;
-
-        // limiter
-        if (KslNext_[cellI] > KslLimit_) KslNext_[cellI] = KslLimit_;
-    }
-
-    // underrelaxation of Ksl
-    if (particleCloud_.dataExchangeM().couplingStep() > 1)
+        tsource() = KslPrev_;
+    }else
     {
-        tsource() = (1 - particleCloud_.dataExchangeM().timeStepFraction()) * KslPrev_
-                    + particleCloud_.dataExchangeM().timeStepFraction() * KslNext_;
-    }
-    else
-    {
-        tsource() = KslNext_;
+        tsource() = (1 - tsf) * KslPrev_ + tsf * KslNext_;
     }
 
     return tsource;

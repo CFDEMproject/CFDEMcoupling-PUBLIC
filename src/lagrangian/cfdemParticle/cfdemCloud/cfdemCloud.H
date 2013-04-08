@@ -43,9 +43,7 @@ SourceFiles
 #define cfdemCloud_H
 
 // choose version
-#define version21
-//#define version16ext
-//#define version15
+#include "OFversion.H"
 
 // choose comp/incomp
 //#define comp
@@ -138,6 +136,10 @@ protected:
     bool cgOK_;
 
     bool impDEMdrag_;
+
+    bool useDDTvoidfraction_;
+
+    mutable volScalarField ddtVoidfraction_;
 
     #if defined(version21) || defined(version16ext)
         #ifdef comp
@@ -314,6 +316,10 @@ public:
 
     // functions
         tmp<fvVectorMatrix> divVoidfractionTau(volVectorField& ,volScalarField&) const;
+
+        tmp<volScalarField> ddtVoidfraction() const;
+
+        void calcDdtVoidfraction(volScalarField& voidfraction) const;
 
         tmp<volScalarField> voidfractionNuEff(volScalarField&) const;
 

@@ -95,6 +95,20 @@ Foam::cfdemCloud::cfdemCloud
     turbulenceModelType_(couplingProperties_.lookup("turbulenceModelType")),
     cgOK_(true),
     impDEMdrag_(false),
+    useDDTvoidfraction_(false),
+    ddtVoidfraction_
+    (   
+        IOobject
+        (
+            "ddtVoidfraction",
+            mesh.time().timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh,
+        dimensionedScalar("zero", dimensionSet(0,0,-1,0,0), 0)  // 1/s
+    ),
     turbulence_
     (
         #if defined(version21) || defined(version16ext)
@@ -183,6 +197,11 @@ Foam::cfdemCloud::cfdemCloud
     if (couplingProperties_.found("ignore")) ignore_=true;
     if (turbulenceModelType_=="LESProperties")
         Info << "WARNING - LES functionality not yet tested!" << endl;
+
+    if (couplingProperties_.found("useDDTvoidfraction"))
+        useDDTvoidfraction_=true;
+    else        
+        Info << "ignoring ddt(voidfraction)" << endl;
 
     forceModel_ = new autoPtr<forceModel>[nrForceModels()];
     for (int i=0;i<nrForceModels();i++)
@@ -400,7 +419,10 @@ bool Foam::cfdemCloud::evolve
 
             // reset vol Fields
             clockM().start(16,"resetVolFields");
-            if(verbose_) Info << "- resetVolFields()" << endl;
+            if(verbose_){
+                Info << "couplingStep:" << dataExchangeM().couplingStep() 
+                     << "\n- resetVolFields()" << endl;
+            }
             averagingM().resetVectorAverage(averagingM().UsPrev(),averagingM().UsNext());
             voidFractionM().resetVoidFractions();
             averagingM().resetVectorAverage(forceM(0).impParticleForces(),forceM(0).impParticleForces(),true);
@@ -484,6 +506,10 @@ bool Foam::cfdemCloud::evolve
         alpha.internalField() = voidFractionM().voidFractionInterp();
         alpha.correctBoundaryConditions();
 
+        // calc ddt(voidfraction)
+        if (doCouple) calcDdtVoidfraction(voidFractionM().voidFractionNext());
+        //calcDdtVoidfraction(alpha); // alternative with scale=1! (does not see change in alpha?)
+
         // update particle velocity Field
         Us.internalField() = averagingM().UsInterp();
         Us.correctBoundaryConditions();
@@ -534,13 +560,21 @@ tmp<fvVectorMatrix> cfdemCloud::divVoidfractionTau(volVectorField& U,volScalarFi
     );
 }
 
-void cfdemCloud::resetArray(double**& array,int length,int width,double resetVal)
+tmp<volScalarField> cfdemCloud::ddtVoidfraction() const
 {
-    for(int index = 0;index < length; ++index){
-        for(int i=0;i<width;i++){
-            array[index][i] = resetVal;
-        }
+    if (dataExchangeM().couplingStep() <= 2 || !useDDTvoidfraction_)
+    {
+        Info << "suppressing ddt(voidfraction)" << endl;
+        return tmp<volScalarField> (ddtVoidfraction_ * 0.);
     }
+    return tmp<volScalarField> (ddtVoidfraction_) ;
+}
+
+void cfdemCloud::calcDdtVoidfraction(volScalarField& voidfraction) const
+{
+    Info << "calculating ddt(voidfraction) based on couplingTime" << endl;
+    scalar scale=mesh().time().deltaT().value()/dataExchangeM().couplingTime();
+    ddtVoidfraction_ = fvc::ddt(voidfraction) * scale;
 }
 
 tmp<volScalarField> cfdemCloud::voidfractionNuEff(volScalarField& voidfraction) const
@@ -569,6 +603,14 @@ tmp<volScalarField> cfdemCloud::voidfractionNuEff(volScalarField& voidfraction) 
     }
 }
 
+void cfdemCloud::resetArray(double**& array,int length,int width,double resetVal)
+{
+    for(int index = 0;index < length; ++index){
+        for(int i=0;i<width;i++){
+            array[index][i] = resetVal;
+        }
+    }
+}
 // * * * * * * * * * * * * * * * *  IOStream operators * * * * * * * * * * * //
 
 #include "cfdemCloudIO.C"

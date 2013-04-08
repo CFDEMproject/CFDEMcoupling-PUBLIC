@@ -29,7 +29,7 @@ gradSchemes
 
 divSchemes
 {
-    default          Gauss linear;
+    default         Gauss linear;
     div(phi,U)      Gauss limitedLinearV 1;
     div(phi,k)      Gauss limitedLinear 1;
     div(phi,epsilon) Gauss limitedLinear 1;
@@ -39,7 +39,7 @@ divSchemes
     div((nuEff*dev(grad(U).T()))) Gauss linear;
     div((viscousTerm*dev(grad(U).T()))) Gauss linear;
     div((nu*dev(grad(U).T()))) Gauss linear;
-    div(phi,T)      Gauss limitedLinear 1;
+    div(phi,T)      Gauss limitedLinear 1; //Gauss upwind; //
 }
 
 laplacianSchemes

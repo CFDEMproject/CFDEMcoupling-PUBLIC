@@ -53,7 +53,7 @@ create_atoms    1 single 0.05 0.04  0.046 units box
 set group all diameter 0.0001 density 3000
 
 #cfd coupling
-fix		cfd all couple/cfd couple_every 10 mpi
+fix		cfd all couple/cfd couple_every 100 mpi
 fix		cfd2 all couple/cfd/force
 
 variable       vx equal vx[1]

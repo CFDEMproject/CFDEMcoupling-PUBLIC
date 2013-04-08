@@ -125,6 +125,9 @@ alias cfdemTestTUT 'bash $CFDEM_SRC_DIR/etc/testTutorials.sh'
 #- shortcut to run liggghts in serial
 alias cfdemLiggghts '$CFDEM_LIGGGHTS_SRC_DIR/lmp_$CFDEM_LIGGGHTS_MAKEFILE_NAME'
 
+#- shortcut to run liggghts in parallel
+# unfortunately no functions available in csh
+
 #- shortcut to run lpp
 alias lpp 'python -i $CFDEM_LPP_DIR/lpp.py \!:1'
 

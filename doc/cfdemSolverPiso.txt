@@ -19,6 +19,6 @@ GONIVA, C., KLOSS, C., HAGER,A. and PIRKER, S. (2010): "An Open Source CFD-DEM P
 
 
 :line
-(*) "OpenFOAM(R)"_of is a registered trade mark of Silicon Graphics International Corp. This offering is not affiliated, approved or endorsed by Silicon Graphics International Corp., the producer of the OpenFOAM(R) software and owner of the OpenFOAM(R) trademark.
+(*) This offering is not approved or endorsed by OpenCFD Limited, the producer of the OpenFOAM software and owner of the OPENFOAM®  and OpenCFD®  trade marks. OPENFOAM® is a registered trade mark of OpenCFD Limited, a wholly owned subsidiary of the ESI Group.
 
 :line

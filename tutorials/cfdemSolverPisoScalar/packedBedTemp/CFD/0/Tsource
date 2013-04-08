@@ -25,7 +25,7 @@ dimensions      [0 0 -1 1 0 0 0];
 // rho=1
 // --> Tsource = 1 
 
-internalField   uniform 1;  
+internalField   uniform 0;  
 
 boundaryField
 {

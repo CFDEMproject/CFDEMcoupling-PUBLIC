@@ -9,7 +9,7 @@ path = '../../DEM/post/velocity.txt';
 data = load(path);
 U_sim = data(:,2:4);
 t_sim = data(:,1);
-fprintf('final velociy of sim = %f/%f/%f m/s\n',U_sim(length(U_sim(:,1)),1),U_sim(length(U_sim(:,1)),2),U_sim(length(U_sim(:,1)),3) )
+fprintf('final velocity of sim = %f/%f/%f m/s\n',U_sim(length(U_sim(:,1)),1),U_sim(length(U_sim(:,1)),2),U_sim(length(U_sim(:,1)),3) )
 
 
 %====================================%

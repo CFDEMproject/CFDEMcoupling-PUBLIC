@@ -78,6 +78,6 @@ compute_modify	thermo_temp dynamic yes
 
 #insert the first particles so that dump is not empty
 run		1
-dump		dmp all custom 10000 ../DEM/post/dump.liggghts_init id type type x y z ix iy iz vx vy vz fx fy fz omegax omegay omegaz radius f_Temp[0] f_heatFlux[0]
+dump		dmp all custom 100 ../DEM/post/dump.liggghts_init id type type x y z ix iy iz vx vy vz fx fy fz omegax omegay omegaz radius f_Temp[0] f_heatFlux[0]
 
 run             1

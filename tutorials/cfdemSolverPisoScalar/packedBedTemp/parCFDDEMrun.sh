@@ -85,6 +85,7 @@ fi
 #- clean up case
 echo "deleting data at: $casePath : ???\n"
 rm -r $casePath/CFD/0.*
+rm -r $casePath/CFD/1
 rm -r $casePath/CFD/callgrind.*
 rm -r $casePath/CFD/*.out
 rm -r $casePath/CFD/octave/*.eps

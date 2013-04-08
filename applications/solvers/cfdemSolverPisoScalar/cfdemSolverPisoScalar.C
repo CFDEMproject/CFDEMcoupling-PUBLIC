@@ -143,7 +143,7 @@ int main(int argc, char *argv[])
                     // Pressure corrector
                     fvScalarMatrix pEqn
                     (
-                        fvm::laplacian(rUAvoidfraction, p) == fvc::div(phiGes) + fvc::ddt(voidfraction)
+                        fvm::laplacian(rUAvoidfraction, p) == fvc::div(phiGes) + particleCloud.ddtVoidfraction()
                     );
                     pEqn.setReference(pRefCell, pRefValue);
 

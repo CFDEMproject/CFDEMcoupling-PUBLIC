@@ -213,8 +213,9 @@ public:
         inline bool doCoupleNow() const
         {
             if (particleCloud_.mesh().time().value()-particleCloud_.mesh().time().startTime().value()
-             - (couplingStep_*(DEMts_*couplingInterval_))
-             > particleCloud_.mesh().time().deltaT().value()/2)
+             - ((1+couplingStep_)*(DEMts_*couplingInterval_))
+             + SMALL > 0)                                         // Chr 27.03.2013 : first coupling after DEMts_*couplingInterval_
+//             > particleCloud_.mesh().time().deltaT().value()/2) // Chr 27.03.2013
             {
                 return true;
             }

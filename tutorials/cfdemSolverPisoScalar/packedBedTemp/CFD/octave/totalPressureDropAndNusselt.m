@@ -44,6 +44,7 @@ fprintf('final pressureDrop of sim = %f Pa\n',dp_sim(length(dp_sim)) )
 %====================================%
 figure(1)
 plot(t_sim,dpErgun*ones(1,length(t_sim)),t_sim,dp_sim)
+axis([0,0.7,0,dpErgun(length(dpErgun))])
 title("Ergun pressure drop")
 legend("analytical - Ergun","simulation") 
 

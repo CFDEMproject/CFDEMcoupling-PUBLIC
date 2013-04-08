@@ -15,7 +15,7 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-application     interDyMFoam;
+application     cfdemSolverPisoScalar;
 
 startFrom       startTime;
 
@@ -23,13 +23,13 @@ startTime       0;
 
 stopAt          endTime;
 
-endTime         0.7;
+endTime         1.0;
 
-deltaT          0.0001;
+deltaT          0.005;
 
 writeControl    adjustableRunTime;
 
-writeInterval   0.1;//0.002;
+writeInterval   0.1;
 
 purgeWrite      0;
 
@@ -47,9 +47,11 @@ runTimeModifiable yes;
 
 adjustTimeStep  no;
 
-maxCo           1;
+maxCo 0.1;
 
 maxDeltaT       1;
+
+//libs ( "libgroovyBC.so" );
 
 functions
 (
@@ -63,8 +65,8 @@ functions
         name        probes;
         probeLocations
         (
-            (0.05 0.05 -0.099)
-            (0.05 0.05 1.099)
+            (0.05 0.05 -0.499)
+            (0.05 0.05 1.499)
         );
 
         // Fields to be probed
@@ -154,5 +156,4 @@ functions
      factor  1;
    }*/
 );
-
 // ************************************************************************* //
