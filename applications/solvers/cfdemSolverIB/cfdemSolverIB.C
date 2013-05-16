@@ -123,7 +123,7 @@ int main(int argc, char *argv[])
 
                     fvScalarMatrix pEqn
                     (
-                        fvm::laplacian(rUA, p) == fvc::div(phi) + fvc::ddt(voidfraction)
+                        fvm::laplacian(rUA, p) == fvc::div(phi) + particleCloud.ddtVoidfraction()
                     );
 
                     pEqn.setReference(pRefCell, pRefValue);

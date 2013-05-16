@@ -171,7 +171,6 @@ bool liggghtsCommandModel::runThisCommand(int couplingStep)
             lastRun_=couplingStep;
         }
     }
-
     return runIt;
 }
 

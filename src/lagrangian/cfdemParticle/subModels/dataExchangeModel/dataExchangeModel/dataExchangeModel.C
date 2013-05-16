@@ -88,7 +88,7 @@ void Foam::dataExchangeModel::allocateArray
 {
     int len=0;
     if(strcmp(length,"nparticles")==0) len = particleCloud_.numberOfParticles();
-    else if (strcmp(length,"nbodies")==0) len = nClumpTypes_;
+    else if (strcmp(length,"nbodies")==0) len = particleCloud_.numberOfClumps();
     else FatalError<<"call allocateArray with length, nparticles or nbodies!\n" << abort(FatalError);
     allocateArray(array,initVal,width,len);
 }

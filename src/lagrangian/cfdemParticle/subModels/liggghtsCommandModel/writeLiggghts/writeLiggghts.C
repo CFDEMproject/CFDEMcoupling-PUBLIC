@@ -83,12 +83,11 @@ writeLiggghts::writeLiggghts
             overwrite_=Switch(propsDict_.lookup("overwrite"));
         }
     }
-
     if(writeLast_)
         runLast_=true;
     else
     {
-        Warning << "Using invalid options of writeLiggghts, please use 'writeLast' option." << endl;
+        //Warning << "Using invalid options of writeLiggghts, please use 'writeLast' option." << endl;
         runEveryWriteStep_=true;
     }    
 

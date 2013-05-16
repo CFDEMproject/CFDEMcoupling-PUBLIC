@@ -1,0 +1,49 @@
+<HTML>
+<CENTER><A HREF = "http://www.cfdem.com">CFDEMproject WWW Site</A> - <A HREF = "CFDEMcoupling_Manual.html#comm">CFDEM Commands</A> 
+</CENTER>
+
+
+
+
+<HR>
+
+<H3>smoothingModel_constDiffSmoothing command 
+</H3>
+<P><B>Syntax:</B>
+</P>
+<P>Defined in couplingProperties dictionary.
+</P>
+<PRE>smoothingModel constDiffSmoothing;
+constDiffSmoothingProps
+{
+    lowerLimit number1;
+    upperLimit number2;
+    DT number3;
+} 
+</PRE>
+<UL><LI><I>number1</I> = scalar fields will be bound to this lower value 
+
+<LI><I>number2</I> = scalar fields will be bound to this upper value 
+
+<LI><I>number3</I> = diffusion constant 
+
+<P><B>Examples:</B>
+</P>
+<PRE>constDiffSmoothingProps
+{
+    lowerLimit 0.1;
+    upperLimit 1e10;
+    DT 1e-3;
+} 
+</PRE>
+<P><B>Description:</B>
+</P>
+<P>The "constDiffSmoothing" model is a basic smoothingModel model which reads a diffusion coefficient being used for smoothening the exchange fields (voidfraction, Ksl, f if present).
+</P>
+<P><B>Restrictions:</B> none.
+</P>
+<P><B>Related commands:</B>
+</P>
+<P><A HREF = "smoothingModel.html">smoothingModel</A>
+</P>
+</HTML>

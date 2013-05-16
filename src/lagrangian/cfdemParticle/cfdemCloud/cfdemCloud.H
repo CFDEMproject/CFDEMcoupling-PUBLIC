@@ -45,9 +45,6 @@ SourceFiles
 // choose version
 #include "OFversion.H"
 
-// choose comp/incomp
-//#define comp
-
 #include "fvCFD.H"
 #include "IFstream.H"
 
@@ -70,6 +67,7 @@ class dataExchangeModel;
 class IOModel;
 class averagingModel;
 class clockModel;
+class smoothingModel;
 class momCoupleModel;
 class meshMotionModel;
 class liggghtsCommandModel;
@@ -166,6 +164,8 @@ protected:
     autoPtr<averagingModel> averagingModel_;
 
     autoPtr<clockModel> clockModel_;
+
+    autoPtr<smoothingModel> smoothingModel_;
 
     autoPtr<meshMotionModel> meshMotionModel_;
 
@@ -268,6 +268,8 @@ public:
 
        inline bool numberOfParticlesChanged() const;
 
+       inline int numberOfClumps() const;
+
        inline bool arraysReallocated() const;
 
        inline const wordList& forceModels();
@@ -285,6 +287,8 @@ public:
        inline const averagingModel& averagingM() const;
 
        inline const clockModel& clockM() const;
+
+       inline const smoothingModel& smoothingM() const;
 
        inline const meshMotionModel& meshMotionM() const;
 

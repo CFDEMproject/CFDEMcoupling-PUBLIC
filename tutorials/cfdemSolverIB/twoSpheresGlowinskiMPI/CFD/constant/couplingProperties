@@ -48,6 +48,8 @@ averagingModel dilute;
 
 clockModel off;
 
+smoothingModel off;
+
 forceModels
 (
     ShirgaonkarIB

@@ -28,20 +28,18 @@ Description
     This code is designed to realize coupled CFD-DEM simulations using LIGGGHTS
     and OpenFOAM(R). Note: this code is not part of OpenFOAM(R) (see DISCLAIMER).
 
-    cloud class managing DEM data for CFD-DEM coupling and IB representation
-
 Class
-    Foam::cfdemCloudIB derived from cfdemCloud
+    constDiffSmoothing
 
 SourceFiles
-    cfdemCloudIB.C
+    constDiffSmoothing.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef cfdemCloudIB_H
-#define cfdemCloudIB_H
+#ifndef constDiffSmoothing_H
+#define constDiffSmoothing_H
 
-#include "cfdemCloud.H"
+#include "smoothingModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -49,49 +47,45 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class cfdemCloudIB Declaration
+                           Class constDiffSmoothing Declaration
 \*---------------------------------------------------------------------------*/
 
-class cfdemCloudIB
+class constDiffSmoothing
 :
-    public cfdemCloud
+    public smoothingModel
 {
-protected:
 
-    mutable double **angularVelocities_;
+private:
+
+    dictionary propsDict_;
+    scalar lowerLimit_;
+    scalar upperLimit_;
+    dimensionedScalar DT_;
 
 public:
+
+    //- Runtime type information
+    TypeName("constDiffSmoothing");
+
 
     // Constructors
 
         //- Construct from components
-        cfdemCloudIB
+        constDiffSmoothing
         (
-            const fvMesh& mesh
+            const dictionary& dict,
+            cfdemCloud& sm
         );
 
     // Destructor
 
-        ~cfdemCloudIB();
+        ~constDiffSmoothing();
 
 
     // Member Functions
-        void getDEMdata();
+        void smoothen(volScalarField&) const;
 
-        bool reAllocArrays() const;
-    
-        bool evolve();
-
-        void calcVelocityCorrection(volScalarField&,volVectorField&,volScalarField&,volScalarField&); // this could be moved to an IB mom couple model
-
-      // Access
-        vector angularVelocity(int);
-
-        inline double ** angularVelocities() const
-        {
-            return angularVelocities_;
-        };
-
+        void smoothen(volVectorField&) const;
 };
 
 

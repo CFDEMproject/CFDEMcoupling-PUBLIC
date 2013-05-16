@@ -49,7 +49,7 @@ adjustTimeStep  no;
 
 maxCo 0.1;
 
-//libs ( "libgroovyBC.so" );
+//libs ( "libgroovyBC.so" "libfiniteVolumeCFDEM.so");
 
 functions
 (

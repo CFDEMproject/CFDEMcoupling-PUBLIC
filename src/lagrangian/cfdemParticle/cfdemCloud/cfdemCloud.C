@@ -40,6 +40,7 @@ Description
 #include "IOModel.H"
 #include "averagingModel.H"
 #include "clockModel.H"
+#include "smoothingModel.H"
 #include "liggghtsCommandModel.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
@@ -175,6 +176,14 @@ Foam::cfdemCloud::cfdemCloud
     clockModel_
     (
         clockModel::New
+        (
+            couplingProperties_,
+            *this
+        )
+    ),
+    smoothingModel_
+    (
+        smoothingModel::New
         (
             couplingProperties_,
             *this
@@ -503,7 +512,10 @@ bool Foam::cfdemCloud::evolve
 
         clockM().start(24,"interpolateEulerFields");
         // update voidFractionField
-        alpha.internalField() = voidFractionM().voidFractionInterp();
+        alpha.oldTime().internalField() = voidFractionM().voidFractionInterp();
+        
+        // smoothing exchange field
+        smoothingM().smoothen(alpha);
         alpha.correctBoundaryConditions();
 
         // calc ddt(voidfraction)

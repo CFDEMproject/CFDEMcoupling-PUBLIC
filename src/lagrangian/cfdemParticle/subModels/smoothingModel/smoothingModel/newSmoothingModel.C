@@ -27,80 +27,58 @@ License
 Description
     This code is designed to realize coupled CFD-DEM simulations using LIGGGHTS
     and OpenFOAM(R). Note: this code is not part of OpenFOAM(R) (see DISCLAIMER).
-
-    cloud class managing DEM data for CFD-DEM coupling and IB representation
-
-Class
-    Foam::cfdemCloudIB derived from cfdemCloud
-
-SourceFiles
-    cfdemCloudIB.C
-
 \*---------------------------------------------------------------------------*/
 
-#ifndef cfdemCloudIB_H
-#define cfdemCloudIB_H
+#include "error.H"
 
-#include "cfdemCloud.H"
+#include "smoothingModel.H"
+#include "standardSearch.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-/*---------------------------------------------------------------------------*\
-                           Class cfdemCloudIB Declaration
-\*---------------------------------------------------------------------------*/
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-class cfdemCloudIB
-:
-    public cfdemCloud
+autoPtr<smoothingModel> smoothingModel::New
+(
+    const dictionary& dict,
+    cfdemCloud& sm
+)
 {
-protected:
+    word smoothingModelType
+    (
+        dict.lookup("smoothingModel")
+    );
 
-    mutable double **angularVelocities_;
-
-public:
-
-    // Constructors
-
-        //- Construct from components
-        cfdemCloudIB
-        (
-            const fvMesh& mesh
-        );
-
-    // Destructor
-
-        ~cfdemCloudIB();
+    Info<< "Selecting smoothingModel "
+         << smoothingModelType << endl;
 
 
-    // Member Functions
-        void getDEMdata();
+    dictionaryConstructorTable::iterator cstrIter =
+        dictionaryConstructorTablePtr_->find(smoothingModelType);
 
-        bool reAllocArrays() const;
-    
-        bool evolve();
+    if (cstrIter == dictionaryConstructorTablePtr_->end())
+    {
+        FatalError
+            << "smoothingModel::New(const dictionary&, const spray&) : "
+            << endl
+            << "    unknown smoothingModelType type "
+            << smoothingModelType
+            << ", constructor not in hash table" << endl << endl
+            << "    Valid smoothingModel types are :"
+            << endl;
+        Info<< dictionaryConstructorTablePtr_->toc()
+            << abort(FatalError);
+    }
 
-        void calcVelocityCorrection(volScalarField&,volVectorField&,volScalarField&,volScalarField&); // this could be moved to an IB mom couple model
-
-      // Access
-        vector angularVelocity(int);
-
-        inline double ** angularVelocities() const
-        {
-            return angularVelocities_;
-        };
-
-};
+    return autoPtr<smoothingModel>(cstrIter()(dict,sm));
+}
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#endif
 
 // ************************************************************************* //

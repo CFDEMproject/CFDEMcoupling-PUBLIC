@@ -141,6 +141,12 @@ inline bool cfdemCloud::numberOfParticlesChanged() const
     return numberOfParticlesChanged_;
 }
 
+inline int cfdemCloud::numberOfClumps() const
+{
+    Warning << "cfdemCloud::numberOfClumps() is not called correctly!" << endl;
+    return -1;
+}
+
 inline bool cfdemCloud::arraysReallocated() const
 {
     return arraysReallocated_;
@@ -184,6 +190,11 @@ inline const averagingModel& cfdemCloud::averagingM() const
 inline const clockModel& cfdemCloud::clockM() const
 {
     return clockModel_;
+}
+
+inline const smoothingModel& cfdemCloud::smoothingM() const
+{
+    return smoothingModel_;
 }
 
 inline const meshMotionModel& cfdemCloud::meshMotionM() const

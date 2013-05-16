@@ -1,0 +1,44 @@
+"CFDEMproject WWW Site"_lws - "CFDEM Commands"_lc :c
+
+:link(lws,http://www.cfdem.com)
+:link(lc,CFDEMcoupling_Manual.html#comm)
+
+:line
+
+smoothingModel_constDiffSmoothing command :h3
+
+[Syntax:]
+
+Defined in couplingProperties dictionary.
+
+smoothingModel constDiffSmoothing;
+constDiffSmoothingProps
+\{
+    lowerLimit number1;
+    upperLimit number2;
+    DT number3;
+\} :pre
+
+{number1} = scalar fields will be bound to this lower value :ulb,l
+{number2} = scalar fields will be bound to this upper value :l
+{number3} = diffusion constant :l
+
+[Examples:]
+
+constDiffSmoothingProps
+\{
+    lowerLimit 0.1;
+    upperLimit 1e10;
+    DT 1e-3;
+\} :pre
+
+[Description:]
+
+The "constDiffSmoothing" model is a basic smoothingModel model which reads a diffusion coefficient being used for smoothening the exchange fields (voidfraction, Ksl, f if present).
+
+[Restrictions:] none.
+
+[Related commands:]
+
+"smoothingModel"_smoothingModel.html
+

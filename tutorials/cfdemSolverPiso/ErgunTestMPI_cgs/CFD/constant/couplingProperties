@@ -46,6 +46,8 @@ averagingModel dense;//dilute;//
 
 clockModel standardClock;//off;
 
+smoothingModel off;
+
 forceModels
 (
     //GidaspowDrag

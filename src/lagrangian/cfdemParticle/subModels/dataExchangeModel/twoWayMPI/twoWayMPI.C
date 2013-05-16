@@ -318,9 +318,9 @@ int Foam::twoWayMPI::getNumberOfParticles() const
 
 int Foam::twoWayMPI::getNumberOfClumps() const
 {
-    Warning << "Foam::twoWayMPI::getNumberOfClumps() - changes necessary here" << endl;
-    //return liggghts_get_maxtag_ms(lmp);
-    return 1;
+Info << "liggghts_get_maxtag_ms(lmp)=" << liggghts_get_maxtag_ms(lmp) << endl;
+
+    return liggghts_get_maxtag_ms(lmp);
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

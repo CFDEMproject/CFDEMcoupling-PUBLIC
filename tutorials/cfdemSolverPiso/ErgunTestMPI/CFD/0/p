@@ -35,8 +35,9 @@ boundaryField
     outlet
     {
         //type            zeroGradient;
+
         type            fixedValue;
-        value           uniform 100000;
+        value           uniform 1.0e5;
     }
 }
 

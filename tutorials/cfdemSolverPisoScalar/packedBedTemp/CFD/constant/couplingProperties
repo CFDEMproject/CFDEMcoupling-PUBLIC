@@ -46,6 +46,8 @@ averagingModel dense;//dilute;//
 
 clockModel off;//standardClock;//
 
+smoothingModel off;
+
 forceModels
 (
     KochHillDrag

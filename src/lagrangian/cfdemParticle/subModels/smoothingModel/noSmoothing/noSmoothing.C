@@ -27,80 +27,61 @@ License
 Description
     This code is designed to realize coupled CFD-DEM simulations using LIGGGHTS
     and OpenFOAM(R). Note: this code is not part of OpenFOAM(R) (see DISCLAIMER).
-
-    cloud class managing DEM data for CFD-DEM coupling and IB representation
-
-Class
-    Foam::cfdemCloudIB derived from cfdemCloud
-
-SourceFiles
-    cfdemCloudIB.C
-
 \*---------------------------------------------------------------------------*/
 
-#ifndef cfdemCloudIB_H
-#define cfdemCloudIB_H
+#include "error.H"
 
-#include "cfdemCloud.H"
+#include "noSmoothing.H"
+#include "addToRunTimeSelectionTable.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-/*---------------------------------------------------------------------------*\
-                           Class cfdemCloudIB Declaration
-\*---------------------------------------------------------------------------*/
+// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-class cfdemCloudIB
+defineTypeNameAndDebug(noSmoothing, 0);
+
+addToRunTimeSelectionTable
+(
+    smoothingModel,
+    noSmoothing,
+    dictionary
+);
+
+// * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
+
+// Construct from components
+noSmoothing::noSmoothing
+(
+    const dictionary& dict,
+    cfdemCloud& sm
+)
 :
-    public cfdemCloud
+    smoothingModel(dict,sm)
+{}
+
+// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
+
+noSmoothing::~noSmoothing()
+{}
+
+
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+void Foam::noSmoothing::smoothen(volScalarField& field) const
 {
-protected:
+    field=field.oldTime();    
+}
 
-    mutable double **angularVelocities_;
-
-public:
-
-    // Constructors
-
-        //- Construct from components
-        cfdemCloudIB
-        (
-            const fvMesh& mesh
-        );
-
-    // Destructor
-
-        ~cfdemCloudIB();
-
-
-    // Member Functions
-        void getDEMdata();
-
-        bool reAllocArrays() const;
-    
-        bool evolve();
-
-        void calcVelocityCorrection(volScalarField&,volVectorField&,volScalarField&,volScalarField&); // this could be moved to an IB mom couple model
-
-      // Access
-        vector angularVelocity(int);
-
-        inline double ** angularVelocities() const
-        {
-            return angularVelocities_;
-        };
-
-};
-
+void Foam::noSmoothing::smoothen(volVectorField& field) const
+{
+    field=field.oldTime();   
+}
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#endif
 
 // ************************************************************************* //

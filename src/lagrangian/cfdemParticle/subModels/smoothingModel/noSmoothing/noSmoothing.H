@@ -28,20 +28,18 @@ Description
     This code is designed to realize coupled CFD-DEM simulations using LIGGGHTS
     and OpenFOAM(R). Note: this code is not part of OpenFOAM(R) (see DISCLAIMER).
 
-    cloud class managing DEM data for CFD-DEM coupling and IB representation
-
 Class
-    Foam::cfdemCloudIB derived from cfdemCloud
+    noSmoothing
 
 SourceFiles
-    cfdemCloudIB.C
+    noSmoothing.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef cfdemCloudIB_H
-#define cfdemCloudIB_H
+#ifndef noSmoothing_H
+#define noSmoothing_H
 
-#include "cfdemCloud.H"
+#include "smoothingModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -49,49 +47,38 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class cfdemCloudIB Declaration
+                           Class noSmoothing Declaration
 \*---------------------------------------------------------------------------*/
 
-class cfdemCloudIB
+class noSmoothing
 :
-    public cfdemCloud
+    public smoothingModel
 {
-protected:
-
-    mutable double **angularVelocities_;
 
 public:
+
+    //- Runtime type information
+    TypeName("off");
+
 
     // Constructors
 
         //- Construct from components
-        cfdemCloudIB
+        noSmoothing
         (
-            const fvMesh& mesh
+            const dictionary& dict,
+            cfdemCloud& sm
         );
 
     // Destructor
 
-        ~cfdemCloudIB();
+        ~noSmoothing();
 
 
     // Member Functions
-        void getDEMdata();
+        void smoothen(volScalarField&) const;
 
-        bool reAllocArrays() const;
-    
-        bool evolve();
-
-        void calcVelocityCorrection(volScalarField&,volVectorField&,volScalarField&,volScalarField&); // this could be moved to an IB mom couple model
-
-      // Access
-        vector angularVelocity(int);
-
-        inline double ** angularVelocities() const
-        {
-            return angularVelocities_;
-        };
-
+        void smoothen(volVectorField&) const;
 };
 
 
