@@ -84,7 +84,8 @@ voidFractionModel::voidFractionModel
         dimensionedScalar("zero", dimensionSet(0,0,0,0,0), 1)*/
     ),
     cellsPerParticle_(NULL),
-    maxCellsPerParticle_(1)
+    maxCellsPerParticle_(1),
+    weight_(1.)
 {
     particleCloud_.dataExchangeM().allocateArray(cellsPerParticle_,1,maxCellsPerParticle_);
 }

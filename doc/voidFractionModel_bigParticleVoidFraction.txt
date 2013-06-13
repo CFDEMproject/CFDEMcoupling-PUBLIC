@@ -17,11 +17,13 @@ bigParticleProps
     maxCellsPerParticle number1;
     alphaMin number2;
     scaleUpVol number3;
+    weight number4;
 \} :pre
 
 {number1} = max number of cells covered by a partilce (search will fail when more than {number1} cells are covered by the particle) :ulb,l
 {number2} = mininmum limit for voidfraction :l
 {number3} = diameter of the particle's representation is artificially increased according to {number3} * Vparticle, volume remains unaltered! :l
+{number4} = scaling of the particle volume to account for porosity or agglomerations. :l
 :ule
 
 [Examples:]
@@ -32,6 +34,7 @@ bigParticleProps
     maxCellsPerParticle 1000;
     alphaMin 0.10;
     scaleUpVol 5.0;
+    weight 1.;
 \} :pre
 
 [Description:]
@@ -40,7 +43,9 @@ The bigParticle voidFraction model is supposed to be used when a particle (or it
 
 The region of influence of a particle can be increased artificially by "scaleUpVol", which  blows up the particles, but keeps their volume (for voidfraction calculation) constant.
 
-Code of this sub-model contributed by Alice Hager, JKU.  
+The particle volume occupied in the CFD domain can be adjusted by the parameter "weight", using Vparticle=dsphere^3*pi/6*weight.
+
+Parts of this sub-model contributed by Alice Hager, JKU.  
 
 [Restrictions:] none.
 

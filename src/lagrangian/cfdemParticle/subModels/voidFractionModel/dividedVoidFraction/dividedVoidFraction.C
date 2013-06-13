@@ -80,6 +80,8 @@ dividedVoidFraction::dividedVoidFraction
         Warning << "interpolation for dividedVoidFraction does not yet work correctly!" << endl;
         Info << "Using interpolated voidfraction field - do not use this in combination with interpolation in drag model!"<< endl;
     }
+    if (propsDict_.found("weight"))
+        setWeight(readScalar(propsDict_.lookup("weight")));
 }
 
 
@@ -116,7 +118,7 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
             position = particleCloud_.position(index);
             cellID = particleCloud_.cellIDs()[index][0];
             radius = particleCloud_.radii()[index][0];
-            scalar volume =  4./3.*radius*radius*radius*3.1415;
+            scalar volume =  4./3.*radius*radius*radius*3.1415*weight();
             radius = radius*pow(scaleUpVol_,1/3);
             cellVol=0;
 

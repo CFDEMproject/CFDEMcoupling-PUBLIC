@@ -437,7 +437,8 @@ bool Foam::cfdemCloud::evolve
             averagingM().resetVectorAverage(forceM(0).impParticleForces(),forceM(0).impParticleForces(),true);
             averagingM().resetVectorAverage(forceM(0).expParticleForces(),forceM(0).expParticleForces(),true);
             averagingM().resetWeightFields();
-            momCoupleM(0).resetMomSourceField();
+            for (int i=0;i<momCoupleModels_.size(); i++)
+                momCoupleM(i).resetMomSourceField();
             if(verbose_) Info << "resetVolFields done." << endl;
             clockM().stop("resetVolFields");
 

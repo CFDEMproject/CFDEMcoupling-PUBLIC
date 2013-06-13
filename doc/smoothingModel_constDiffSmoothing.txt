@@ -16,12 +16,13 @@ constDiffSmoothingProps
 \{
     lowerLimit number1;
     upperLimit number2;
-    DT number3;
+    smoothingLength lengthScale;
 \} :pre
 
 {number1} = scalar fields will be bound to this lower value :ulb,l
 {number2} = scalar fields will be bound to this upper value :l
-{number3} = diffusion constant :l
+{lengthScale} = length scale over which the exchange fields will be smoothed out :l
+:ule
 
 [Examples:]
 
@@ -29,14 +30,16 @@ constDiffSmoothingProps
 \{
     lowerLimit 0.1;
     upperLimit 1e10;
-    DT 1e-3;
+    smoothingLength 1500e-6;
 \} :pre
 
 [Description:]
 
-The "constDiffSmoothing" model is a basic smoothingModel model which reads a diffusion coefficient being used for smoothening the exchange fields (voidfraction, Ksl, f if present).
+The "constDiffSmoothing" model is a basic smoothingModel model which reads a smoothing length scale being used for smoothening the exchange fields (voidfraction, Ksl, f if present). This model can be used for smoothing explicit force coupling fields, as well as implicit fource coupling algorithms
+(see solver "cfdemSolverPisoImEx").
 
-[Restrictions:] none.
+[Restrictions:] Should be used for monodisperse cases only. 
+Time derivatives of the voidfraction field are calculated incorrectly, so don't use them in your solver when smoothing is applied.
 
 [Related commands:]
 

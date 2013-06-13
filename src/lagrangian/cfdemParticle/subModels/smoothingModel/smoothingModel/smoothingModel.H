@@ -101,9 +101,16 @@ public:
 
     // Member Functions
 
+        virtual bool doSmoothing() const;
+
+        // the particle diameter for smoothing
+        virtual void dSmoothing(volScalarField&) const;
+
         virtual void smoothen(volScalarField&) const=0;
 
         virtual void smoothen(volVectorField&) const=0;
+
+        virtual void smoothenReferenceField(volVectorField&) const=0;
 };
 
 

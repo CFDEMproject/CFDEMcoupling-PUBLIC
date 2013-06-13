@@ -6,6 +6,8 @@
                                 Christoph Goniva, christoph.goniva@cfdem.com
                                 Copyright 2009-2012 JKU Linz
                                 Copyright 2012-     DCS Computing GmbH, Linz
+                                Copyright (C) 2013-     Graz University of  
+                                                        Technology, IPPT
 -------------------------------------------------------------------------------
 License
     This file is part of CFDEMcoupling.
@@ -60,7 +62,8 @@ private:
     dictionary propsDict_;
     scalar lowerLimit_;
     scalar upperLimit_;
-    dimensionedScalar DT_;
+    dimensionedScalar smoothingLength_;
+    mutable dimensionedScalar DT_;
 
 public:
 
@@ -83,9 +86,16 @@ public:
 
 
     // Member Functions
+        bool doSmoothing() const;
+
+        void dSmoothing(volScalarField&) const;
+        
         void smoothen(volScalarField&) const;
 
         void smoothen(volVectorField&) const;
+
+        void smoothenReferenceField(volVectorField&) const;
+
 };
 
 

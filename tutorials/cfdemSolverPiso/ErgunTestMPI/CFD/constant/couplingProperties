@@ -51,13 +51,15 @@ smoothingModel off;
 forceModels
 (
     //GidaspowDrag
-    DiFeliceDrag
-    //KochHillDrag
+    //BeetstraDrag
+    //DiFeliceDrag
+    KochHillDrag
     gradPForce
     viscForce
     //Archimedes
     //volWeightedAverage
     //totalMomentumExchange
+    particleCellVolume
 );
 
 momCoupleModels
@@ -137,10 +139,32 @@ KochHillDragProps
     voidfractionFieldName "voidfraction";
 }
 
+BeetstraDragProps
+{
+    velFieldName "U";
+    densityFieldName "rho";
+    gravityFieldName "g";
+    rhoParticle     2000.;
+    voidfractionFieldName "voidfraction";
+    interpolation ;
+    useFilteredDragModel ;
+    useParcelSizeDependentFilteredDrag ;
+    k       0.05;
+    aLimit  0.0;
+//    verbose ;
+}
+
 virtualMassForceProps
 {
     velFieldName "U";
     densityFieldName "rho";
+}
+
+particleCellVolumeProps
+{
+    upperThreshold 0.999;
+    lowerThreshold 0.;
+    verbose;
 }
 
 oneWayVTKProps
@@ -174,7 +198,7 @@ turboEngineM2MProps
 
 dividedProps
 {
-    alphaMin 0.1;
+    alphaMin 0.01;
     scaleUpVol 1.0;
 }
 

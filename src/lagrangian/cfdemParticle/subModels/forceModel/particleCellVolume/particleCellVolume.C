@@ -31,9 +31,10 @@ Description
 
 #include "error.H"
 
-#include "noSmoothing.H"
+#include "particleCellVolume.H"
 #include "addToRunTimeSelectionTable.H"
-
+#include "dataExchangeModel.H"
+#include "mpi.h"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -41,49 +42,104 @@ namespace Foam
 
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
-defineTypeNameAndDebug(noSmoothing, 0);
+defineTypeNameAndDebug(particleCellVolume, 0);
 
 addToRunTimeSelectionTable
 (
-    smoothingModel,
-    noSmoothing,
+    forceModel,
+    particleCellVolume,
     dictionary
 );
+
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 // Construct from components
-noSmoothing::noSmoothing
+particleCellVolume::particleCellVolume
 (
     const dictionary& dict,
     cfdemCloud& sm
 )
 :
-    smoothingModel(dict,sm)
-{}
+    forceModel(dict,sm),
+    propsDict_(dict.subDict(typeName + "Props")),
+    mesh_(particleCloud_.mesh()),
+    startTime_(0.),
+    scalarFieldName_("voidfraction"),
+    scalarField_
+    (   
+        IOobject
+        (
+            "particleCellVolume",
+            mesh_.time().timeName(),
+            mesh_,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh_,
+        dimensionedScalar("zero", dimensionSet(0,0,0,0,0), 0)
+    ),
+    upperThreshold_(readScalar(propsDict_.lookup("upperThreshold"))),
+    lowerThreshold_(readScalar(propsDict_.lookup("lowerThreshold"))),
+    verbose_(false)
+{
+    if (propsDict_.found("startTime")){
+        startTime_=readScalar(propsDict_.lookup("startTime"));
+    }
+
+    if (propsDict_.found("verbose")){
+        verbose_ = true;
+    }
+}
+
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
-noSmoothing::~noSmoothing()
+particleCellVolume::~particleCellVolume()
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void Foam::noSmoothing::smoothen(volScalarField& field) const
+void particleCellVolume::setForce() const
 {
-    field=field.oldTime();    
+    if(mesh_.time().value() >= startTime_)
+    {
+        if(verbose_) Info << "particleCellVolume.C - setForce()" << endl;
+
+        scalarField_.internalField()=0.;
+
+        // get reference to actual field
+        volScalarField& field = (volScalarField&) mesh_.lookupObject<volScalarField>(scalarFieldName_);
+
+        scalar fieldValue=-1;
+        scalar cellVol=-1;
+
+        forAll(field,cellI)
+        {
+            fieldValue = field[cellI];
+            if(fieldValue < upperThreshold_ && fieldValue > lowerThreshold_)
+            {
+                cellVol = mesh_.V()[cellI];
+                scalarField_[cellI] = (1-fieldValue) * cellVol;
+            }
+            else
+            {
+                scalarField_[cellI] = 0.;
+            }
+        }
+        scalarField_.internalField() = gSum(scalarField_);
+
+        if(verbose_)
+        {
+           Info << "calculated integral of field: " << scalarFieldName_
+                << " = " << scalarField_[0]
+                << ",\n considering cells where the field < " << upperThreshold_
+                << ", and > " << lowerThreshold_ << endl;
+        }
+    }// end if time >= startTime_
 }
 
-void Foam::noSmoothing::smoothen(volVectorField& field) const
-{
-    field=field.oldTime();   
-}
-
-void Foam::noSmoothing::smoothenReferenceField(volVectorField& field) const
-{
-    field=field.oldTime();   
-}
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

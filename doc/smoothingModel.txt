@@ -18,13 +18,15 @@ model = name of the smoothingModel to be applied :ul
 [Examples:]
 
 smoothingModel off; :pre
+smoothingModel  constDiffSmoothing; :pre
+smoothingModel  localPSizeDiffSmoothing; :pre
 
 Note: This examples list might not be complete - please look for other models (smoothingModel_XY) in this documentation.
 
 [Description:]
 
-The smoothingModel is the base class for models smoothen the exchange fields.
+The smoothingModel is the base class for models that smoothen the exchange fields (i.e., voidfraction and the Ksl field in case of implicit force coupling). This is relevant in case one uses a small grid resolution compared to the local particle diameter (or parcel diameter in case one uses a parcel approach).
 
-[Restrictions:] none.
+[Restrictions:] These models are in beta testing.
 
 [Default:] none.

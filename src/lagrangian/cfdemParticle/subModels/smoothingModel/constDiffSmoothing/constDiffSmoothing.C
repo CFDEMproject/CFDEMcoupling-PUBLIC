@@ -6,6 +6,8 @@
                                 Christoph Goniva, christoph.goniva@cfdem.com
                                 Copyright 2009-2012 JKU Linz
                                 Copyright 2012-     DCS Computing GmbH, Linz
+                                Copyright (C) 2013-     Graz University of  
+                                                        Technology, IPPT
 -------------------------------------------------------------------------------
 License
     This file is part of CFDEMcoupling.
@@ -63,8 +65,11 @@ constDiffSmoothing::constDiffSmoothing
     propsDict_(dict.subDict(typeName + "Props")),
     lowerLimit_(readScalar(propsDict_.lookup("lowerLimit"))),
     upperLimit_(readScalar(propsDict_.lookup("upperLimit"))),
-    DT_(dimensionedScalar("DT",dimensionSet(0,2,-1,0,0,0,0),readScalar(propsDict_.lookup("DT"))))
-{}
+    smoothingLength_(dimensionedScalar("smoothingLength",dimensionSet(0,1,0,0,0,0,0), readScalar(propsDict_.lookup("smoothingLength")))),
+    DT_("DT", dimensionSet(0,2,-1,0,0), 0.)
+{
+
+}
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
@@ -73,9 +78,39 @@ constDiffSmoothing::~constDiffSmoothing()
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+bool constDiffSmoothing::doSmoothing() const
+{
+    return true;
+}
+
+void constDiffSmoothing::dSmoothing(volScalarField& dSmooth) const
+{
+    
+    tmp<volScalarField> dSmooth0
+    (
+        new volScalarField
+        (
+            IOobject
+            (
+                "dSmooth",
+                particleCloud_.mesh().time().timeName(),
+                particleCloud_.mesh(),
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            ),
+            particleCloud_.mesh(),
+            smoothingLength_
+        )
+    );
+
+    dSmooth.internalField() = dSmooth0;             
+}
 
 void Foam::constDiffSmoothing::smoothen(volScalarField& field) const
 {
+    double deltaT = field.mesh().time().deltaTValue();
+    DT_.value() = smoothingLength_.value() * smoothingLength_.value() / deltaT;
+
     // do smoothing
     solve
     (
@@ -89,15 +124,63 @@ void Foam::constDiffSmoothing::smoothen(volScalarField& field) const
         field[cellI]=max(lowerLimit_,min(upperLimit_,field[cellI]));
     }  
 }
-
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 void Foam::constDiffSmoothing::smoothen(volVectorField& field) const
 {
+    double deltaT = field.mesh().time().deltaTValue();
+    DT_.value() = smoothingLength_.value() * smoothingLength_.value() / deltaT;
+
     // do smoothing
     solve
     (
         fvm::ddt(field)
        -fvm::laplacian(DT_, field)
     );  
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+void Foam::constDiffSmoothing::smoothenReferenceField(volVectorField& field) const
+{
+    dimensionedScalar deltaT =  particleCloud_.mesh().time().deltaT();
+    DT_.value() = smoothingLength_.value() * smoothingLength_.value() / deltaT.value();
+
+     tmp<volScalarField> NLarge
+    (
+        new volScalarField
+        (
+            IOobject
+            (
+                "xxx",
+                particleCloud_.mesh().time().timeName(),
+                particleCloud_.mesh(),
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            ),
+            particleCloud_.mesh(),
+            0.0
+        )
+    );
+
+
+    //loop over particles and map max particle diameter to Euler Grid
+    for(int cellI = 0; cellI <  field.mesh().nCells(); cellI++)
+    {
+            if ( mag(field.internalField()[cellI]) > 0)  // have a vector in the field, so keep it!
+            {
+                  NLarge()[cellI] = 1e5;  //use large value here to keep cell values constant
+            }
+    }
+
+    // do smoothing
+    fvVectorMatrix dSmoothEqn
+    (
+        fvm::ddt(field) == fvm::laplacian( DT_, field) 
+                                       +  NLarge() / deltaT * field.oldTime() //add source to keep cell values constant
+                                       - fvm::Sp( NLarge() / deltaT, field)     //add sink to keep cell values constant
+    );
+   dSmoothEqn.solve();
+
+
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

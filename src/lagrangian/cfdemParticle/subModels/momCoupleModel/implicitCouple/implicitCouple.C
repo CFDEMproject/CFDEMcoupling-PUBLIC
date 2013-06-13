@@ -150,7 +150,7 @@ tmp<volScalarField> implicitCouple::impMomSource() const
         {
             Ur = mag(U_[cellI] - Us_[cellI]);
 
-            if(Ur > 0. && (1.-alpha_[cellI]) > SMALL) //momentum exchange switched off if alphaMin=1
+            if(Ur > SMALL && (1.-alpha_[cellI]) > SMALL) //momentum exchange switched off if alphaMin=1
             {
                 KslNext_[cellI] = mag(particleCloud_.forceM(0).impParticleForces()[cellI])
                             / Ur

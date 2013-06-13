@@ -19,6 +19,7 @@ dividedProps
     alphaMin number1;
     scaleUpVol number2;
     interpolation;
+    weight number3;
 } 
 </PRE>
 <UL><LI><I>number1</I> = mininmum limit for voidfraction 
@@ -26,6 +27,8 @@ dividedProps
 <LI><I>number2</I> = diameter of the particle's representation is artificially increased according to <I>number2</I> * Vparticle, volume remains unaltered! 
 
 <LI><I>interpolation</I> = flag to interpolate voidfraction to particle positions (normally off) 
+
+<LI><I>number3</I> = scaling of the particle volume to account for porosity or agglomerations. 
 
 
 </UL>
@@ -36,6 +39,7 @@ dividedProps
 {
     alphaMin 0.2;
     scaleUpVol 1.0;
+    weight 1.;
 } 
 </PRE>
 <P><B>Description:</B>
@@ -43,6 +47,8 @@ dividedProps
 <P>The divided voidFraction model is supposed to be used when a particle (or it's representation) is in the size range of a CFD cell. Satellite points are used to divide the particle's volume to the touched cells.
 </P>
 <P>The region of influence of a particle can be increased artificially by "scaleUpVol", which  blows up the particles, but keeps their volume (for voidfraction calculation) constant.
+</P>
+<P>The particle volume occupied in the CFD domain can be adjusted by the parameter "weight", using Vparticle=dsphere^3*pi/6*weight.
 </P>
 <P><B>Restrictions:</B> none.
 </P>

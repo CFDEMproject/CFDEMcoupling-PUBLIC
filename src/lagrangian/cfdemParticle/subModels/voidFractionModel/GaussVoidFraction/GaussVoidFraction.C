@@ -76,6 +76,8 @@ GaussVoidFraction::GaussVoidFraction
 
     if(scaleUpVol_ < 1){ FatalError<< "scaleUpVol shloud be > 1."<< abort(FatalError); }
     if(alphaMin_ > 1 || alphaMin_ < 0.01){ FatalError<< "alphaMin shloud be > 1 and < 0.01." << abort(FatalError); }
+    if (propsDict_.found("weight"))
+        setWeight(readScalar(propsDict_.lookup("weight")));
 }
 
 
@@ -111,7 +113,7 @@ void GaussVoidFraction::setvoidFraction(double** const& mask,double**& voidfract
             scalar radius =  particleCloud_.radii()[index][0];
               //Info << "physical radius" << radius  << endl;
 
-            scalar volume = 4./3.*radius*radius*radius*pi;
+            scalar volume = 4./3.*radius*radius*radius*pi*weight();
             radius = radius*pow(scaleUpVol_,0.3333);
               //Info << "fictuous radius" << radius  << endl;
             vector positionCenter=particleCloud_.position(index);

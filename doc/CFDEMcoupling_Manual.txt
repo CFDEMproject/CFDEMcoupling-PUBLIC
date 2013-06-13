@@ -238,6 +238,7 @@ listing below of styles within certain commands.
 "forceModel_ShirgaonkarIB"_forceModel_ShirgaonkarIB.html,
 "forceModel_gradPForce"_forceModel_gradPForce.html,
 "forceModel_noDrag"_forceModel_noDrag.html,
+"forceModel_particleCellVolume"_forceModel_particleCellVolume.html,
 "forceModel_virtualMassForce"_forceModel_virtualMassForce.html,
 "forceModel_viscForce"_forceModel_viscForce.html,
 "liggghtsCommandModel"_liggghtsCommandModel.html,

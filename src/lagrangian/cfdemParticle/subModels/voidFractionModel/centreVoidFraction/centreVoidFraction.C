@@ -65,7 +65,9 @@ centreVoidFraction::centreVoidFraction
     alphaMin_(readScalar(propsDict_.lookup("alphaMin"))),
     alphaLimited_(0)
 {
-Info << "centreVoidFraction constructor done" << endl;
+    Info << "centreVoidFraction constructor done" << endl;
+    if (propsDict_.found("weight"))
+        setWeight(readScalar(propsDict_.lookup("weight")));
 }
 
 
@@ -95,7 +97,7 @@ void centreVoidFraction::setvoidFraction(double** const& mask,double**& voidfrac
             {
                 scalar ds = 2*particleCloud_.radii()[index][0];
                 scalar cellVolume=voidfractionNext_.mesh().V()[cellI];
-                scalar particleVolume= ds*ds*ds/6.*3.1415;
+                scalar particleVolume= ds*ds*ds/6.*3.1415*weight();
 
                 // store particleVolume for each particle
                 particleVolumes[index][0] = particleVolume;

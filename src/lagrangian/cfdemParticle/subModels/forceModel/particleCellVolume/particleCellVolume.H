@@ -28,119 +28,72 @@ Description
     This code is designed to realize coupled CFD-DEM simulations using LIGGGHTS
     and OpenFOAM(R). Note: this code is not part of OpenFOAM(R) (see DISCLAIMER).
 
-    Gaussian distributed particle voidfraction model
-    contribution from RQ
-
+    calc volume of the particles from the voidfraction field
 Class
-    voidFractionModel
+    particleCellVolume
 
 SourceFiles
-    voidFractionModel.C
+    particleCellVolume.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef voidFractionModel_H
-#define voidFractionModel_H
+#ifndef particleCellVolume_H
+#define particleCellVolume_H
 
-#include "fvCFD.H"
-#include "cfdemCloud.H"
+#include "forceModel.H"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class voidFractionModel Declaration
+                           Class particleCellVolume Declaration
 \*---------------------------------------------------------------------------*/
 
-class voidFractionModel
+class particleCellVolume
+:
+    public forceModel
 {
+private:
 
-protected:
+    dictionary propsDict_;
 
-    // Protected data
-        const dictionary& dict_;
+    const fvMesh& mesh_;
 
-        cfdemCloud& particleCloud_;
+    scalar startTime_;
 
-        mutable volScalarField voidfractionPrev_;
+    const word scalarFieldName_;
 
-        mutable volScalarField voidfractionNext_;
+    mutable volScalarField scalarField_;
 
-        mutable double ** cellsPerParticle_;
+    mutable scalar upperThreshold_;
 
-        int maxCellsPerParticle_;
+    mutable scalar lowerThreshold_;
 
-        mutable scalar weight_;
-
-    // Protected member functions
+    Switch verbose_;
 
 public:
 
     //- Runtime type information
-    TypeName("voidFractionModel");
-
-    // Declare runtime constructor selection table
-
-        declareRunTimeSelectionTable
-        (
-            autoPtr,
-            voidFractionModel,
-            dictionary,
-            (
-                const dictionary& dict,
-                cfdemCloud& sm
-            ),
-            (dict,sm)
-        );
+    TypeName("particleCellVolume");
 
 
     // Constructors
 
         //- Construct from components
-        voidFractionModel
+        particleCellVolume
         (
             const dictionary& dict,
             cfdemCloud& sm
         );
-
 
     // Destructor
 
-        virtual ~voidFractionModel();
+        ~particleCellVolume();
 
 
-    // Selector
-
-        static autoPtr<voidFractionModel> New
-        (
-            const dictionary& dict,
-            cfdemCloud& sm
-        );
-
-
-    // public member functions
-        virtual void setvoidFraction(double** const&,double**&,double**&,double**&) const = 0;
-
-        tmp<volScalarField> voidFractionInterp() const;
-
-        inline volScalarField& voidFractionPrev()const { return voidfractionPrev_; }
-
-        inline volScalarField& voidFractionNext()const { return voidfractionNext_; }
-
-        inline void setWeight(scalar weight)const { weight_ = weight; }
-
-        inline scalar weight()const { return weight_; }
-
-        void resetVoidFractions() const;
-
-        //void undoVoidFractions(double**const&) const;
-
-        double** const& cellsPerParticle() const;
-
-        int maxCellsPerParticle() const;
-
-        void reAllocArrays() const;
+    // Member Functions
+        void setForce() const;
 };
 
 

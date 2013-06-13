@@ -14,10 +14,12 @@ Defined in couplingProperties dictionary.
 voidfractionModel centre;
 centreProps
 \{
-    alphaMin value;
+    alphaMin number1;
+    weight number2;
 \} :pre
 
-{value} = mininmum limit for voidfraction :ulb,l
+{number1} = mininmum limit for voidfraction :ulb,l
+{number2} = scaling of the particle volume to account for porosity or agglomerations. :l
 :ule
 
 [Examples:]
@@ -26,11 +28,14 @@ voidfractionModel centre;
 centreProps
 \{
     alphaMin 0.1;
+    weight 1.;
 \} :pre
 
 [Description:]
 
 The centre voidFraction model calculates the voidfraction in a CFD cell accounting for the volume of the particles whose centres are inside the cell.
+
+The particle volume occupied in the CFD domain can be adjusted by the parameter "weight", using Vparticle=dsphere^3*pi/6*weight.
 
 [Restrictions:] none.
 

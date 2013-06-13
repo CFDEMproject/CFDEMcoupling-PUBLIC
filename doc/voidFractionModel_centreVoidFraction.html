@@ -16,10 +16,13 @@
 <PRE>voidfractionModel centre;
 centreProps
 {
-    alphaMin value;
+    alphaMin number1;
+    weight number2;
 } 
 </PRE>
-<UL><LI><I>value</I> = mininmum limit for voidfraction 
+<UL><LI><I>number1</I> = mininmum limit for voidfraction 
+
+<LI><I>number2</I> = scaling of the particle volume to account for porosity or agglomerations. 
 
 
 </UL>
@@ -29,11 +32,14 @@ centreProps
 centreProps
 {
     alphaMin 0.1;
+    weight 1.;
 } 
 </PRE>
 <P><B>Description:</B>
 </P>
 <P>The centre voidFraction model calculates the voidfraction in a CFD cell accounting for the volume of the particles whose centres are inside the cell.
+</P>
+<P>The particle volume occupied in the CFD domain can be adjusted by the parameter "weight", using Vparticle=dsphere^3*pi/6*weight.
 </P>
 <P><B>Restrictions:</B> none.
 </P>

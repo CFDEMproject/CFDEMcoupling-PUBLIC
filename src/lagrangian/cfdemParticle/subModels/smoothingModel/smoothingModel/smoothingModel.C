@@ -69,6 +69,17 @@ Foam::smoothingModel::~smoothingModel()
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+bool smoothingModel::doSmoothing() const
+{
+    return false;
+}
+
+void smoothingModel::dSmoothing(volScalarField& dSmooth) const
+{
+    dSmooth *= 0.0;
+}
+
 } // End namespace Foam
 
 // ************************************************************************* //
