@@ -94,6 +94,12 @@ gradPForce::gradPForce
         useRho_ = true;
 
     particleCloud_.checkCG(true);
+
+    particleCloud_.probeM().initialize(typeName, "gradP.logDat");
+    particleCloud_.probeM().vectorFields_.append("gradPForce"); //first entry must the be the force
+    particleCloud_.probeM().scalarFields_.append("Vs");
+    particleCloud_.probeM().scalarFields_.append("rho");
+    particleCloud_.probeM().writeHeader();
 }
 
 
@@ -127,6 +133,7 @@ void gradPForce::setForce() const
 
     interpolationCellPoint<vector> gradPInterpolator_(gradPField);
 
+    #include "setupProbeModel.H"
 
     for(int index = 0;index <  particleCloud_.numberOfParticles(); index++)
     {
@@ -162,6 +169,16 @@ void gradPForce::setForce() const
                     Info << "index = " << index << endl;
                     Info << "gradP = " << gradP << endl;
                     Info << "force = " << force << endl;
+                }
+
+                //Set value fields and write the probe
+                if(probeIt_)
+                {
+                    #include "setupProbeModelfields.H"
+                    vValues.append(force);           //first entry must the be the force
+                    sValues.append(Vs);
+                    sValues.append(rho);
+                    particleCloud_.probeM().writeProbe(index, sValues, vValues);
                 }
             }
 

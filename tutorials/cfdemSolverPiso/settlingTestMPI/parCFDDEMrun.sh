@@ -10,7 +10,7 @@
 . ~/.bashrc
 
 #- include functions
-source $CFDEM_SRC_DIR/etc/functions.sh
+source $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/functions.sh
 
 #--------------------------------------------------------------------------------#
 #- define variables
@@ -24,6 +24,7 @@ machineFileName="none"   # yourMachinefileName | none
 debugMode="off"          # on | off| strict
 testHarnessPath="$CFDEM_TEST_HARNESS_PATH"
 runOctave="true"
+cleanCase="true"
 postproc="false"
 #--------------------------------------------------------------------------------#
 
@@ -63,7 +64,7 @@ if [ $postproc == "true" ]
     #- get VTK data from CFD sim
     cd $casePath/CFD
     foamToVTK                                                   #- serial run of foamToVTK
-    #source $CFDEM_SRC_DIR/etc/functions.sh                       #- include functions
+    #source $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/functions.sh                       #- include functions
     #pseudoParallelRun "foamToVTK" $nrPostProcProcessors          #- pseudo parallel run of foamToVTK
 
     #- start paraview
@@ -76,21 +77,17 @@ if [ $postproc == "true" ]
 fi
 
 #- clean up case
-echo "deleting data at: $casePath :\n"
-rm -r $casePath/CFD/0.*
-rm -r $casePath/CFD/callgrind.*
-rm -r $casePath/CFD/*.out
-rm -r $casePath/CFD/log.*
-rm -r $casePath/CFD/octave/octave-core
-rm -r $casePath/CFD/VTK
-rm -r $casePath/CFD/processor*
-rm -r $casePath/CFD/couplingFiles/*
-rm -r $casePath/DEM/post/*
-rm -r $casePath/DEM/log.*
-rm -r $casePath/CFD/probes
-rm -r $casePath/CFD/lagrangian
-rm -r $casePath/CFD/clockData
-echo "done"
+if [ $cleanCase == "true" ]
+  then
+    echo "deleting data at: $casePath :\n"
+    source $WM_PROJECT_DIR/bin/tools/CleanFunctions
+    cd $casePath/CFD
+    cleanCase
+    cd $casePath
+    rm -r $casePath/CFD/clockData
+    rm -r $casePath/DEM/post/*
+    echo "done"
+fi
 
 #- preserve post directory
 echo "dummyfile" >> $casePath/DEM/post/dummy

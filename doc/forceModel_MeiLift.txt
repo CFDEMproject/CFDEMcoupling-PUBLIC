@@ -19,10 +19,16 @@ MeiLiftProps
 \{
     velFieldName "U";
     densityFieldName "density";
+    useSecondOrderTerms;
+    interpolation;
+    verbose;
 \}; :pre
 
 {U} = name of the finite volume fluid velocity field :ulb,l
 {density} = name of the finite volume fluid density field :l
+{useSecondOrderTerms} = switch to activate second order terms in the lift force model :l
+{interpolation} = switch to activate tri-linear interpolation of the flow quantities at the particle position :l
+{verbose} = switch to activate the report of per-particle quantities to the screen :l
 :ule
 
 [Examples:]
@@ -35,11 +41,14 @@ MeiLiftProps
 \{
     velFieldName "U";
     densityFieldName "rho";
+    useSecondOrderTerms;
+    interpolation;
+    verbose;
 \} :pre
 
 [Description:]
 
-The force model performs the calculation of forces (e.g. fluid-particle interaction forces) acting on each DEM particle. The MeiLift model calculates the lift force for each particle based on Loth and Dorgan (2009)
+The force model performs the calculation of forces (e.g. fluid-particle interaction forces) acting on each DEM particle. The MeiLift model calculates the lift force for each particle based on Loth and Dorgan (2009). In case the keyword "useSecondOrderTerms" is not specified, this lift force model uses the expression of McLaughlin (1991, Journal of Fluid Mechanics 224:261-274).
 
 [Restrictions:]
 

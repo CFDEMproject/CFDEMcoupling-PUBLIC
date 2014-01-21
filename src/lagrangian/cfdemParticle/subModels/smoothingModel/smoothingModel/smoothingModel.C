@@ -75,9 +75,10 @@ bool smoothingModel::doSmoothing() const
     return false;
 }
 
-void smoothingModel::dSmoothing(volScalarField& dSmooth) const
+void smoothingModel::dSmoothing() const
 {
-    dSmooth *= 0.0;
+    // do nothing
+    //dSmooth *= 0.0;
 }
 
 } // End namespace Foam

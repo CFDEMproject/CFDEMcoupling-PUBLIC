@@ -69,7 +69,8 @@ liggghtsCommandModel::liggghtsCommandModel
     timeInterval_(0.),
     firstCouplingStep_(-1),
     lastCouplingStep_(-1),
-    couplingStepInterval_(0)
+    couplingStepInterval_(0),
+    exactTiming_(false)
 {}
 
 
@@ -182,6 +183,55 @@ string liggghtsCommandModel::addTimeStamp(word command)
     return string(command+add);
 }
 
+DynamicList<scalar> liggghtsCommandModel::executionsWithinPeriod(scalar TSstart,scalar TSend)
+{
+    Info << "liggghtsCommandModel::executionsWithinPeriod TSstart" << TSstart << endl;
+    Info << "liggghtsCommandModel::executionsWithinPeriod TSend" << TSend << endl;
+    Info << "startTime =" << startTime_ << endl;
+    Info << "endTime =" << endTime_ << endl;
+
+    // init exec times array
+    DynamicList<scalar> executions(0);
+
+    // current TS within active period
+    if(startTime_<TSend && endTime_>=TSstart )
+    {
+        Info << "working time within this TS" << endl;
+
+        // find first execution within TS (better routine with modulo)
+        int startNr = 0;
+        scalar t = startTime_ + startNr * timeInterval_;
+
+        if(timeInterval_ > SMALL)
+        {
+            while (TSend - t > SMALL)
+            {
+                t = startTime_ + startNr * timeInterval_;
+                startNr++;
+            }
+            t -= timeInterval_;
+        }
+        // check if first exec found within TS
+        if(TSstart <= t && t < TSend)
+        {
+            // check for more executions
+            while (t <= endTime_ && TSend - t > SMALL)
+            {
+                executions.append(t);
+                t += timeInterval_;
+            }
+        }
+        //else
+        //    Info << "liggghtsCommandModel::executionsWithinPeriod error???" << endl;     
+
+        // debug
+        Info << "liggghtsCommandModel::executionsWithinPeriod executions=" << executions << endl;
+    }
+
+    // return dummy
+
+    return executions;
+}
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam

@@ -40,6 +40,8 @@ regionModel allRegion;
 
 IOModel basicIO;
 
+probeModel off;
+
 dataExchangeModel twoWayMPI;
 
 averagingModel dense;//dilute;//

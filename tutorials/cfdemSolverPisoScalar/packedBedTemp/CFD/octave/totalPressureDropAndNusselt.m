@@ -29,7 +29,8 @@ fprintf('final pressure drop = %f Pa\n',dpErgun)
 %====================================%
 % simulation data
 %====================================%
-path = '../probes/0/p';
+%path = '../probes/0/p'; % 2.1.x
+path = '../postProcessing/probes/0/p'; % 2.2.x
 columns=3;
 headerlines=5;
 data = loaddata(path,columns,headerlines);
@@ -70,7 +71,8 @@ Tp = 600;
 Np = 1005;
 lambda = 0.0256;
 
-path = '../probes/0/T';
+%path = '../probes/0/T'; % 2.1.x
+path = '../postProcessing/probes/0/T'; % 2.2.x
 columns=3;
 headerlines=5;
 data = loaddata(path,columns,headerlines);

@@ -24,7 +24,7 @@ read
 echo "Make sure $HOME/.OpenFOAM/$WM_PROJECT_VERSION/controlDict is removed after this simulation."
 
 mkdir -p $FOAM_INST_DIR/.OpenFOAM//$WM_PROJECT_VERSION
-cp $CFDEM_SRC_DIR/etc/controlDict_cgs_$WM_PROJECT_VERSION $FOAM_INST_DIR/.OpenFOAM/$WM_PROJECT_VERSION/controlDict
+cp $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/controlDict_cgs_$WM_PROJECT_VERSION $FOAM_INST_DIR/.OpenFOAM/$WM_PROJECT_VERSION/controlDict
 
 #- run parallel CFD-DEM in new terminal
 gnome-terminal --title='cfdemSolverPiso ErgunTestMPI CFD'  -e "bash $casePath/parCFDDEMrun.sh" 

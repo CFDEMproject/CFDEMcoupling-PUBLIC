@@ -74,6 +74,11 @@ ArchimedesIB::ArchimedesIB
         g_(dimensionedVector(sm.mesh().lookupObject<IOdictionary>("environmentalProperties").lookup(gravityFieldName_)).value())
     #endif
 {
+    //Append the field names to be probed
+    particleCloud_.probeM().initialize(typeName, "archimedesIBF.logDat");
+    particleCloud_.probeM().vectorFields_.append("archimedesIBForce");  //first entry must the be the force
+    particleCloud_.probeM().writeHeader();  
+
     if (propsDict_.found("twoDimensional"))
     {
         twoDimensional_=true;
@@ -98,6 +103,9 @@ ArchimedesIB::~ArchimedesIB()
 void ArchimedesIB::setForce() const
 {
     vector force;
+
+    #include "setupProbeModel.H"
+
     for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
     {
         //if(mask[index][0])
@@ -112,6 +120,15 @@ void ArchimedesIB::setForce() const
                 	force += -g_.value()*rho_[cellI]*rho_.mesh().V()[cellI]*(1-voidfractions_[cellI]);//mod by alice
         	    }
             }
+
+            //Set value fields and write the probe
+            if(probeIt_)
+            {
+                #include "setupProbeModelfields.H"
+                vValues.append(force);           //first entry must the be the force
+                particleCloud_.probeM().writeProbe(index, sValues, vValues);
+            }
+
             // set force on particle
             if(twoDimensional_) Warning<<"ArchimedesIB model doesn't work for 2D right now!!\n"<< endl;
             if(!treatDEM_)

@@ -72,6 +72,19 @@ solvers
         tolerance       1e-05;
         relTol          0;
     }
+
+    voidfraction
+    {
+        solver          PCG;
+        preconditioner  DIC;
+        tolerance       1e-09;
+        relTol          1e-06;
+    }
+
+    Ksl
+    {
+        $voidfraction
+    }
 }
 
 PISO

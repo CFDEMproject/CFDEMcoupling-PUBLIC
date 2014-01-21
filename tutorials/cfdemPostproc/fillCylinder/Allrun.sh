@@ -9,7 +9,7 @@
 . ~/.bashrc
 
 #- include functions
-source $CFDEM_SRC_DIR/etc/functions.sh
+source $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/functions.sh
 
 #- define variables
 casePath="$(dirname "$(readlink -f ${BASH_SOURCE[0]})")"
@@ -86,7 +86,7 @@ fi
 #- clean up case
 echo "deleting data at: $casePath"
 rm -r $casePath/CFD/0.*
-rm -r $casePath/CFD/particles
+rm -r $casePath/CFD/lagrangian
 rm -r $casePath/CFD/VTK
 rm -r $casePath/DEM/post/*
 rm -r $casePath/DEM/log.*

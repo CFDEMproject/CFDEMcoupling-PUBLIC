@@ -6,6 +6,39 @@
 # Christoph Goniva - June. 2011, DCS Computing GmbH
 #===================================================================#
 
+#==================================#
+#- function to pull from a repo
+
+pullRepo()
+{
+    #--------------------------------------------------------------------------------#
+    #- define variables
+    logpath="$1"
+    logfileName="$2"
+    casePath="$3"
+    headerText="$4"
+    #--------------------------------------------------------------------------------#
+
+    #- clean up old log file
+    rm $logpath/$logfileName
+
+    #- change path
+    cd $casePath
+
+    #- header
+    echo 2>&1 | tee -a $logpath/$logfileName
+    echo 2>&1 | tee -a $logpath/$logfileName
+    echo "//=== $headerText ===//" 2>&1 | tee -a $logpath/$logfileName
+    echo 2>&1 | tee -a $logpath/$logfileName
+
+    #- write path
+    pwd 2>&1 | tee -a $logpath/$logfileName
+    echo 2>&1 | tee -a $logpath/$logfileName
+
+    #- pull
+    git pull 2>&1 | tee -a $logpath/$logfileName
+}
+#==================================#
 
 #==================================#
 #- function to compile a cfdem library
@@ -117,6 +150,8 @@ compileLIGGGHTS()
     echo 2>&1 | tee -a $logpath/$logfileName
 
     #- wclean and wmake
+    rm $CFDEM_LIGGGHTS_SRC_DIR/"lmp_"$CFDEM_LIGGGHTS_MAKEFILE_NAME
+    rm $CFDEM_LIGGGHTS_SRC_DIR/"lib"$CFDEM_LIGGGHTS_LIB_NAME".a"
     make clean-all 2>&1 | tee -a $logpath/$logfileName
     make $CFDEM_LIGGGHTS_MAKEFILE_NAME -j $WM_NCOMPPROCS  2>&1 | tee -a $logpath/$logfileName
     make makelib 2>&1 | tee -a $logpath/$logfileName
@@ -162,6 +197,112 @@ compileLMPlib()
     echo "make" 2>&1 | tee -a $logpath/$logfileName
     echo 2>&1 | tee -a $logpath/$logfileName
     make -f $makeFileName 2>&1 | tee -a $logpath/$logfileName
+}
+#==================================#
+
+#==================================#
+#- function to clean CFDEMcoupling solvers and src
+
+cleanCFDEM()
+{
+    echo "do you really want to clean CFDEM src?"
+    echo "if not, abort with ctrl-C"
+    read
+
+    #**********************************************
+    #cleaning libraries
+    whitelist="$CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/library-list.txt"
+    echo ""
+    echo "Please provide the libraries to be cleaned in the $CWD/$whitelist file."
+
+    if [ ! -f "$CWD/$whitelist" ];then
+        echo "$whitelist does not exist in $CWD. Nothing will be done."
+        NLINES=0
+        COUNT=0
+    else
+        NLINES=`wc -l < $CWD/$whitelist`
+        COUNT=0
+    fi
+
+    while [ $COUNT -lt $NLINES ]
+    do
+            let COUNT++  
+            LINE=`head -n $COUNT $CWD/$whitelist | tail -1`
+  
+            # white lines
+            if [[ "$LINE" == "" ]]; then
+                continue
+            # comments
+            elif [[ "$LINE" == \#* ]]; then
+                continue
+             # paths
+            elif [[ "$LINE" == */dir ]]; then
+                echo "will change path..."
+                LINE=$(echo "${LINE%????}")
+                path="$CFDEM_PROJECT_DIR/src/$LINE"
+                cd $path
+                #continue
+            fi
+
+            cd  $path
+            echo "cleaning library $PWD"
+            rmdepall
+            wclean    
+            rm -r ./Make/linux*
+            rm -r ./lnInclude
+    done
+
+
+    #**********************************************
+    #cleaning utilities
+    echo "removing object files in"
+    echo "   $CFDEM_UT_DIR"
+    rm -r $CFDEM_UT_DIR/*/Make/linux*
+    rm -r $CFDEM_UT_DIR/*/Make/linux*
+    rm -r $CFDEM_UT_DIR/*/*.dep
+
+
+
+    #**********************************************
+    #cleaning solvers
+    whitelist="$CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/solver-list.txt"
+    echo ""
+    echo "Please provide the solvers to be cleaned in the $CWD/$whitelist file."
+
+    if [ ! -f "$CWD/$whitelist" ];then
+        echo "$whitelist does not exist in $CWD. Nothing will be done."
+        NLINES=0
+        COUNT=0
+    else
+        NLINES=`wc -l < $CWD/$whitelist`
+        COUNT=0
+    fi
+
+    while [ $COUNT -lt $NLINES ]
+    do
+            let COUNT++  
+            LINE=`head -n $COUNT $CWD/$whitelist | tail -1`
+  
+            # white lines
+            if [[ "$LINE" == "" ]]; then
+                continue
+            # comments
+            elif [[ "$LINE" == \#* ]]; then
+                continue
+             # paths
+            elif [[ "$LINE" == */dir ]]; then
+                echo "will change path..."
+                LINE=$(echo "${LINE%????}")
+                path="$CFDEM_SOLVER_DIR/$LINE"
+                cd $path
+                #continue
+            fi
+
+            cd  $path            
+            echo "cleaning solver $PWD"
+            rmdepall
+            wclean    
+    done
 }
 #==================================#
 

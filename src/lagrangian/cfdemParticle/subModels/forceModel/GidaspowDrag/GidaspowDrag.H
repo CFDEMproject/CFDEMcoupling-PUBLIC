@@ -69,6 +69,8 @@ private:
 
     const volScalarField& rho_;
 
+    const scalar phi_;
+
 public:
 
     //- Runtime type information

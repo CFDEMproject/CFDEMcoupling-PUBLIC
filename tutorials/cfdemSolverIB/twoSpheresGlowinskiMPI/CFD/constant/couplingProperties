@@ -44,6 +44,8 @@ dataExchangeModel twoWayMPI;//twoWayFiles;
 
 IOModel basicIO;
 
+probeModel off;
+
 averagingModel dilute;
 
 clockModel off;

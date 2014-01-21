@@ -66,8 +66,12 @@ constDiffSmoothing::constDiffSmoothing
     lowerLimit_(readScalar(propsDict_.lookup("lowerLimit"))),
     upperLimit_(readScalar(propsDict_.lookup("upperLimit"))),
     smoothingLength_(dimensionedScalar("smoothingLength",dimensionSet(0,1,0,0,0,0,0), readScalar(propsDict_.lookup("smoothingLength")))),
+    smoothingLengthReferenceField_(dimensionedScalar("smoothingLengthReferenceField",dimensionSet(0,1,0,0,0,0,0), readScalar(propsDict_.lookup("smoothingLength")))),
     DT_("DT", dimensionSet(0,2,-1,0,0), 0.)
 {
+
+        if(propsDict_.found("smoothingLengthReferenceField"))  
+            smoothingLengthReferenceField_.value() = double(readScalar(propsDict_.lookup("smoothingLengthReferenceField")));
 
 }
 
@@ -83,7 +87,7 @@ bool constDiffSmoothing::doSmoothing() const
     return true;
 }
 
-void constDiffSmoothing::dSmoothing(volScalarField& dSmooth) const
+/*void constDiffSmoothing::dSmoothing(volScalarField& dSmooth) const
 {
     
     tmp<volScalarField> dSmooth0
@@ -104,10 +108,16 @@ void constDiffSmoothing::dSmoothing(volScalarField& dSmooth) const
     );
 
     dSmooth.internalField() = dSmooth0;             
-}
+}*/
 
-void Foam::constDiffSmoothing::smoothen(volScalarField& field) const
+void Foam::constDiffSmoothing::smoothen(volScalarField& fieldSrc) const
 {
+    // transfer data to working field to not mess up ddt
+    volScalarField field=fieldSrc;
+    field.correctBoundaryConditions();
+    field.oldTime()=fieldSrc;
+    field.oldTime().correctBoundaryConditions();
+
     double deltaT = field.mesh().time().deltaTValue();
     DT_.value() = smoothingLength_.value() * smoothingLength_.value() / deltaT;
 
@@ -123,6 +133,10 @@ void Foam::constDiffSmoothing::smoothen(volScalarField& field) const
     {
         field[cellI]=max(lowerLimit_,min(upperLimit_,field[cellI]));
     }  
+
+    // get data from working field
+    fieldSrc=field;
+    fieldSrc.correctBoundaryConditions(); 
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 void Foam::constDiffSmoothing::smoothen(volVectorField& field) const
@@ -141,8 +155,11 @@ void Foam::constDiffSmoothing::smoothen(volVectorField& field) const
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 void Foam::constDiffSmoothing::smoothenReferenceField(volVectorField& field) const
 {
-    dimensionedScalar deltaT =  particleCloud_.mesh().time().deltaT();
-    DT_.value() = smoothingLength_.value() * smoothingLength_.value() / deltaT.value();
+    double sourceStrength = 1e5; //Should be a large numbe to keep reference values constant
+
+    dimensionedScalar deltaT = field.mesh().time().deltaT();
+    DT_.value() = smoothingLengthReferenceField_.value() 
+                         * smoothingLengthReferenceField_.value() / deltaT.value();
 
      tmp<volScalarField> NLarge
     (
@@ -165,21 +182,19 @@ void Foam::constDiffSmoothing::smoothenReferenceField(volVectorField& field) con
     //loop over particles and map max particle diameter to Euler Grid
     for(int cellI = 0; cellI <  field.mesh().nCells(); cellI++)
     {
-            if ( mag(field.internalField()[cellI]) > 0)  // have a vector in the field, so keep it!
+            if ( mag(field.oldTime().internalField()[cellI]) > 0)  // have a vector in the OLD field, so keep it!
             {
-                  NLarge()[cellI] = 1e5;  //use large value here to keep cell values constant
+                  NLarge()[cellI] = sourceStrength;
             }
     }
 
-    // do smoothing
-    fvVectorMatrix dSmoothEqn
+    // do the smoothing
+    solve
     (
         fvm::ddt(field) == fvm::laplacian( DT_, field) 
                                        +  NLarge() / deltaT * field.oldTime() //add source to keep cell values constant
-                                       - fvm::Sp( NLarge() / deltaT, field)     //add sink to keep cell values constant
-    );
-   dSmoothEqn.solve();
-
+                                       - fvm::Sp( NLarge() / deltaT, field)   //add sink to keep cell values constant
+    );  
 
 }
 

@@ -73,9 +73,9 @@ int main(int argc, char *argv[])
         // do particle stuff
         particleCloud.clockM().start(2,"Coupling");
         particleCloud.evolve(voidfraction,Us,U);
-
+      
         Info << "update Ksl.internalField()" << endl;
-        Ksl.oldTime().internalField() = particleCloud.momCoupleM(0).impMomSource();
+        Ksl = particleCloud.momCoupleM(0).impMomSource();
         particleCloud.smoothingM().smoothen(Ksl);
         Ksl.correctBoundaryConditions();
 
@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
             // Momentum predictor
             fvVectorMatrix UEqn
             (
-                fvm::ddt(voidfraction,U)
+                fvm::ddt(voidfraction,U) //particleCloud.ddtVoidfractionU(U,voidfraction) //
               + fvm::div(phi, U)
 //              + turbulence->divDevReff(U)
               + particleCloud.divVoidfractionTau(U, voidfraction)
@@ -120,8 +120,8 @@ int main(int argc, char *argv[])
 
                 U = rUA*UEqn.H();
 
-                phi = (fvc::interpolate(U*voidfraction) & mesh.Sf() )
-                     + fvc::ddtPhiCorr(rUAvoidfraction, U, phi);
+                phi = (fvc::interpolate(U*voidfraction) & mesh.Sf() );
+                     //+ fvc::ddtPhiCorr(rUAvoidfraction, U, phi);
                 surfaceScalarField phiS(fvc::interpolate(Us*voidfraction) & mesh.Sf());
                 surfaceScalarField phiGes = phi + rUAf*(fvc::interpolate(Ksl/rho) * phiS);
 

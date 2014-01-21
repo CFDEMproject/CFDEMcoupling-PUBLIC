@@ -273,25 +273,119 @@ bool Foam::twoWayMPI::couple() const
         // start liggghts
         if (liggghts == 1)
         {
-            /*// hardcoded run commands
-            char lammpsRunCommand[80];
-            if (couplingStep()==1) sprintf(lammpsRunCommand,"run %d",int(couplingInterval_));
-            else           sprintf(lammpsRunCommand,"run %d pre no",int(couplingInterval_));
-            Info << "old script would Executing command: '"<<lammpsRunCommand <<"'"<< endl;
-            lmp->input->one(lammpsRunCommand);*/
-
             // run commands from liggghtsCommands dict
             Info<<"Starting up LIGGGHTS" << endl;
             particleCloud_.clockM().start(3,"LIGGGHTS");
+
+            // check if liggghtsCommandModels with exaxt timing are being run
+            bool exactTiming(false);
+            int runComNr = -10;
+            DynamicList<scalar> interruptTimes(0);
+            DynamicList<int> DEMstepsToInterrupt(0);
+            DynamicList<int> lcModel(0);
+            scalar interruptTime = -1;
+
             forAll(particleCloud_.liggghtsCommandModelList(),i)
             {
-                if(particleCloud_.liggghtsCommand()[i]().runCommand(couplingStep()))
+                // Check if exact timing is needed
+                // get time for execution
+                // store time for execution in list
+                if(particleCloud_.liggghtsCommand()[i]().exactTiming())
                 {
-                    const char* command = particleCloud_.liggghtsCommand()[i]().command();
+                    exactTiming = true;
+                    DynamicList<scalar> h = particleCloud_.liggghtsCommand()[i]().executionsWithinPeriod(TSstart(),TSend());
+
+                    forAll(h,j)
+                    {
+                        // save interrupt times (is this necessary)
+                        interruptTimes.append(h[j]);
+
+                        // calc stepsToInterrupt
+                        DEMstepsToInterrupt.append(DEMstepsTillT(h[j]));
+
+                        // remember which liggghtsCommandModel to run
+                        lcModel.append(i);
+                    }
+
+                    // make cumulative
+                    label len = DEMstepsToInterrupt.size();
+                    label ind(0);
+                    forAll(DEMstepsToInterrupt,i)
+                    {
+                        ind = len-i-1;
+                        if(ind>0)
+                            DEMstepsToInterrupt[ind] -= DEMstepsToInterrupt[ind-1];
+                    }                    
+
+                    Info << "Foam::twoWayMPI::couple(): interruptTimes=" << interruptTimes << endl;
+                    Info << "Foam::twoWayMPI::couple(): DEMstepsToInterrupt=" << DEMstepsToInterrupt << endl;
+                    Info << "Foam::twoWayMPI::couple(): lcModel=" << lcModel << endl;
+                }
+
+                if(particleCloud_.liggghtsCommand()[i]().type()=="runLiggghts")
+                    runComNr=i;
+            }
+
+            // models with exact timing exists
+            if(exactTiming)
+            {
+                // extension for more liggghtsCommands active the same time:
+                //    sort interrupt list within this run period
+                //    keep track of corresponding liggghtsCommand
+                int DEMstepsRun(0);
+                forAll(interruptTimes,j)
+                {                  
+                    // set run command till interrupt
+                    DEMstepsRun += DEMstepsToInterrupt[j];          
+                    particleCloud_.liggghtsCommand()[runComNr]().set(DEMstepsToInterrupt[j]);
+                    const char* command = particleCloud_.liggghtsCommand()[runComNr]().command();
+                    Info << "Executing run command: '"<< command <<"'"<< endl;
+                    lmp->input->one(command);
+    
+                    // run liggghts command with exact timing
+                    command = particleCloud_.liggghtsCommand()[lcModel[j]]().command();
                     Info << "Executing command: '"<< command <<"'"<< endl;
                     lmp->input->one(command);
                 }
+
+                // do the run
+                if(particleCloud_.liggghtsCommand()[runComNr]().runCommand(couplingStep()))
+                {
+                    particleCloud_.liggghtsCommand()[runComNr]().set(couplingInterval() - DEMstepsRun);
+                    const char* command = particleCloud_.liggghtsCommand()[runComNr]().command();
+                    Info << "Executing run command: '"<< command <<"'"<< endl;
+                    lmp->input->one(command);
+                }
+
+                // do the other non exact timing models
+                forAll(particleCloud_.liggghtsCommandModelList(),i)
+                {
+                    if
+                    (
+                      ! particleCloud_.liggghtsCommand()[i]().exactTiming() &&
+                        particleCloud_.liggghtsCommand()[i]().runCommand(couplingStep())
+                    )
+                    {
+                        const char* command = particleCloud_.liggghtsCommand()[i]().command();
+                        Info << "Executing command: '"<< command <<"'"<< endl;
+                        lmp->input->one(command);
+                    }
+                }
             }
+            // no model with exact timing exists
+            else
+            {
+                forAll(particleCloud_.liggghtsCommandModelList(),i)
+                {
+                    if(particleCloud_.liggghtsCommand()[i]().runCommand(couplingStep()))
+                    {
+                        const char* command = particleCloud_.liggghtsCommand()[i]().command();
+                        Info << "Executing command: '"<< command <<"'"<< endl;
+                        lmp->input->one(command);
+                    }
+                }
+            }
+
             particleCloud_.clockM().stop("LIGGGHTS");
             Info<<"LIGGGHTS finished"<<endl;
         }
@@ -317,9 +411,12 @@ int Foam::twoWayMPI::getNumberOfParticles() const
 
 int Foam::twoWayMPI::getNumberOfClumps() const
 {
+    #ifdef multisphere
+        return liggghts_get_maxtag_ms(lmp);
+    #endif
+
     Warning << "liggghts_get_maxtag_ms(lmp) is commented here!" << endl;
-    return -1;
-//    return liggghts_get_maxtag_ms(lmp);
+    return -1;       
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

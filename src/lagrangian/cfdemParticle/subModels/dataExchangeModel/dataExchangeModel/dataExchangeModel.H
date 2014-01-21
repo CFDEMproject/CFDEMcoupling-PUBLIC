@@ -191,6 +191,14 @@ public:
 
         inline scalar couplingTime() const {return couplingInterval_*DEMts_;};
 
+        inline scalar TSstart() const { return particleCloud_.mesh().time().startTime().value()
+                                        + (couplingStep_-1) * couplingTime();};
+
+        inline scalar TSend() const {return particleCloud_.mesh().time().startTime().value()
+                                        + (couplingStep_) * couplingTime();};
+
+        inline int DEMstepsTillT(scalar t) const {return (t - (particleCloud_.mesh().time().value() - couplingTime())  + SMALL) / DEMts_;};
+
         inline void checkTSsize() const
         {
             if(particleCloud_.mesh().time().deltaT().value() >  couplingInterval_ * DEMts_ + SMALL)
@@ -200,6 +208,11 @@ public:
                 Info << "DEMts_ = " << DEMts_ << endl;
                 FatalError<<"\nError - TS bigger than coupling interval!\n"<< abort(FatalError);
             }
+        }
+
+        inline bool checkExactTiming() const
+        {
+
         }
 
         //void checkNClumpTypes() const {};

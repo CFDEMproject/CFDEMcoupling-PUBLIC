@@ -53,7 +53,9 @@ cfdemCloudIB::cfdemCloudIB
 )
 :
     cfdemCloud(mesh),
-    angularVelocities_(NULL)
+    angularVelocities_(NULL),
+    pRefCell_(readLabel(mesh.solutionDict().subDict("PISO").lookup("pRefCell"))),
+    pRefValue_(readScalar(mesh.solutionDict().subDict("PISO").lookup("pRefValue")))
 {}
 
 
@@ -146,6 +148,7 @@ void Foam::cfdemCloudIB::calcVelocityCorrection
     vector rVec(0,0,0);
     vector velRot(0,0,0);
     vector angVel(0,0,0);
+
     for(int index=0; index< numberOfParticles(); index++)
     {
         //if(regionM().inRegion()[index][0])
@@ -170,8 +173,17 @@ void Foam::cfdemCloudIB::calcVelocityCorrection
         //}
     }
 
-    // make field divergence free
-    solve(fvm::laplacian(phiIB) == fvc::div(U) + fvc::ddt(voidfraction));
+    // make field divergence free - set reference value in case it is needed
+    fvScalarMatrix phiIBEqn
+    (
+        fvm::laplacian(phiIB) == fvc::div(U) + fvc::ddt(voidfraction)
+    );
+     if(phiIB.needReference()) 
+     {
+         phiIBEqn.setReference(pRefCell_, pRefValue_);
+     }
+    
+    phiIBEqn.solve();
 
     U=U-fvc::grad(phiIB);
     U.correctBoundaryConditions();

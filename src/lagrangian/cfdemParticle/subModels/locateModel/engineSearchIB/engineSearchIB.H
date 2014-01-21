@@ -62,6 +62,8 @@ private:
     	const label zSplit_;
 
     	const label xySplit_;
+    	
+    	bool checkPeriodicCells_;
 
 public:
 

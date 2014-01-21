@@ -36,6 +36,7 @@ Description
 #include "addToRunTimeSelectionTable.H"
 #include "mathematicalConstants.H"
 
+#include "mpi.h"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -66,8 +67,13 @@ engineSearchIB::engineSearchIB
     engineSearch(dict.subDict(typeName + "Props"),sm),
     propsDict_(dict.subDict(typeName + "Props")),
     zSplit_(readLabel(propsDict_.lookup("zSplit"))),
-    xySplit_(readLabel(propsDict_.lookup("xySplit")))
-{}
+    xySplit_(readLabel(propsDict_.lookup("xySplit"))),
+    checkPeriodicCells_(false)
+{
+
+    if(propsDict_.found("checkPeriodicCells")) checkPeriodicCells_=true;
+
+}
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
@@ -87,6 +93,13 @@ label engineSearchIB::findCell
     int size
 ) const
 {
+
+    int numprocs, me;
+    MPI_Comm_size(MPI_COMM_WORLD, &numprocs);
+    MPI_Comm_rank(MPI_COMM_WORLD, &me);
+    const boundBox& globalBb = particleCloud_.mesh().bounds();
+
+
     vector position;
     for(int index = 0;index < size; ++index)
     {
@@ -118,7 +131,8 @@ label engineSearchIB::findCell
             			pos[2]+=radius;
             		else if(countPoints==1)
             			pos[2]-=radius;
-            		else {
+            		else 
+            		{
             			thetaLevel=(countPoints-2)/xySplit_;
             			theta=factor*thetaSize*thetaLevel;
             			phi=factor*phiSize*(countPoints-2-thetaLevel*xySplit_);
@@ -128,6 +142,23 @@ label engineSearchIB::findCell
             		}
 
             		altStartPos=findSingleCell(pos,oldID); //particleCloud_.mesh().findCell(pos);//
+                    //check for periodic domains
+                    if(checkPeriodicCells_)
+                    {
+                        for(int iDir=0;iDir<3;iDir++)
+                        {
+                            if( pos[iDir] > globalBb.max()[iDir] )
+                            {
+                                pos[iDir]-=globalBb.max()[iDir]-globalBb.min()[iDir];
+                            }
+                            else if( pos[iDir] < globalBb.min()[iDir] )
+                            {
+                                pos[iDir]+=globalBb.max()[iDir]-globalBb.min()[iDir];
+                            }
+                        }
+                  		altStartPos=findSingleCell(pos,oldID); //particleCloud_.mesh().findCell(pos);//
+                    }
+                    
             		if(altStartPos>=0) foundPos=1;
             		countPoints++;
             	}

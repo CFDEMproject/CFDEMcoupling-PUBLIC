@@ -41,6 +41,7 @@ SourceFiles
 
 #include "fvCFD.H"
 #include "cfdemCloud.H"
+#include "probeModel.H"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -75,6 +76,9 @@ protected:
         const word modelType_;
 
         mutable scalar cg_;
+
+        bool probeIt_;
+
 public:
 
     //- Runtime type information

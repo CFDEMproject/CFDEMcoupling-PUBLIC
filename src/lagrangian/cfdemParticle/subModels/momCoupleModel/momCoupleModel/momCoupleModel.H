@@ -61,6 +61,8 @@ protected:
 
         cfdemCloud& particleCloud_;
 
+        scalar maxAlpha_;     // max fluid volume fraction to calculate exchange field
+
 public:
 
     //- Runtime type information

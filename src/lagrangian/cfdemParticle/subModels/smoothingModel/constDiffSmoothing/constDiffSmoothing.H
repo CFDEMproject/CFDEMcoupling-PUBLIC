@@ -63,6 +63,7 @@ private:
     scalar lowerLimit_;
     scalar upperLimit_;
     dimensionedScalar smoothingLength_;
+    dimensionedScalar smoothingLengthReferenceField_;
     mutable dimensionedScalar DT_;
 
 public:
@@ -88,7 +89,7 @@ public:
     // Member Functions
         bool doSmoothing() const;
 
-        void dSmoothing(volScalarField&) const;
+        //void dSmoothing(volScalarField&) const;
         
         void smoothen(volScalarField&) const;
 

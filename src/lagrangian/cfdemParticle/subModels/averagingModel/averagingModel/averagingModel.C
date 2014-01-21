@@ -32,6 +32,7 @@ Description
 #include "error.H"
 #include "averagingModel.H"
 #include "voidFractionModel.H"
+#include "forceModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -197,6 +198,80 @@ void averagingModel::setScalarSum
 
     // correct cell values to patches
     field.correctBoundaryConditions();
+}
+
+void averagingModel::setDSauter
+(
+    volScalarField& dSauter,
+    double**& weight,
+    volScalarField& weightField,
+    label myParticleType
+) const
+{
+    label cellI;
+    scalar valueScal;
+    scalar weightP;
+    scalar radius(-1);
+    scalar radiusPow2(-1);
+    scalar radiusPow3(-1);
+    scalar volume(-1);
+
+    scalar scale_ = particleCloud_.forceM(0).cg(); //scaling of parcel vs. primary particle diameter
+    dSauter = 0.0 * dSauter; //set to zero, because we will use it to calc sum(wi*ri^3)
+    volScalarField riPower2
+    (
+        IOobject
+        (
+            "dummy2",
+            particleCloud_.mesh().time().timeName(),
+            particleCloud_.mesh(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        particleCloud_.mesh(),
+        dimensionedScalar("zero", dimensionSet(0, 0, 0, 0, 0),0)
+    );
+
+    for(int index=0; index< particleCloud_.numberOfParticles(); index++)
+    {
+        if(myParticleType!=0) //in case a particle type is specified, only consider particles of the right type
+            if(myParticleType != particleCloud_.particleType(index)) continue; 
+
+        radius         = particleCloud_.radii()[index][0] / scale_; //the primary particle diameter
+        radiusPow2 = radius*radius;
+        radiusPow3 = radiusPow2*radius;
+        weightP      = weight[index][0];
+
+        for(int subCell=0;subCell<particleCloud_.voidFractionM().cellsPerParticle()[index][0];subCell++)
+        {
+
+            cellI = particleCloud_.cellIDs()[index][subCell];
+            if (cellI >= 0)
+            {
+                // first entry in this cell
+                if(weightField[cellI] == 0)
+                {
+                    dSauter[cellI]      = radiusPow3; //use dSauter to store sum(ri^3)
+                    riPower2[cellI]    = radiusPow2;
+                    weightField[cellI] = weightP;
+                }
+                else
+                {
+                    dSauter[cellI] = (dSauter[cellI]*weightField[cellI]+radiusPow3*weightP)
+                                    /(weightField[cellI]+weightP);
+                    riPower2[cellI] = (riPower2[cellI]*weightField[cellI]+radiusPow2*weightP)
+                                    /(weightField[cellI]+weightP);
+                    weightField[cellI] += weightP;
+                }
+            }
+        }
+    }
+
+    // set value and correct cell values to patches
+    dSauter=2.0*dSauter / (riPower2+1e-99);
+    dSauter.correctBoundaryConditions();
+
+    return;
 }
 
 void averagingModel::resetVectorAverage(volVectorField& prev,volVectorField& next,bool single) const

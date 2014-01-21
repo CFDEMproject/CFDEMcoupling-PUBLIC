@@ -202,6 +202,30 @@ Reasonable example settings for the "liggghtsCommands" dictionary are given in t
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 1.6 Models/Solvers :h4,link(cmd_5),link(comm)
 
 This section lists all CFDEMcoupling sub-models and solvers alphabetically, with a separate
@@ -214,6 +238,7 @@ listing below of styles within certain commands.
 "IOModel_sophIO"_IOModel_sophIO.html,
 "IOModel_trackIO"_IOModel_trackIO.html,
 "averagingModel"_averagingModel.html,
+"averagingModel_dense"_averagingModel_dense.html,
 "averagingModel_dilute"_averagingModel_dilute.html,
 "cfdemSolverIB"_cfdemSolverIB.html,
 "cfdemSolverPiso"_cfdemSolverPiso.html,
@@ -256,6 +281,8 @@ listing below of styles within certain commands.
 "momCoupleModel_explicitCouple"_momCoupleModel_explicitCouple.html,
 "momCoupleModel_implicitCouple"_momCoupleModel_implicitCouple.html,
 "momCoupleModel_noCouple"_momCoupleModel_noCouple.html,
+"probeModel"_probeModel.html,
+"probeModel_noProbe"_probeModel_noProbe.html,
 "regionModel"_regionModel.html,
 "regionModel_allRegion"_regionModel_allRegion.html,
 "smoothingModel"_smoothingModel.html,

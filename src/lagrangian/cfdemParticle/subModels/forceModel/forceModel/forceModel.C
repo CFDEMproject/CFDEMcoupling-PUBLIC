@@ -85,7 +85,8 @@ forceModel::forceModel
     ),
     coupleForce_(true),
     modelType_(sm.modelType()),
-    cg_(1.)
+    cg_(1.),
+    probeIt_(sm.probeM().active())
 {}
 
 

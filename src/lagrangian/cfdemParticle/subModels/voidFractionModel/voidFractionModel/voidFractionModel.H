@@ -141,6 +141,10 @@ public:
         int maxCellsPerParticle() const;
 
         void reAllocArrays() const;
+
+        virtual void setParticleType(label type) const {};
+
+        virtual bool checkParticleType(label) const {return true;}; //consider all particles by default
 };
 
 

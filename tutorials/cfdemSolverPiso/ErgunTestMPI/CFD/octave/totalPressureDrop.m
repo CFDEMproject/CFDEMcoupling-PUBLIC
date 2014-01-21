@@ -6,8 +6,8 @@ clc;
 % simulation data 1
 %====================================%
 rhoG = 10			% density in kg/m3
-%path = '../probes/0/p';
-path = '../probes/0/p';
+%path = '../probes/0/p'; % 2.1.x
+path = '../postProcessing/probes/0/p'; % 2.2.x
 columns=22;
 headerlines=4;
 data = loaddata(path,columns,headerlines);
@@ -30,7 +30,7 @@ phip = 1			% sphericity
 epsilon = 0.451335              % void fraction
 Ustart = 0.002
 Uend = 0.02
-timeStepSize = 0.0005;            % time interval of pressure data
+timeStepSize = 0.001;            % time interval of pressure data
 Tstart = 0;
 Tend = t_sim(length(t_sim));
 deltaU=(Uend-Ustart)/((Tend-Tstart)/timeStepSize);

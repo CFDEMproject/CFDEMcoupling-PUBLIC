@@ -168,6 +168,14 @@ public:
             double**const& mask
         ) const;
 
+        void setDSauter
+        (
+            volScalarField& dSauter,
+            double**& weight,
+            volScalarField& weightField,
+            label myParticleType = 0  // can be evaluated for a special type
+        ) const;
+
         void resetVectorAverage(volVectorField& prev,volVectorField& next,bool single=false) const;
 
         void resetWeightFields() const;
@@ -175,6 +183,10 @@ public:
         void undoWeightFields(double**const&) const;
 
         tmp<volVectorField> UsInterp() const;
+
+        virtual void setParticleType(label type) const {};
+
+        virtual bool checkParticleType(label) const {return true;};  //consider all particles by default
 
     // Access
         inline volVectorField& UsPrev() const {return UsPrev_;};

@@ -75,6 +75,10 @@ readLiggghtsData::readLiggghtsData
     myName_=word(typeName + "Props" + h);
     propsDict_=dictionary(dict.subDict(myName_));
 
+    if (propsDict_.found("exactTiming"))
+        exactTiming_=true;
+    Info << "exactTiming==" << exactTiming_ << endl;
+
     // read first index of data file to be injected
     insertionNr_=readScalar(propsDict_.lookup("startIndex"));
 
@@ -95,48 +99,7 @@ readLiggghtsData::readLiggghtsData
         command_ += add;
     }
 
-    // check if being run only at first coupling step
-    runFirst_=Switch(propsDict_.lookup("runFirst"));
-
-    if(!runFirst_)
-    {
-        // check if being run every coupling step
-        runEveryCouplingStep_=Switch(propsDict_.lookup("runEveryCouplingStep"));
-
-        scalar DEMts = particleCloud_.dataExchangeM().DEMts();
-        scalar couplingInterval = particleCloud_.dataExchangeM().couplingInterval();
-
-        if (!runEveryCouplingStep_)
-        {
-            // read time options
-            startTime_ = readScalar(propsDict_.lookup("startTime"));
-            endTime_ = readScalar(propsDict_.lookup("endTime"));
-            timeInterval_ = readScalar(propsDict_.lookup("timeInterval"));
-
-            // calculate coupling times
-            firstCouplingStep_ = floor(startTime_/DEMts/couplingInterval);
-            lastCouplingStep_ = floor(endTime_/DEMts/couplingInterval);
-            couplingStepInterval_ = floor(timeInterval_/DEMts/couplingInterval);
-        }
-        else
-        {
-            firstCouplingStep_ =1;
-            lastCouplingStep_ =1e9;
-            couplingStepInterval_ =1;
-        }
-    }
-    else
-    {
-            firstCouplingStep_ =1;
-            lastCouplingStep_ =1;
-            couplingStepInterval_ =1;
-    }
-
-    nextRun_ = firstCouplingStep_;
-
-    Info << "firstCouplingStep = " << firstCouplingStep_ << endl;
-    Info << "lastCouplingStep = " << lastCouplingStep_ << endl;
-    Info << "couplingStepInterval = " << couplingStepInterval_ << endl;
+    checkTimeSettings(propsDict_);
 }
 
 
@@ -160,9 +123,7 @@ const char* readLiggghtsData::command()
 
 bool readLiggghtsData::runCommand(int couplingStep)
 {
-    checkTimeSettings(propsDict_);
-
-    return runCommand(couplingStep);
+    return runThisCommand(couplingStep);
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

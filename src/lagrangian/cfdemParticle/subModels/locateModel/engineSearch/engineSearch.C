@@ -96,9 +96,9 @@ label engineSearch::findCell
         //if(mask[index][0] && particleCloud_.radius(index) > SMALL)
         if(particleCloud_.radius(index) > SMALL)
         {
-
             // create pos vector
             for(int i=0;i<3;i++) position[i] = positions[index][i];
+
             // find cell
             cellIDs[index][0] =searchEngine_.findCell(position,cellIDs[index][0],treeSearch_);
         }

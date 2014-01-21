@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
         Info << "- evolve()" << endl;
         particleCloud.evolve(voidfraction,Us,U);
 
-        Ksl.oldTime().internalField() = particleCloud.momCoupleM(0).impMomSource();
+        Ksl.internalField() = particleCloud.momCoupleM(0).impMomSource();
         particleCloud.smoothingM().smoothen(Ksl);
         Ksl.correctBoundaryConditions();
 

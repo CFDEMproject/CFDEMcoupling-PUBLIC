@@ -59,6 +59,8 @@ class dividedVoidFraction
 private:
         dictionary propsDict_;
 
+        bool verbose_;
+
         const scalar alphaMin_;          //NP min value of voidFraction
 
 	    mutable bool alphaLimited_;

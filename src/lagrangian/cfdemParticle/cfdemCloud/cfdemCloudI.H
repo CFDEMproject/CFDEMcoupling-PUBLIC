@@ -177,6 +177,11 @@ inline const IOModel& cfdemCloud::IOM() const
     return IOModel_;
 }
 
+inline const probeModel& cfdemCloud::probeM() const
+{
+    return probeModel_;
+}
+
 inline const voidFractionModel& cfdemCloud::voidFractionM() const
 {
     return voidFractionModel_;

@@ -64,24 +64,42 @@ MeiLift::MeiLift
 :
     forceModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
-    verbose_(false),
     velFieldName_(propsDict_.lookup("velFieldName")),
     U_(sm.mesh().lookupObject<volVectorField> (velFieldName_)),
     densityFieldName_(propsDict_.lookup("densityFieldName")),
-    rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_))/*,
+    rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_)),
+    useSecondOrderTerms_(false),
+    interpolation_(false),
+    verbose_(false)
+/*,
     vorticityFieldName_(propsDict_.lookup("vorticityFieldName")),
     vorticity_(sm.mesh().lookupObject<volVectorField> (vorticityFieldName_))*/
 {
-    if (propsDict_.found("verbose")) verbose_=true;
+    if (propsDict_.found("useSecondOrderTerms")) useSecondOrderTerms_=true;
     if (propsDict_.found("treatExplicit")) treatExplicit_=true;
-    particleCloud_.checkCG(false);
+
+    if (propsDict_.found("interpolation")) interpolation_=true;
+    if (propsDict_.found("verbose")) verbose_=true;
+
+     particleCloud_.checkCG(false);
+
+    //Append the field names to be probed
+    particleCloud_.probeM().initialize(typeName, "meiLift.logDat");
+    particleCloud_.probeM().vectorFields_.append("liftForce"); //first entry must the be the force
+    particleCloud_.probeM().vectorFields_.append("Urel");        //other are debug
+    particleCloud_.probeM().vectorFields_.append("vorticity");  //other are debug
+    particleCloud_.probeM().scalarFields_.append("Rep");          //other are debug
+    particleCloud_.probeM().scalarFields_.append("Rew");          //other are debug
+    particleCloud_.probeM().scalarFields_.append("J_star");       //other are debug
+    particleCloud_.probeM().writeHeader();
 }
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 MeiLift::~MeiLift()
-{}
+{
+}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
@@ -95,10 +113,12 @@ void MeiLift::setForce() const
         const volScalarField& nufField = particleCloud_.turbulence().nu();
     #endif
 
+    vector position(0,0,0);
     vector lift(0,0,0);
     vector Us(0,0,0);
     vector Ur(0,0,0);
     scalar magUr(0);
+    scalar magVorticity(0);
     scalar ds(0);
     scalar nuf(0);
     scalar rho(0);
@@ -109,63 +129,141 @@ void MeiLift::setForce() const
     scalar Cl_star(0);
     scalar J_star(0);
     scalar Omega_eq(0);
+    scalar alphaStar(0);
+    scalar epsilon(0);
     scalar omega_star(0);
     vector vorticity(0,0,0);
     volVectorField vorticityField = fvc::curl(U_);
 
+    interpolationCellPoint<vector> UInterpolator_(U_);
+    interpolationCellPoint<vector> VorticityInterpolator_(vorticityField);
+
+    #include "setupProbeModel.H"
 
     for(int index = 0;index <  particleCloud_.numberOfParticles(); index++)
     {
         //if(mask[index][0])
         //{
-            lift=vector::zero;
+            lift           = vector::zero;
             label cellI = particleCloud_.cellIDs()[index][0];
 
             if (cellI > -1) // particle Found
             {
-                //NP note: one could add pointInterpolated values instead of cell centered
                 Us = particleCloud_.velocity(index);
-                Ur = U_[cellI]-Us;
-                magUr = mag(Ur);
-                vorticity=vorticityField[cellI];
 
-                if (magUr > 0 && mag(vorticity) > 0)
+                if(interpolation_)
                 {
-                    ds = 2*particleCloud_.radius(index);
-                    nuf = nufField[cellI];
-                    rho = rho_[cellI];
-                    voidfraction = particleCloud_.voidfraction(index);
-                    omega_star=mag(vorticity)*ds/magUr;
-
-                    // calc particle Re Nr
-                    Rep = ds*magUr/nuf;
-		    Rew = mag(vorticity)*ds*ds/nuf;
-
-                    Omega_eq = omega_star/2.0*(1.0-0.0075*Rew)*(1.0-0.062*sqrt(Rep)-0.001*Rep);
-                    J_star = 0.3*(1.0+tanh(2.5*(log10(sqrt(omega_star/Rep))+0.191)))
-                             *(2.0/3.0+tanh(6.0*sqrt(omega_star/Rep)-1.92));
-                    Cl_star=1.0-(0.675+0.15*(1.0+tanh(0.28*(omega_star/2.0-2.0))))*tanh(0.18*sqrt(Rep));
-                    Cl=J_star*12.92/M_PI*sqrt(omega_star/Rep)+Omega_eq*Cl_star;
-                    lift = 0.125*rho*M_PI*Cl*magUr*Ur^vorticity/mag(vorticity)*ds*ds;
-
-                    if (modelType_=="B")
-                        lift /= voidfraction;
+	                position       = particleCloud_.position(index);
+                    Ur               = UInterpolator_.interpolate(position,cellI) 
+                                        - Us;
+                    vorticity       = VorticityInterpolator_.interpolate(position,cellI);
+                }
+                else
+                {
+                    Ur =  U_[cellI]
+                          - Us;
+                    vorticity=vorticityField[cellI];
                 }
 
-                if(verbose_ && index >100 && index <102)
+                magUr           = mag(Ur);
+                magVorticity = mag(vorticity);
+
+                if (magUr > 0 && magVorticity > 0)
                 {
+                    ds  = 2*particleCloud_.radius(index);
+                    nuf = nufField[cellI];
+                    rho = rho_[cellI];
+
+                    // calc dimensionless properties
+                    Rep = ds*magUr/nuf;
+		            Rew = magVorticity*ds*ds/nuf;
+
+                    alphaStar   = magVorticity*ds/magUr/2.0;
+                    epsilon       =  sqrt(2.0*alphaStar /Rep );
+                    omega_star=2.0*alphaStar;
+
+                    //Basic model for the correction to the Saffman lift
+                    //Based on McLaughlin (1991)
+                    if(epsilon < 0.1)
+                    {
+                        J_star = -140 *epsilon*epsilon*epsilon*epsilon*epsilon 
+                                             *log( 1./(epsilon*epsilon+SMALL) );
+                    }
+                    else if(epsilon > 20)
+                    {
+                      J_star = 1.0-0.287/(epsilon*epsilon+SMALL);
+                    }
+                    else
+                    {
+                     J_star = 0.3
+                                *(     1.0
+                                      +tanh(  2.5 * log10(epsilon+0.191)  )
+                                 )
+                                *(    0.667
+                                     +tanh(  6.0 * (epsilon-0.32)  )
+                                  );
+                    }
+                    Cl=J_star*4.11*epsilon; //multiply McLaughlin's correction to the basic Saffman model
+
+                    //Second order terms given by Loth and Dorgan 2009 
+                    if(useSecondOrderTerms_)
+                    {   
+                        Omega_eq = omega_star/2.0*(1.0-0.0075*Rew)*(1.0-0.062*sqrt(Rep)-0.001*Rep);
+                        Cl_star=1.0-(0.675+0.15*(1.0+tanh(0.28*(omega_star/2.0-2.0))))*tanh(0.18*sqrt(Rep));
+                        Cl += Omega_eq*Cl_star;
+                    }
+
+                    lift =  0.125*M_PI
+                           *rho
+                           *Cl  
+                           *magUr*Ur^vorticity/magVorticity
+                           *ds*ds;
+
+                    if (modelType_=="B")
+                    {
+                        voidfraction = particleCloud_.voidfraction(index);
+                        lift /= voidfraction;
+                    }
+                }
+
+                //**********************************        
+                //SAMPLING AND VERBOSE OUTOUT
+                if(verbose_ )
+                {   
                     Pout << "index = " << index << endl;
                     Pout << "Us = " << Us << endl;
                     Pout << "Ur = " << Ur << endl;
+                    Pout << "vorticity = " << vorticity << endl;
                     Pout << "ds = " << ds << endl;
                     Pout << "rho = " << rho << endl;
                     Pout << "nuf = " << nuf << endl;
                     Pout << "Rep = " << Rep << endl;
+                    Pout << "Rew = " << Rew << endl;
+                    Pout << "alphaStar = " << alphaStar << endl;
+                    Pout << "epsilon = " << epsilon << endl;
+                    Pout << "J_star = " << J_star << endl;
                     Pout << "lift = " << lift << endl;
                 }
+
+                //Set value fields and write the probe
+                if(probeIt_)
+                {
+                    #include "setupProbeModelfields.H"
+                    vValues.append(lift);   //first entry must the be the force
+                    vValues.append(Ur);
+                    vValues.append(vorticity);
+                    sValues.append(Rep);
+                    sValues.append(Rew);
+                    sValues.append(J_star);
+                    particleCloud_.probeM().writeProbe(index, sValues, vValues);
+                }
+                // END OF SAMPLING AND VERBOSE OUTOUT
+                //**********************************        
+
             }
             // set force on particle
-            if(!treatDEM_){
+            if(!treatDEM_)
+            {
                 if(!treatExplicit_) for(int j=0;j<3;j++) impForces()[index][j] += lift[j];
                 else  for(int j=0;j<3;j++) expForces()[index][j] += lift[j];
             }
@@ -174,7 +272,6 @@ void MeiLift::setForce() const
     }
 
 }
-
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

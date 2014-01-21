@@ -59,6 +59,8 @@ class cfdemCloudIB
 protected:
 
     mutable double **angularVelocities_;
+    label pRefCell_;
+    scalar pRefValue_;
 
 public:
 

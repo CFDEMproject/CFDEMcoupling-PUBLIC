@@ -79,6 +79,19 @@ particleCellVolume::particleCellVolume
         mesh_,
         dimensionedScalar("zero", dimensionSet(0,0,0,0,0), 0)
     ),
+    scalarField2_
+    (   
+        IOobject
+        (
+            "cellVolume",
+            mesh_.time().timeName(),
+            mesh_,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh_,
+        dimensionedScalar("zero", dimensionSet(0,0,0,0,0), 0)
+    ),
     upperThreshold_(readScalar(propsDict_.lookup("upperThreshold"))),
     lowerThreshold_(readScalar(propsDict_.lookup("lowerThreshold"))),
     verbose_(false)
@@ -122,20 +135,26 @@ void particleCellVolume::setForce() const
             {
                 cellVol = mesh_.V()[cellI];
                 scalarField_[cellI] = (1-fieldValue) * cellVol;
+                scalarField2_[cellI] = cellVol;
             }
             else
             {
                 scalarField_[cellI] = 0.;
+                scalarField2_[cellI] = 0.;
             }
         }
         scalarField_.internalField() = gSum(scalarField_);
+        scalarField2_.internalField() = gSum(scalarField2_);
 
         if(verbose_)
         {
-           Info << "calculated integral of field: " << scalarFieldName_
+           Info << "calculated integral particle volume "
                 << " = " << scalarField_[0]
                 << ",\n considering cells where the field < " << upperThreshold_
-                << ", and > " << lowerThreshold_ << endl;
+                << ", and > " << lowerThreshold_
+                << ",\n the total volume of cells holding particles = " << scalarField2_[0]
+                << ",\n this results in an average volume fraction of:" << scalarField_[0]/(scalarField2_[0]+SMALL)
+                << endl;
         }
     }// end if time >= startTime_
 }

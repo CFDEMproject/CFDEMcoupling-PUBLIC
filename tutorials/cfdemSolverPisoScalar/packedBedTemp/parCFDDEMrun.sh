@@ -10,7 +10,7 @@
 . ~/.bashrc
 
 #- include functions
-source $CFDEM_SRC_DIR/etc/functions.sh
+source $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/functions.sh
 
 #--------------------------------------------------------------------------------#
 #- define variables
@@ -70,7 +70,7 @@ if [ $postproc == "true" ]
     #- get VTK data from CFD sim
     cd $casePath/CFD
     foamToVTK                                                   #- serial run of foamToVTK
-    #source $CFDEM_SRC_DIR/etc/functions.sh                       #- include functions
+    #source $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/functions.sh                       #- include functions
     #pseudoParallelRun "foamToVTK" $nrPostProcProcessors          #- pseudo parallel run of foamToVTK
 
     #- start paraview
@@ -97,6 +97,7 @@ rm -r $casePath/DEM/log.*
 rm -r $casePath/CFD/log.*
 rm -r $casePath/DEM/log.*
 rm -r $casePath/CFD/probes
+rm -r $casePath/CFD/postProcessing
 rm -r $casePath/log_*
 echo "done"
 

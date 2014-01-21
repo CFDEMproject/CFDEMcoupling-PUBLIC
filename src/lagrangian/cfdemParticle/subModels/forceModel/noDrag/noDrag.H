@@ -54,11 +54,17 @@ class noDrag
 :
     public forceModel
 {
+private:
+    dictionary propsDict_;
+
+    bool verbose_;
+
+    bool noDEMForce_;
 
 public:
 
     //- Runtime type information
-    TypeName("off");
+    TypeName("noDrag");
 
 
     // Constructors

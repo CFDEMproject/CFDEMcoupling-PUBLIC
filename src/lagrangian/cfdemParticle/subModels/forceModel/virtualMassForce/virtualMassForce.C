@@ -79,6 +79,15 @@ virtualMassForce::virtualMassForce
     }
     if (propsDict_.found("treatExplicit")) treatExplicit_=true;
     particleCloud_.checkCG(true);
+
+    //Append the field names to be probed
+    particleCloud_.probeM().initialize(typeName, "virtualMass.logDat");
+    particleCloud_.probeM().vectorFields_.append("virtualMassForce"); //first entry must the be the force
+    particleCloud_.probeM().vectorFields_.append("Urel");
+    particleCloud_.probeM().vectorFields_.append("UrelOld");
+    particleCloud_.probeM().scalarFields_.append("Vs");
+    particleCloud_.probeM().scalarFields_.append("rho");
+    particleCloud_.probeM().writeHeader();
 }
 
 
@@ -97,6 +106,8 @@ void virtualMassForce::setForce() const
     reAllocArrays();
 
     scalar dt = U_.mesh().time().deltaT().value();
+
+    #include "setupProbeModel.H"
 
     for(int index = 0;index <  particleCloud_.numberOfParticles(); index++)
     {
@@ -123,6 +134,17 @@ void virtualMassForce::setForce() const
 
                 virtualMassForce = 0.5 * rho * Vs * ddtUrel;
 
+                //Set value fields and write the probe
+                if(probeIt_)
+                {
+                    #include "setupProbeModelfields.H"
+                    vValues.append(virtualMassForce);           //first entry must the be the force
+                    vValues.append(Ur);
+                    vValues.append(UrelOld);
+                    sValues.append(Vs);
+                    sValues.append(rho);
+                    particleCloud_.probeM().writeProbe(index, sValues, vValues);
+                }
             }
             // set force on particle
             if(treatExplicit_) for(int j=0;j<3;j++) expForces()[index][j] += virtualMassForce[j];

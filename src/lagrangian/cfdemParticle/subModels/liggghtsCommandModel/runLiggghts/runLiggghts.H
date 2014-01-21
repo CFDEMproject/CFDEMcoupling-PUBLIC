@@ -63,6 +63,8 @@ private:
 
     bool preNo_;
 
+    int stdInterval_;
+
 public:
 
     //- Runtime type information
@@ -88,11 +90,13 @@ public:
 
     const char* command();
 
-    string createCommand(word="",word="",word="",word="",word="");
+    string createCommand(word="",int=0,word="",word="",word="",word="");
 
     bool runCommand(int);
 
     word name(){return "runLiggghts";};
+
+    void set(int);
 };
 
 

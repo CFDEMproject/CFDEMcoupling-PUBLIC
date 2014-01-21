@@ -66,6 +66,8 @@ private:
 
     mutable volScalarField scalarField_;
 
+    mutable volScalarField scalarField2_;
+
     mutable scalar upperThreshold_;
 
     mutable scalar lowerThreshold_;

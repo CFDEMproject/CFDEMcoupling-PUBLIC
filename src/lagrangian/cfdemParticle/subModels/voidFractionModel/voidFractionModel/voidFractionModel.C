@@ -124,7 +124,7 @@ tmp<volScalarField> Foam::voidFractionModel::voidFractionInterp() const
     );
 
     scalar tsf = particleCloud_.dataExchangeM().timeStepFraction();
-    if(1-tsf < 1e-4) //tsf==1
+    if(1-tsf < 1e-4 && particleCloud_.dataExchangeM().couplingStep() > 1) //tsf==1
     {
         tsource() = voidfractionPrev_;
     }

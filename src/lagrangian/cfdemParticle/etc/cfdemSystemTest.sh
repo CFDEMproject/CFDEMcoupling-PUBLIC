@@ -6,7 +6,7 @@
 #===================================================================#
 
 #- include functions
-source $CFDEM_SRC_DIR/etc/functions.sh
+source $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/functions.sh
 
 #- show gcc settings
 checkGPP="true"
@@ -18,6 +18,7 @@ echo "*******************"
 
 echo "CFDEM_VERSION=$CFDEM_VERSION"
 echo "couple to OF_VERSION=$WM_PROJECT_VERSION"
+echo "compile option=$WM_COMPILE_OPTION"
 
 echo
 echo "check if paths are set correctly"

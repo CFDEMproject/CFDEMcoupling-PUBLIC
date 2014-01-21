@@ -65,6 +65,7 @@ class locateModel;
 class voidFractionModel;
 class dataExchangeModel;
 class IOModel;
+class probeModel;
 class averagingModel;
 class clockModel;
 class smoothingModel;
@@ -159,6 +160,8 @@ protected:
 
     autoPtr<IOModel> IOModel_;
 
+    autoPtr<probeModel> probeModel_;
+
     autoPtr<voidFractionModel> voidFractionModel_;
 
     autoPtr<averagingModel> averagingModel_;
@@ -181,6 +184,8 @@ protected:
     virtual void findCells();
 
     virtual void setForces();
+
+    virtual void setVectorAverages();
 
 public:
 
@@ -264,6 +269,16 @@ public:
 
        inline double ** particleVolumes() const;
 
+       virtual inline double dMin() {return -1;}
+       virtual inline double dMax() {return -1;}
+       virtual inline int minType() {return -1;}
+       virtual inline int maxType() {return -1;}
+       virtual inline bool multipleTypesDMax() {return false;}
+       virtual inline bool multipleTypesDMin() {return false;}
+       virtual inline double ** particleDensity() const {return NULL;};
+       virtual inline int ** particleTypes() const {return NULL;};
+       virtual label particleType(label index) const {return -1;};
+
        inline int numberOfParticles() const;
 
        inline bool numberOfParticlesChanged() const;
@@ -283,6 +298,8 @@ public:
        inline const dataExchangeModel& dataExchangeM() const;
 
        inline const IOModel& IOM() const;
+
+       inline const probeModel& probeM() const;
 
        inline const averagingModel& averagingM() const;
 
@@ -324,6 +341,8 @@ public:
         tmp<volScalarField> ddtVoidfraction() const;
 
         void calcDdtVoidfraction(volScalarField& voidfraction) const;
+
+        //tmp<fvVectorMatrix> ddtVoidfractionU(volVectorField& ,volScalarField&) const;
 
         tmp<volScalarField> voidfractionNuEff(volScalarField&) const;
 

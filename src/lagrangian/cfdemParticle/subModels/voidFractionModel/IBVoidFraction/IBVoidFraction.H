@@ -67,6 +67,8 @@ private:
 	mutable bool alphaLimited_;
 
         const scalar scaleUpVol_;        //NP scaling radius, keeping volume of particle
+        
+    	mutable bool checkPeriodicCells_;
 
 public:
 
@@ -96,8 +98,19 @@ public:
             const scalar radius,
             const vector position,
             const label cellID,
-            labelHashSet& hashSett
+            labelHashSet& hashSett,
+            bool          initialInsert
         ) const;
+        
+        double minPeriodicDistance
+        (
+            vector    cellCentrePosition, 
+            vector    positionCenter, 
+            boundBox  globalBb,
+            vector&   minPeriodicPos
+        ) const;
+        
+        
 };
 
 

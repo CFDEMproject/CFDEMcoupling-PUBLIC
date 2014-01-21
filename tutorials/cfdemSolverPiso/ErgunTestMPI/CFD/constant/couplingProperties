@@ -30,7 +30,7 @@ modelType "A"; // A or B
 
 couplingInterval 100;
 
-voidFractionModel divided;
+voidFractionModel divided;//centre;//
 
 locateModel engine;//turboEngineM2M;//
 
@@ -40,13 +40,15 @@ regionModel allRegion;
 
 IOModel basicIO;
 
+probeModel off;
+
 dataExchangeModel twoWayMPI;//twoWayM2M;//twoWayFiles;//oneWayVTK;//
 
 averagingModel dense;//dilute;//
 
 clockModel standardClock;//off;
 
-smoothingModel off;
+smoothingModel off;// localPSizeDiffSmoothing;// constDiffSmoothing; //
 
 forceModels
 (
@@ -71,6 +73,21 @@ turbulenceModelType "RASProperties";//"LESProperties";//
 
 //===========================================================================//
 // sub-model properties
+
+localPSizeDiffSmoothingProps
+{
+    lowerLimit 0.1;
+    upperLimit 1e10;
+    dSmoothingLength 1.5e-3;
+    Csmoothing    1.0; 
+}
+
+constDiffSmoothingProps
+{
+    lowerLimit 0.1;
+    upperLimit 1e10;
+    smoothingLength 1.5e-3;
+}
 
 implicitCoupleProps
 {
@@ -134,6 +151,7 @@ DiFeliceDragProps
 
 KochHillDragProps
 {
+    //verbose;
     velFieldName "U";
     densityFieldName "rho";
     voidfractionFieldName "voidfraction";

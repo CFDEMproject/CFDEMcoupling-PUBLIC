@@ -17,7 +17,7 @@ FoamFile
 
 solvers
 {
-    p
+    "(p)"
     {
         solver          PCG;
         preconditioner  DIC;
@@ -33,7 +33,7 @@ solvers
         relTol          0;
     }
 
-    U
+    "(U|k|epsilon|R|nuTilda)"
     {
         solver          PBiCG;
         preconditioner  DILU;
@@ -41,34 +41,10 @@ solvers
         relTol          0;
     }
 
-    k
+    "(voidfraction|Us|Ksl|dSmoothing)"
     {
-        solver          PBiCG;
-        preconditioner  DILU;
-        tolerance       1e-05;
-        relTol          0;
-    }
-
-    epsilon
-    {
-        solver          PBiCG;
-        preconditioner  DILU;
-        tolerance       1e-05;
-        relTol          0;
-    }
-
-    R
-    {
-        solver          PBiCG;
-        preconditioner  DILU;
-        tolerance       1e-05;
-        relTol          0;
-    }
-
-    nuTilda
-    {
-        solver          PBiCG;
-        preconditioner  DILU;
+        solver          PCG;
+        preconditioner  DIC;
         tolerance       1e-05;
         relTol          0;
     }

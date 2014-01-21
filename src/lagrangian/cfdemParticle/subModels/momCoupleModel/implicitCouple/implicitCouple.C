@@ -104,6 +104,11 @@ implicitCouple::implicitCouple
         KslLimit_=readScalar(propsDict_.lookup ("KslLimit"));
         Info << "implicit momentum exchange field is limited to : " << KslLimit_ << endl;
     }
+
+    if (propsDict_.found("minAlphaP"))
+        maxAlpha_ = 1-readScalar(propsDict_.lookup ("minAlphaP"));
+
+    Info << "implicit momentum exchange field calculate if alphaP larger than : " <<  maxAlpha_ << endl;
 }
 
 
@@ -150,7 +155,7 @@ tmp<volScalarField> implicitCouple::impMomSource() const
         {
             Ur = mag(U_[cellI] - Us_[cellI]);
 
-            if(Ur > SMALL && (1.-alpha_[cellI]) > SMALL) //momentum exchange switched off if alphaMin=1
+            if(Ur > SMALL && alpha_[cellI] < maxAlpha_) //momentum exchange switched off if alpha too big
             {
                 KslNext_[cellI] = mag(particleCloud_.forceM(0).impParticleForces()[cellI])
                             / Ur

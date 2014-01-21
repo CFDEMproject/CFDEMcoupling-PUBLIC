@@ -6,27 +6,26 @@
 #===================================================================#
 
 #- include functions
-source $CFDEM_SRC_DIR/etc/functions.sh
+source $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/functions.sh
 
 NOW="$(date +"%Y-%m-%d-%H:%M")"
 logDir="log"
 
 
-cd $CFDEM_SRC_DIR/etc
+cd $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc
 mkdir -p $logDir
-
 
 #================================================================================#
 # compile src
 #================================================================================#
-bash $CFDEM_SRC_DIR/etc/compileCFDEMcoupling_src.sh
+bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/compileCFDEMcoupling_src.sh
 
 #================================================================================#
 # compile solvers
 #================================================================================#
-bash $CFDEM_SRC_DIR/etc/compileCFDEMcoupling_sol.sh
+bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/compileCFDEMcoupling_sol.sh
 
 #================================================================================#
 # compile utilities
 #================================================================================#
-bash $CFDEM_SRC_DIR/etc/compileCFDEMcoupling_uti.sh
+bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/compileCFDEMcoupling_uti.sh

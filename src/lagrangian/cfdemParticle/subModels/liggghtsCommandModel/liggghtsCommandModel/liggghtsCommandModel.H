@@ -87,6 +87,8 @@ protected:
 
     int couplingStepInterval_;
 
+    bool exactTiming_;
+
 public:
 
     //- Runtime type information
@@ -150,6 +152,10 @@ public:
 
         string addTimeStamp(word);
 
+        virtual void set(int){};
+
+        DynamicList<scalar> executionsWithinPeriod(scalar,scalar);
+
     // Access
 
         int nextRun(){return nextRun_;};
@@ -157,6 +163,8 @@ public:
         int lastRun(){return lastRun_;};
 
         virtual word name()=0;
+
+        bool exactTiming(){return exactTiming_;};
 
 };
 

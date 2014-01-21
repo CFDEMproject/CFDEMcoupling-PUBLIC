@@ -28,8 +28,22 @@ Description
     This code is designed to realize coupled CFD-DEM simulations using LIGGGHTS
     and OpenFOAM(R). Note: this code is not part of OpenFOAM(R) (see DISCLAIMER).
 
-    Mei Lift force following Loth and Dorgan 2009
-    contribution from RQ
+     This function is based on the derivation in R. Kurose, S. Komori, 
+     Drag and lift forces on a rotating sphere in a linear shear flow, 
+     Journal of Fluid Mechanics. 384 (1999) 183-206.
+
+     The data for this functions is based on J.B. Mclaughlin, 
+     Inertial migration of a small sphere in linear shear flows, 
+     Journal of Fluid Mechanics. 224 (1991) 261-274.
+
+     The second order terms are based on: 
+     Mei Lift force following Loth and Dorgan 2009,
+     and can be added to the lift coefficient if desired
+     (contribution from RQ)
+
+    - including interpolation of the velocity to the particle position (optional)
+    - including output to file for testing/data analysis (optional)
+
 
 Class
     MeiLift
@@ -43,6 +57,8 @@ SourceFiles
 #define MeiLift_H
 
 #include "forceModel.H"
+#include "IOList.H"
+#include "interpolationCellPoint.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -60,8 +76,6 @@ class MeiLift
 private:
     dictionary propsDict_;
 
-    bool verbose_;
-
     word velFieldName_;
 
     const volVectorField& U_;
@@ -70,10 +84,15 @@ private:
 
     const volScalarField& rho_;
 
+    bool useSecondOrderTerms_;
+
+    bool  interpolation_;
+
+    bool  verbose_;
+
     /*word vorticityFieldName_;
 
     volVectorField& vorticity_;*/
-
 
 public:
 
@@ -97,6 +116,7 @@ public:
 
     // Member Functions
         void setForce() const;
+
 };
 
 

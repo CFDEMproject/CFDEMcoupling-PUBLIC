@@ -13,19 +13,24 @@ Defined in couplingProperties dictionary.
 
 forceModels
 (
-    off
+    noDrag
 ); :pre
 
 [Examples:]
 
 forceModels
 (
-    off
+    noDrag
 ); :pre
+
+noDragProps (optional)
+\{
+    noDEMForce; (optional)
+\}; :pre
 
 [Description:]
 
-The force model performs the calculation of forces (e.g. fluid-particle interaction forces) acting on each DEM particle. The noDrag model sets the forces acting on the particle to zero. If several force models are selected and noDrag is the last model being executed, the fluid particle force will be set to zero.
+The force model performs the calculation of forces (e.g. fluid-particle interaction forces) acting on each DEM particle. The noDrag model sets the forces acting on the particle to zero. If several force models are selected and noDrag is the last model being executed, the fluid particle force will be set to zero. If the variable noDEMForce is set, then the forces communicated to the DEM solver are also set to zero.
 
 [Restrictions:]
 

@@ -49,7 +49,7 @@ fix			zwalls2 all wall/gran/hooke/history   primitive type 1  zplane 0.01
 #fix		bucket_wall all wall/gran/hertz/history 1 0 mesh/gran 1 cad1
 
 #- create single partciles
-create_atoms    1 single 0.05 0.04  0.046 units box  
+create_atoms    1 single 0.05 0.025  0.05 units box  
 set group all diameter 0.0001 density 3000
 
 #cfd coupling

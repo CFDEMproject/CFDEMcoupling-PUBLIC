@@ -104,7 +104,7 @@ public:
         virtual bool doSmoothing() const;
 
         // the particle diameter for smoothing
-        virtual void dSmoothing(volScalarField&) const;
+        virtual void dSmoothing() const;
 
         virtual void smoothen(volScalarField&) const=0;
 

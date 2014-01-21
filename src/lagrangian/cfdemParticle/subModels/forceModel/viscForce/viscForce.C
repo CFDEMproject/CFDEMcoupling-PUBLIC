@@ -85,6 +85,12 @@ viscForce::viscForce
         interpolation_=true;
     }
     particleCloud_.checkCG(true);
+
+    //Append the field names to be probed
+    particleCloud_.probeM().initialize(typeName, "visc.logDat");
+    particleCloud_.probeM().vectorFields_.append("viscForce"); //first entry must the be the force
+    particleCloud_.probeM().scalarFields_.append("Vs");
+    particleCloud_.probeM().writeHeader();
 }
 
 
@@ -125,6 +131,7 @@ void viscForce::setForce() const
 
     interpolationCellPoint<vector> divTauInterpolator_(divTauField);
 
+    #include "setupProbeModel.H"
 
     for(int index = 0;index <  particleCloud_.numberOfParticles(); index++)
     {
@@ -149,7 +156,8 @@ void viscForce::setForce() const
                 ds = 2*particleCloud_.radius(index);
                 Vs = ds*ds*ds*M_PI/6;
 
-                // calc particle's pressure gradient force
+                // calc the contribution of the deviatoric stress 
+                // to the generalized buoyancy force
                 force = -Vs*divTau;
 
                 if(verbose_ && index >0 && index <2)
@@ -157,6 +165,15 @@ void viscForce::setForce() const
                     Info << "index = " << index << endl;
                     Info << "gradP = " << divTau << endl;
                     Info << "force = " << force << endl;
+                }
+
+                //Set value fields and write the probe
+                if(probeIt_)
+                {
+                    #include "setupProbeModelfields.H"
+                    vValues.append(force);  //first entry must the be the force
+                    sValues.append(Vs);
+                    particleCloud_.probeM().writeProbe(index, sValues, vValues);
                 }
             }
 
@@ -170,7 +187,6 @@ void viscForce::setForce() const
         //}
     }
 }
-
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

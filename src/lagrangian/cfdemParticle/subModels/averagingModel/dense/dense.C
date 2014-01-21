@@ -89,6 +89,8 @@ void dense::setScalarAverage
 
     for(int index=0; index< particleCloud_.numberOfParticles(); index++)
     {
+        if(!checkParticleType(index)) continue; //skip this particle if not correct type
+
         //if(mask[index][0])
         //{
             for(int subCell=0;subCell<particleCloud_.voidFractionM().cellsPerParticle()[index][0];subCell++)
@@ -136,6 +138,8 @@ void dense::setVectorAverage
 
     for(int index=0; index< particleCloud_.numberOfParticles(); index++)
     {
+        if(!checkParticleType(index)) continue; //skip this particle if not correct type
+
         //if(mask[index][0])
         //{
             for(int subCell=0;subCell<particleCloud_.voidFractionM().cellsPerParticle()[index][0];subCell++)
@@ -146,6 +150,8 @@ void dense::setVectorAverage
                 {
                     for(int i=0;i<3;i++) valueVec[i] = value[index][i];
                     weightP = weight[index][subCell];
+                    // not yet implemented:
+                    //if(weightWithParticleDensity) weightP *= particleCloud_.particleDensity()[index][0];
 
                     // first entry in this cell
                     if(weightField[cellI] == 0)

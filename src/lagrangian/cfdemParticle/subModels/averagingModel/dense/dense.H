@@ -95,7 +95,6 @@ public:
             volScalarField& weightField,
             double**const& mask
         ) const;
-
 };
 
 

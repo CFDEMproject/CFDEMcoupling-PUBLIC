@@ -50,7 +50,9 @@ fprintf('final position = %f m\n',X_(length(X_)))
 % plot data
 %====================================%
 figure(1)
-plot(t_,U_,t_sim,-U_sim(:,2))
+plot(t_,U_, 'k--')
+hold on
+plot(t_sim,-U_sim(:,2),'rd-')
 legend("analytical - Stokes","simulation - DiFelice?") 
 
 print('cfdemSolverPiso_settlingTestMPI.eps','-deps2')
