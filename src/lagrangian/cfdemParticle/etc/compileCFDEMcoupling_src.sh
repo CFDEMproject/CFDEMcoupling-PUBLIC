@@ -56,7 +56,7 @@ mkdir -p $logDir
             #--------------------------------------------------------------------------------#
             #- define variables
             logpath="$(dirname "$(readlink -f ${BASH_SOURCE[0]})")/$logDir"
-            logfileName="log_compileCFDEMcoupling_"$(basename $LINE)"-$NOW"
+            logfileName="log_compileCFDEMcoupling_"$(basename $LINE)""
             casePath="$path"
             headerText="$logfileName""-$NOW"
             #--------------------------------------------------------------------------------#
