@@ -69,6 +69,8 @@ private:
 
     scalarList scalarList_;
 
+    labelList labelList_;
+
     bool runTimeModifiable_;
 
     bool timeStamp_;

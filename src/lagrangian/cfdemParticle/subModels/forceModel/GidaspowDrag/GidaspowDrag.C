@@ -115,7 +115,7 @@ void GidaspowDrag::setForce() const
                 vector Us = particleCloud_.velocity(index);
                 vector Ur = U_[cellI]-Us;
                 scalar magUr = mag(Ur);
-                scalar ds = 2*particleCloud_.radius(index);
+                scalar ds = 2*particleCloud_.radius(index)*phi_;
                 scalar voidfraction = particleCloud_.voidfraction(index);
                 scalar rho = rho_[cellI];
                 scalar nuf = nufField[cellI];
@@ -141,7 +141,7 @@ void GidaspowDrag::setForce() const
                 //divide by number of particles per unit volume - Enwald (Int J Multiphase Flow, 22, 21-61, pp39
                 KslLag /= (particleCloud_.averagingM().UsWeightField()[cellI]/particleCloud_.mesh().V()[cellI]);
 
-                drag = KslLag*Ur*phi_;
+                drag = KslLag*Ur;
 
                 if (modelType_=="B")
                     drag /= voidfraction;

@@ -99,6 +99,7 @@ IBProps
     maxCellsPerParticle 1000;
     alphaMin 0.30;
     scaleUpVol 1.0;
+    checkPeriodicCells;
 }
 
 bigParticleProps
@@ -126,6 +127,7 @@ engineIBProps
     }
     zSplit 8;
     xySplit 16;
+    checkPeriodicCells;
 }
 
 // ************************************************************************* //

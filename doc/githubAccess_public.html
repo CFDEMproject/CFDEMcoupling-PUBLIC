@@ -87,13 +87,13 @@ git pull
 #- source cfdem env vars
 export CFDEM_VERSION=PUBLIC
 export CFDEM_PROJECT_DIR=$HOME/CFDEM/CFDEMcoupling-$CFDEM_VERSION-$WM_PROJECT_VERSION
-export CFDEM_SRC_DIR=$CFDEM_PROJECT_DIR/src/lagrangian/cfdemParticle
+export CFDEM_SRC_DIR=$CFDEM_PROJECT_DIR/src
 export CFDEM_SOLVER_DIR=$CFDEM_PROJECT_DIR/applications/solvers
 export CFDEM_DOC_DIR=$CFDEM_PROJECT_DIR/doc
 export CFDEM_UT_DIR=$CFDEM_PROJECT_DIR/applications/utilities
 export CFDEM_TUT_DIR=$CFDEM_PROJECT_DIR/tutorials
 export CFDEM_PROJECT_USER_DIR=$HOME/CFDEM/$LOGNAME-$CFDEM_VERSION-$WM_PROJECT_VERSION
-export CFDEM_bashrc=$CFDEM_SRC_DIR/etc/bashrc
+export CFDEM_bashrc=$CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/bashrc
 export CFDEM_LIGGGHTS_SRC_DIR=$HOME/LIGGGHTS/LIGGGHTS-PUBLIC/src
 export CFDEM_LIGGGHTS_MAKEFILE_NAME=fedora_fpic
 export CFDEM_LPP_DIR=$HOME/LIGGGHTS/mylpp/src
@@ -109,7 +109,7 @@ $CFDEM_LIGGGHTS_SRC_DIR
 </PRE>
 <P>should give "...: is a directory" otherwise something went wrong and the environment variables in ~/bashrc are not set correctly.
 </P>
-<P>To specify the paths of pizza, please check the settings in $CFDEM_SRC_DIR/etc/bashrc.
+<P>To specify the paths of pizza, please check the settings in $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/bashrc.
 </P>
 <P>If $CFDEM_SRC_DIR is set correctly, you can type 
 </P>

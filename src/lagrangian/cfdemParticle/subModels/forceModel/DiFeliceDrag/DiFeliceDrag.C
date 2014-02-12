@@ -115,7 +115,6 @@ void DiFeliceDrag::setForce() const
     vector Ufluid(0,0,0);
     vector drag(0,0,0);
     label cellI=0;
-
     vector Us(0,0,0);
     vector Ur(0,0,0);
     scalar ds(0);

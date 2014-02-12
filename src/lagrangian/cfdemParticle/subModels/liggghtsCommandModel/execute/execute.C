@@ -68,6 +68,7 @@ execute::execute
     commandList_(0),
     command_(""),
     scalarList_(0),
+    labelList_(0),
     runTimeModifiable_(true),
     timeStamp_(false)
 {
@@ -83,9 +84,13 @@ execute::execute
     // read list of scalars
     if(propsDict_.found("scalars")) scalarList_ = scalarList(propsDict_.lookup("scalars"));
 
+    // read list of labels
+    if(propsDict_.found("labels")) labelList_ = labelList(propsDict_.lookup("labels"));
+
     bool addBlank = true;  // std no blanks after each word
     fileName add;
     label numberCount=0;   // nr of scalars inserted to command
+    label labelCount=0;   // nr of labels inserted to command
 
     forAll(commandList_,i)
     {
@@ -125,6 +130,18 @@ execute::execute
             sprintf(h,"%f",scalarList_[numberCount]);
             add = h;
             numberCount ++;
+        }else if (add=="label") // next command will be a number read from scalarList_
+        {
+            if (!propsDict_.found("labels"))
+            {
+                FatalError<<"you want to use a label in the command\n - specify a label list with all numbers"
+                << abort(FatalError);
+
+            }
+            char h[50];
+            sprintf(h,"%d",labelList_[labelCount]);
+            add = h;
+            labelCount ++;
         }
 
         // compose command

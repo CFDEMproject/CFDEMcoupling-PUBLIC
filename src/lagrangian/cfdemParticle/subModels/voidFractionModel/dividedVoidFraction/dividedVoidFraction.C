@@ -74,7 +74,7 @@ dividedVoidFraction::dividedVoidFraction
 {
     maxCellsPerParticle_ = 29;
 
-    if(scaleUpVol_ > 1.3 || scaleUpVol_ < 1){ FatalError<< "scaleUpVol shloud be > 1 and < 1.3 !!!" << abort(FatalError); }
+    if(scaleUpVol_ > 2 || scaleUpVol_ < 1){ FatalError<< "scaleUpVol should be > 1 and < 2 !!!" << abort(FatalError); }
     if(alphaMin_ > 1 || alphaMin_ < 0.01){ FatalError<< "alphaMin should be < 1 and > 0.01 !!!" << abort(FatalError); }
     if (propsDict_.found("interpolation")){
         interpolation_=true;

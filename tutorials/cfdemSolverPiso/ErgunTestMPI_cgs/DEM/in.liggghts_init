@@ -23,7 +23,7 @@ fix 		m3 all property/global coefficientRestitution peratomtypepair 1 0.3
 fix 		m4 all property/global coefficientFriction peratomtypepair 1 0.5
 
 #pair style
-pair_style 	gran/hertz/history #Hertzian without cohesion
+pair_style gran model hertz tangential history #Hertzian without cohesion
 pair_coeff	* *
 
 #timestep, gravity
@@ -31,9 +31,9 @@ timestep	0.00001
 fix		gravi all gravity 981 vector 0.0 0.0 -1.0
 
 #walls
-fix			zwalls1 all wall/gran/hertz/history   primitive type 1  zplane 0.0
-fix			zwalls2 all wall/gran/hertz/history   primitive type 1  zplane 5.53
-fix         cylwalls all wall/gran/hertz/history primitive type 1 zcylinder 1.385 0. 0. tangential_damping off
+fix zwalls1 all wall/gran model hertz tangential history primitive type 1  zplane 0.0
+fix zwalls2 all wall/gran model hertz tangential history primitive type 1  zplane 5.53
+fix cylwalls all wall/gran model hertz tangential history primitive type 1 zcylinder 1.385 0. 0.
 
 #particle distributions and insertion
 region		bc cylinder z 0.0 0.0 1.2 0. 5.5 units box

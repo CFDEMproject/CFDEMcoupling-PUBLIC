@@ -27,7 +27,7 @@ fix 		m4 all property/global coefficientFriction peratomtypepair 1 0.5
 fix 		m5 all property/global characteristicVelocity scalar 2.0
 
 #pair style
-pair_style 	gran/hooke/history  #Hookean without cohesion
+pair_style gran model hooke tangential history #Hookean without cohesion
 pair_coeff	* *
 
 #timestep, gravity
@@ -35,12 +35,12 @@ timestep	0.00001
 fix		gravi all gravity 9.81 vector 0.0 -1.0 0.0
 
 #walls (liggghts 2.0)
-fix			xwalls1 all wall/gran/hooke/history   primitive type 1  xplane 0.0
-fix			xwalls2 all wall/gran/hooke/history   primitive type 1  xplane 0.1
-fix			ywalls1 all wall/gran/hooke/history   primitive type 1  yplane 0.0
-fix			ywalls2 all wall/gran/hooke/history   primitive type 1  yplane 0.1
-fix			zwalls1 all wall/gran/hooke/history   primitive type 1  zplane 0.0
-fix			zwalls2 all wall/gran/hooke/history   primitive type 1  zplane 0.01
+fix xwalls1 all wall/gran model hooke tangential history primitive type 1  xplane 0.0
+fix xwalls2 all wall/gran model hooke tangential history primitive type 1  xplane 0.1
+fix ywalls1 all wall/gran model hooke tangential history primitive type 1  yplane 0.0
+fix ywalls2 all wall/gran model hooke tangential history primitive type 1  yplane 0.1
+fix zwalls1 all wall/gran model hooke tangential history primitive type 1  zplane 0.0
+fix zwalls2 all wall/gran model hooke tangential history primitive type 1  zplane 0.01
 
 #-import mesh from cad:
 #fix		cad1 all mesh/gran hopperGenauerSALOME.stl 1 1.0 0. 0. 0. 0. 180. 0. 

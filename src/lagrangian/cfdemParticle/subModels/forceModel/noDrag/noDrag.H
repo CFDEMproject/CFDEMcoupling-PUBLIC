@@ -61,6 +61,8 @@ private:
 
     bool noDEMForce_;
 
+    bool keepCFDForce_;
+
 public:
 
     //- Runtime type information

@@ -59,7 +59,12 @@ laplacianSchemes
 interpolationSchemes
 {
     default         linear;
-    interpolate(U)  linear;
+    //interpolate(U)  linear;
+    //interpolate((1|A(U))) linear;
+    //interpolate((U*voidfraction)) linear;
+    //interpolate((Us*voidfraction)) linear;
+    //interpolate((Ksl|rho)) linear;
+    
 }
 
 snGradSchemes

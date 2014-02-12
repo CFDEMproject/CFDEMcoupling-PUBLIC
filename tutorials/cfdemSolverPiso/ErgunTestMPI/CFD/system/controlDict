@@ -87,7 +87,7 @@ functions
         );
 
         // Fields to be probed
-        fields ( p U voidfraction volAverage_voidfraction);
+        fields ( p U voidfraction volAverage_voidfraction voidfractionNext voidfractionPrev);
 
         // Write at same frequency as fields
         outputControl   timeStep;//outputTime;

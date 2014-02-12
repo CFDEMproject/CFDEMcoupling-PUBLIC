@@ -210,10 +210,10 @@ public:
             }
         }
 
-        inline bool checkExactTiming() const
+        /*inline bool checkExactTiming() const
         {
-
-        }
+            return false;
+        }*/
 
         //void checkNClumpTypes() const {};
 
