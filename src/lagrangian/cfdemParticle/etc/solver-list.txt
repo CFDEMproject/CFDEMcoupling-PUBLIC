@@ -1,7 +1,3 @@
-cfdemSolverInterDyM/dir
-cfdemSolverPimple/dir
-cfdemSolverPisoMS/dir
 cfdemSolverPiso/dir
 cfdemSolverIB/dir
 cfdemSolverPisoScalar/dir
-cfdemSolverPimpleDyM_22x/dir
