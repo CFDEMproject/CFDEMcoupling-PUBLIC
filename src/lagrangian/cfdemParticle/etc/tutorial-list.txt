@@ -17,21 +17,3 @@ cfdemSolverPiso/ErgunTestMPI_restart/dir
 cfdemSolverIB/twoSpheresGlowinskiMPI/dir
 
 cfdemSolverPisoScalar/packedBedTemp/dir
-
-#===================================================================#
-# not in release:
-
-#cfdemSolverPiso/settlingTestBigParticleMPI/dir
-#cfdemSolverPiso/ErgunTestCG/dir
-#cfdemSolverPiso/ErgunTestM2M/dir
-#cfdemSolverPiso/HopperEmptying/dir
-
-#cfdemSolverPisoMS/settlingTestMPI/dir
-#cfdemSolverPisoMS/ErgunTestMPI/dir
-
-#cfdemSolverPimple/ErgunTestMPI/dir
-
-#cfdemSolverInterDyM/twoPhaseSettlingTest/dir
-#cfdemSolverInterDyM/ErgunTestMPI/dir
-#cfdemSolverInterDyM/granularPiston/dir
-#cfdemSolverInterDyM/sugarNcoffee/dir
