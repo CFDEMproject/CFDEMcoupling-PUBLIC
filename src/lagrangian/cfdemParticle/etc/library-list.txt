@@ -1,1 +1,3 @@
+cylPorousMedia/dir
+finiteVolume/dir
 lagrangian/cfdemParticle/dir
