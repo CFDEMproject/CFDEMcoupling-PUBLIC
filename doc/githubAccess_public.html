@@ -17,8 +17,8 @@
 
 <P><B>Description:</B>
 </P>
-<P>This routine describes how to setup a github account and pull repositories of the CFDEMproject.
-After setting some environment variables LIGGGHTS and CFDEMcoupling can be compiled
+<P>This routine describes how to setup a github account and pull repositories of the CFDEM(R)project.
+After setting some environment variables LIGGGHTS(R) and CFDEM(R)coupling can be compiled
 </P>
 <P><B>Procedure:</B>
 </P>
@@ -30,7 +30,7 @@ After setting some environment variables LIGGGHTS and CFDEMcoupling can be compi
 
 <LI>set environment variables 
 
-<LI>compile LIGGGHTS and CFDEMcoupling 
+<LI>compile LIGGGHTS(R) and CFDEM(R)coupling 
 
 <LI>run your own cases 
 
@@ -38,7 +38,7 @@ After setting some environment variables LIGGGHTS and CFDEMcoupling can be compi
 </UL>
 <P><B><I>git clone</I> the desired repository:</B>
 </P>
-<P>If not already done, open a terminal and create a directory for LIGGGHTS in $HOME:
+<P>If not already done, open a terminal and create a directory for LIGGGHTS(R) in $HOME:
 </P>
 <PRE>cd 
 </PRE>
@@ -50,7 +50,7 @@ After setting some environment variables LIGGGHTS and CFDEMcoupling can be compi
 </P>
 <PRE><H6>git clone git://github.com/CFDEMproject/LIGGGHTS-PUBLIC.git LIGGGHTS-PUBLIC  
 </H6></PRE>
-<P>If not already done, open a terminal and create a directory for CFDEMcoupling in $HOME:
+<P>If not already done, open a terminal and create a directory for CFDEM(R)coupling in $HOME:
 </P>
 <PRE>cd 
 </PRE>
@@ -58,9 +58,9 @@ After setting some environment variables LIGGGHTS and CFDEMcoupling can be compi
 </PRE>
 <PRE>cd CFDEM 
 </PRE>
-<P>Make sure that OpenFOAM(R)-2.1.x is already set up correctly!
+<P>Make sure that OpenFOAM(R) is already set up correctly!
 </P>
-<P>To clone the public CFDEMcoupling repository, open a terminal and execute:
+<P>To clone the public CFDEM(R)coupling repository, open a terminal and execute:
 </P>
 <PRE><H6>git clone git://github.com/CFDEMproject/CFDEMcoupling-PUBLIC.git CFDEMcoupling-PUBLIC-$WM_PROJECT_VERSION 
 </H6></PRE>
@@ -117,13 +117,13 @@ $CFDEM_LIGGGHTS_SRC_DIR
 </PRE>
 <P>to get some information if the paths are set correctly.
 </P>
-<P><B>Compile LIGGGHTS and CFDEMcoupling:</B>
+<P><B>Compile LIGGGHTS(R) and CFDEM(R)coupling:</B>
 </P>
-<P>If above settings were done correctly, you can compile LIGGGHTS by typing:
+<P>If above settings were done correctly, you can compile LIGGGHTS(R) by typing:
 </P>
 <PRE>cfdemCompLIG 
 </PRE>
-<P>and you can then compile CFDEMcoupling by typing:
+<P>and you can then compile CFDEM(R)coupling by typing:
 </P>
 <PRE>cfdemCompCFDEM 
 </PRE>
@@ -149,6 +149,17 @@ Changes in $CFDEM_TUT_DIR will be lost after every <I>git stash</I>!
 </PRE>
 <PRE>git clone git://cfdem.git.sourceforge.net/gitroot/cfdem/lpp mylpp 
 </PRE>
+<P><B>Backward Compatibility:</B>
+</P>
+<P>Basically CFDEM(R)coupling supports one OpenFOAM(R) version therefore all settings are prepared for that. Nevertheless we try to maintain backward compatibility as long as it works with reasonable effort.
+</P>
+<P>The supported OpenFOAM(R) and LIGGGHTS(R) versions are stated in:
+src/lagrangian/cfdemParticle/cfdTools/versionInfo.H
+</P>
+<P>For using other versions you can manipulate:
+src/lagrangian/cfdemParticle/etc/OFversion/OFversion.H
+(still not all functionality might work then!)
+</P>
 <P><B>Troubleshooting:</B>
 </P>
 <UL><LI>toubles with git clone? 

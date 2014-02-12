@@ -51,8 +51,11 @@ Contributions
 #include "dynamicFvMesh.H" //dyM
 
 #include "cellSet.H"
-#include "meshToMeshNew.H"
-#include "fvIOoptionList.H"
+
+#if defined(version22)
+    #include "meshToMeshNew.H"
+    #include "fvIOoptionList.H"
+#endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -68,7 +71,9 @@ int main(int argc, char *argv[])
 
     #include "initContinuityErrs.H"
 
-    #include "createFvOptions.H"
+    #if defined(version22)
+        #include "createFvOptions.H"
+    #endif
 
     // create cfdemCloud
     #include "readGravitationalAcceleration.H"
@@ -102,13 +107,17 @@ int main(int argc, char *argv[])
                 fvm::ddt(voidfraction,U)
               + fvm::div(phi, U)
               + turbulence->divDevReff(U)
+                #if defined(version22)
                 ==
                 fvOptions(U)
+                #endif
             );
 
             UEqn.relax();
 
+            #if defined(version22)
             fvOptions.constrain(UEqn);
+            #endif
 
             if (momentumPredictor)
             {
@@ -126,7 +135,9 @@ int main(int argc, char *argv[])
 
                 adjustPhi(phi, U, p);
 
+                #if defined(version22)
                 fvOptions.relativeFlux(phi);
+                #endif
 
                 // Non-orthogonal pressure corrector loop
                 for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
@@ -172,7 +183,9 @@ int main(int argc, char *argv[])
         volScalarField voidfractionNext=mesh.lookupObject<volScalarField>("voidfractionNext");
         particleCloud.calcVelocityCorrection(p,U,phiIB,voidfractionNext);
 
+        #if defined(version22)
         fvOptions.correct(U);
+        #endif
 
         runTime.write();
 

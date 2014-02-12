@@ -11,8 +11,8 @@ githubAccess_public :h3
 
 [Description:]
 
-This routine describes how to setup a github account and pull repositories of the CFDEMproject.
-After setting some environment variables LIGGGHTS and CFDEMcoupling can be compiled
+This routine describes how to setup a github account and pull repositories of the CFDEM(R)project.
+After setting some environment variables LIGGGHTS(R) and CFDEM(R)coupling can be compiled
 
 [Procedure:]
 
@@ -21,13 +21,13 @@ Basically the following steps have to be performed:
 {git clone} the desired repository :ulb,l
 update your repositories by {git pull} :l
 set environment variables :l
-compile LIGGGHTS and CFDEMcoupling :l
+compile LIGGGHTS(R) and CFDEM(R)coupling :l
 run your own cases :l
 :ule
 
 [{git clone} the desired repository:]
 
-If not already done, open a terminal and create a directory for LIGGGHTS in $HOME:
+If not already done, open a terminal and create a directory for LIGGGHTS(R) in $HOME:
 
 cd :pre
 mkdir LIGGGHTS :pre
@@ -37,15 +37,15 @@ To clone the public LIGGGHTS repository, open a terminal and execute:
 
 git clone git://github.com/CFDEMproject/LIGGGHTS-PUBLIC.git LIGGGHTS-PUBLIC  :pre,h6
 
-If not already done, open a terminal and create a directory for CFDEMcoupling in $HOME:
+If not already done, open a terminal and create a directory for CFDEM(R)coupling in $HOME:
 
 cd :pre
 mkdir CFDEM :pre
 cd CFDEM :pre
 
-Make sure that OpenFOAM(R)-2.1.x is already set up correctly!
+Make sure that OpenFOAM(R) is already set up correctly!
 
-To clone the public CFDEMcoupling repository, open a terminal and execute:
+To clone the public CFDEM(R)coupling repository, open a terminal and execute:
 
 git clone git://github.com/CFDEMproject/CFDEMcoupling-PUBLIC.git CFDEMcoupling-PUBLIC-$WM_PROJECT_VERSION :pre,h6
 
@@ -103,13 +103,13 @@ cfdemSysTest :pre
 
 to get some information if the paths are set correctly.
 
-[Compile LIGGGHTS and CFDEMcoupling:]
+[Compile LIGGGHTS(R) and CFDEM(R)coupling:]
 
-If above settings were done correctly, you can compile LIGGGHTS by typing:
+If above settings were done correctly, you can compile LIGGGHTS(R) by typing:
 
 cfdemCompLIG :pre
 
-and you can then compile CFDEMcoupling by typing:
+and you can then compile CFDEM(R)coupling by typing:
 
 cfdemCompCFDEM :pre
 
@@ -133,6 +133,17 @@ You can pull the latest version of lpp with:
 
 cd $HOME/LIGGGHTS :pre
 git clone git://cfdem.git.sourceforge.net/gitroot/cfdem/lpp mylpp :pre
+
+[Backward Compatibility:]
+
+Basically CFDEM(R)coupling supports one OpenFOAM(R) version therefore all settings are prepared for that. Nevertheless we try to maintain backward compatibility as long as it works with reasonable effort.
+
+The supported OpenFOAM(R) and LIGGGHTS(R) versions are stated in:
+src/lagrangian/cfdemParticle/cfdTools/versionInfo.H
+
+For using other versions you can manipulate:
+src/lagrangian/cfdemParticle/etc/OFversion/OFversion.H
+(still not all functionality might work then!)
 
 [Troubleshooting:]
 
