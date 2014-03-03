@@ -67,6 +67,7 @@ viscForce::viscForce
     U_(sm.mesh().lookupObject<volVectorField> (velocityFieldName_)),
     densityFieldName_(propsDict_.lookup("densityFieldName")),
     rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_)),
+    addedMassCoeff_(0.0),
     interpolation_(false)
 {
     if (modelType_ == "B")
@@ -79,6 +80,14 @@ viscForce::viscForce
     }
     if (propsDict_.found("verbose")) verbose_=true;
     if (propsDict_.found("treatExplicit")) treatExplicit_=true;
+
+    if (propsDict_.found("useAddedMass")) 
+    {
+        addedMassCoeff_ =  readScalar(propsDict_.lookup("useAddedMass"));
+        Info << "viscForce will also include added mass with coefficient: " << addedMassCoeff_ << endl;
+        Info << "WARNING: use fix nve/sphere/addedMass in LIGGGHTS input script to correctly account for added mass effects!" << endl;
+    }
+
     if (propsDict_.found("interpolation"))
     {
         Info << "using interpolated value of pressure gradient." << endl;
@@ -158,7 +167,7 @@ void viscForce::setForce() const
 
                 // calc the contribution of the deviatoric stress 
                 // to the generalized buoyancy force
-                force = -Vs*divTau;
+                force = -Vs*divTau*(1.0+addedMassCoeff_);
 
                 if(verbose_ && index >0 && index <2)
                 {

@@ -55,8 +55,17 @@ cfdemCloudIB::cfdemCloudIB
     cfdemCloud(mesh),
     angularVelocities_(NULL),
     pRefCell_(readLabel(mesh.solutionDict().subDict("PISO").lookup("pRefCell"))),
-    pRefValue_(readScalar(mesh.solutionDict().subDict("PISO").lookup("pRefValue")))
-{}
+    pRefValue_(readScalar(mesh.solutionDict().subDict("PISO").lookup("pRefValue"))),
+    haveEvolvedOnce_(false),
+    skipLagrangeToEulerMapping_(false)
+{
+
+    if(this->couplingProperties().found("skipLagrangeToEulerMapping"))
+    {
+        Info << "Will skip lagrange-to-Euler mapping..." << endl;
+        skipLagrangeToEulerMapping_=true;
+    }
+}
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
@@ -95,20 +104,25 @@ bool Foam::cfdemCloudIB::evolve()
         Info << "\n timeStepFraction() = " << dataExchangeM().timeStepFraction() << endl;
         doCouple=true;
 
-        if(verbose_) Info << "- getDEMdata()" << endl;
-        getDEMdata();
-        Info << "nr particles = " << numberOfParticles() << endl;
+//        Info << "skipLagrangeToEulerMapping_: " << skipLagrangeToEulerMapping_ 
+//             << " haveEvolvedOnce_: " << haveEvolvedOnce_ << endl;
+        if(!skipLagrangeToEulerMapping_ || !haveEvolvedOnce_)
+        {
+          if(verbose_) Info << "- getDEMdata()" << endl;
+          getDEMdata();
+          Info << "nr particles = " << numberOfParticles() << endl;
+        
+          // search cellID of particles
+          if(verbose_) Info << "- findCell()" << endl;
+          locateM().findCell(NULL,positions_,cellIDs_,numberOfParticles());
+          if(verbose_) Info << "findCell done." << endl;
 
-        // search cellID of particles
-        if(verbose_) Info << "- findCell()" << endl;
-        locateM().findCell(NULL,positions_,cellIDs_,numberOfParticles());
-        if(verbose_) Info << "findCell done." << endl;
-
-        // set void fraction field
-        if(verbose_) Info << "- setvoidFraction()" << endl;
-        voidFractionM().setvoidFraction(NULL,voidfractions_,particleWeights_,particleVolumes_);
-        if(verbose_) Info << "setvoidFraction done." << endl;
-
+          // set void fraction field
+          if(verbose_) Info << "- setvoidFraction()" << endl;
+          voidFractionM().setvoidFraction(NULL,voidfractions_,particleWeights_,particleVolumes_);
+          if(verbose_) Info << "setvoidFraction done." << endl;
+        }
+        
         // set particles forces
         if(verbose_) Info << "- setForce(forces_)" << endl;
         for(int index = 0;index <  numberOfParticles_; ++index){
@@ -124,6 +138,8 @@ bool Foam::cfdemCloudIB::evolve()
         // write DEM data
         if(verbose_) Info << " -giveDEMdata()" << endl;
         giveDEMdata();
+        
+        haveEvolvedOnce_=true;
     }
     Info << "evolve done." << endl;
 

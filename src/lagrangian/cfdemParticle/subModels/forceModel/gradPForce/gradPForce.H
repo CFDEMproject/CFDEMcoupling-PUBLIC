@@ -81,6 +81,8 @@ private:
 
     bool useU_;          // if false: substitution p=0.5*rho*U^2
 
+    mutable double addedMassCoeff_; //added mass coefficient
+
     bool interpolation_; // use interpolated field values
 
 public:

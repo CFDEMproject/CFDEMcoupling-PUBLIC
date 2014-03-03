@@ -127,7 +127,7 @@ void IBVoidFraction::setvoidFraction(double** const& mask,double**& voidfraction
                 vector cellCentrePosition = particleCloud_.mesh().C()[particleCenterCellID];
                 scalar centreDist=mag(cellCentrePosition-positionCenter);
 
-                vector minPeriodicParticlePos;
+                vector minPeriodicParticlePos=positionCenter;
                 if(checkPeriodicCells_) //consider minimal distance to all periodic images of this particle
                 {
                     centreDist = minPeriodicDistance(cellCentrePosition, positionCenter, globalBb,          
@@ -158,11 +158,6 @@ void IBVoidFraction::setvoidFraction(double** const& mask,double**& voidfraction
                 		else if(centreDist<radius && centreVertexDist>radius)
                 		{
                 			//compute lambda
-                			if(!checkPeriodicCells_) //set if no periodic check of cells
-                			{
-                			    minPeriodicParticlePos = positionCenter;
-                			}
-
                 			scalar a = (vertexPosition - cellCentrePosition)
                 			         & (vertexPosition - cellCentrePosition);
                 			scalar b = 2. * (vertexPosition - cellCentrePosition)
@@ -185,11 +180,6 @@ void IBVoidFraction::setvoidFraction(double** const& mask,double**& voidfraction
                 		else if(centreDist>radius && centreVertexDist<radius)
                 		{
                 		    //compute another lambda too
-                			if(!checkPeriodicCells_) //set if no periodic check of cells
-                			{
-                			    minPeriodicParticlePos = positionCenter;
-                			}
-
                             scalar a = (vertexPosition - cellCentrePosition)
                                      & (vertexPosition - cellCentrePosition);
                             scalar b = 2.* (vertexPosition - cellCentrePosition)

@@ -71,6 +71,7 @@ gradPForce::gradPForce
     rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_)),
     useRho_(false),
     useU_(false),
+    addedMassCoeff_(0.0),
     interpolation_(false)
 {
     if (modelType_ == "B")
@@ -84,6 +85,12 @@ gradPForce::gradPForce
     if (propsDict_.found("verbose")) verbose_=true;
     if (propsDict_.found("treatExplicit")) treatExplicit_=true;
     if (propsDict_.found("useU")) useU_=true;
+    if (propsDict_.found("useAddedMass")) 
+    {
+        addedMassCoeff_ =  readScalar(propsDict_.lookup("useAddedMass"));
+        Info << "gradP will also include added mass with coefficient: " << addedMassCoeff_ << endl;
+        Info << "WARNING: use fix nve/sphere/addedMass in LIGGGHTS input script to correctly account for added mass effects!" << endl;
+    }
     if (propsDict_.found("interpolation"))
     {
         Info << "using interpolated value of pressure gradient." << endl;
@@ -160,9 +167,9 @@ void gradPForce::setForce() const
 
                 // calc particle's pressure gradient force
                 if (useRho_)
-                    force = -Vs*gradP*rho;
+                    force = -Vs*gradP*rho*(1.0+addedMassCoeff_);
                 else
-                    force = -Vs*gradP;
+                    force = -Vs*gradP*(1.0+addedMassCoeff_);
 
                 if(verbose_ && index >=0 && index <2)
                 {

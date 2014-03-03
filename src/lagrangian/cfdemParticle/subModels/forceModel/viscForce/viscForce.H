@@ -69,6 +69,8 @@ private:
 
     const volScalarField& rho_;
 
+    mutable double addedMassCoeff_; //added mass coefficient
+
     bool interpolation_; // use interpolated field values
 
 public:

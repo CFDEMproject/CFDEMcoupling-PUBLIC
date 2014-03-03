@@ -60,6 +60,8 @@ mkdir -p $logDir
             casePath="$path"
             headerText="$logfileName""-$NOW"
             #--------------------------------------------------------------------------------#
+            # remove old log file
+            rm "$logpath/$logfileName"*
             compileLib $logpath $logfileName $casePath $headerText
     done
 

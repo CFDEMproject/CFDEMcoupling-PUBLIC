@@ -61,6 +61,9 @@ protected:
     mutable double **angularVelocities_;
     label pRefCell_;
     scalar pRefValue_;
+    
+    mutable bool haveEvolvedOnce_;
+    mutable bool skipLagrangeToEulerMapping_;
 
 public:
 

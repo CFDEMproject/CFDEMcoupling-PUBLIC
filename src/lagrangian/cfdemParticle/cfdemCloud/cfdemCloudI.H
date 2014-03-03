@@ -30,6 +30,16 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
+#include "momCoupleModel.H"
+#include "smoothingModel.H"
+#include "meshMotionModel.H"
+#include "averagingModel.H"
+#include "clockModel.H"
+#include "IOModel.H"
+#include "voidFractionModel.H"
+#include "locateModel.H"
+#include "probeModel.H"
+
 namespace Foam
 {
 

@@ -6,14 +6,45 @@
 # Christoph Goniva - June. 2011, DCS Computing GmbH
 #===================================================================#
 
-cfdemSolverPiso/settlingTestMPI/dir
+#cfdemSolverPiso/settlingTestMPI/dir
+#cfdemSolverPiso/ErgunTestMPI/dir
+#cfdemSolverPiso/ErgunTestMPI_cgs/dir
+#cfdemSolverPiso/ErgunTestMPI_restart/dir
+#cfdemSolverIB/twoSpheresGlowinskiMPI/dir
+#cfdemSolverPisoScalar/packedBedTemp/dir
 
-cfdemSolverPiso/ErgunTestMPI/dir
+#===================================================================#
+# RADL
+#cfdemSolverPimpleImEx/settlingTestMPI/dir
+#cfdemSolverPimpleImEx/crossFlow/dir
+#cfdemSolverIBInterLubrication/twoCoatedParticlesRelMotion_smallTest/dir
+#cfdemSolverIBScalar/cfdemIBPeriodicCubicalBoxScalar/dir
 
-cfdemSolverPiso/ErgunTestMPI_cgs/dir
+#===================================================================#
+# NesteJacobs
+#Projects/Neste/cfdemSolverBubble/3pFBreactor/dir
+#Projects/Neste/cfdemSolverInterDyM/3pFBreactor/dir
 
-cfdemSolverPiso/ErgunTestMPI_restart/dir
+#===================================================================#
+# not in release:
 
-cfdemSolverIB/twoSpheresGlowinskiMPI/dir
+#cfdemSolverPiso/settlingTestBigParticleMPI/dir
+#cfdemSolverPiso/ErgunTestCG/dir
+#cfdemSolverPiso/ErgunTestM2M/dir
+#cfdemSolverPiso/HopperEmptying/dir
 
-cfdemSolverPisoScalar/packedBedTemp/dir
+#cfdemSolverPisoMS/settlingTestMPI/dir
+#cfdemSolverPisoMS/ErgunTestMPI/dir
+
+#cfdemSolverPimple/ErgunTestMPI/dir
+
+cfdemSolverInterDyM/twoPhaseSettlingTest/dir
+cfdemSolverInterDyM/ErgunTestMPI/dir
+cfdemSolverInterDyM/granularPiston/dir
+cfdemSolverInterDyM/sugarNcoffee/dir
+
+#cfdemSolverBubble/ErgunTestMPI_pureLiquid/dir
+
+
+
+
