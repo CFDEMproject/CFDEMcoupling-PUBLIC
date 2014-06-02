@@ -164,9 +164,8 @@ else
         echo "make new dirs $CFDEM_PROJECT_USER_DIR ? (y/n)"
         read YN
         if [ $YN == "y" ]; then
-            cd $CFDEM_PROJECT_DIR
-            mkdir $LOGNAME-$CFDEM_VERSION-$WM_PROJECT_VERSION
-            cd $LOGNAME-$CFDEM_VERSION-$WM_PROJECT_VERSION
+            mkdir -p $CFDEM_PROJECT_USER_DIR
+            cd $CFDEM_PROJECT_USER_DIR
             mkdir run
             mkdir -p log/logFilesCFDEM-$CFDEM_VERSION-$WM_PROJECT_VERSION
         else
