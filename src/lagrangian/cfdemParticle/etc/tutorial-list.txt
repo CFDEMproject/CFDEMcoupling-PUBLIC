@@ -7,51 +7,13 @@
 #===================================================================#
 
 cfdemSolverPiso/settlingTestMPI/dir
+
 cfdemSolverPiso/ErgunTestMPI/dir
+
 cfdemSolverPiso/ErgunTestMPI_cgs/dir
+
 cfdemSolverPiso/ErgunTestMPI_restart/dir
+
 cfdemSolverIB/twoSpheresGlowinskiMPI/dir
+
 cfdemSolverPisoScalar/packedBedTemp/dir
-
-#===================================================================#
-# RADL
-cfdemSolverPimpleImEx/settlingTestMPI/dir
-cfdemSolverPimpleImEx/ErgunTestMPI/dir
-#cfdemSolverPimpleImEx/crossFlow/dir
-#cfdemSolverIB/periodicCase/dir
-#cfdemSolverIB/cfdemIBPeriodicCubicalBox_fullyPeriodic/dir
-#cfdemSolverIBInterLubrication/twoCoatedParticlesRelMotion_smallTest/dir
-#cfdemSolverIBScalar/cfdemIBPeriodicCubicalBoxScalar/dir
-
-#===================================================================#
-# NesteJacobs
-#Projects/Neste/cfdemSolverBubble/3pFBreactor/dir
-#Projects/Neste/cfdemSolverInterDyM/3pFBreactor/dir
-
-#===================================================================#
-# not in release:
-
-#cfdemSolverPiso/settlingTestBigParticleMPI/dir
-cfdemSolverPiso/ErgunTestCG/dir
-cfdemSolverPiso/ErgunTestM2M/dir
-#cfdemSolverPiso/HopperEmptying/dir
-
-cfdemSolverPimpleDyM/ErgunTestMPI/dir
-
-#cfdemSolverPisoMS/settlingTestMPI/dir
-#cfdemSolverPisoMS/ErgunTestMPI/dir
-
-#cfdemSolverInterDyM/twoPhaseSettlingTest/dir
-#cfdemSolverInterDyM/ErgunTestMPI/dir
-#cfdemSolverInterDyM/granularPiston/dir
-#cfdemSolverInterDyM/sugarNcoffee/dir
-
-#cfdemSolverBubble/ErgunTestMPI_pureLiquid/dir
-
-#- these examples are already designed for 2.3.x
-#cfdemSolverInterDyMPC/sugarNcoffee/dir
-#cfdemSolverInterDyMPC/granularPiston/dir
-#cfdemSolverInterDyMPC/meltingPot/dir
-
-
-
