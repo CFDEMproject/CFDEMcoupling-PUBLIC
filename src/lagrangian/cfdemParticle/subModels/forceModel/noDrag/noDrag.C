@@ -88,16 +88,28 @@ void noDrag::setForce() const
 {
     // Do nothing
     Info << "noDrag::setForce" << endl;
+    label cellI=0;
     for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
     {
-        // set force on particle
-        if(!keepCFDForce_)
+        cellI = particleCloud_.cellIDs()[index][0];
+        if (cellI > -1) // particle Found
         {
-            if(treatExplicit_) for(int j=0;j<3;j++) expForces()[index][j] = 0.;
-            else  for(int j=0;j<3;j++) impForces()[index][j] = 0.;
-        }
-        if(noDEMForce_)for(int j=0;j<3;j++) DEMForces()[index][j] = 0.;
-        
+            // set force on particle
+            if(!keepCFDForce_)
+            {
+                if(treatExplicit_) for(int j=0;j<3;j++) expForces()[index][j] = 0.;
+                else  for(int j=0;j<3;j++) impForces()[index][j] = 0.;
+            }
+            if(noDEMForce_)
+            {
+                for(int j=0;j<3;j++) DEMForces()[index][j] = 0.;
+                if(particleCloud_.impDEMdrag())
+                {
+                    Cds()[index][0] = 0.;
+                    for(int j=0;j<3;j++) fluidVel()[index][j] = 0.;
+                }
+            }
+        }        
     }
 }
 

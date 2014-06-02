@@ -46,6 +46,7 @@ SourceFiles
 
 #include "forceModel.H"
 #include "averagingModel.H"
+#include "interpolationCellPoint.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -64,13 +65,15 @@ private:
 
     dictionary propsDict_;
 
+    bool verbose_;
+
     word tempFieldName_;
 
     const volScalarField& tempField_;            // ref to temperature field
 
     word voidfractionFieldName_;
 
-    const volScalarField& voidfractionField_;    // ref to voidfraction field
+    const volScalarField& voidfraction_;    // ref to voidfraction field
 
     scalar maxSource_;                           // max (limited) value of src field
 
@@ -93,6 +96,8 @@ private:
     word densityFieldName_;
 
     const volScalarField& rho_;                  // ref to fluid density field
+
+    bool interpolation_; // use interpolated field values
 
     void allocateMyArrays() const;
 

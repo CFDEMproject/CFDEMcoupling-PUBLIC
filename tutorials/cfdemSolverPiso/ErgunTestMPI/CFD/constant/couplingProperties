@@ -61,7 +61,8 @@ forceModels
     //Archimedes
     //volWeightedAverage
     //totalMomentumExchange
-    particleCellVolume
+    //particleCellVolume
+    //fieldTimeAverage
 );
 
 momCoupleModels
@@ -107,7 +108,7 @@ gradPForceProps
     densityFieldName "rho";
     voidfractionFieldName "voidfraction";
     velocityFieldName "U";
-    //interpolation;
+    interpolation;
 }
 
 viscForceProps
@@ -139,8 +140,12 @@ totalMomentumExchangeProps
 }
 GidaspowDragProps
 {
+    verbose;
     velFieldName "U";
     densityFieldName "rho";
+    voidfractionFieldName "voidfraction";
+    interpolation;
+    phi 1;
 }
 DiFeliceDragProps
 {
@@ -155,6 +160,7 @@ KochHillDragProps
     velFieldName "U";
     densityFieldName "rho";
     voidfractionFieldName "voidfraction";
+    interpolation;
 }
 
 BeetstraDragProps
@@ -198,7 +204,7 @@ twoWayFilesProps
 
 centreProps
 {
-    alphaMin 0.10;
+    alphaMin 0.1;
 }
 
 engineProps
@@ -222,7 +228,6 @@ dividedProps
 
 twoWayMPIProps
 {
-    //maxNumberOfParticles 10100;
     liggghtsPath "../DEM/in.liggghts_resume";
 }
 twoWayM2MProps

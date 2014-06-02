@@ -65,6 +65,7 @@ private:
     dimensionedScalar smoothingLength_;
     dimensionedScalar smoothingLengthReferenceField_;
     mutable dimensionedScalar DT_;
+    bool verbose_;
 
 public:
 

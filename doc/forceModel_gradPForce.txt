@@ -26,7 +26,7 @@ gradPForceProps
 {pressure} = name of the finite volume fluid pressure field :ulb,l
 {density} = name of the finite volume gravity field :l
 {U} = name of the finite volume fluid velocity field :l
-{interpolation} = flag to use interolate interpolated pressure values (normally off) :l
+{interpolation} = flag to use interpolated pressure values (normally off) :l
 :ule
 
 [Examples:]

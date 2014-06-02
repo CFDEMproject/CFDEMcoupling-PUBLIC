@@ -46,9 +46,9 @@ dataExchangeModel twoWayMPI;//twoWayFiles;//oneWayVTK;//
 
 averagingModel dense;//dilute;//
 
-clockModel standardClock;//off; //
+clockModel off; //standardClock;//
 
-smoothingModel  off; //constDiffSmoothing; //
+smoothingModel  constDiffSmoothing; //off;//
 
 //useDDTvoidfraction;
 
@@ -93,6 +93,8 @@ DiFeliceDragProps
     velFieldName "U";
     densityFieldName "rho";
     voidfractionFieldName "voidfraction";
+    granVelFieldName "Us";
+    verbose;
 }
 
 SchillerNaumannDragProps

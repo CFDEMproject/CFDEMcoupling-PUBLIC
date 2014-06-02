@@ -18,8 +18,8 @@ centreProps
     weight number2;
 \} :pre
 
-{number1} = mininmum limit for voidfraction :ulb,l
-{number2} = scaling of the particle volume to account for porosity or agglomerations. :l
+{number1} = minimum limit for voidfraction :ulb,l
+{number2} = (optional) scaling of the particle volume to account for porosity or agglomerations. :l
 :ule
 
 [Examples:]

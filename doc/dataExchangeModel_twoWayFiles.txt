@@ -19,7 +19,7 @@ twoWayFilesProps
 \}; :pre
 
 {filename} = filename of the VTK file series :ulb,l
-{number} = maximum nuber of particles in DEM simulation :l
+{number} = maximum number of particles in DEM simulation :l
 :ule
 
 [Examples:]
@@ -37,7 +37,7 @@ The data exchange model performs the data exchange between the DEM code and the 
 
 [Restrictions:]
 
-Developed only for two processors, one for DEM and on for CFD run.
+Developed only for two processors, one for DEM and one for CFD run.
 
 [Related commands:]
 

@@ -80,7 +80,9 @@ private:
 
     bool interpolation_; // use interpolated field values
 
-    mutable scalar scale_;
+    mutable scalar scaleDia_;
+
+    mutable scalar scaleDrag_;
 
 public:
 

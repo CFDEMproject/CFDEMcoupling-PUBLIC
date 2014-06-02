@@ -69,20 +69,18 @@ dividedVoidFraction::dividedVoidFraction
     alphaMin_(readScalar(propsDict_.lookup("alphaMin"))),
     alphaLimited_(0),
     tooMuch_(0.0),
-    scaleUpVol_(readScalar(propsDict_.lookup("scaleUpVol"))),
     interpolation_(false)
 {
     maxCellsPerParticle_ = 29;
 
-    if(scaleUpVol_ > 2 || scaleUpVol_ < 1){ FatalError<< "scaleUpVol should be > 1 and < 2 !!!" << abort(FatalError); }
     if(alphaMin_ > 1 || alphaMin_ < 0.01){ FatalError<< "alphaMin should be < 1 and > 0.01 !!!" << abort(FatalError); }
     if (propsDict_.found("interpolation")){
         interpolation_=true;
         Warning << "interpolation for dividedVoidFraction does not yet work correctly!" << endl;
         Info << "Using interpolated voidfraction field - do not use this in combination with interpolation in drag model!"<< endl;
     }
-    if (propsDict_.found("weight"))
-        setWeight(readScalar(propsDict_.lookup("weight")));
+
+    checkWeightNporosity(propsDict_);
 
     if (propsDict_.found("verbose")) verbose_=true;
 }
@@ -104,7 +102,10 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
     vector position(0,0,0);
     label cellID=-1;
     scalar radius(-1);
+    scalar volume(0);
     scalar cellVol(0);
+    scalar scaleVol= weight();
+    scalar scaleRadius = pow(porosity(),1/3);
 
     for(int index=0; index< particleCloud_.numberOfParticles(); index++)
     {
@@ -113,7 +114,6 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
         //if(mask[index][0])
         //{
             // reset
-
             for(int subcell=0;subcell<cellsPerParticle_[index][0];subcell++)
             {
                 particleWeights[index][subcell]=0;
@@ -124,9 +124,8 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
             position = particleCloud_.position(index);
             cellID = particleCloud_.cellIDs()[index][0];
             radius = particleCloud_.radii()[index][0];
-
-            //radius = radius*pow(scaleUpVol_,1/3);
-            scalar volume =  4.188790205*radius*radius*radius*weight()*scaleUpVol_; //4/3*pi=4.188790205
+            volume =  4.188790205*radius*radius*radius*scaleVol; //4/3*pi=4.188790205
+            radius *= scaleRadius;
             cellVol=0;
 
             //--variables for sub-search
@@ -217,7 +216,7 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
 
     // bring voidfraction from Eulerian Field to particle array
     //interpolationCellPoint<scalar> voidfractionInterpolator_(voidfractionNext_);
-    scalar voidfractionAtPos(0);
+    //scalar voidfractionAtPos(0);
     for(int index=0; index< particleCloud_.numberOfParticles(); index++)
     {
         /*if(interpolation_)

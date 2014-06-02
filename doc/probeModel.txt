@@ -29,7 +29,7 @@ Note: This examples list might not be complete - please check below for the list
 
 [Description:]
 
-The probeModel feature allows one to implement various probing features in CFDEM. Currently, only the "particleProbe"_probeModel_particleProbe.html model is implemented, that performs probing of particle forces.
+The probeModel feature allows to implement various probing features in CFDEM. Currently, only the "particleProbe"_probeModel_particleProbe.html model is implemented, that performs probing of particle forces.
 
 [Restrictions:]
 

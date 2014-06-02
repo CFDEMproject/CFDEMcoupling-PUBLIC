@@ -27,6 +27,10 @@ momCoupleModels
 
 Note: This examples list might not be complete - please look for other models (momCoupleModel_XY) in this documentation.
 
+Forces can be coupled in an implicit way to the fluid solver (i.e., when solving the Navier-Stokes equations, the fluid velocity at the new time will be considered for the coupling force). This implicit coupling is typically done for the drag forces (look for "impForces()" in the implementation of the drag model). Implicit coupling is more stable (especially important for dense flows), but conflicts Newton's third law. Explicit forces are imposed on the flow solver in an explicit fashion (look for "expForces()" in the implementation of the drag model), which is less stable, but does not conflict Newton's third law.
+
+Note that the variable "imExSplitFactor" can be set in the couplingProperties in order to treat implicitly defined forces (in the implementation of the force model) as explicit ones. "imExSplitFactor 1.0;" is set by default, meaning that all implicit forces will be considered implicitly, whereas "imExSplitFactor 0.0;" would mean that implicitly defined forces will be treated in an explicit fashion.
+
 [Description:]
 
 The momCoupleModel is the base class for momentum exchange between DEM and CFD simulation.

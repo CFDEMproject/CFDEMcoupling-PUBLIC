@@ -1,5 +1,5 @@
 # Pour granular particles into chute container, then induce flow
-echo both
+
 atom_style	granular
 atom_modify	map array
 communicate	single vel yes
@@ -8,10 +8,9 @@ boundary	m m m
 newton		off
 
 units		si
-processors	2 1 1
+processors	2 2 1
 
 #read the restart file
-#read_restart 	../DEM/liggghts.restartCFDEM
 read_restart 	../DEM/liggghts.restartCFDEM_0.050000
 
 #do not do this here, the simulation box is in the restart file!
@@ -36,8 +35,6 @@ pair_coeff	* *
 timestep	0.00001
 fix		gravi all gravity 9.81 vector 0.0 0.0 -1.0
 
-#walls
-#walls
 fix zwalls1 all wall/gran model hertz tangential history primitive type 1  zplane 0.0
 fix zwalls2 all wall/gran model hertz tangential history primitive type 1  zplane 0.0553
 fix cylwalls all wall/gran model hertz tangential history primitive type 1 zcylinder 0.01385 0. 0.
@@ -56,11 +53,11 @@ fix		integr all nve/sphere
 compute         centerOfMass all com
 
 #compute total dragforce
-#compute		dragtotal all reduce sum f_dragforce[1] f_dragforce[2] f_dragforce[3]
+compute		dragtotal all reduce sum f_dragforce[1] f_dragforce[2] f_dragforce[3]
 
 #screen output
 compute		1 all erotate/sphere
-thermo_style	custom step atoms ke c_1 vol c_centerOfMass[3] #c_dragtotal[1] c_dragtotal[2] c_dragtotal[3]
+thermo_style	custom step atoms ke c_1 vol c_centerOfMass[3] c_dragtotal[1] c_dragtotal[2] c_dragtotal[3]
 thermo		10
 thermo_modify	lost ignore norm no
 compute_modify	thermo_temp dynamic yes
@@ -68,7 +65,7 @@ compute_modify	thermo_temp dynamic yes
 #insert the first particles so that dump is not empty
 dump 		myDump all stl 1 post/dump_*.stl
 #run		1
-dump		dmp all custom 5000 ../DEM/post/dump.liggghts_restart id type type x y z ix iy iz vx vy vz fx fy fz omegax omegay omegaz radius 
+dump		dmp all custom 5000 ../DEM/post/dump*.liggghts_restart id type type x y z vx vy vz fx fy fz f_dragforce[1] f_dragforce[2] f_dragforce[3] radius 
 undump		myDump
 
 run		1

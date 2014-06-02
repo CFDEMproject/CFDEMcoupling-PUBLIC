@@ -73,6 +73,8 @@ protected:
 
         mutable scalar weight_;
 
+        mutable scalar porosity_;
+
     // Protected member functions
 
 public:
@@ -128,9 +130,15 @@ public:
 
         inline volScalarField& voidFractionNext()const { return voidfractionNext_; }
 
-        inline void setWeight(scalar weight)const { weight_ = weight; }
-
         inline scalar weight()const { return weight_; }
+
+        inline scalar porosity()const { return porosity_; }
+
+        inline void checkWeightNporosity(dictionary& propsDict) const
+        {
+            if (propsDict.found("weight")) weight_ = readScalar(propsDict.lookup("weight"));
+            if (propsDict.found("porosity")) porosity_ = readScalar(propsDict.lookup("porosity"));
+        };
 
         void resetVoidFractions() const;
 

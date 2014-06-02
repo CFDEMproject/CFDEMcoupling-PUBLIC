@@ -20,12 +20,7 @@ internalField   uniform 0;
 
 boundaryField
 {
-    walls           
-    {
-        type            zeroGradient;
-    }
-
-    atmosphere          
+    ".*"       
     {
         type            zeroGradient;
     }

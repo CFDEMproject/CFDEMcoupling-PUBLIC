@@ -23,13 +23,13 @@ startTime       0;
 
 stopAt          endTime;
 
-endTime         0.05;//0.01;
+endTime         0.05;
 
 deltaT          0.001;
 
 writeControl    adjustableRunTime;
 
-writeInterval   0.01;//0.01;
+writeInterval   0.01;
 
 purgeWrite      0;
 
@@ -49,7 +49,7 @@ adjustTimeStep  no;
 
 maxCo 0.1;
 
-//libs ( "libgroovyBC.so" );
+//libs ( "libgroovyBC.so" "libfiniteVolumeCFDEM.so");
 
 functions
 (
@@ -87,7 +87,7 @@ functions
         );
 
         // Fields to be probed
-        fields ( p U voidfraction volAverage_voidfraction);
+        fields ( p U voidfraction volAverage_voidfraction voidfractionNext voidfractionPrev);
 
         // Write at same frequency as fields
         outputControl   timeStep;//outputTime;

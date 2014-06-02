@@ -21,7 +21,7 @@
 
 <H3>1. Contents 
 </H3>
-<P>The CFDEMcoupling documentation is organized into the following sections. If you find errors or omissions in this manual or have suggestions for useful information to add, please send an email to the developers so we can improve the CFDEMcoupling documentation. 
+<P>The CFDEMcoupling documentation is organized into the following sections. If you find any errors or omissions in this manual or have suggestions for useful information to add, please send an email to the developers so the CFDEMcoupling documentation can be improved.
 </P>
 1.1 <A HREF = "#1_1">About CFDEMcoupling</A><BR>
 1.2 <A HREF = "#1_2">Installation</A><BR>
@@ -63,11 +63,11 @@
 
 </UL>
 <P>Details on installation are given on the <A HREF = "http://www.cfdem.com">CFDEMproject WWW Site</A> .
-The functionality of this CFD-DEM framwork is described via <A HREF = "#_1_2">tutorial cases</A> showing how to use different solvers and models.
+The functionality of this CFD-DEM framework is described via <A HREF = "#_1_2">tutorial cases</A> showing how to use different solvers and models.
 </P>
 <P>CFDEMcoupling stands for Computational Fluid Dynamics (CFD) -Discrete Element Method (DEM) coupling.
 </P>
-<P>CFDEMcoupling is an open-source code, distributed freely under the terms of the GNU Public License (GPL). 
+<P>CFDEMcoupling is an open-source code, distributed freely under the terms of the GNU Public License (GPL).
 </P>
 <P>Core development of CFDEMcoupling is done by Christoph Goniva and Christoph Kloss, both at DCS Computing GmbH, 2012
 </P>
@@ -90,7 +90,7 @@ In order to get the latest code version, please use the git repository at http:/
 </H4>
 <P><B>General:</B>
 </P>
-<P>Each solver of the CFDEMcoupling is comes with at least one tutorial example, showing its functionality and correct useage. Provided that the installation is correct, the tutorials can be run via "Allrun.sh" shell scripts. These scripts perform all necessary steps (preprocessing, run, postprocessing, visualization).
+<P>Each solver of the CFDEMcoupling comes with at least one tutorial example, showing its functionality and correct usage. Provided that the installation is correct, the tutorials can be run via "Allrun.sh" shell scripts. These scripts perform all necessary steps (preprocessing, run, postprocessing, visualization).
 </P>
 <P><B>Location:</B>
 </P>
@@ -108,7 +108,7 @@ In order to get the latest code version, please use the git repository at http:/
 </P>
 <P>The main settings of a simulation are done via dictionaries:
 </P>
-<P>The DEM setup of each case is defined by a <A HREF = "http://www.cfdem.com">LIGGGHTS</A> input file located in $caseDir/DEM (e.g. in.liggghts_init). For details on the <A HREF = "http://www.cfdem.com">LIGGGHTS</A> setup, please have a look in the <A HREF = "http://www.cfdem.com">LIGGGHTS</A> manual.
+<P>The DEM setup of each case is defined by a <A HREF = "http://www.cfdem.com">LIGGGHTS</A> input file located in $caseDir/DEM (e.g. in.liggghts_init). For details on the <A HREF = "http://www.cfdem.com">LIGGGHTS</A> setup, please have a look at the <A HREF = "http://www.cfdem.com">LIGGGHTS</A> manual.
 </P>
 <P>Standard CFD settings are defined in $caseDir/CFD/constant (e.g. transportProperties, RASproperties, etc.) and $caseDir/CFD/system (e.g. fvSchemes, controlDict). You can find more information on that in <A HREF = "http://www.openfoam.com">OpenFOAM(R)(*)</A> documentations (www.openFoam.com)(*).
 </P>
@@ -164,16 +164,16 @@ In order to get the latest code version, please use the git repository at http:/
 </P>
 <PRE>modelType 
 </PRE>
-<P>"modelType" refers to the formulation of the equations to be solved. Choose "A" or "B", according to Zhou et al. (2010): "Discrete particle simulation of particle-fluid flow: model formulations and their appliccability", JFM. "A" requres the use of the force models gradPForce and viscForce, whereas "B" requires the force model "Archimedes".
+<P>"modelType" refers to the formulation of the equations to be solved. Choose "A" or "B", according to Zhou et al. (2010): "Discrete particle simulation of particle-fluid flow: model formulations and their applicability", JFM. "A" requires the use of the force models gradPForce and viscForce, whereas "B" requires the force model "Archimedes".
 </P>
 <PRE>couplingInterval 
 </PRE>
-<P>The coupling interval determines the time passing between two CFD-DEM data exchanges. 
+<P>The coupling interval determines the time passing between two CFD-DEM data exchanges.
 </P>
 <P>A useful procedure would be:
-1) Set the DEM TS in the in.xxx according to the needs of the pure DEM problem.
+1) Set the DEM timestep in the in.xxx file according to the needs of the pure DEM problem.
 2) Set the "couplingInterval", which refers to the DEM timesteps. Depending on the problem you will need to have a close (small couplingInterval) or loose coupling.
-3) Choose the CFD timestep in the controlDict. it must be equal or smaller than the coupling time, otherwise you will get the error: "Error - TS bigger than coupling interval!".
+3) Choose the CFD timestep in the controlDict. It must be equal to or smaller than the coupling time, otherwise you will get the error: "Error - TS bigger than coupling interval!".
 </P>
 <P>Example: DEMts=0.00001s, couplingInterval=10 exchange data (=couple) will happen every 0.0001s.
 </P>

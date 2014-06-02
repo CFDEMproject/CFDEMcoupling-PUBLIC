@@ -26,9 +26,9 @@ momCoupleModels
 
 [Description:]
 
-The noCouple-model is a dummy momCoupleModel model providing an no momentum source term for the CFD solver.
+The noCouple-model is a dummy momCoupleModel model providing a no momentum source term for the CFD solver.
 
-[Restrictions:] 
+[Restrictions:]
 
 Only for solvers that include no momentum exchange, e.g. immersed boundary.
 

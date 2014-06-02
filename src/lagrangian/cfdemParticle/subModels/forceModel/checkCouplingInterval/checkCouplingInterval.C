@@ -99,7 +99,7 @@ void checkCouplingInterval::setForce() const
 
             if (cellI > -1) // particle Found
             {
-                scaledRad = particleCloud_.radius(index)/cg();
+                scaledRad = particleCloud_.radius(index)/particleCloud_.cg();
                 tauP = rhoP_*4*scaledRad*scaledRad/
                         (18 * nufField[cellI] * rho_[cellI]);
                 minTauP = min(minTauP,tauP);

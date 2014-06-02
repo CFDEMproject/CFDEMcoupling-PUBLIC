@@ -91,17 +91,15 @@ label engineSearch::findCell
     vector position;
     for(int index = 0;index < size; ++index)
     {
-        cellIDs[index][0]=-1;
-
-        //if(mask[index][0] && particleCloud_.radius(index) > SMALL)
         if(particleCloud_.radius(index) > SMALL)
         {
             // create pos vector
             for(int i=0;i<3;i++) position[i] = positions[index][i];
 
-            // find cell
-            cellIDs[index][0] =searchEngine_.findCell(position,cellIDs[index][0],treeSearch_);
+            // find cell using tree search if switched on
+            cellIDs[index][0] = searchEngine_.findCell(position,-1,treeSearch_);
         }
+        else cellIDs[index][0] = -1;
     }
     return 1;
 }
@@ -112,7 +110,6 @@ label engineSearch::findSingleCell
     label& oldCellID
 ) const
 {
-    // find cell
     return searchEngine_.findCell(position,oldCellID,treeSearch_);
 }
 

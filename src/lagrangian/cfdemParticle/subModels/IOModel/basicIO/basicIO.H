@@ -64,17 +64,12 @@ private:
 
     fileName path_;
 
-    bool parOutput_;
-
     mutable int nPProc_;
 
     // Member Functions
-    fileName buildFilePath(word) const;
 
 protected:
     mutable fileName lagPath_;
-
-    void streamDataToPath(fileName,double**,word,word type,word className,word finaliser) const;
 
 public:
 
@@ -97,7 +92,7 @@ public:
 
 
     // Member Functions
-    void dumpDEMdata() const;
+    int dumpDEMdata() const;
 };
 
 

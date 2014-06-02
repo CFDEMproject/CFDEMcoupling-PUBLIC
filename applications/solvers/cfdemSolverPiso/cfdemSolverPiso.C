@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
         // do particle stuff
         particleCloud.clockM().start(2,"Coupling");
         particleCloud.evolve(voidfraction,Us,U);
-      
+    
         Info << "update Ksl.internalField()" << endl;
         Ksl = particleCloud.momCoupleM(0).impMomSource();
         particleCloud.smoothingM().smoothen(Ksl);
@@ -83,94 +83,102 @@ int main(int argc, char *argv[])
         particleCloud.clockM().stop("Coupling");
 
         particleCloud.clockM().start(26,"Flow");
-        // Pressure-velocity PISO corrector
+
+        if(particleCloud.solveFlow())
         {
-            // Momentum predictor
-            fvVectorMatrix UEqn
-            (
-                fvm::ddt(voidfraction,U) //particleCloud.ddtVoidfractionU(U,voidfraction) //
-              + fvm::div(phi, U)
-//              + turbulence->divDevReff(U)
-              + particleCloud.divVoidfractionTau(U, voidfraction)
-             ==
-              - fvm::Sp(Ksl/rho,U)
-            );
-
-            if (modelType=="B")
-                UEqn == - fvc::grad(p) + Ksl/rho*Us;
-            else
-                UEqn == - voidfraction*fvc::grad(p) + Ksl/rho*Us;
-
-            UEqn.relax();
-
-            if (momentumPredictor)
-                solve(UEqn);
-
-            // --- PISO loop
-
-            //for (int corr=0; corr<nCorr; corr++)
-            int nCorrSoph = nCorr + 5 * pow((1-particleCloud.dataExchangeM().timeStepFraction()),1);
-
-            for (int corr=0; corr<nCorrSoph; corr++)
+            // Pressure-velocity PISO corrector
             {
-                volScalarField rUA = 1.0/UEqn.A();
-
-                surfaceScalarField rUAf("(1|A(U))", fvc::interpolate(rUA));
-                volScalarField rUAvoidfraction("(voidfraction2|A(U))",rUA*voidfraction);
-
-                U = rUA*UEqn.H();
-
-                phi = (fvc::interpolate(U*voidfraction) & mesh.Sf() );
-                     //+ fvc::ddtPhiCorr(rUAvoidfraction, U, phi);
-                surfaceScalarField phiS(fvc::interpolate(Us*voidfraction) & mesh.Sf());
-                surfaceScalarField phiGes = phi + rUAf*(fvc::interpolate(Ksl/rho) * phiS);
-
-                if (modelType=="A")
-                    rUAvoidfraction = volScalarField("(voidfraction2|A(U))",rUA*voidfraction*voidfraction);
-
-                // Non-orthogonal pressure corrector loop
-                for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
-                {
-                    // Pressure corrector
-                    fvScalarMatrix pEqn
-                    (
-                        fvm::laplacian(rUAvoidfraction, p) == fvc::div(phiGes) + particleCloud.ddtVoidfraction()
-                    );
-                    pEqn.setReference(pRefCell, pRefValue);
-
-                    if
-                    (
-                        corr == nCorr-1
-                     && nonOrth == nNonOrthCorr
-                    )
-                    {
-                        pEqn.solve(mesh.solver("pFinal"));
-                    }
-                    else
-                    {
-                        pEqn.solve();
-                    }
-
-                    if (nonOrth == nNonOrthCorr)
-                    {
-                        phiGes -= pEqn.flux();
-                    }
-
-                } // end non-orthogonal corrector loop
-
-                #include "continuityErrorPhiPU.H"
+                // Momentum predictor
+                fvVectorMatrix UEqn
+                (
+                    fvm::ddt(voidfraction,U) + fvm::Sp(fvc::ddt(voidfraction),U)
+                  + fvm::div(phi,U) + fvm::Sp(fvc::div(phi),U)
+//                + turbulence->divDevReff(U)
+                  + particleCloud.divVoidfractionTau(U, voidfraction)
+                  ==
+                  - fvm::Sp(Ksl/rho,U)
+                );
 
                 if (modelType=="B")
-                    U -= rUA*fvc::grad(p) - Ksl/rho*Us*rUA;
+                 UEqn == - fvc::grad(p) + Ksl/rho*Us;
                 else
-                    U -= voidfraction*rUA*fvc::grad(p) - Ksl/rho*Us*rUA;
+                    UEqn == - voidfraction*fvc::grad(p) + Ksl/rho*Us;
 
-                U.correctBoundaryConditions();
+                UEqn.relax();
 
-            } // end piso loop
+                if (momentumPredictor)
+                    solve(UEqn);
+
+                // --- PISO loop
+
+                //for (int corr=0; corr<nCorr; corr++)
+                int nCorrSoph = nCorr + 5 * pow((1-particleCloud.dataExchangeM().timeStepFraction()),1);
+
+                for (int corr=0; corr<nCorrSoph; corr++)
+                {
+                    volScalarField rUA = 1.0/UEqn.A();
+
+                    surfaceScalarField rUAf("(1|A(U))", fvc::interpolate(rUA));
+                    volScalarField rUAvoidfraction("(voidfraction2|A(U))",rUA*voidfraction);
+
+                    U = rUA*UEqn.H();
+
+                    phi = (fvc::interpolate(U*voidfraction) & mesh.Sf() );
+                     //+ fvc::ddtPhiCorr(rUAvoidfraction, U, phi);
+                    surfaceScalarField phiS(fvc::interpolate(Us*voidfraction) & mesh.Sf());
+                    surfaceScalarField phiGes = phi + rUAf*(fvc::interpolate(Ksl/rho) * phiS);
+
+                    if (modelType=="A")
+                        rUAvoidfraction = volScalarField("(voidfraction2|A(U))",rUA*voidfraction*voidfraction);
+
+                    // Non-orthogonal pressure corrector loop
+                    for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
+                    {
+                        // Pressure corrector
+                        fvScalarMatrix pEqn
+                        (
+                            fvm::laplacian(rUAvoidfraction, p) == fvc::div(phiGes) + particleCloud.ddtVoidfraction()
+                        );
+                        pEqn.setReference(pRefCell, pRefValue);
+
+                        if
+                        (
+                            corr == nCorr-1
+                         && nonOrth == nNonOrthCorr
+                        )
+                        {
+                            pEqn.solve(mesh.solver("pFinal"));
+                        }
+                        else
+                        {
+                            pEqn.solve();
+                        }
+
+                        if (nonOrth == nNonOrthCorr)
+                        {
+                            phiGes -= pEqn.flux();
+                        }
+
+                    } // end non-orthogonal corrector loop
+
+                    #include "continuityErrorPhiPU.H"
+
+                    if (modelType=="B")
+                        U -= rUA*fvc::grad(p) - Ksl/rho*Us*rUA;
+                    else
+                        U -= voidfraction*rUA*fvc::grad(p) - Ksl/rho*Us*rUA;
+
+                    U.correctBoundaryConditions();
+
+                } // end piso loop
+            }
+
+            turbulence->correct();
+        }// end solveFlow
+        else
+        {
+            Info << "skipping flow solution." << endl;
         }
-
-        turbulence->correct();
 
         runTime.write();
 

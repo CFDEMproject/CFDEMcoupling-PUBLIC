@@ -160,6 +160,14 @@ public:
             double**const& mask
         ) const;
 
+        void setVectorSumSimple
+        (
+            volVectorField& field,
+            double**& value,
+            double**& weight,
+            int np
+        ) const;
+
         void setScalarSum
         (
             volScalarField& field,

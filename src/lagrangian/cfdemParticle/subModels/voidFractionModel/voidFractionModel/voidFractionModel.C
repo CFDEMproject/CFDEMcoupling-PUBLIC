@@ -85,7 +85,8 @@ voidFractionModel::voidFractionModel
     ),
     cellsPerParticle_(NULL),
     maxCellsPerParticle_(1),
-    weight_(1.)
+    weight_(1.),
+    porosity_(1.)
 {
     particleCloud_.dataExchangeM().allocateArray(cellsPerParticle_,1,maxCellsPerParticle_);
 }

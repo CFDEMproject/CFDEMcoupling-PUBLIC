@@ -82,9 +82,6 @@ label standardSearch::findCell
     vector position;
     for(int index = 0;index < size; ++index)
     {
-
-        cellIDs[index][0]=-1;
-
         //if(mask[index][0] && particleCloud_.radius(index) > SMALL)
         if(particleCloud_.radius(index) > SMALL)
         {
@@ -98,6 +95,7 @@ label standardSearch::findCell
                 cellIDs[index][0] = particleCloud_.mesh().findCell(position, polyMesh::FACEPLANES);
             #endif
         }
+        else cellIDs[index][0]=-1;
     }
 
     return 1;

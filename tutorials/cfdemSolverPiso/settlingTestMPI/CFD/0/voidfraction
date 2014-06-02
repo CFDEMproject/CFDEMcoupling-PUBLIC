@@ -20,19 +20,10 @@ internalField   uniform 1;
 
 boundaryField
 {
-    walls
+    "(inlet|outlet|walls)"
     {
         type            zeroGradient;
-    }
-
-    obstacle
-    {
-        type            zeroGradient;
-    }
-
-    atmosphere
-    {
-        type            zeroGradient;
+        value           uniform 1;
     }
 }
 

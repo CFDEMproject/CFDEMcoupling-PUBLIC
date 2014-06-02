@@ -45,8 +45,10 @@ defineRunTimeSelectionTable(IOModel, dictionary);
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void IOModel::dumpDEMdata() const
-{}
+int IOModel::dumpDEMdata() const
+{
+    return -1;
+}
 
 fileName IOModel::createTimeDir(fileName path) const
 {
@@ -64,6 +66,60 @@ fileName IOModel::createLagrangianDir(fileName path) const
     return cfdemCloudDirPath;
 }
 
+fileName IOModel::buildFilePath(word dirName) const
+{
+    // create file structure
+	fileName path("");
+    if(parOutput_)
+    {
+    	path=fileName(particleCloud_.mesh().time().path()/particleCloud_.mesh().time().timeName()/dirName/"particleCloud");
+    	mkDir(path,0777);
+    } else
+    {
+		path=fileName("."/dirName);
+    	mkDir(path,0777);
+    	mkDir(fileName(path/"constant"),0777);
+    	OFstream* stubFile = new OFstream(fileName(path/"particles.foam"));
+    	delete stubFile;
+        }
+    return path;
+}
+
+void IOModel::streamDataToPath(fileName path, double** array,int nPProc,word name,word type,word className,word finaliser) const
+{
+    vector vec;
+    OFstream* fileStream = new OFstream(fileName(path/name));
+    *fileStream << "FoamFile\n";
+    *fileStream << "{version 2.0; format ascii;class "<< className << "; location 0;object  "<< name <<";}\n";
+    *fileStream << nPProc <<"\n";
+
+
+    if(type!="origProcId")*fileStream << "(\n";
+    else if(type=="origProcId")
+    {
+        if(nPProc>0) *fileStream <<"{0}"<< "\n";
+        else *fileStream <<"{}"<< "\n";
+    }
+
+    for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
+    {
+        if (particleCloud_.cellIDs()[index][0] > -1) // particle Found
+        {
+            if (type=="scalar"){
+                *fileStream << array[index][0] << " \n";
+            }else if (type=="position" || type=="vector"){
+                for(int i=0;i<3;i++) vec[i] = array[index][i];
+                *fileStream <<"( "<< vec[0] <<" "<<vec[1]<<" "<<vec[2]<<" ) "<< finaliser << " \n";
+            }else if (type=="label"){
+                *fileStream << index << finaliser << " \n";
+            }
+        }
+    }
+
+    if(type!="origProcId")*fileStream << ")\n";
+    delete fileStream;
+}
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 // Construct from components
@@ -75,8 +131,18 @@ IOModel::IOModel
 :
     dict_(dict),
     particleCloud_(sm),
-    time_(sm.mesh().time())
-{}
+    time_(sm.mesh().time()),
+    parOutput_(true)
+{
+	if (
+            particleCloud_.dataExchangeM().myType()=="oneWayVTK" ||
+            dict_.found("serialOutput")
+       )
+    {
+        parOutput_=false;
+        Warning << "IO model is in serial write mode, only data on proc 0 is written" << endl;
+    }
+}
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //

@@ -21,11 +21,13 @@ writeLiggghtsProps
     writeLast switch1;
     writeName "name";
     overwrite switch2;
+    verbose;
 \} :pre
 
 {switch1} = switch (choose on/off) to select if only last step is stored or every write step. :ulb,l
 {name} = name of the restart file to be written in /$caseDir/DEM/  default default "liggghts.restartCFDEM" :l
 {switch2} = switch (choose on/off) to select if only one restart file $name or many files $name_$timeStamp are written :l
+{verbose} = (normally off) for verbose run :l
 :ule
 
 [Examples:]

@@ -93,7 +93,7 @@ public:
 
     word name(){return myName_;};
 
-    const char* command();
+    const char* command(int);
 
     bool runCommand(int);
 

@@ -61,13 +61,11 @@ private:
 
         bool verbose_;
 
-        const scalar alphaMin_;          //NP min value of voidFraction
+        const scalar alphaMin_;          // min value of voidFraction
 
 	    mutable bool alphaLimited_;
 
-        mutable scalar tooMuch_;         //NP particle volume which is lost due to voidFraction limitation
-
-        const scalar scaleUpVol_;        //NP scaling radius, keeping volume of particle
+        mutable scalar tooMuch_;         // particle volume which is lost due to voidFraction limitation
 
         bool interpolation_;
 

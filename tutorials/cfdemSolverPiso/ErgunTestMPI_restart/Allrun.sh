@@ -97,22 +97,12 @@ if [ $postproc == "true" ]
 fi
 
 #- clean up case
-rm -rf $casePath/CFD/0.*
-rm -r $casePath/CFD/callgrind.*
-rm -r $casePath/CFD/*.out
+echo "deleting data at: $casePath :\n"
+source $WM_PROJECT_DIR/bin/tools/CleanFunctions
+cd $casePath/CFD
+cleanCase
 rm -r $casePath/CFD/clockData
-rm -rf $casePath/CFD/processor*
-rm -r $casePath/CFD/VTK
-rm -rf $casePath/CFD/patchAverage_pressureDrop
-rm -rf $casePath/CFD/probes
-rm -rf $casePath/CFD/postProcessing
-rm -rf $casePath/CFD/particles
-rm -r $casePath/CFD/log.*
-rm -r $casePath/CFD/lagrangian
-rm $casePath/log.liggghts
+rm -r $casePath/DEM/post/*
 rm $casePath/DEM/liggghts.restartCFDEM*
-rm $casePath/DEM/post/dump.*
-rm -r $casePath/DEM/log.*
-
-#- preserve post directory
-echo "dummyfile" >> $casePath/DEM/post/dummy
+(cd $casePath/DEM/post && touch dummy)
+echo "done"

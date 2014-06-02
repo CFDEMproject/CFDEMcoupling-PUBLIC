@@ -29,7 +29,7 @@ postproc="false"
 #--------------------------------------------------------------------------------#
 
 #- call function to run a parallel CFD-DEM case
-parCFDDEMrun $logpath $logfileName $casePath $headerText $solverName $nrProcs $machineFileName $debugMode
+parCFDDEMrun $logpath $logfileName $casePath $headerText $solverName $nrProcs $machineFileName $debugMode "true"
 
 if [ $runOctave == "true" ]
     then

@@ -63,9 +63,7 @@ private:
 
         const scalar alphaMin_;          //NP min value of voidFraction
 
-	mutable bool alphaLimited_;
-
-        const scalar scaleUpVol_;        //NP scaling radius, keeping volume of particle
+	    mutable bool alphaLimited_;
 
 public:
 

@@ -19,12 +19,18 @@ GidaspowDragProps
 \{
     velFieldName "U";
     densityFieldName "density";
+    voidfractionFieldName "voidfraction";
     phi "scalar";
+    interpolation;
+    implDEM;
 \}; :pre
 
 {U} = name of the finite volume fluid velocity field :ulb,l
 {density} = name of the finite volume gravity field :l
+{voidfraction} = name of the finite volume voidfraction field :l
 {phi} = drag correction factor (in doubt 1) :l
+{interpolation} = (optional, normally off) flag to use interpolated voidfraction and fluid velocity values :l
+{implDEM} = (optional, normally off) flag to use implicit formulation of drag on DEM side:l
 :ule
 
 [Examples:]
@@ -37,11 +43,12 @@ GidaspowDragProps
 \{
     velFieldName "U";
     densityFieldName "rho";
+    voidfractionFieldName "voidfraction";
 \} :pre
 
 [Description:]
 
-The force model performs the calculation of forces (e.g. fluid-particle interaction forces) acting on each DEM particle. The GidaspowDrag model is a model that calculates the particle based drag force following the correlation of Gidaspow which is a combination of Egrun (1952) and Wen & Yu (1966)  (see Zhu et al. (2007): "Discrete particle simulation of particulate systems: Theoretical developments" ,ChemEngScience).
+The force model performs the calculation of forces (e.g. fluid-particle interaction forces) acting on each DEM particle. The GidaspowDrag model is a model that calculates the particle based drag force following the correlation of Gidaspow which is a combination of Ergun (1952) and Wen & Yu (1966)  (see Zhu et al. (2007): "Discrete particle simulation of particulate systems: Theoretical developments", ChemEngScience).
 
 [Restrictions:]
 

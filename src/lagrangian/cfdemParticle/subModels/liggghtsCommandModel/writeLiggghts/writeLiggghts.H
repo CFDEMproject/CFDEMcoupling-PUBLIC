@@ -93,7 +93,7 @@ public:
 
     // Member Functions
 
-    const char* command();
+    const char* command(int);
 
     bool runCommand(int);
 

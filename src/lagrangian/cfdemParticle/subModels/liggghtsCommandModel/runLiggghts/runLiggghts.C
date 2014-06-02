@@ -72,6 +72,9 @@ runLiggghts::runLiggghts
     {
         propsDict_=dictionary(dict.subDict(myName));
         preNo_=Switch(propsDict_.lookup("preNo"));
+
+        // check if verbose
+        if (propsDict_.found("verbose")) verbose_=true;
     }
 
     runEveryCouplingStep_=true;
@@ -90,7 +93,7 @@ runLiggghts::~runLiggghts()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-const char* runLiggghts::command()
+const char* runLiggghts::command(int commandLine)
 {
     return strCommand_.c_str();
 }

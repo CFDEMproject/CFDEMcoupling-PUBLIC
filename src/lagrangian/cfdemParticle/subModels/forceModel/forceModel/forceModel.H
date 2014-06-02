@@ -75,9 +75,9 @@ protected:
 
         const word modelType_;
 
-        mutable scalar cg_;
-
         bool probeIt_;
+        
+        bool requiresEx_;           //requires a orientation vector
 
 public:
 
@@ -150,17 +150,12 @@ public:
 
         inline const bool& coupleForce() const { return coupleForce_;};
 
-        inline const scalar cg() const { return cg_; };
-
-        void const setCG(double cg) const
-        { 
-            cg_ = cg;
-            Info << "cg is set to: " << cg_ << endl;
-        };
-
         void const setImpDEMdrag() const {particleCloud_.impDEMdrag_=true;};
-
-
+        
+        virtual inline bool& requiresEx() { return requiresEx_;};
+        
+    //Repartition Implixit/Explicit forces
+        void repartitionImExForces() const;
 };
 
 

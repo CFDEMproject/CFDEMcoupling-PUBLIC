@@ -26,10 +26,16 @@ boundaryField
         value           uniform 0;
     }
 
-    atmosphere          
+    inlet          
     {
         type            inletOutlet;
         inletValue      uniform 0;
+        value           uniform 0;
+    }
+    outlet          
+    {
+        type            outletInlet;
+        outletValue      uniform 0;
         value           uniform 0;
     }
 }

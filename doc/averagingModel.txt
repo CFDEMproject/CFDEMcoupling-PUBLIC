@@ -20,7 +20,7 @@ model = name of averaging model to be applied :ul
 averagingModel dense;
 averagingModel dilute; :pre
 
-Note: This examples list might not be complete - please look for other averagin models (averagingModel_XY) in this documentation.
+Note: This examples list might not be complete - please look for other averaging models (averagingModel_XY) in this documentation.
 
 [Description:]
 

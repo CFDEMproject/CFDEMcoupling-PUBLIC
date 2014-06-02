@@ -35,10 +35,10 @@ readLiggghtsDataProps0
 
 [Description:]
 
-The readLiggghtsData liggghtsCommand Model can be used to ??? 
+The readLiggghtsData liggghtsCommand Model can be used to ???
 
 
-[Restrictions:] 
+[Restrictions:]
 
 Note: Model is not up to date.
 

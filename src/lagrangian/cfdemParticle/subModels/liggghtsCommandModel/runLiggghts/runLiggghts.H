@@ -88,7 +88,7 @@ public:
 
     // Member Functions
 
-    const char* command();
+    const char* command(int);
 
     string createCommand(word="",int=0,word="",word="",word="",word="");
 

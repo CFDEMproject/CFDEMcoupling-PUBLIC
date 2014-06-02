@@ -36,6 +36,8 @@ Description
 #include "locateModel.H"
 #include "dataExchangeModel.H"
 #include "IOModel.H"
+#include "mpi.h"
+#include "IOmanip.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -207,6 +209,13 @@ void Foam::cfdemCloudIB::calcVelocityCorrection
     // correct the pressure as well
     p=p+phiIB/U.mesh().time().deltaT();  // do we have to  account for rho here?
     p.correctBoundaryConditions();
+
+     if (couplingProperties_.found("checkinterface"))
+       {
+          Info << "checking no-slip on interface..." << endl;
+//          #include "checkInterfaceVelocity.H" //TODO: check carefully!
+       }
+
 }
 
 vector Foam::cfdemCloudIB::angularVelocity(int index)

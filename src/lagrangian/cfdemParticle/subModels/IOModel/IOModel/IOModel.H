@@ -63,6 +63,8 @@ protected:
 
         const Time& time_;
 
+        bool parOutput_;
+
 public:
 
     //- Runtime type information
@@ -109,11 +111,15 @@ public:
 
     // Member Functions
 
-    virtual void dumpDEMdata() const;
+    virtual int dumpDEMdata() const;
 
     fileName createTimeDir(fileName) const;
 
     fileName createLagrangianDir(fileName) const;
+
+    fileName buildFilePath(word) const;
+
+    void streamDataToPath(fileName,double**,int,word,word type,word className,word finaliser) const;
 };
 
 

@@ -51,7 +51,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                           Class noDrag Declaration
+                           Class particleProbe Declaration
 \*---------------------------------------------------------------------------*/
 
 class particleProbe

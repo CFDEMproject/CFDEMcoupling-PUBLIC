@@ -33,7 +33,7 @@ solvers
         relTol          0;
     }
 
-    U
+    "(U|k|epsilon|R|nuTilda)"
     {
         solver          PBiCG;
         preconditioner  DILU;
@@ -41,49 +41,12 @@ solvers
         relTol          0;
     }
 
-    k
-    {
-        solver          PBiCG;
-        preconditioner  DILU;
-        tolerance       1e-05;
-        relTol          0;
-    }
-
-    epsilon
-    {
-        solver          PBiCG;
-        preconditioner  DILU;
-        tolerance       1e-05;
-        relTol          0;
-    }
-
-    R
-    {
-        solver          PBiCG;
-        preconditioner  DILU;
-        tolerance       1e-05;
-        relTol          0;
-    }
-
-    nuTilda
-    {
-        solver          PBiCG;
-        preconditioner  DILU;
-        tolerance       1e-05;
-        relTol          0;
-    }
-
-    voidfraction
+    "(voidfraction|Ksl|UsNext|voidfractionNext)"
     {
         solver          PCG;
         preconditioner  DIC;
         tolerance       1e-09;
         relTol          1e-06;
-    }
-
-    Ksl
-    {
-        $voidfraction
     }
 }
 

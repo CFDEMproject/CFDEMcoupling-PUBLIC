@@ -28,6 +28,8 @@ LaEuScalarTempProps
     lambda value;
     Cp value1;
     densityFieldName "density";
+    interpolation;
+    verbose;
 }; 
 </PRE>
 <UL><LI><I>U</I> = name of the finite volume fluid velocity field 
@@ -47,6 +49,10 @@ LaEuScalarTempProps
 <LI><I>value1</I> = fluid specific heat capacity [W*s/(kg*K)] 
 
 <LI><I>density</I> = name of the finite volume fluid density field 
+
+<LI><I>interpolation</I> = (optional, normally off) flag to use interpolated voidfraction and fluid velocity values 
+
+<LI><I>verbose</I> = (normally off) for verbose run 
 
 
 </UL>
@@ -71,7 +77,7 @@ LaEuScalarTempProps
 </PRE>
 <P><B>Description:</B>
 </P>
-<P>This "forceModel" does not influence the particles or the fluid flow! Using the particles' temperature a scalar field representing "particle-fluid heatflux" is calculated. The solver then uses this source field in the scalar transport equation for the temperature. The model for convective heat transfer is based on Li and Mason (2000), A computational investigation of transient heat transfer in  pneumatic transport of granular particles, Pow.Tech 112 
+<P>This "forceModel" does not influence the particles or the fluid flow! Using the particles' temperature a scalar field representing "particle-fluid heatflux" is calculated. The solver then uses this source field in the scalar transport equation for the temperature. The model for convective heat transfer is based on Li and Mason (2000), A computational investigation of transient heat transfer in  pneumatic transport of granular particles, Pow.Tech 112
 </P>
 <P><B>Restrictions:</B>
 </P>

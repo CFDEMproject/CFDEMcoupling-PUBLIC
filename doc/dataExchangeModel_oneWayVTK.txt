@@ -23,7 +23,7 @@ oneWayVTKProps
 {timeStep} = time step size of stored DEM data :ulb,l
 {path} = path to the VTK data files relative do simulation directory :l
 {filename} = filename of the VTK file series :l
-{number} = maximum nuber of particles in DEM simulation :l
+{number} = maximum number of particles in DEM simulation :l
 :ule
 
 [Examples:]

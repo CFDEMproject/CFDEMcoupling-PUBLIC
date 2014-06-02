@@ -85,8 +85,8 @@ forceModel::forceModel
     ),
     coupleForce_(true),
     modelType_(sm.modelType()),
-    cg_(1.),
-    probeIt_(sm.probeM().active())
+    probeIt_(sm.probeM().active()),
+    requiresEx_(false)
 {}
 
 
@@ -130,6 +130,21 @@ void forceModel::manipulateScalarField(volScalarField& field) const
     Info << "no scalar manipulation done" << endl;
     // do nothing
 }
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+void forceModel::repartitionImExForces() const
+{
+  if(particleCloud_.imExSplitFactor()<1.0)
+  {
+    Info << "Will re-partition split of implicit and explicit forces: alpha = " 
+         << particleCloud_.imExSplitFactor() << endl;
+    // Update implicit particle
+    expParticleForces_ += (1.0-particleCloud_.imExSplitFactor())*impParticleForces_;
+    impParticleForces_ *= particleCloud_.imExSplitFactor();
+  }
+}
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam

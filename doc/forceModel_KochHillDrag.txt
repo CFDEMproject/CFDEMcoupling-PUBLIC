@@ -21,13 +21,14 @@ KochHillDragProps
     densityFieldName "density";
     voidfractionFieldName "voidfraction"; 
     interpolation;
+    implDEM;
 \}; :pre
 
 {U} = name of the finite volume fluid velocity field :ulb,l
 {density} = name of the finite volume gravity field :l
 {voidfraction} = name of the finite volume voidfraction field :l
-{interpolation} = flag to use interpolated voidfraction and fluid velocity values (normally off) :l
-{implDEM} = flag to use implicit formulation of drag on DEM side (normally off) :l
+{interpolation} = (optional, normally off) flag to use interpolated voidfraction and fluid velocity values :l
+{implDEM} = (optional, normally off) flag to use implicit formulation of drag on DEM side:l
 :ule
 
 [Examples:]
@@ -45,7 +46,7 @@ KochHillDragProps
 
 [Description:]
 
-The force model performs the calculation of forces (e.g. fluid-particle interaction forces) acting on each DEM particle. The KochHillDrag model is a model that calculates the particle based drag force following the correlation of Koch & Hill (2001)  (see van Buijtenen et al. (2011): "Numerical and experimental study on multiple-spout fluidized beds" ,ChemEngScience).
+The force model performs the calculation of forces (e.g. fluid-particle interaction forces) acting on each DEM particle. The KochHillDrag model is a model that calculates the particle based drag force following the correlation of Koch & Hill (2001)  (see van Buijtenen et al. (2011): "Numerical and experimental study on multiple-spout fluidized beds", ChemEngScience).
 
 [Restrictions:]
 

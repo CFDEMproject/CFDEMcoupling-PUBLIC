@@ -75,18 +75,21 @@ sophIO::~sophIO()
 
 // Public Member Functions
 
-void sophIO::dumpDEMdata() const
+int sophIO::dumpDEMdata() const
 {
+    int npProcs(-1);
+
     if (time_.outputTime())
     {
-        basicIO::dumpDEMdata();
+        npProcs=basicIO::dumpDEMdata();
 
         // stream data to file
-        streamDataToPath(lagPath_, particleCloud_.voidfractions(), "voidfractions","scalar","scalarField","");
-        streamDataToPath(lagPath_, particleCloud_.impForces(), "impForces","vector","vectorField","");
-        streamDataToPath(lagPath_, particleCloud_.expForces(), "expForces","vector","vectorField","");
-        streamDataToPath(lagPath_, particleCloud_.DEMForces(), "DEMForces","vector","vectorField","");
+        streamDataToPath(lagPath_, particleCloud_.voidfractions(),npProcs,"voidfractions","scalar","scalarField","");
+        streamDataToPath(lagPath_, particleCloud_.impForces(),npProcs,"impForces","vector","vectorField","");
+        streamDataToPath(lagPath_, particleCloud_.expForces(),npProcs,"expForces","vector","vectorField","");
+        streamDataToPath(lagPath_, particleCloud_.DEMForces(),npProcs,"DEMForces","vector","vectorField","");
     }
+    return npProcs;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 // Private Member Functions

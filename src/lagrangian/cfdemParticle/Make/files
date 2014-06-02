@@ -1,11 +1,12 @@
 cfdemCloud = cfdemCloud
 forceModels = subModels/forceModel
+forceModelsMS = subModels/forceModelMS
 IOModels = subModels/IOModel
 voidFractionModels = subModels/voidFractionModel
+voidFractionModelsMS = subModels/voidFractionModelMS
 locateModels = subModels/locateModel
 meshMotionModels = subModels/meshMotionModel
 momCoupleModels = subModels/momCoupleModel
-regionModels = subModels/regionModel
 dataExchangeModels = subModels/dataExchangeModel
 averagingModels = subModels/averagingModel
 clockModels = subModels/clockModel
@@ -14,35 +15,68 @@ smoothingModels = subModels/smoothingModel
 probeModels = subModels/probeModel
 
 $(cfdemCloud)/cfdemCloud.C
+derived/cfdemCloudBiDisperse/cfdemCloudBiDisperse.C
 derived/cfdemCloudIB/cfdemCloudIB.C
+derived/cfdemCloudMS/cfdemCloudMS.C
 
 $(forceModels)/forceModel/forceModel.C
 $(forceModels)/forceModel/newForceModel.C
 $(forceModels)/noDrag/noDrag.C
 $(forceModels)/checkCouplingInterval/checkCouplingInterval.C
 $(forceModels)/DiFeliceDrag/DiFeliceDrag.C
+$(forceModels)/DiFeliceDragNLift/DiFeliceDragNLift.C
 $(forceModels)/GidaspowDrag/GidaspowDrag.C
 $(forceModels)/SchillerNaumannDrag/SchillerNaumannDrag.C
 $(forceModels)/Archimedes/Archimedes.C
 $(forceModels)/ArchimedesIB/ArchimedesIB.C
 $(forceModels)/interface/interface.C
 $(forceModels)/ShirgaonkarIB/ShirgaonkarIB.C
+$(forceModels)/interfaceParticleProbe/interfaceParticleProbe.C
+$(forceModels)/fieldStore/fieldStore.C
+$(forceModels)/fieldTimeAverage/fieldTimeAverage.C
+$(forceModels)/fieldBound/fieldBound.C
+$(forceModels)/volWeightedAverage/volWeightedAverage.C
+$(forceModels)/totalMomentumExchange/totalMomentumExchange.C
 $(forceModels)/KochHillDrag/KochHillDrag.C
+$(forceModels)/KochHillRWDrag/KochHillRWDrag.C
+$(forceModels)/BeetstraDrag/multiphaseFlowBasic/multiphaseFlowBasic.C
+$(forceModels)/BeetstraDrag/BeetstraDrag.C
+$(forceModels)/LaEuScalarLiquid/LaEuScalarLiquid.C
 $(forceModels)/LaEuScalarTemp/LaEuScalarTemp.C
+$(forceModels)/LaEuScalarDust/LaEuScalarDust.C
 $(forceModels)/virtualMassForce/virtualMassForce.C
 $(forceModels)/gradPForce/gradPForce.C
+$(forceModels)/gradULiftForce/gradULiftForce.C
+$(forceModels)/HollowayDrag/HollowayDrag.C
 $(forceModels)/viscForce/viscForce.C
 $(forceModels)/MeiLift/MeiLift.C
+$(forceModels)/melting/melting.C
+$(forceModels)/KochHillDragNLift/KochHillDragNLift.C
+$(forceModels)/stokesSpheroidDrag/stokesSpheroidDrag.C
+$(forceModels)/solidsPressureForce/solidsPressureForce.C
+$(forceModels)/periodicPressure/periodicPressure.C
+$(forceModels)/periodicPressureControl/periodicPressureControl.C
+$(forceModels)/averageSlipVel/averageSlipVel.C
 $(forceModels)/particleCellVolume/particleCellVolume.C
+
+$(forceModelsMS)/forceModelMS/forceModelMS.C
+$(forceModelsMS)/forceModelMS/newForceModelMS.C
+$(forceModelsMS)/DiFeliceDragMS/DiFeliceDragMS.C
+$(forceModelsMS)/GidaspowDragMS/GidaspowDragMS.C
+$(forceModelsMS)/noDragMS/noDragMS.C
 
 $(probeModels)/probeModel/probeModel.C
 $(probeModels)/probeModel/newProbeModel.C
 $(probeModels)/noProbe/noProbe.C
+$(probeModels)/particleProbe/particleProbe.C
+/*$(probeModels)/interfaceParticleProbe/interfaceParticleProbe.C*/
 
 $(IOModels)/IOModel/IOModel.C
 $(IOModels)/IOModel/newIOModel.C
 $(IOModels)/noIO/noIO.C
 $(IOModels)/basicIO/basicIO.C
+$(IOModels)/tempIO/tempIO.C
+$(IOModels)/colorIO/colorIO.C
 $(IOModels)/trackIO/trackIO.C
 $(IOModels)/sophIO/sophIO.C
 
@@ -50,30 +84,38 @@ $(voidFractionModels)/voidFractionModel/voidFractionModel.C
 $(voidFractionModels)/voidFractionModel/newVoidFractionModel.C
 $(voidFractionModels)/centreVoidFraction/centreVoidFraction.C
 $(voidFractionModels)/dividedVoidFraction/dividedVoidFraction.C
+$(voidFractionModels)/dividedVoidFractionBiDi/dividedVoidFractionBiDi.C
 $(voidFractionModels)/bigParticleVoidFraction/bigParticleVoidFraction.C
 $(voidFractionModels)/GaussVoidFraction/GaussVoidFraction.C
 $(voidFractionModels)/IBVoidFraction/IBVoidFraction.C
+$(voidFractionModels)/weightedNeigbhorsVoidFraction/weightedNeigbhorsVoidFraction.C
+
+$(voidFractionModelsMS)/voidFractionModelMS/voidFractionModelMS.C
+$(voidFractionModelsMS)/voidFractionModelMS/newVoidFractionModelMS.C
+$(voidFractionModelsMS)/dividedVoidFractionMS/dividedVoidFractionMS.C
 
 $(locateModels)/locateModel/locateModel.C
 $(locateModels)/locateModel/newLocateModel.C
 $(locateModels)/standardSearch/standardSearch.C
 $(locateModels)/engineSearch/engineSearch.C
+$(locateModels)/engineSearchMany2Many/engineSearchMany2Many.C
+$(locateModels)/turboEngineSearch/turboEngineSearch.C
+$(locateModels)/turboEngineSearchM2M/turboEngineSearchM2M.C
 $(locateModels)/engineSearchIB/engineSearchIB.C
-
+$(locateModels)/hyperEngineSearch/hyperEngineSearch.C
+$(locateModels)/ijkSearch/ijkSearch.C
 
 $(meshMotionModels)/meshMotionModel/meshMotionModel.C
 $(meshMotionModels)/meshMotionModel/newMeshMotionModel.C
 $(meshMotionModels)/noMeshMotion/noMeshMotion.C
+$(meshMotionModels)/DEMdrivenMeshMotion/DEMdrivenMeshMotion.C
 
 $(momCoupleModels)/momCoupleModel/momCoupleModel.C
 $(momCoupleModels)/momCoupleModel/newMomCoupleModel.C
 $(momCoupleModels)/explicitCouple/explicitCouple.C
+$(momCoupleModels)/explicitCoupleSource/explicitCoupleSource.C
 $(momCoupleModels)/implicitCouple/implicitCouple.C
 $(momCoupleModels)/noCouple/noCouple.C
-
-$(regionModels)/regionModel/regionModel.C
-$(regionModels)/regionModel/newRegionModel.C
-$(regionModels)/allRegion/allRegion.C
 
 $(dataExchangeModels)/dataExchangeModel/dataExchangeModel.C
 $(dataExchangeModels)/dataExchangeModel/newDataExchangeModel.C
@@ -81,11 +123,14 @@ $(dataExchangeModels)/oneWayVTK/oneWayVTK.C
 $(dataExchangeModels)/twoWayFiles/twoWayFiles.C
 $(dataExchangeModels)/noDataExchange/noDataExchange.C
 $(dataExchangeModels)/twoWayMPI/twoWayMPI.C
+$(dataExchangeModels)/twoWayM2M/twoWayM2M.C
+$(dataExchangeModels)/twoWayMany2Many/twoWayMany2Many.C
 
 $(averagingModels)/averagingModel/averagingModel.C
 $(averagingModels)/averagingModel/newAveragingModel.C
 $(averagingModels)/dilute/dilute.C
 $(averagingModels)/dense/dense.C
+$(averagingModels)/denseBiDi/denseBiDi.C
 
 $(clockModels)/clockModel/clockModel.C
 $(clockModels)/clockModel/newClockModel.C
@@ -94,6 +139,7 @@ $(clockModels)/noClock/noClock.C
 
 $(liggghtsCommandModels)/liggghtsCommandModel/liggghtsCommandModel.C
 $(liggghtsCommandModels)/liggghtsCommandModel/newLiggghtsCommandModel.C
+$(liggghtsCommandModels)/colorParticles/colorParticles.C
 $(liggghtsCommandModels)/execute/execute.C
 $(liggghtsCommandModels)/runLiggghts/runLiggghts.C
 $(liggghtsCommandModels)/writeLiggghts/writeLiggghts.C
@@ -103,5 +149,6 @@ $(smoothingModels)/smoothingModel/smoothingModel.C
 $(smoothingModels)/smoothingModel/newSmoothingModel.C
 $(smoothingModels)/noSmoothing/noSmoothing.C
 $(smoothingModels)/constDiffSmoothing/constDiffSmoothing.C
+$(smoothingModels)/localPSizeDiffSmoothing/localPSizeDiffSmoothing.C
 
-LIB = $(FOAM_USER_LIBBIN)/lib$(CFDEM_LIB_NAME)
+LIB = $(CFDEM_LIB_DIR)/lib$(CFDEM_LIB_NAME)

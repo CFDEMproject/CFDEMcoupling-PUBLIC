@@ -73,6 +73,9 @@ writeLiggghts::writeLiggghts
     {
         propsDict_=dictionary(dict.subDict(typeName + "Props"));
 
+        // check if verbose
+        if (propsDict_.found("verbose")) verbose_=true;
+
         if(propsDict_.found("writeLast"))
         {
             writeLast_=Switch(propsDict_.lookup("writeLast"));
@@ -112,7 +115,7 @@ writeLiggghts::~writeLiggghts()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-const char* writeLiggghts::command()
+const char* writeLiggghts::command(int commandLine)
 {
     return strCommand_.c_str();
 }

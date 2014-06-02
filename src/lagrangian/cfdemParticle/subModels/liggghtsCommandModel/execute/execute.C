@@ -69,7 +69,6 @@ execute::execute
     command_(""),
     scalarList_(0),
     labelList_(0),
-    runTimeModifiable_(true),
     timeStamp_(false)
 {
     // define dictionary
@@ -87,73 +86,12 @@ execute::execute
     // read list of labels
     if(propsDict_.found("labels")) labelList_ = labelList(propsDict_.lookup("labels"));
 
-    bool addBlank = true;  // std no blanks after each word
-    fileName add;
-    label numberCount=0;   // nr of scalars inserted to command
-    label labelCount=0;   // nr of labels inserted to command
+    // check if verbose
+    if (propsDict_.found("verbose")) verbose_=true;
 
-    forAll(commandList_,i)
-    {
-        add = word(commandList_[i]);
-
-        //- handle symbols
-        if (add == "$couplingInterval")
-        {
-            char h[50];
-            sprintf(h,"%d",particleCloud_.dataExchangeM().couplingInterval());
-            add = h;
-        }
-        else if (add=="dot")    add = ".";
-        else if (add=="dotdot") add = "..";
-        else if (add=="slash")  add = "/";
-        else if (add=="noBlanks")  // no blanks after the following words
-        {
-            add = "";
-            addBlank = false;
-        }else if (add=="blanks") // add a blank here and after the following words
-        {
-            add = "";
-            addBlank = true;
-        }else if (add=="timeStamp") // next command will be a number read from scalarList_
-        {
-            add = "";
-            timeStamp_=true;
-        }else if (add=="number") // next command will be a number read from scalarList_
-        {
-            if (!propsDict_.found("scalars"))
-            {
-                FatalError<<"you want to use a number in the command\n - specify a scalar list with all numbers"
-                << abort(FatalError);
-
-            }
-            char h[50];
-            sprintf(h,"%f",scalarList_[numberCount]);
-            add = h;
-            numberCount ++;
-        }else if (add=="label") // next command will be a number read from scalarList_
-        {
-            if (!propsDict_.found("labels"))
-            {
-                FatalError<<"you want to use a label in the command\n - specify a label list with all numbers"
-                << abort(FatalError);
-
-            }
-            char h[50];
-            sprintf(h,"%d",labelList_[labelCount]);
-            add = h;
-            labelCount ++;
-        }
-
-        // compose command
-        if (addBlank)
-        {
-            command_ += add + " ";
-        }else
-        {
-            command_ += add;
-        }
-    }
+    parseCommandList(commandList_, labelList_, scalarList_, command_, propsDict_, timeStamp_);
     Info << "liggghtsCommand " << command_ << endl;
+
     strCommand_=string(command_);
 
     checkTimeMode(propsDict_);
@@ -170,7 +108,7 @@ execute::~execute()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-const char* execute::command()
+const char* execute::command(int commandLine)
 {
     return strCommand_.c_str();
 }
@@ -178,7 +116,7 @@ const char* execute::command()
 bool execute::runCommand(int couplingStep)
 {
     if(timeStamp_) strCommand_=addTimeStamp(command_);
-    if(runTimeModifiable_) checkTimeSettings(propsDict_);
+    checkTimeSettings(propsDict_);
 
     return runThisCommand(couplingStep);
 }

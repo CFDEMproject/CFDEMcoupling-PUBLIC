@@ -130,9 +130,12 @@ int main(int argc, char *argv[])
                 volScalarField rUA = 1.0/UEqn.A();
 
                 U = rUA*UEqn.H();
+                #ifdef version23
+                phi = (fvc::interpolate(U) & mesh.Sf()); // there is a new version in 23x
+                #else
                 phi = (fvc::interpolate(U) & mesh.Sf())
                     + fvc::ddtPhiCorr(rUA, U, phi);
-
+                #endif
                 adjustPhi(phi, U, p);
 
                 #if defined(version22)

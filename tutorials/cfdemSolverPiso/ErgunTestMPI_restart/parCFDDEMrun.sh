@@ -19,12 +19,13 @@ logpath=$casePath
 headerText="run_parallel_cfdemSolverPiso_ErgunTestMPI_CFDDEM"
 logfileName="log_$headerText"
 solverName="cfdemSolverPiso"
-nrProcs="2"
+nrProcs="4"
 machineFileName="none"   # yourMachinefileName | none
 debugMode="off"          # on | off| strict
+reconstuctCase="true"    # true | false
 testHarnessPath="$CFDEM_TEST_HARNESS_PATH"
 #--------------------------------------------------------------------------------#
 
 #- call function to run a parallel CFD-DEM case
-parCFDDEMrun $logpath $logfileName $casePath $headerText $solverName $nrProcs $machineFileName $debugMode
+parCFDDEMrun $logpath $logfileName $casePath $headerText $solverName $nrProcs $machineFileName $debugMode $reconstuctCase
 

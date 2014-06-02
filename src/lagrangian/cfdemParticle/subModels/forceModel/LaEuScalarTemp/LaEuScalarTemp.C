@@ -63,10 +63,11 @@ LaEuScalarTemp::LaEuScalarTemp
 :
     forceModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
+    verbose_(false),
     tempFieldName_(propsDict_.lookup("tempFieldName")),
     tempField_(sm.mesh().lookupObject<volScalarField> (tempFieldName_)),
     voidfractionFieldName_(propsDict_.lookup("voidfractionFieldName")),
-    voidfractionField_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
+    voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
     maxSource_(1e30),
     velFieldName_(propsDict_.lookup("velFieldName")),
     U_(sm.mesh().lookupObject<volVectorField> (velFieldName_)),
@@ -77,7 +78,8 @@ LaEuScalarTemp::LaEuScalarTemp
     lambda_(readScalar(propsDict_.lookup("lambda"))),
     Cp_(readScalar(propsDict_.lookup("Cp"))),
     densityFieldName_(propsDict_.lookup("densityFieldName")),
-    rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_))
+    rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_)),
+    interpolation_(false)
 {
     allocateMyArrays();
 
@@ -86,6 +88,11 @@ LaEuScalarTemp::LaEuScalarTemp
         maxSource_=readScalar(propsDict_.lookup ("maxSource"));
         Info << "limiting eulerian source field to: " << maxSource_ << endl;
     }
+    if (propsDict_.found("interpolation")) interpolation_=true;
+    if (propsDict_.found("verbose")) verbose_=true;
+
+Info << "verbose_" << verbose_ << endl;
+
     particleCloud_.checkCG(false);
 }
 
@@ -132,56 +139,75 @@ void LaEuScalarTemp::manipulateScalarField(volScalarField& EuField) const
     #endif
 
     // calc La based heat flux
-    vector Us;
-    scalar magUr;
-    scalar alpha;
-    scalar rs;
-    scalar As;
-    scalar nuf;
-    scalar Rep;
-    scalar Pr;
+    vector position(0,0,0);
+    scalar voidfraction(1);
+    vector Ufluid(0,0,0);
+    scalar Tfluid(0);
+    label cellI=0;
+    vector Us(0,0,0);
+    scalar ds(0);
+    scalar nuf(0);
+    scalar magUr(0);
+    scalar As(0);
+    scalar Rep(0);
+    scalar Pr(0);
+    scalar Nup(0);
     scalar n = 3.5; // model parameter
-    scalar Nup;
+
+    interpolationCellPoint<scalar> voidfractionInterpolator_(voidfraction_);
+    interpolationCellPoint<vector> UInterpolator_(U_);
+    interpolationCellPoint<scalar> TInterpolator_(tempField_);
 
     for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
     {
         //if(particleCloud_.regionM().inRegion()[index][0])
         //{
-            label cellI = particleCloud_.cellIDs()[index][0];
-
+            cellI = particleCloud_.cellIDs()[index][0];
             if(cellI >= 0)
             {
+                if(interpolation_)
+                {
+	                position = particleCloud_.position(index);
+                    voidfraction = voidfractionInterpolator_.interpolate(position,cellI);
+                    Ufluid = UInterpolator_.interpolate(position,cellI);
+                    Tfluid = TInterpolator_.interpolate(position,cellI);
+                }else
+                {
+					voidfraction = voidfraction_[cellI];
+                    Ufluid = U_[cellI];
+                    Tfluid = tempField_[cellI];
+                }
+
                 // calc relative velocity
                 Us = particleCloud_.velocity(index);
-                magUr = mag(U_[cellI]-Us);
-                alpha = voidfractionField_[cellI];
-                rs = particleCloud_.radius(index);
-                As = 4*rs*rs*M_PI;
+                magUr = mag(Ufluid-Us);
+                ds = 2*particleCloud_.radius(index);
+                As = ds*ds*M_PI;
                 nuf = nufField[cellI];
-                Rep = 2*rs*magUr/nuf;
+                Rep = ds*magUr/nuf;
                 Pr = Cp_*nuf*rho_[cellI]/lambda_;
 
                 if (Rep < 200)
                 {
-                    Nup = 2+0.6*pow(alpha,n)*sqrt(Rep)*pow(Pr,0.33);
+                    Nup = 2+0.6*pow(voidfraction,n)*sqrt(Rep)*pow(Pr,0.33);
                 }
                 else if (Rep < 1500)
                 {
-                    Nup = 2+0.5*pow(alpha,n)*sqrt(Rep)*pow(Pr,0.33)
-                                 +0.02*pow(alpha,n)*pow(Rep,0.8)*pow(Pr,0.33);
+                    Nup = 2+0.5*pow(voidfraction,n)*sqrt(Rep)*pow(Pr,0.33)
+                                 +0.02*pow(voidfraction,n)*pow(Rep,0.8)*pow(Pr,0.33);
                 }
                 else
                 {
-                    Nup = 2+0.000045*pow(alpha,n)*pow(Rep,1.8);
+                    Nup = 2+0.000045*pow(voidfraction,n)*pow(Rep,1.8);
                 }
-                scalar h = lambda_*Nup/(2*rs);
+                scalar h = lambda_*Nup/(ds);
 
                 // calc convective heat flux [W]
-                scalar partHeatFlux = h * As * (tempField_[cellI] - partTemp_[index][0]);
+                scalar partHeatFlux = h * As * (Tfluid - partTemp_[index][0]);
                 partHeatFlux_[index][0] = partHeatFlux;
 
 
-                /*if(index == 101)
+                if(verbose_ && index >=0 && index <2)
                 {
                     Info << "partHeatFlux = " << partHeatFlux << endl;
                     Info << "magUr = " << magUr << endl;
@@ -190,10 +216,10 @@ void LaEuScalarTemp::manipulateScalarField(volScalarField& EuField) const
                     Info << "Rep = " << Rep << endl;
                     Info << "Pr = " << Pr << endl;
                     Info << "Nup = " << Nup << endl;
-                    Info << "alpha = " << alpha << endl;
+                    Info << "voidfraction = " << voidfraction << endl;
                     Info << "partTemp_[index][0] = " << partTemp_[index][0] << endl  ;
-                    Info << "ptempField_[cellI] = " << tempField_[cellI] << endl  ;
-                }*/
+                    Info << "Tfluid = " << Tfluid << endl  ;
+                }
             }
         //}
     }

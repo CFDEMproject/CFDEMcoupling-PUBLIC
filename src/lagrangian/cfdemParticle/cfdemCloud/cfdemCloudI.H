@@ -44,6 +44,27 @@ namespace Foam
 {
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+inline void cfdemCloud::setCG(double cg) const
+{ 
+    cg_ = cg;
+    Info << "cg is set to: " << cg_ << endl;
+};
+
+inline const bool& cfdemCloud::impDEMdrag() const
+{ 
+    return impDEMdrag_;
+};
+
+inline const scalar& cfdemCloud::imExSplitFactor() const
+{
+	    return imExSplitFactor_;
+};
+
+inline const scalar& cfdemCloud::cg() const
+{ 
+    return cg_;
+};
+
 inline const bool& cfdemCloud::ignore() const
 {
     return ignore_;
@@ -52,6 +73,11 @@ inline const bool& cfdemCloud::ignore() const
 inline const fvMesh& cfdemCloud::mesh() const
 {
     return mesh_;
+}
+
+inline bool cfdemCloud::solveFlow() const
+{
+    return bool(solveFlow_);
 }
 
 inline bool cfdemCloud::verbose() const

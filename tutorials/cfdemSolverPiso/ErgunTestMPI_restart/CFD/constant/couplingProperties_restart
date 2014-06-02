@@ -25,41 +25,43 @@ FoamFile
 
 //===========================================================================//
 // sub-models & settings
-verbous;
+
 modelType "A"; // A or B
 
 couplingInterval 100;
 
-voidFractionModel divided;
+voidFractionModel divided;//centre;//
 
-locateModel engine;
+locateModel engine;//turboEngineM2M;//
 
 meshMotionModel noMeshMotion;
 
 regionModel allRegion;
 
-IOModel "basicIO";
+IOModel basicIO;
 
 probeModel off;
 
-dataExchangeModel twoWayMPI;//twoWayFiles;//oneWayVTK;//
+dataExchangeModel twoWayMPI;//twoWayM2M;//twoWayFiles;//oneWayVTK;//
 
 averagingModel dense;//dilute;//
 
-clockModel off;
+clockModel standardClock;//off;//
 
-smoothingModel off;
+smoothingModel off;// localPSizeDiffSmoothing;// constDiffSmoothing; //
 
 forceModels
 (
     //GidaspowDrag
-    DiFeliceDrag
-    //KochHillDrag
+    //BeetstraDrag
+    //DiFeliceDrag
+    KochHillDrag
     gradPForce
     viscForce
     //Archimedes
     //volWeightedAverage
     //totalMomentumExchange
+    //particleCellVolume
 );
 
 momCoupleModels
@@ -71,6 +73,21 @@ turbulenceModelType "RASProperties";//"LESProperties";//
 
 //===========================================================================//
 // sub-model properties
+
+localPSizeDiffSmoothingProps
+{
+    lowerLimit 0.1;
+    upperLimit 1e10;
+    dSmoothingLength 1.5e-3;
+    Csmoothing    1.0; 
+}
+
+constDiffSmoothingProps
+{
+    lowerLimit 0.1;
+    upperLimit 1e10;
+    smoothingLength 1.5e-3;
+}
 
 implicitCoupleProps
 {
@@ -110,7 +127,7 @@ volWeightedAverageProps
     );
     upperThreshold 0.999;
     lowerThreshold 0;
-    verbous;
+    verbose;
 }
 totalMomentumExchangeProps
 {
@@ -122,8 +139,11 @@ totalMomentumExchangeProps
 }
 GidaspowDragProps
 {
+    verbose;
     velFieldName "U";
     densityFieldName "rho";
+    voidfractionFieldName "voidfraction";
+    phi 1;
 }
 DiFeliceDragProps
 {
@@ -134,14 +154,38 @@ DiFeliceDragProps
 
 KochHillDragProps
 {
+    //verbose;
     velFieldName "U";
     densityFieldName "rho";
+    voidfractionFieldName "voidfraction";
+}
+
+BeetstraDragProps
+{
+    velFieldName "U";
+    densityFieldName "rho";
+    gravityFieldName "g";
+    rhoParticle     2000.;
+    voidfractionFieldName "voidfraction";
+    interpolation ;
+    useFilteredDragModel ;
+    useParcelSizeDependentFilteredDrag ;
+    k       0.05;
+    aLimit  0.0;
+//    verbose ;
 }
 
 virtualMassForceProps
 {
     velFieldName "U";
     densityFieldName "rho";
+}
+
+particleCellVolumeProps
+{
+    upperThreshold 0.999;
+    lowerThreshold 0.;
+    verbose;
 }
 
 oneWayVTKProps
@@ -165,9 +209,17 @@ engineProps
     treeSearch true;
 }
 
+turboEngineM2MProps
+{
+    turboEngineProps
+    {
+        treeSearch true;
+    }
+}
+
 dividedProps
 {
-    alphaMin 0.1;
+    alphaMin 0.01;
     scaleUpVol 1.0;
 }
 

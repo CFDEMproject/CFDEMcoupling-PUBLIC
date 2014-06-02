@@ -133,8 +133,12 @@ int main(int argc, char *argv[])
 
                 U = rUA*UEqn.H();
 
+                #ifdef version23
+                phi = ( fvc::interpolate(U*voidfraction) & mesh.Sf() );
+                #else
                 phi = ( fvc::interpolate(U*voidfraction) & mesh.Sf() )
                       + fvc::ddtPhiCorr(rUAvoidfraction, U, phi);
+                #endif
                 surfaceScalarField phiS(fvc::interpolate(Us*voidfraction) & mesh.Sf());
                 surfaceScalarField phiGes = phi + rUAf*(fvc::interpolate(Ksl/rho) * phiS);
                 if (modelType=="A")

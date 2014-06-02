@@ -29,6 +29,10 @@ liggghtsCommandModels
     writeLiggghts
 );
 
+runLiggghtsProps
+{
+    preNo false;
+}
 
 //- optional
 writeLiggghtsProps

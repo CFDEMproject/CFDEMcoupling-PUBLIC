@@ -24,7 +24,7 @@ DiFeliceDragProps
 
 {U} = name of the finite volume fluid velocity field :ulb,l
 {density} = name of the finite volume gravity field :l
-{interpolation} = flag to use interolate interpolated voidfraction and velocity values (normally off) :l
+{interpolation} = flag to use interpolated voidfraction and velocity values (normally off) :l
 :ule
 
 [Examples:]

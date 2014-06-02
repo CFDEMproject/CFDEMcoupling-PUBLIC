@@ -89,6 +89,10 @@ protected:
 
     bool exactTiming_;
 
+    label commandLines_;
+
+    bool verbose_;
+
 public:
 
     //- Runtime type information
@@ -140,7 +144,7 @@ public:
 
     // Member Functions
 
-        virtual const char* command()=0;
+        virtual const char* command(int)=0;
 
         void checkTimeMode(dictionary&);
 
@@ -166,6 +170,9 @@ public:
 
         bool exactTiming(){return exactTiming_;};
 
+        label commandLines(){return commandLines_;};
+
+        void parseCommandList(wordList&, labelList&, scalarList&, word&, dictionary&, bool=false);
 };
 
 

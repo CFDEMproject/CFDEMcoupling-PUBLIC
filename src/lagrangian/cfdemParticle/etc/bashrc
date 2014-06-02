@@ -18,7 +18,7 @@
 ##- source cfdem env vars
 #export CFDEM_VERSION=PUBLIC
 #export CFDEM_PROJECT_DIR=$HOME/CFDEM/CFDEMcoupling-$CFDEM_VERSION-$WM_PROJECT_VERSION
-#export CFDEM_SRC_DIR=$CFDEM_PROJECT_DIR/src/lagrangian/cfdemParticle
+#export CFDEM_SRC_DIR=$CFDEM_PROJECT_DIR/src
 #export CFDEM_SOLVER_DIR=$CFDEM_PROJECT_DIR/applications/solvers
 #export CFDEM_DOC_DIR=$CFDEM_PROJECT_DIR/doc
 #export CFDEM_UT_DIR=$CFDEM_PROJECT_DIR/applications/utilities
@@ -43,8 +43,17 @@ export CFDEM_LIGGGHTS_LIB_NAME=lmp_$CFDEM_LIGGGHTS_MAKEFILE_NAME
 #- CFDEM lib name
 export CFDEM_LIB_NAME=lagrangianCFDEM-$CFDEM_VERSION-$WM_PROJECT_VERSION
 
-#- LMP M2M lib path
+#- LMP Many2Many lib path and makefile
+export CFDEM_Many2ManyLIB_PATH=$CFDEM_SRC_DIR/lagrangian/cfdemParticle/subModels/dataExchangeModel/twoWayMany2Many/library
+export CFDEM_Many2ManyLIB_MAKEFILENAME=$CFDEM_LIGGGHTS_MAKEFILE_NAME
+
+#- LMP M2M lib path and makefile
 export CFDEM_M2MLIB_PATH=$CFDEM_SRC_DIR/lagrangian/cfdemParticle/subModels/dataExchangeModel/twoWayM2M/library
+export CFDEM_M2MLIB_MAKEFILENAME=$CFDEM_LIGGGHTS_MAKEFILE_NAME
+
+#- LMP POEMS lib path and makefile
+export CFDEM_POEMSLIB_PATH=$CFDEM_LIGGGHTS_SRC_DIR/../lib/poems
+export CFDEM_POEMSLIB_MAKEFILENAME=g++
 
 #- path to test harness
 export CFDEM_TEST_HARNESS_PATH=$CFDEM_PROJECT_USER_DIR/log/logFilesCFDEM-$CFDEM_VERSION-$WM_PROJECT_VERSION
@@ -112,7 +121,7 @@ alias cfdemPullCFDEMcoupling='bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/p
 #- shortcut to clean CFDEM
 alias cfdemCleanCFDEM='bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/cleanCFDEMcoupling.sh'
 
-#- shortcut to compile LIGGGHTS
+#- shortcut to compile LIGGGHTS + sublibraries
 alias cfdemCompLIG='bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/compileLIGGGHTS.sh'
 
 #- shortcut to compile CFDEMcoupling +LIGGGHTS
@@ -130,9 +139,6 @@ alias cfdemCompCFDEMsol='bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/compil
 #- shortcut to compile CFDEMcoupling utilities
 alias cfdemCompCFDEMuti='bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/compileCFDEMcoupling_uti.sh'
 
-#- shortcut to compile couple library
-alias cfdemCompM2M='bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/compileM2Mlib.sh'
-
 #- shortcut to test basic tutorials
 alias cfdemTestTUT='bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/testTutorials.sh'
 
@@ -147,25 +153,24 @@ export -f cfdemLiggghts
 cfdemLiggghtsPar() { mpirun -np $2 $CFDEM_LIGGGHTS_SRC_DIR/lmp_$CFDEM_LIGGGHTS_MAKEFILE_NAME < $1; }
 export -f cfdemLiggghtsPar
 
+#- shortcut to open files including a pattern
+cfdemGrep() { grep -rl "$1" ./* | xargs gedit; }
+export -f cfdemGrep
+
 # check if the run directory exists
 if [ -d "$CFDEM_PROJECT_USER_DIR" ]; then
     :
 else
-    if [ -d "$CFDEM_PROJECT_DIR" ]; then
-        cd $CFDEM_PROJECT_DIR/..
-        echo "make new dirs $CFDEM_PROJECT_DIR/../$LOGNAME-$CFDEM_VERSION-$WM_PROJECT_VERSION ? (y/n)"
+        echo "make new dirs $CFDEM_PROJECT_USER_DIR ? (y/n)"
         read YN
         if [ $YN == "y" ]; then
+            cd $CFDEM_PROJECT_DIR
             mkdir $LOGNAME-$CFDEM_VERSION-$WM_PROJECT_VERSION
             cd $LOGNAME-$CFDEM_VERSION-$WM_PROJECT_VERSION
             mkdir run
             mkdir -p log/logFilesCFDEM-$CFDEM_VERSION-$WM_PROJECT_VERSION
         else
             echo "aborted by user."
-            exit
+            #exit
         fi
-    else
-        echo "error in CFDEMcoupling's bashrc."
-        exit
-    fi
 fi

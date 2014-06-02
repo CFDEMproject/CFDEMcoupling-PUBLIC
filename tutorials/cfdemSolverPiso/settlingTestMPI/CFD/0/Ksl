@@ -21,15 +21,11 @@ internalField   uniform 0;
 
 boundaryField
 {
-    atmosphere
+    "(inlet|outlet|walls)"     
     {
         type            zeroGradient;
+        value           uniform 0;
     }
-    walls
-    {
-        type            zeroGradient;
-    }
-
 }
 
 

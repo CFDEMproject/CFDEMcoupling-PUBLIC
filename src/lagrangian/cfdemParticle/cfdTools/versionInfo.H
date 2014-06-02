@@ -1,6 +1,6 @@
-word CFDEMversion="cfdem-2.6.1";
-word compatibleLIGGGHTSversion="3.0.0";
-word OFversion="2.2.x-commit-61b850bc107bdd60bbf1bf9a6417b9faf701d128";
+word CFDEMversion="cfdem-2.7.0";
+word compatibleLIGGGHTSversion="3.0.2";
+word OFversion="2.3.x-commit-4d6f4a3115ff76ec4154c580eb041bc95ba4ec09";
 
 Info << "\nCFDEMcoupling version: " << CFDEMversion << "\n" <<  endl;
 Info << "\n, compatible to LIGGGHTS version: " << compatibleLIGGGHTSversion << "\n" <<  endl;

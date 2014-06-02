@@ -88,6 +88,8 @@ protected:
 
     IOdictionary liggghtsCommandDict_;
 
+    Switch solveFlow_;
+
     bool verbose_;
 
     bool ignore_;
@@ -132,9 +134,13 @@ protected:
 
     const word turbulenceModelType_;
 
+    mutable scalar cg_;
+
     bool cgOK_;
 
     bool impDEMdrag_;
+
+    mutable scalar imExSplitFactor_;
 
     bool useDDTvoidfraction_;
 
@@ -185,6 +191,8 @@ protected:
 
     virtual void setForces();
 
+    virtual void setParticleForceField();
+
     virtual void setVectorAverages();
 
 public:
@@ -233,9 +241,19 @@ public:
 
        label liggghtsCommandModelIndex(word);
 
+       inline void setCG(double) const;
+
+       inline const scalar& cg() const;
+
+       inline const bool& impDEMdrag() const;
+
+       inline const scalar& imExSplitFactor() const;
+
        inline const bool& ignore() const;
 
        inline const fvMesh& mesh() const;
+
+       inline bool solveFlow() const;
 
        inline bool verbose() const;
 
@@ -278,6 +296,10 @@ public:
        virtual inline double ** particleDensity() const {return NULL;};
        virtual inline int ** particleTypes() const {return NULL;};
        virtual label particleType(label index) const {return -1;};
+
+       //access to the particles' orientation information
+       virtual inline double ** exArray() const {return NULL;};
+       virtual vector ex(int) const {return Foam::vector(0,0,0);};
 
        inline int numberOfParticles() const;
 

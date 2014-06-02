@@ -76,6 +76,16 @@ private:
 
     bool interpolation_; // use interpolated U field values
 
+    bool splitImplicitExplicit_; // use splitting of implicit and explict force contribution
+
+    word UsFieldName_;   
+
+    const volVectorField& UsField_;  // the average particle velocity field (for implicit/expliti force split)
+
+    mutable scalar scaleDia_;
+
+    mutable scalar scaleDrag_;
+
 public:
 
     //- Runtime type information

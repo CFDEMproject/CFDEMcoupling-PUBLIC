@@ -65,9 +65,8 @@ centreVoidFraction::centreVoidFraction
     alphaMin_(readScalar(propsDict_.lookup("alphaMin"))),
     alphaLimited_(0)
 {
-    Info << "centreVoidFraction constructor done" << endl;
-    if (propsDict_.found("weight"))
-        setWeight(readScalar(propsDict_.lookup("weight")));
+    checkWeightNporosity(propsDict_);
+    if(porosity()!=1) FatalError << "porosity not used in centreVoidFraction" << abort(FatalError);
 }
 
 
@@ -83,6 +82,11 @@ void centreVoidFraction::setvoidFraction(double** const& mask,double**& voidfrac
 {
     reAllocArrays();
 
+    scalar radius(-1);
+    scalar volume(0);
+    scalar cellVol(0);
+    scalar scaleVol= weight();
+
     for(int index=0; index< particleCloud_.numberOfParticles(); index++)
     {
         //if(mask[index][0])
@@ -95,14 +99,14 @@ void centreVoidFraction::setvoidFraction(double** const& mask,double**& voidfrac
 
             if (cellI >= 0)  // particel centre is in domain
             {
-                scalar ds = 2*particleCloud_.radii()[index][0];
-                scalar cellVolume=voidfractionNext_.mesh().V()[cellI];
-                scalar particleVolume= ds*ds*ds/6.*3.1415*weight();
+                cellVol = voidfractionNext_.mesh().V()[cellI];
+                radius = particleCloud_.radii()[index][0];
+                volume = 4.188790205*radius*radius*radius*scaleVol;
 
-                // store particleVolume for each particle
-                particleVolumes[index][0] = particleVolume;
+                // store volume for each particle
+                particleVolumes[index][0] = volume;
 
-                voidfractionNext_[cellI] -= particleVolume/cellVolume;
+                voidfractionNext_[cellI] -= volume/cellVol;
 
                 if(voidfractionNext_[cellI] < alphaMin_ )
                 {

@@ -199,7 +199,7 @@ void IBVoidFraction::setvoidFraction(double** const& mask,double**& voidfraction
                             }
                 		}
                 	}
-                }
+                } //end particle partially overlapping with cell
 
                 //generating list with cell and subcells
                 buildLabelHashSet(radius, minPeriodicParticlePos, particleCenterCellID, hashSett, true);

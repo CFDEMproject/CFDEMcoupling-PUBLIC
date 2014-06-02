@@ -73,6 +73,7 @@ Foam::cfdemCloud::cfdemCloud
             IOobject::NO_WRITE
         )
     ),
+    solveFlow_(true),
     verbose_(false),
     ignore_(false),
     modelType_(couplingProperties_.lookup("modelType")),
@@ -95,8 +96,10 @@ Foam::cfdemCloud::cfdemCloud
     momCoupleModels_(couplingProperties_.lookup("momCoupleModels")),
     liggghtsCommandModelList_(liggghtsCommandDict_.lookup("liggghtsCommandModels")),
     turbulenceModelType_(couplingProperties_.lookup("turbulenceModelType")),
+    cg_(1.),
     cgOK_(true),
     impDEMdrag_(false),
+    imExSplitFactor_(1.0),
     useDDTvoidfraction_(false),
     ddtVoidfraction_
     (   
@@ -212,7 +215,10 @@ Foam::cfdemCloud::cfdemCloud
     #include "versionInfo.H"
 
     Info << "If BC are important, please provide volScalarFields -imp/expParticleForces-" << endl;
-
+    if (couplingProperties_.found("solveFlow"))
+        solveFlow_=Switch(couplingProperties_.lookup("solveFlow"));
+    if (couplingProperties_.found("imExSplitFactor"))
+        imExSplitFactor_ = readScalar(couplingProperties_.lookup("imExSplitFactor"));
     if (couplingProperties_.found("verbose")) verbose_=true;
     if (couplingProperties_.found("ignore")) ignore_=true;
     if (turbulenceModelType_=="LESProperties")
@@ -259,7 +265,7 @@ Foam::cfdemCloud::cfdemCloud
     }
 
     dataExchangeM().setCG();
-    if (!cgOK_ && forceM(0).cg() > 1) FatalError<< "at least one of your models is not fit for cg !!!"<< abort(FatalError); 
+    if (!cgOK_ && cg_ > 1) FatalError<< "at least one of your models is not fit for cg !!!"<< abort(FatalError); 
 }
 
 // * * * * * * * * * * * * * * * * Destructors  * * * * * * * * * * * * * * //
@@ -329,6 +335,24 @@ void Foam::cfdemCloud::setForces()
     resetArray(DEMForces_,numberOfParticles(),3);
     resetArray(Cds_,numberOfParticles(),1);
     for (int i=0;i<cfdemCloud::nrForceModels();i++) cfdemCloud::forceM(i).setForce();
+}
+
+void Foam::cfdemCloud::setParticleForceField()
+{
+    averagingM().setVectorSum
+    (
+        forceM(0).impParticleForces(),
+        impForces_,
+        particleWeights_,
+        NULL //mask
+    );
+    averagingM().setVectorSum
+    (
+        forceM(0).expParticleForces(),
+        expForces_,
+        particleWeights_,
+        NULL //mask
+    );
 }
 
 void Foam::cfdemCloud::setVectorAverages()
@@ -457,7 +481,7 @@ bool Foam::cfdemCloud::evolve
                 Info << "couplingStep:" << dataExchangeM().couplingStep() 
                      << "\n- resetVolFields()" << endl;
             }
-            averagingM().resetVectorAverage(averagingM().UsPrev(),averagingM().UsNext());
+            averagingM().resetVectorAverage(averagingM().UsPrev(),averagingM().UsNext(),false);
             voidFractionM().resetVoidFractions();
             averagingM().resetVectorAverage(forceM(0).impParticleForces(),forceM(0).impParticleForces(),true);
             averagingM().resetVectorAverage(forceM(0).expParticleForces(),forceM(0).expParticleForces(),true);
@@ -487,11 +511,47 @@ bool Foam::cfdemCloud::evolve
             if(verbose_) Info << "setvoidFraction done." << endl;
             clockM().stop("setvoidFraction");
 
-            // set particles velocity field
+            // set average particles velocity field
             clockM().start(20,"setVectorAverage");
             setVectorAverages();
-            clockM().stop("setVectorAverage");
 
+
+            //Smoothen "next" fields            
+            smoothingM().dSmoothing();
+            smoothingM().smoothen(voidFractionM().voidFractionNext());
+            smoothingM().smoothenReferenceField(averagingM().UsNext());
+            
+            clockM().stop("setVectorAverage");
+        }
+        
+        //============================================
+        //CHECK JUST TIME-INTERPOATE ALREADY SMOOTHENED VOIDFRACTIONNEXT AND UsNEXT FIELD 
+        //      IMPLICIT FORCE CONTRIBUTION AND SOLVER USE EXACTLY THE SAME AVERAGED
+        //      QUANTITIES AT THE GRID!
+        Info << "\n timeStepFraction() = " << dataExchangeM().timeStepFraction() << endl;
+        clockM().start(24,"interpolateEulerFields");
+
+        // update voidFractionField
+        alpha = voidFractionM().voidFractionInterp();
+        if(dataExchangeM().couplingStep() < 2)
+        {
+            alpha.oldTime() = alpha; // supress volume src
+            alpha.oldTime().correctBoundaryConditions();
+        }
+        alpha.correctBoundaryConditions();
+
+        // calc ddt(voidfraction)
+        calcDdtVoidfraction(alpha);
+
+        // update mean particle velocity Field
+        Us = averagingM().UsInterp();
+        Us.correctBoundaryConditions();
+
+        clockM().stop("interpolateEulerFields");
+        //============================================
+
+        if(doCouple)
+        {
             // set particles forces
             clockM().start(21,"setForce");
             if(verbose_) Info << "- setForce(forces_)" << endl;
@@ -502,20 +562,7 @@ bool Foam::cfdemCloud::evolve
             // get next force field
             clockM().start(22,"setParticleForceField");
             if(verbose_) Info << "- setParticleForceField()" << endl;
-            averagingM().setVectorSum
-            (
-                forceM(0).impParticleForces(),
-                impForces_,
-                particleWeights_,
-                NULL //mask
-            );
-            averagingM().setVectorSum
-            (
-                forceM(0).expParticleForces(),
-                expForces_,
-                particleWeights_,
-                NULL //mask
-            );
+            setParticleForceField();
             if(verbose_) Info << "- setParticleForceField done." << endl;
             clockM().stop("setParticleForceField");
 
@@ -525,49 +572,7 @@ bool Foam::cfdemCloud::evolve
             giveDEMdata();
             clockM().stop("giveDEMdata");
         }//end dataExchangeM().couple()
-        Info << "\n timeStepFraction() = " << dataExchangeM().timeStepFraction() << endl;
 
-        clockM().start(24,"interpolateEulerFields");
-        // update smoothing model
-        smoothingM().dSmoothing();
-
-        //============================================
-        // update voidFractionField V1
-        alpha = voidFractionM().voidFractionInterp();
-        smoothingM().smoothen(alpha);
-        if(dataExchangeM().couplingStep() < 2)
-        {
-            alpha.oldTime() = alpha; // supress volume src
-            alpha.oldTime().correctBoundaryConditions();
-        }
-        alpha.correctBoundaryConditions();
-
-        // calc ddt(voidfraction)
-        //calcDdtVoidfraction(voidFractionM().voidFractionNext());
-        calcDdtVoidfraction(alpha);
-
-        // update particle velocity Field
-        Us = averagingM().UsInterp();
-        //smoothingM().smoothenReferenceField(Us);
-        Us.correctBoundaryConditions();
-        /*//============================================
-        // update voidFractionField
-        volScalarField oldAlpha = alpha.oldTime(); //save old (smooth) alpha field
-        alpha.oldTime().internalField() = voidFractionM().voidFractionInterp();
-        smoothingM().smoothen(alpha);
-        alpha.correctBoundaryConditions();
-        alpha.oldTime() = oldAlpha; //set old (smooth) alpha field to allow correct computation of ddt
-
-        // calc ddt(voidfraction)
-        if (doCouple) calcDdtVoidfraction(alpha);
-        //calcDdtVoidfraction(alpha); // alternative with scale=1! (does not see change in alpha?)
-
-        // update particle velocity Field
-        Us.oldTime().internalField() = averagingM().UsInterp();
-        smoothingM().smoothenReferenceField(Us);
-        Us.correctBoundaryConditions();
-        //============================================*/
-        clockM().stop("interpolateEulerFields");
 
         if(verbose_){
             #include "debugInfo.H"
@@ -643,7 +648,7 @@ void cfdemCloud::calcDdtVoidfraction(volScalarField& voidfraction) const
 
 tmp<volScalarField> cfdemCloud::voidfractionNuEff(volScalarField& voidfraction) const
 {
-    if (modelType_=="A")
+    if (modelType_=="B")
     {
         return tmp<volScalarField>
         (

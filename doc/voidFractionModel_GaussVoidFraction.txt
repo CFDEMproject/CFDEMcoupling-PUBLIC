@@ -16,14 +16,14 @@ GaussProps
 \{
     maxCellsPerParticle number1;
     alphaMin number2;
-    scaleUpVol number3;
-    weight number4;
+    weight number3;
+    porosity number4;
 \} :pre
 
-{number1} = max number of cells covered by a partilce (search will fail when more than {number1} cells are covered by the particle) :ulb,l
-{number2} = mininmum limit for voidfraction :l
-{number3} = diameter of the particle's representation is artificially increased according to {number3} * Vparticle, volume remains unaltered! :l
-{number4} = scaling of the particle volume to account for porosity or agglomerations. :l
+{number1} = maximum number of cells covered by a particle (search will fail when more than {number1} cells are covered by the particle) :ulb,l
+{number2} = minimum limit for voidfraction :l
+{number3} = (optional) scaling of the particle volume to account for porosity or agglomerations. :l
+{number4} = (optional) diameter of the particle's representation is artificially increased according to {number2} * Vparticle, volume remains unaltered! :l
 :ule
 
 [Examples:]
@@ -33,15 +33,15 @@ GaussProps
 \{
     maxCellsPerParticle 1000;
     alphaMin 0.10;
-    scaleUpVol 5.0;
     weight 1.;
+    porosity 1.;
 \} :pre
 
 [Description:]
 
-The Gauss voidFraction model is supposed to be used when a particle (or it's representation) is bigger than a CFD cell. The voidfraction field is set in those cell whose centres are inside the particle. The volume is here distributed according to a Gaussian dirstibution.
+The Gauss voidFraction model is supposed to be used when a particle (or its representation) is bigger than a CFD cell. The voidfraction field is set in those cell whose centres are inside the particle. The volume is here distributed according to a Gaussian distribution.
 
-The region of influence of a particle can be increased artificially by "scaleUpVol", which  blows up the particles, but keeps their volume (for voidfraction calculation) constant.
+The region of influence of a particle can be increased artificially by "porosity", which  blows up the particles, but keeps their volume (for voidfraction calculation) constant.
 
 The particle volume occupied in the CFD domain can be adjusted by the parameter "weight", using Vparticle=dsphere^3*pi/6*weight.
 

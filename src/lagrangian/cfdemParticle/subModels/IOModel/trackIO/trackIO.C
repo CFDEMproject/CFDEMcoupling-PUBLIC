@@ -73,16 +73,20 @@ trackIO::~trackIO()
 
 // Public Member Functions
 
-void trackIO::dumpDEMdata() const
+int trackIO::dumpDEMdata() const
 {
+    int npProcs(-1);
+
     if (time_.outputTime())
     {
-        sophIO::dumpDEMdata();
+        npProcs = sophIO::dumpDEMdata();
 
         // stream data to file
-        streamDataToPath(lagPath_, particleCloud_.velocities(), "origId","label","labelField","");
-        streamDataToPath(lagPath_, particleCloud_.velocities(), "origProcId","origProcId","labelField","");
+        streamDataToPath(lagPath_, particleCloud_.velocities(),npProcs,"origId","label","labelField","");
+        streamDataToPath(lagPath_, particleCloud_.velocities(),npProcs,"origProcId","origProcId","labelField","");
     }
+
+    return npProcs;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 // Private Member Functions

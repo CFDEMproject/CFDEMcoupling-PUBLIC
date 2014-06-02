@@ -17,7 +17,7 @@
 
 <P><B>Description:</B>
 </P>
-<P>This routine describes how to setup a github account and pull repositories of the CFDEM(R)project.
+<P>This routine describes how to set up a github account and pull repositories of the CFDEM(R)project.
 After setting some environment variables LIGGGHTS(R) and CFDEM(R)coupling can be compiled
 </P>
 <P><B>Procedure:</B>
@@ -81,7 +81,7 @@ git pull
 </P>
 <PRE>gedit ~/.bashrc & 
 </PRE>
-<P>add the lines (you find them also in .../cfdemParticle/etc/bashrc and cshrc respectively): 
+<P>add the lines (you find them also in .../cfdemParticle/etc/bashrc and cshrc respectively):
 </P>
 <PRE>#================================================#
 #- source cfdem env vars
@@ -107,7 +107,7 @@ export CFDEM_PIZZA_DIR=$HOME/LIGGGHTS/PIZZA/gran_pizza_17Aug10/src
 $CFDEM_SRC_DIR
 $CFDEM_LIGGGHTS_SRC_DIR 
 </PRE>
-<P>should give "...: is a directory" otherwise something went wrong and the environment variables in ~/bashrc are not set correctly.
+<P>should give "...: is a directory" otherwise something went wrong and the environment variables in ~/.bashrc are not set correctly.
 </P>
 <P>To specify the paths of pizza, please check the settings in $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/bashrc.
 </P>
@@ -139,7 +139,7 @@ Changes in $CFDEM_TUT_DIR will be lost after every <I>git stash</I>!
 </P>
 <P><B>Additional Installations:</B>
 </P>
-<P>Optionally you can install lpp which will help you convert the DEM (dump) data to VTK format. For standard CFD-DEM runs this will not be necessary. To get the DEM postporcessing tool "lpp" you need python-numpy package installed:
+<P>Optionally you can install lpp which will help you convert the DEM (dump) data to VTK format. For standard CFD-DEM runs this will not be necessary. To get the DEM postprocessing tool "lpp" you need python-numpy package installed:
 </P>
 <PRE>sudo apt-get install python-numpy 
 </PRE>
@@ -149,9 +149,9 @@ Changes in $CFDEM_TUT_DIR will be lost after every <I>git stash</I>!
 </PRE>
 <PRE>git clone git://cfdem.git.sourceforge.net/gitroot/cfdem/lpp mylpp 
 </PRE>
-<P><B>Backward Compatibility:</B>
+<P><B>Backwards Compatibility:</B>
 </P>
-<P>Basically CFDEM(R)coupling supports one OpenFOAM(R) version therefore all settings are prepared for that. Nevertheless we try to maintain backward compatibility as long as it works with reasonable effort.
+<P>Basically CFDEM(R)coupling supports one OpenFOAM(R) version therefore all settings are prepared for that. Nevertheless we try to maintain backwards compatibility as long as it works with reasonable effort.
 </P>
 <P>The supported OpenFOAM(R) and LIGGGHTS(R) versions are stated in:
 src/lagrangian/cfdemParticle/cfdTools/versionInfo.H
@@ -162,7 +162,7 @@ src/lagrangian/cfdemParticle/etc/OFversion/OFversion.H
 </P>
 <P><B>Troubleshooting:</B>
 </P>
-<UL><LI>toubles with git clone? 
+<UL><LI>Troubles with git clone? 
 
 
 </UL>

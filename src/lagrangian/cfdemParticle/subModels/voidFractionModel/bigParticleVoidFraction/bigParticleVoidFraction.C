@@ -66,18 +66,15 @@ bigParticleVoidFraction::bigParticleVoidFraction
     voidFractionModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
     alphaMin_(readScalar(propsDict_.lookup("alphaMin"))),
-    alphaLimited_(0),
-    scaleUpVol_(readScalar(propsDict_.lookup("scaleUpVol")))
+    alphaLimited_(0)
 {
     Info << "\n\n W A R N I N G - do not use in combination with differentialRegion model! \n\n" << endl;
     Info << "\n\n W A R N I N G - this model does not yet work properly! \n\n" << endl;
     //reading maxCellsPerParticle from dictionary
     maxCellsPerParticle_=readLabel(propsDict_.lookup("maxCellsPerParticle"));
-
-    if(scaleUpVol_ < 1){ FatalError<< "scaleUpVol shloud be > 1."<< abort(FatalError); }
     if(alphaMin_ > 1 || alphaMin_ < 0.01){ FatalError<< "alphaMin shloud be > 1 and < 0.01." << abort(FatalError); }
-    if (propsDict_.found("weight"))
-        setWeight(readScalar(propsDict_.lookup("weight")));
+
+    checkWeightNporosity(propsDict_);
 }
 
 
@@ -95,6 +92,11 @@ void bigParticleVoidFraction::setvoidFraction(double** const& mask,double**& voi
 
     voidfractionNext_.internalField()=1;
 
+    scalar radius(-1);
+    scalar volume(0);
+    scalar scaleVol= weight();
+    scalar scaleRadius = pow(porosity(),1/3);
+
     for(int index=0; index< particleCloud_.numberOfParticles(); index++)
     {
         //if(mask[index][0])
@@ -108,14 +110,10 @@ void bigParticleVoidFraction::setvoidFraction(double** const& mask,double**& voi
             cellsPerParticle_[index][0]=1.0;
 
             //collecting data
-            scalar pi = M_PI;
             label particleCenterCellID=particleCloud_.cellIDs()[index][0];
-            scalar radius =  particleCloud_.radii()[index][0];
-              //Info << "physical radius" << radius  << endl;
-
-            scalar volume = 4./3.*radius*radius*radius*3.1415*weight();
-            radius = radius*pow(scaleUpVol_,0.3333);
-              //Info << "fictuous radius" << radius  << endl;
+            radius =  particleCloud_.radii()[index][0];
+            volume = 4.188790205*radius*radius*radius*scaleVol;
+            radius *= scaleRadius;
             vector positionCenter=particleCloud_.position(index);
 
             if (particleCenterCellID >= 0)

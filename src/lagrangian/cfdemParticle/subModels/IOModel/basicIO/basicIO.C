@@ -64,19 +64,9 @@ basicIO::basicIO
     //propsDict_(dict.subDict(typeName + "Props")),
     dirName_("lagrangian"),
     path_("dev/null"),
-    parOutput_(true),
     nPProc_(-1),
     lagPath_("dev/null")
 {
-	if (
-            particleCloud_.dataExchangeM().myType()=="oneWayVTK" ||
-            dict_.found("serialOutput")
-       )
-    {
-        parOutput_=false;
-        Warning << "IO model is in serial write mode, only data on proc 0 is written" << endl;
-    }
-
     //if (propsDict_.found("dirName")) dirName_=word(propsDict_.lookup("dirName"));
     path_ = buildFilePath(dirName_);
 }
@@ -92,7 +82,7 @@ basicIO::~basicIO()
 
 // Public Member Functions
 
-void basicIO::dumpDEMdata() const
+int basicIO::dumpDEMdata() const
 {
     if (time_.outputTime())
     {
@@ -112,67 +102,16 @@ void basicIO::dumpDEMdata() const
         nPProc_=count;
         
         // stream data to file
-        streamDataToPath(lagPath_, particleCloud_.positions(), "positions","vector","Cloud<passiveParticle>","0");
-        streamDataToPath(lagPath_, particleCloud_.velocities(), "v","vector","vectorField","");
-        streamDataToPath(lagPath_, particleCloud_.radii(), "r","scalar","scalarField","");
+        streamDataToPath(lagPath_, particleCloud_.positions(),nPProc_,"positions","vector","Cloud<passiveParticle>","0");
+        streamDataToPath(lagPath_, particleCloud_.velocities(),nPProc_,"v","vector","vectorField","");
+        streamDataToPath(lagPath_, particleCloud_.radii(),nPProc_,"r","scalar","scalarField","");
     }
+    return nPProc_;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 // Private Member Functions
 
-fileName basicIO::buildFilePath(word dirName) const
-{
-    // create file structure
-	fileName path("");
-    if(parOutput_)
-    {
-    	path=fileName(particleCloud_.mesh().time().path()/particleCloud_.mesh().time().timeName()/dirName/"particleCloud");
-    	mkDir(path,0777);
-    } else
-    {
-		path=fileName("."/dirName);
-    	mkDir(path,0777);
-    	mkDir(fileName(path/"constant"),0777);
-    	OFstream* stubFile = new OFstream(fileName(path/"particles.foam"));
-    	delete stubFile;
-        }
-    return path;
-}
 
-void basicIO::streamDataToPath(fileName path, double** array,word name,word type,word className,word finaliser) const
-{
-    vector vec;
-    OFstream* fileStream = new OFstream(fileName(path/name));
-    *fileStream << "FoamFile\n";
-    *fileStream << "{version 2.0; format ascii;class "<< className << "; location 0;object  "<< name <<";}\n";
-    *fileStream << nPProc_ <<"\n";
-    //*fileStream << "(\n";
-
-    if(type!="origProcId")*fileStream << "(\n";
-    else if(type=="origProcId")
-    {
-        if(nPProc_>0) *fileStream <<"{0}"<< "\n";
-        else *fileStream <<"{}"<< "\n";
-    }
-
-    for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
-    {
-        if (particleCloud_.cellIDs()[index][0] > -1) // particle Found
-        {
-            if (type=="scalar"){
-                *fileStream << array[index][0] << " \n";
-            }else if (type=="position" || type=="vector"){
-                for(int i=0;i<3;i++) vec[i] = array[index][i];
-                *fileStream <<"( "<< vec[0] <<" "<<vec[1]<<" "<<vec[2]<<" ) "<< finaliser << " \n";
-            }else if (type=="label"){
-                *fileStream << index << finaliser << " \n";
-            }
-        }
-    }
-    //*fileStream << ")\n";
-    if(type!="origProcId")*fileStream << ")\n";
-    delete fileStream;
-}
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam

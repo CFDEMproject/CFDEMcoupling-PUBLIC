@@ -81,7 +81,7 @@ public:
 
 
     // Member Functions
-    void dumpDEMdata() const;
+    int dumpDEMdata() const;
 };
 
 

@@ -67,11 +67,15 @@ constDiffSmoothing::constDiffSmoothing
     upperLimit_(readScalar(propsDict_.lookup("upperLimit"))),
     smoothingLength_(dimensionedScalar("smoothingLength",dimensionSet(0,1,0,0,0,0,0), readScalar(propsDict_.lookup("smoothingLength")))),
     smoothingLengthReferenceField_(dimensionedScalar("smoothingLengthReferenceField",dimensionSet(0,1,0,0,0,0,0), readScalar(propsDict_.lookup("smoothingLength")))),
-    DT_("DT", dimensionSet(0,2,-1,0,0), 0.)
+    DT_("DT", dimensionSet(0,2,-1,0,0), 0.),
+    verbose_(false)
 {
 
-        if(propsDict_.found("smoothingLengthReferenceField"))  
-            smoothingLengthReferenceField_.value() = double(readScalar(propsDict_.lookup("smoothingLengthReferenceField")));
+    if(propsDict_.found("verbose"))  
+        verbose_ = true;
+
+    if(propsDict_.found("smoothingLengthReferenceField"))  
+       smoothingLengthReferenceField_.value() = double(readScalar(propsDict_.lookup("smoothingLengthReferenceField")));
 
 }
 
@@ -87,28 +91,6 @@ bool constDiffSmoothing::doSmoothing() const
     return true;
 }
 
-/*void constDiffSmoothing::dSmoothing(volScalarField& dSmooth) const
-{
-    
-    tmp<volScalarField> dSmooth0
-    (
-        new volScalarField
-        (
-            IOobject
-            (
-                "dSmooth",
-                particleCloud_.mesh().time().timeName(),
-                particleCloud_.mesh(),
-                IOobject::NO_READ,
-                IOobject::NO_WRITE
-            ),
-            particleCloud_.mesh(),
-            smoothingLength_
-        )
-    );
-
-    dSmooth.internalField() = dSmooth0;             
-}*/
 
 void Foam::constDiffSmoothing::smoothen(volScalarField& fieldSrc) const
 {
@@ -134,13 +116,26 @@ void Foam::constDiffSmoothing::smoothen(volScalarField& fieldSrc) const
         field[cellI]=max(lowerLimit_,min(upperLimit_,field[cellI]));
     }  
 
-    // get data from working field
+    // get data from working field - will copy only values at new time
     fieldSrc=field;
     fieldSrc.correctBoundaryConditions(); 
+
+    if(verbose_)
+    {
+        Info << "min/max(fieldoldTime) (unsmoothed): " << min(field.oldTime()) << tab << max(field.oldTime()) << endl;
+        Info << "min/max(fieldSrc): " << min(fieldSrc) << tab << max(fieldSrc) << endl;
+        Info << "min/max(fieldSrc.oldTime): " << min(fieldSrc.oldTime()) << tab << max(fieldSrc.oldTime()) << endl;
+    }
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-void Foam::constDiffSmoothing::smoothen(volVectorField& field) const
+void Foam::constDiffSmoothing::smoothen(volVectorField& fieldSrc) const
 {
+    // transfer data to working field to not mess up ddt
+    volVectorField field=fieldSrc;
+    field.correctBoundaryConditions();
+    field.oldTime()=fieldSrc;
+    field.oldTime().correctBoundaryConditions();
+
     double deltaT = field.mesh().time().deltaTValue();
     DT_.value() = smoothingLength_.value() * smoothingLength_.value() / deltaT;
 
@@ -149,19 +144,36 @@ void Foam::constDiffSmoothing::smoothen(volVectorField& field) const
     (
         fvm::ddt(field)
        -fvm::laplacian(DT_, field)
-    );  
+    );
+
+    // get data from working field
+    fieldSrc=field;
+    fieldSrc.correctBoundaryConditions(); 
+
+    if(verbose_)
+    {
+        Info << "min/max(fieldoldTime) (unsmoothed): " << min(field.oldTime()) << tab << max(field.oldTime()) << endl;
+        Info << "min/max(fieldSrc): " << min(fieldSrc) << tab << max(fieldSrc) << endl;
+        Info << "min/max(fieldSrc.oldTime): " << min(fieldSrc.oldTime()) << tab << max(fieldSrc.oldTime()) << endl;
+    }
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-void Foam::constDiffSmoothing::smoothenReferenceField(volVectorField& field) const
+void Foam::constDiffSmoothing::smoothenReferenceField(volVectorField& fieldSrc) const
 {
-    double sourceStrength = 1e5; //Should be a large numbe to keep reference values constant
+    // transfer data to working field to not mess up ddt
+    volVectorField field=fieldSrc;
+    field.correctBoundaryConditions();
+    field.oldTime()=fieldSrc;
+    field.oldTime().correctBoundaryConditions();
+
+    double sourceStrength = 1e5; //large number to keep reference values constant
 
     dimensionedScalar deltaT = field.mesh().time().deltaT();
     DT_.value() = smoothingLengthReferenceField_.value() 
                          * smoothingLengthReferenceField_.value() / deltaT.value();
 
-     tmp<volScalarField> NLarge
+    tmp<volScalarField> NLarge
     (
         new volScalarField
         (
@@ -180,21 +192,32 @@ void Foam::constDiffSmoothing::smoothenReferenceField(volVectorField& field) con
 
 
     //loop over particles and map max particle diameter to Euler Grid
-    for(int cellI = 0; cellI <  field.mesh().nCells(); cellI++)
+    forAll(field,cellI)
     {
-            if ( mag(field.oldTime().internalField()[cellI]) > 0)  // have a vector in the OLD field, so keep it!
-            {
-                  NLarge()[cellI] = sourceStrength;
-            }
+        if ( mag(field.oldTime().internalField()[cellI]) > 0.0f)  // have a vector in the OLD field, so keep it!
+            NLarge()[cellI] = sourceStrength;
     }
 
     // do the smoothing
     solve
     (
-        fvm::ddt(field) == fvm::laplacian( DT_, field) 
-                                       +  NLarge() / deltaT * field.oldTime() //add source to keep cell values constant
-                                       - fvm::Sp( NLarge() / deltaT, field)   //add sink to keep cell values constant
-    );  
+        fvm::ddt(field)
+       -fvm::laplacian( DT_, field)
+       == 
+        NLarge() / deltaT * field.oldTime()  //add source to keep cell values constant
+       -fvm::Sp( NLarge() / deltaT, field)   //add sink to keep cell values constant
+    );
+
+    // get data from working field
+    fieldSrc=field;
+    fieldSrc.correctBoundaryConditions(); 
+
+    if(verbose_)
+    {
+        Info << "min/max(fieldoldTime) (unsmoothed): " << min(field.oldTime()) << tab << max(field.oldTime()) << endl;
+        Info << "min/max(fieldSrc): " << min(fieldSrc) << tab << max(fieldSrc) << endl;
+        Info << "min/max(fieldSrc.oldTime): " << min(fieldSrc.oldTime()) << tab << max(fieldSrc.oldTime()) << endl;
+    }
 
 }
 

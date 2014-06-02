@@ -21,7 +21,7 @@ particleCellVolumeProps
 {
     upperThreshold value;
     lowerThreshold value2;
-    verbous;
+    verbose;
 }; 
 </PRE>
 <LI><I>value</I> = only cells with a field value (magnitude) lower than this upper threshold are considered 
@@ -40,13 +40,13 @@ particleCellVolumeProps
 {
     upperThreshold 0.999;
     lowerThreshold 0;
-    verbous;
+    verbose;
 } 
 </PRE>
 <P><B>Description:</B>
 </P>
 <P>This "forceModel" does not influence the particles or the simulation - it is a postprocessing tool! The total volume of the particles as they are represented on the CFD mesh is calculated. Further the total volume of the cells particles are in is calculated.
-At "writeTime" a field named particleCellVolume , where scalarField is the name of the original field, is written. This can be can the be probed using standard function object probes. Analogously a field named cellVolume is written. Using the verbose option a screen output is given.
+At "writeTime" a field named particleCellVolume , where scalarField is the name of the original field, is written. This can then be probed using standard function object probes. Analogously a field named cellVolume is written. Using the verbose option a screen output is given.
 </P>
 <P><B>Restrictions:</B>
 </P>

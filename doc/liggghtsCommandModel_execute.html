@@ -28,6 +28,7 @@ executeProps0
     runLast switch2;
     runEveryCouplingStep switch3;
     runEveryWriteStep switch4;
+    verbose;
 } 
 </PRE>
 <UL><LI><I>command</I> = LIGGGHTS command to be executed. Each word in a new line, numbers and symbols need special treatment (e.g. $couplingInterval will be replaced by correct coupling interval in the simulation)  
@@ -39,6 +40,8 @@ executeProps0
 <LI><I>switch3</I> = switch (choose on/off) if the command is executed at every coupling step 
 
 <LI><I>switch4</I> = switch (choose on/off) if the command is executed at every writing step 
+
+<LI><I>verbose</I> = (normally off) for verbose run 
 
 
 </UL>
