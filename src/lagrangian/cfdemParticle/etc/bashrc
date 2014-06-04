@@ -100,6 +100,9 @@ alias cfdemUt='cd $CFDEM_UT_DIR'
 #- shortcut to run path
 alias cfdemRun='cd $CFDEM_PROJECT_USER_DIR/run'
 
+#- shortcut to user solver path
+alias cfdemUsrSol='cd $CFDEM_PROJECT_USER_DIR/applications/solvers'
+
 #- shortcut to documentation path
 alias cfdemDoc='cd $CFDEM_DOC_DIR'
 
@@ -168,6 +171,7 @@ else
             cd $CFDEM_PROJECT_USER_DIR
             mkdir run
             mkdir -p log/logFilesCFDEM-$CFDEM_VERSION-$WM_PROJECT_VERSION
+            mkdir -p applications/solvers
         else
             echo "aborted by user."
             #exit

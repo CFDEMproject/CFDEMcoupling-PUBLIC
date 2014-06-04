@@ -524,7 +524,7 @@ parCFDrun()
 
     #- run applictaion
     if [ $machineFileName == "none" ]; then
-        mpirun -np $nrProcs $solverName 2>&1 | tee -a $logpath/$logfileName
+        mpirun -np $nrProcs $solverName -parallel 2>&1 | tee -a $logpath/$logfileName
     else
         mpirun -machinefile $machineFileName -np $nrProcs $debugMode $solverName -parallel 2>&1 | tee -a $logpath/$logfileName
     fi

@@ -98,6 +98,9 @@ alias cfdemUt 'cd $CFDEM_UT_DIR'
 #- shortcut to run path
 alias cfdemRun 'cd $CFDEM_PROJECT_USER_DIR/run'
 
+#- shortcut to user solver path
+alias cfdemUsrSol 'cd $CFDEM_PROJECT_USER_DIR/applications/solvers'
+
 #- shortcut to documentation path
 alias cfdemDoc 'cd $CFDEM_DOC_DIR'
 
@@ -157,20 +160,20 @@ if ( -d "$CFDEM_PROJECT_USER_DIR" ) then
     :
 else
     if ( -d "$CFDEM_PROJECT_DIR" ) then
-        cd $CFDEM_PROJECT_DIR/..
-        echo "make new dirs $CFDEM_PROJECT_DIR/../$LOGNAME-$CFDEM_VERSION-$WM_PROJECT_VERSION ? (y/n)"
+        echo "make new dirs $CFDEM_PROJECT_USER_DIR ? (y/n)"
 	set YN=$<
         if ( $YN == "y" ) then
-            mkdir $LOGNAME-$CFDEM_VERSION-$WM_PROJECT_VERSION
-            cd $LOGNAME-$CFDEM_VERSION-$WM_PROJECT_VERSION
+            mkdir -p $CFDEM_PROJECT_USER_DIR
+            cd $CFDEM_PROJECT_USER_DIR
             mkdir run
             mkdir -p log/logFilesCFDEM-$CFDEM_VERSION-$WM_PROJECT_VERSION
+            mkdir -p applications/solvers
         else
             echo "aborted by user."
             exit
         endif
     else
-        echo "error in CFDEMcoupling's bashrc."
+        echo "error in CFDEMcoupling's cshrc."
         exit
     endif
 endif
