@@ -161,8 +161,7 @@ void gradPForce::setForce() const
                     gradP = gradPField[cellI];
                 }
 
-                ds = 2*particleCloud_.radius(index);
-                Vs = ds*ds*ds*M_PI/6;
+                Vs = particleCloud_.particleVolume(index);
                 rho = rho_[cellI];
 
                 // calc particle's pressure gradient force

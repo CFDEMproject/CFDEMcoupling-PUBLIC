@@ -100,7 +100,7 @@ void centreVoidFraction::setvoidFraction(double** const& mask,double**& voidfrac
             if (cellI >= 0)  // particel centre is in domain
             {
                 cellVol = voidfractionNext_.mesh().V()[cellI];
-                radius = particleCloud_.radii()[index][0];
+                radius = particleCloud_.radius(index);
                 volume = 4.188790205*radius*radius*radius*scaleVol;
 
                 // store volume for each particle

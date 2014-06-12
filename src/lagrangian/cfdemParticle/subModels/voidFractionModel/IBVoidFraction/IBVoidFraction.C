@@ -116,7 +116,7 @@ void IBVoidFraction::setvoidFraction(double** const& mask,double**& voidfraction
 
             //collecting data
             label particleCenterCellID=particleCloud_.cellIDs()[index][0];
-            scalar radius =  particleCloud_.radii()[index][0];
+            scalar radius =  particleCloud_.radius(index);
             vector positionCenter=particleCloud_.position(index);
 
             if (particleCenterCellID >= 0)

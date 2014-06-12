@@ -179,7 +179,7 @@ void KochHillDrag::setForce() const
 
                 Us = particleCloud_.velocity(index);
                 Ur = Ufluid-Us;
-                ds = 2*particleCloud_.radius(index);
+                ds = particleCloud_.d(index);
                 nuf = nufField[cellI];
                 rho = rho_[cellI];
                 magUr = mag(Ur);

@@ -128,8 +128,9 @@ void Archimedes::setForce() const
                 if(twoDimensional_)
                 {
                     force = -g_.value()*rho_[cellI]*pow(dp,2)/4*M_PI;
+                    Warning << "Archimedes::setForce() : this functionality is not tested!" << endl;
                 }else{
-                    force = -g_.value()*rho_[cellI]*pow(dp,3)/6*M_PI;
+                    force = -g_.value()*rho_[cellI]*particleCloud_.particleVolume(index);
                 }
 
                 //Set value fields and write the probe
@@ -137,13 +138,13 @@ void Archimedes::setForce() const
                 {
                     #include "setupProbeModelfields.H"
                     vValues.append(force);           //first entry must the be the force
-                    sValues.append(pow(dp,3)/6*M_PI);
+                    sValues.append(particleCloud_.particleVolume(index));
                     particleCloud_.probeM().writeProbe(index, sValues, vValues);
                 }
             }
 
             if(!treatDEM_)
-            {            
+            {         
                 if(treatExplicit_)
                     for(int j=0;j<3;j++) expForces()[index][j] += force[j];
                 else

@@ -162,8 +162,7 @@ void viscForce::setForce() const
                     divTau = divTauField[cellI];
                 }
 
-                ds = 2*particleCloud_.radius(index);
-                Vs = ds*ds*ds*M_PI/6;
+                Vs = particleCloud_.particleVolume(index);
 
                 // calc the contribution of the deviatoric stress 
                 // to the generalized buoyancy force

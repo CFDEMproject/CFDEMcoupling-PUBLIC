@@ -113,7 +113,7 @@ void GaussVoidFraction::setvoidFraction(double** const& mask,double**& voidfract
             //collecting data
             label particleCenterCellID=particleCloud_.cellIDs()[index][0];
 
-            radius = particleCloud_.radii()[index][0];
+            radius = particleCloud_.radius(index);
             volume = 4.188790205*radius*radius*radius*scaleVol;
             radius *= scaleRadius;
 

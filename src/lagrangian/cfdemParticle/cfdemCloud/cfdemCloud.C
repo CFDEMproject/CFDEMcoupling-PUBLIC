@@ -391,11 +391,6 @@ label Foam::cfdemCloud::particleCell(int index)
     return cellI;
 }
 
-double Foam::cfdemCloud::d(int index)
-{
-    return 2*radii()[index][0];
-}
-
 vector Foam::cfdemCloud::position(int index)
 {
     vector pos;
@@ -425,12 +420,6 @@ const forceModel& Foam::cfdemCloud::forceM(int i)
 int Foam::cfdemCloud::nrForceModels()
 {
     return forceModels_.size();
-}
-
-scalar Foam::cfdemCloud::radius(int index)
-{
-    scalar r = radii()[index][0];
-    return r;
 }
 
 scalar Foam::cfdemCloud::voidfraction(int index)

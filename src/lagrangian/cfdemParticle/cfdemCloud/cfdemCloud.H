@@ -223,8 +223,6 @@ public:
 
        label particleCell(int);
 
-       double d(int);
-
        vector position(int);
 
        vector velocity(int);
@@ -234,8 +232,6 @@ public:
        virtual const forceModel& forceM(int);
 
        virtual int nrForceModels();
-
-       scalar radius(int);
 
        scalar voidfraction(int);
 
@@ -288,6 +284,10 @@ public:
        virtual inline label body(int);
 
        virtual inline double particleVolume(int);
+
+       inline scalar radius(int);
+
+       virtual inline double d(int);
 
        virtual inline double dMin() {return -1;}
        virtual inline double dMax() {return -1;}

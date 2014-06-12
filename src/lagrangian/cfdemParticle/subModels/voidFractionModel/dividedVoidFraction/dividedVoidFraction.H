@@ -69,6 +69,11 @@ private:
 
         bool interpolation_;
 
+        virtual inline scalar Vp(int index, scalar radius, scalar scaleVol) const
+        {
+            return 4.188790205*radius*radius*radius*scaleVol; //4/3*pi=4.188790205
+        };
+
 public:
 
     //- Runtime type information

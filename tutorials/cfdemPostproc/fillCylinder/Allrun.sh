@@ -75,7 +75,10 @@ if [ $postproc == "true" ]
     #foamToVTK
     
     #- start paraview
+    echo ""
+    echo "trying to start paraview..."
     paraview
+    read
 fi
 
 #- keep terminal open (if started in new terminal)
@@ -84,7 +87,8 @@ fi
 #read
 
 #- clean up case
-echo "deleting data at: $casePath"
+echo "deleting data at: $casePath ?"
+read
 rm -r $casePath/CFD/0.*
 rm -r $casePath/CFD/lagrangian
 rm -r $casePath/CFD/VTK

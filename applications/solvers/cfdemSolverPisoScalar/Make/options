@@ -7,7 +7,7 @@ EXE_INC = \
     -I$(CFDEM_SRC_DIR)/lagrangian/cfdemParticle/cfdTools \
 
 EXE_LIBS = \
-    -L$(FOAM_USER_LIBBIN)\
+    -L$(CFDEM_LIB_DIR)\
     -lincompressibleRASModels \
     -lincompressibleLESModels \
     -lincompressibleTransportModels \
