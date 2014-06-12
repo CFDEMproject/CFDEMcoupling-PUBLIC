@@ -8,7 +8,7 @@ EXE_INC = \
 
 
 EXE_LIBS = \
-    -L$(FOAM_USER_LIBBIN)\
+    -L$(CFDEM_LIB_DIR)\
     -lincompressibleRASModels \
     -lincompressibleLESModels \
     -lincompressibleTransportModels \
