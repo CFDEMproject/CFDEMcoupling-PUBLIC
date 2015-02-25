@@ -1,22 +1,24 @@
-cfdemCloud = cfdemCloud
-cfdTools = cfdTools
-forceModels = subModels/forceModel
-forceSubModels = subModels/forceModel/forceSubModels
-IOModels = subModels/IOModel
-voidFractionModels = subModels/voidFractionModel
-locateModels = subModels/locateModel
-meshMotionModels = subModels/meshMotionModel
-momCoupleModels = subModels/momCoupleModel
-regionModels = subModels/regionModel
-dataExchangeModels = subModels/dataExchangeModel
-averagingModels = subModels/averagingModel
-clockModels = subModels/clockModel
-liggghtsCommandModels = subModels/liggghtsCommandModel
-smoothingModels = subModels/smoothingModel
-probeModels = subModels/probeModel
+path = ../cfdemParticle
+cfdemCloud = $(path)/cfdemCloud
+derived = $(path)/derived
+cfdTools = $(path)/cfdTools
+forceModels = $(path)/subModels/forceModel
+forceSubModels = $(path)/subModels/forceModel/forceSubModels
+IOModels = $(path)/subModels/IOModel
+voidFractionModels = $(path)/subModels/voidFractionModel
+locateModels = $(path)/subModels/locateModel
+meshMotionModels = $(path)/subModels/meshMotionModel
+momCoupleModels = $(path)/subModels/momCoupleModel
+regionModels = $(path)/subModels/regionModel
+dataExchangeModels = $(path)/subModels/dataExchangeModel
+averagingModels = $(path)/subModels/averagingModel
+clockModels = $(path)/subModels/clockModel
+liggghtsCommandModels = $(path)/subModels/liggghtsCommandModel
+smoothingModels = $(path)/subModels/smoothingModel
+probeModels = $(path)/subModels/probeModel
 
 $(cfdemCloud)/cfdemCloud.C
-derived/cfdemCloudIB/cfdemCloudIB.C
+$(derived)/cfdemCloudIB/cfdemCloudIB.C
 
 $(cfdTools)/global.C
 $(cfdTools)/newGlobal.C
@@ -114,4 +116,4 @@ $(smoothingModels)/smoothingModel/newSmoothingModel.C
 $(smoothingModels)/noSmoothing/noSmoothing.C
 $(smoothingModels)/constDiffSmoothing/constDiffSmoothing.C
 
-LIB = $(CFDEM_LIB_DIR)/lib$(CFDEM_LIB_NAME)
+LIB = $(CFDEM_LIB_DIR)/lib$(CFDEM_LIB_COMP_NAME)

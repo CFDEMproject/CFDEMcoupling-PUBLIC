@@ -1,11 +1,8 @@
-#define version23  // currently being tested
-//#define version22  // currently being used
+#define version23  // currently being used
+//#define version22
 //#define version21
 //#define version16ext
 //#define version15
-
-// choose comp/incomp
-//#define comp   // if comp is on - you must use Make/options_comp!
 
 //define multi sphere
 //#define multisphere
