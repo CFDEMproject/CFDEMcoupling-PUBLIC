@@ -42,6 +42,7 @@ Description
 #include "implicitCouple.H"
 #include "clockModel.H"
 #include "smoothingModel.H"
+#include "forceModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -59,11 +60,10 @@ int main(int argc, char *argv[])
     #include "checkModelType.H"
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
+    Info<< "\nStarting time loop\n" << endl;
     while (runTime.loop())
     {
-        Info<< "\nStarting time loop\n" << endl;
-            particleCloud.clockM().start(1,"Global");
+        particleCloud.clockM().start(1,"Global");
 
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
@@ -72,12 +72,23 @@ int main(int argc, char *argv[])
 
         // do particle stuff
         particleCloud.clockM().start(2,"Coupling");
-        particleCloud.evolve(voidfraction,Us,U);
+        bool hasEvolved = particleCloud.evolve(voidfraction,Us,U);
+
+        if(hasEvolved)
+        {
+            particleCloud.smoothingM().smoothen(particleCloud.forceM(0).impParticleForces());
+        }
     
         Info << "update Ksl.internalField()" << endl;
         Ksl = particleCloud.momCoupleM(0).impMomSource();
-        particleCloud.smoothingM().smoothen(Ksl);
         Ksl.correctBoundaryConditions();
+
+       //Force Checks
+       vector fTotal(0,0,0);
+       vector fImpTotal = sum(mesh.V()*Ksl.internalField()*(Us.internalField()-U.internalField()));
+       reduce(fImpTotal, sumOp<vector>());
+       Info << "TotalForceExp: " << fTotal << endl;
+       Info << "TotalForceImp: " << fImpTotal << endl;
 
         #include "solverDebugInfo.H"
         particleCloud.clockM().stop("Coupling");
@@ -91,23 +102,19 @@ int main(int argc, char *argv[])
                 // Momentum predictor
                 fvVectorMatrix UEqn
                 (
-                    fvm::ddt(voidfraction,U) + fvm::Sp(fvc::ddt(voidfraction),U)
-                  + fvm::div(phi,U) + fvm::Sp(fvc::div(phi),U)
+                    fvm::ddt(voidfraction,U) - fvm::Sp(fvc::ddt(voidfraction),U)
+                  + fvm::div(phi,U) - fvm::Sp(fvc::div(phi),U)
 //                + turbulence->divDevReff(U)
                   + particleCloud.divVoidfractionTau(U, voidfraction)
                   ==
                   - fvm::Sp(Ksl/rho,U)
                 );
 
-                if (modelType=="B")
-                 UEqn == - fvc::grad(p) + Ksl/rho*Us;
-                else
-                    UEqn == - voidfraction*fvc::grad(p) + Ksl/rho*Us;
-
                 UEqn.relax();
-
-                if (momentumPredictor)
-                    solve(UEqn);
+                if (momentumPredictor && (modelType=="B" || modelType=="Bfull"))
+                    solve(UEqn == - fvc::grad(p) + Ksl/rho*Us);
+                else if (momentumPredictor)
+                    solve(UEqn == - voidfraction*fvc::grad(p) + Ksl/rho*Us);
 
                 // --- PISO loop
 
@@ -120,11 +127,17 @@ int main(int argc, char *argv[])
 
                     surfaceScalarField rUAf("(1|A(U))", fvc::interpolate(rUA));
                     volScalarField rUAvoidfraction("(voidfraction2|A(U))",rUA*voidfraction);
+                    surfaceScalarField rUAfvoidfraction("(voidfraction2|A(U)F)", fvc::interpolate(rUAvoidfraction));
 
                     U = rUA*UEqn.H();
 
-                    phi = (fvc::interpolate(U*voidfraction) & mesh.Sf() );
-                     //+ fvc::ddtPhiCorr(rUAvoidfraction, U, phi);
+                    #ifdef version23
+                    phi = ( fvc::interpolate(U*voidfraction) & mesh.Sf() )
+                        + rUAfvoidfraction*fvc::ddtCorr(U, phi);
+                    #else
+                    phi = ( fvc::interpolate(U*voidfraction) & mesh.Sf() )
+                        + fvc::ddtPhiCorr(rUAvoidfraction, U, phi);
+                    #endif
                     surfaceScalarField phiS(fvc::interpolate(Us*voidfraction) & mesh.Sf());
                     surfaceScalarField phiGes = phi + rUAf*(fvc::interpolate(Ksl/rho) * phiS);
 
@@ -157,13 +170,14 @@ int main(int argc, char *argv[])
                         if (nonOrth == nNonOrthCorr)
                         {
                             phiGes -= pEqn.flux();
+                            phi = phiGes;
                         }
 
                     } // end non-orthogonal corrector loop
 
                     #include "continuityErrorPhiPU.H"
 
-                    if (modelType=="B")
+                    if (modelType=="B" || modelType=="Bfull")
                         U -= rUA*fvc::grad(p) - Ksl/rho*Us*rUA;
                     else
                         U -= voidfraction*rUA*fvc::grad(p) - Ksl/rho*Us*rUA;
@@ -191,7 +205,7 @@ int main(int argc, char *argv[])
     }
 
     Info<< "End\n" << endl;
-    
+
     return 0;
 }
 

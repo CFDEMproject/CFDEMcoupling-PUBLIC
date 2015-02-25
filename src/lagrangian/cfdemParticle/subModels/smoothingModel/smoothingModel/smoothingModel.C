@@ -57,7 +57,33 @@ Foam::smoothingModel::smoothingModel
 )
 :
     dict_(dict),
-    particleCloud_(sm)
+    particleCloud_(sm),
+    vSmoothField_
+    (   
+        IOobject
+        (
+            "vSmoothField",
+            particleCloud_.mesh().time().timeName(),
+            particleCloud_.mesh(),
+            IOobject::READ_IF_PRESENT,
+            IOobject::NO_WRITE
+        ),
+        particleCloud_.mesh(),
+        dimensionedVector("zero", dimensionSet(0,0,0,0,0), vector::zero)
+    ),
+    sSmoothField_
+    (   
+        IOobject
+        (
+            "sSmoothField",
+            particleCloud_.mesh().time().timeName(),
+            particleCloud_.mesh(),
+            IOobject::READ_IF_PRESENT,
+            IOobject::NO_WRITE
+        ),
+        particleCloud_.mesh(),
+        dimensionedScalar("zero", dimensionSet(0,0,0,0,0), 0)
+    )
 {}
 
 
@@ -68,6 +94,28 @@ Foam::smoothingModel::~smoothingModel()
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+void smoothingModel::checkFields(volScalarField& sSmoothField_) const
+{
+    // currently it is detected if field was auto generated or defined
+    // improvement would be changing the type here automatically
+    forAll(sSmoothField_.boundaryField(),patchI)
+        if(sSmoothField_.boundaryField()[patchI].type()=="calculated")
+            FatalError <<"Scalar field:"<< sSmoothField_.name() << " must be defined.\n" << abort(FatalError);
+
+    sSmoothField_.writeOpt() = IOobject::AUTO_WRITE;
+}
+
+void smoothingModel::checkFields(volVectorField& vSmoothField_) const
+{
+    // currently it is detected if field was auto generated or defined
+    // improvement would be changing the type here automatically
+    forAll(vSmoothField_.boundaryField(),patchI)      
+        if(vSmoothField_.boundaryField()[patchI].type()=="calculated")
+            FatalError <<"Vector field:"<< vSmoothField_.name() << " must be defined.\n" << abort(FatalError);
+
+    vSmoothField_.writeOpt() = IOobject::AUTO_WRITE;
+}
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 bool smoothingModel::doSmoothing() const

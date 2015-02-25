@@ -41,6 +41,7 @@ SourceFiles
 
 #include "forceModel.H"
 #include "dataExchangeModel.H"
+#include "interpolationCellPoint.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -58,17 +59,21 @@ class virtualMassForce
 private:
     dictionary propsDict_;
 
-    bool verbose_;
-
     word velFieldName_;
 
     const volVectorField& U_;
 
-    word densityFieldName_;
+    word phiFieldName_;
 
-    const volScalarField& rho_;
+    const surfaceScalarField& phi_;
 
     mutable double **UrelOld_;
+
+    mutable bool splitUrelCalculation_;    //indicator to split calculation of Urel between CFDEM and LIGGGHTS
+                                           //requires the integration fix to take dv/dt into account!
+
+    mutable double Cadd_;                  //indicator to split calculation of Urel between CFDEM and LIGGGHTS
+                                           //requires the integration fix to take dv/dt into account!
 
 public:
 

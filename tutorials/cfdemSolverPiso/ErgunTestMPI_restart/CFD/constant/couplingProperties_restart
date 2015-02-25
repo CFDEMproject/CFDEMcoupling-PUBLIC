@@ -98,23 +98,20 @@ implicitCoupleProps
 
 ArchimedesProps
 {
-    densityFieldName "rho";
     gravityFieldName "g";
 }
 gradPForceProps
 {
     pFieldName "p";
-    densityFieldName "rho";
     voidfractionFieldName "voidfraction";
     velocityFieldName "U";
-    //interpolation;
+    //interpolation true;
 }
 
 viscForceProps
 {
     velocityFieldName "U";
-    densityFieldName "rho";
-    interpolation;
+    interpolation true;
 }
 volWeightedAverageProps
 {
@@ -135,20 +132,17 @@ totalMomentumExchangeProps
     explicitMomExFieldName "none";
     fluidVelFieldName "U";
     granVelFieldName "Us";
-    densityFieldName "rho";
 }
 GidaspowDragProps
 {
     verbose;
     velFieldName "U";
-    densityFieldName "rho";
     voidfractionFieldName "voidfraction";
     phi 1;
 }
 DiFeliceDragProps
 {
     velFieldName "U";
-    densityFieldName "rho";
     voidfractionFieldName "voidfraction";
 }
 
@@ -156,14 +150,12 @@ KochHillDragProps
 {
     //verbose;
     velFieldName "U";
-    densityFieldName "rho";
     voidfractionFieldName "voidfraction";
 }
 
 BeetstraDragProps
 {
     velFieldName "U";
-    densityFieldName "rho";
     gravityFieldName "g";
     rhoParticle     2000.;
     voidfractionFieldName "voidfraction";
@@ -178,7 +170,6 @@ BeetstraDragProps
 virtualMassForceProps
 {
     velFieldName "U";
-    densityFieldName "rho";
 }
 
 particleCellVolumeProps

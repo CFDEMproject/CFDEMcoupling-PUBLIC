@@ -62,8 +62,6 @@ protected:
 
         int maxNumberOfParticles_;
 
-        int nClumpTypes_;
-
         mutable int couplingStep_;
 
         scalar DEMts_;
@@ -71,7 +69,6 @@ protected:
         int couplingInterval_;
 
     // Protected member functions
-        void setNumberOfParticles(int) const;
 
 public:
 
@@ -118,9 +115,9 @@ public:
 
 
     // Member Function
-        inline const int& maxNumberOfParticles() const {return maxNumberOfParticles_;};
+        void setNumberOfParticles(int) const;
 
-        inline int nClumpTypes() const {return nClumpTypes_;};
+        inline const int& maxNumberOfParticles() const {return maxNumberOfParticles_;};
 
         template <typename T>
         void getData
@@ -179,7 +176,7 @@ public:
         virtual void destroy(double*) const;
         //====
 
-        virtual bool couple() const;
+        virtual bool couple(int) const;
 
         virtual scalar timeStepFraction() const;
 
@@ -240,6 +237,8 @@ public:
 
         virtual int getNumberOfParticles() const;
         virtual int getNumberOfClumps() const;
+        virtual int getNumberOfTypes() const;
+        virtual double* getTypeVol() const;
 
         inline void setPositions(label n,double* pos) const
         {

@@ -63,7 +63,6 @@ LaEuScalarTemp::LaEuScalarTemp
 :
     forceModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
-    verbose_(false),
     tempFieldName_(propsDict_.lookup("tempFieldName")),
     tempField_(sm.mesh().lookupObject<volScalarField> (tempFieldName_)),
     voidfractionFieldName_(propsDict_.lookup("voidfractionFieldName")),
@@ -76,10 +75,7 @@ LaEuScalarTemp::LaEuScalarTemp
     partHeatFluxName_(propsDict_.lookup("partHeatFluxName")),
     partHeatFlux_(NULL),
     lambda_(readScalar(propsDict_.lookup("lambda"))),
-    Cp_(readScalar(propsDict_.lookup("Cp"))),
-    densityFieldName_(propsDict_.lookup("densityFieldName")),
-    rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_)),
-    interpolation_(false)
+    Cp_(readScalar(propsDict_.lookup("Cp")))
 {
     allocateMyArrays();
 
@@ -88,10 +84,18 @@ LaEuScalarTemp::LaEuScalarTemp
         maxSource_=readScalar(propsDict_.lookup ("maxSource"));
         Info << "limiting eulerian source field to: " << maxSource_ << endl;
     }
-    if (propsDict_.found("interpolation")) interpolation_=true;
-    if (propsDict_.found("verbose")) verbose_=true;
 
-Info << "verbose_" << verbose_ << endl;
+    // init force sub model
+    setForceSubModels(propsDict_);
+
+    // define switches which can be read from dict
+    forceSubM(0).setSwitchesList(3,true); // activate search for verbose switch
+    forceSubM(0).setSwitchesList(4,true); // activate search for interpolate switch
+    forceSubM(0).setSwitchesList(8,true); // activate scalarViscosity switch
+
+    // read those switches defined above, if provided in dict
+    forceSubM(0).readSwitches();
+
 
     particleCloud_.checkCG(false);
 }
@@ -131,12 +135,8 @@ void LaEuScalarTemp::manipulateScalarField(volScalarField& EuField) const
     // get DEM data
     particleCloud_.dataExchangeM().getData(partTempName_,"scalar-atom",partTemp_);
 
-    // get viscosity field
-    #ifdef comp
-        const volScalarField& nufField = particleCloud_.turbulence().mu() / rho_;
-    #else
-        const volScalarField& nufField = particleCloud_.turbulence().nu();
-    #endif
+    const volScalarField& nufField = forceSubM(0).nuField();
+    const volScalarField& rhoField = forceSubM(0).rhoField();
 
     // calc La based heat flux
     vector position(0,0,0);
@@ -158,6 +158,8 @@ void LaEuScalarTemp::manipulateScalarField(volScalarField& EuField) const
     interpolationCellPoint<vector> UInterpolator_(U_);
     interpolationCellPoint<scalar> TInterpolator_(tempField_);
 
+    scalar h1(0);
+    scalar h2(0);
     for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
     {
         //if(particleCloud_.regionM().inRegion()[index][0])
@@ -165,7 +167,7 @@ void LaEuScalarTemp::manipulateScalarField(volScalarField& EuField) const
             cellI = particleCloud_.cellIDs()[index][0];
             if(cellI >= 0)
             {
-                if(interpolation_)
+                if(forceSubM(0).interpolation())
                 {
 	                position = particleCloud_.position(index);
                     voidfraction = voidfractionInterpolator_.interpolate(position,cellI);
@@ -185,7 +187,7 @@ void LaEuScalarTemp::manipulateScalarField(volScalarField& EuField) const
                 As = ds*ds*M_PI;
                 nuf = nufField[cellI];
                 Rep = ds*magUr/nuf;
-                Pr = Cp_*nuf*rho_[cellI]/lambda_;
+                Pr = max(SMALL,Cp_*nuf*rhoField[cellI]/lambda_);
 
                 if (Rep < 200)
                 {
@@ -193,8 +195,9 @@ void LaEuScalarTemp::manipulateScalarField(volScalarField& EuField) const
                 }
                 else if (Rep < 1500)
                 {
-                    Nup = 2+0.5*pow(voidfraction,n)*sqrt(Rep)*pow(Pr,0.33)
-                                 +0.02*pow(voidfraction,n)*pow(Rep,0.8)*pow(Pr,0.33);
+                    h1=pow(voidfraction,n);
+                    h2=pow(Pr,0.33);
+                    Nup = 2+0.5*h1*sqrt(Rep)*h2+0.02*h1*pow(Rep,0.8)*h2;
                 }
                 else
                 {
@@ -207,7 +210,7 @@ void LaEuScalarTemp::manipulateScalarField(volScalarField& EuField) const
                 partHeatFlux_[index][0] = partHeatFlux;
 
 
-                if(verbose_ && index >=0 && index <2)
+                if(forceSubM(0).verbose() && index >=0 && index <2)
                 {
                     Info << "partHeatFlux = " << partHeatFlux << endl;
                     Info << "magUr = " << magUr << endl;
@@ -233,7 +236,7 @@ void LaEuScalarTemp::manipulateScalarField(volScalarField& EuField) const
     );
 
     // scale with -1/(Vcell*rho*Cp)
-    EuField.internalField() /= -rho_.internalField()*Cp_*EuField.mesh().V();
+    EuField.internalField() /= -rhoField.internalField()*Cp_*EuField.mesh().V();
 
     // limit source term
     scalar EuFieldInCell;
@@ -247,7 +250,7 @@ void LaEuScalarTemp::manipulateScalarField(volScalarField& EuField) const
         }
     }
 
-    Info << "total convective particle-fluid heat flux [W] (Eulerian) = " << gSum(EuField*rho_*Cp_*EuField.mesh().V()) << endl;
+    Info << "total convective particle-fluid heat flux [W] (Eulerian) = " << gSum(EuField*rhoField*Cp_*EuField.mesh().V()) << endl;
 
     // give DEM data
     particleCloud_.dataExchangeM().giveData(partHeatFluxName_,"scalar-atom", partHeatFlux_);

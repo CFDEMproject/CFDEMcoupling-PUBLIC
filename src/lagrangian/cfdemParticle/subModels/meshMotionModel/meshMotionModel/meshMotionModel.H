@@ -109,6 +109,16 @@ public:
     // Member Function
         virtual tmp<volVectorField> setMotion() const=0;
 
+        virtual void correctF(volVectorField&) const {};
+
+        virtual void correctUo(volVectorField&) const {};
+
+        virtual volVectorField& f() const;
+
+        virtual volScalarField& body() const;
+
+        virtual volScalarField& inside() const;
+
     // Access
 
 };

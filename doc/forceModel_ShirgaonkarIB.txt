@@ -18,12 +18,10 @@ forceModels
 ShirgaonkarIBProps
 \{
     velFieldName "U";
-    densityFieldName "density";
     pressureFieldName "pressure";
 \}; :pre
 
 {U} = name of the finite volume fluid velocity field :ulb,l
-{density} = name of the finite volume density field :l
 {pressure} = name of the finite volume pressure field :l
 :ule
 
@@ -36,7 +34,6 @@ forceModels
 ShirgaonkarIBProps
 \{
     velFieldName "U";
-    densityFieldName "rho";
     pressureFieldName "p";
 \} :pre
 

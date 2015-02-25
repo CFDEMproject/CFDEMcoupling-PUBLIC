@@ -65,10 +65,6 @@ private:
 
     bool twoDimensional_;
 
-    word densityFieldName_;
-
-    const volScalarField& rho_;    // ref to fluid density
-
     word voidfractionFieldName_;
 
     const volScalarField& voidfractions_;

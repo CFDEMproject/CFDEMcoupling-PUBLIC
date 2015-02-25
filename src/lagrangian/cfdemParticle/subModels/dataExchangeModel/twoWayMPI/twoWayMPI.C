@@ -112,8 +112,9 @@ twoWayMPI::twoWayMPI
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 twoWayMPI::~twoWayMPI()
-{}
-
+{
+    if (liggghts == 1) delete lmp;
+}
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
 char* twoWayMPI::wordToChar(word& inWord) const
@@ -124,6 +125,7 @@ char* twoWayMPI::wordToChar(word& inWord) const
 
 
 // * * * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * * //
+
 void twoWayMPI::getData
 (
     word name,
@@ -251,10 +253,10 @@ void Foam::twoWayMPI::destroy(double* array) const
 }
 //============
 
-bool Foam::twoWayMPI::couple() const
+bool Foam::twoWayMPI::couple(int i) const
 {
     bool coupleNow = false;
-    if (doCoupleNow())
+    if (i==0)
     {
         couplingStep_++;
         coupleNow = true;
@@ -306,9 +308,9 @@ bool Foam::twoWayMPI::couple() const
                             DEMstepsToInterrupt[ind] -= DEMstepsToInterrupt[ind-1];
                     }                    
 
-                    Info << "Foam::twoWayMPI::couple(): interruptTimes=" << interruptTimes << endl;
-                    Info << "Foam::twoWayMPI::couple(): DEMstepsToInterrupt=" << DEMstepsToInterrupt << endl;
-                    Info << "Foam::twoWayMPI::couple(): lcModel=" << lcModel << endl;
+                    Info << "Foam::twoWayMPI::couple(i): interruptTimes=" << interruptTimes << endl;
+                    Info << "Foam::twoWayMPI::couple(i): DEMstepsToInterrupt=" << DEMstepsToInterrupt << endl;
+                    Info << "Foam::twoWayMPI::couple(i): lcModel=" << lcModel << endl;
                 }
 
                 if(particleCloud_.liggghtsCommand()[i]().type()=="runLiggghts")
@@ -391,7 +393,6 @@ bool Foam::twoWayMPI::couple() const
 
         // give nr of particles to cloud
         double newNpart = liggghts_get_maxtag(lmp);
-
         setNumberOfParticles(newNpart);
 
         // re-allocate arrays of cloud
@@ -414,9 +415,29 @@ int Foam::twoWayMPI::getNumberOfClumps() const
         return liggghts_get_maxtag_ms(lmp);
     #endif
 
-    Warning << "liggghts_get_maxtag_ms(lmp) is commented here!" << endl;
+    Warning << "liggghts_get_maxtag_ms(lmp) is not available here!" << endl;
     return -1;       
 }
+
+int Foam::twoWayMPI::getNumberOfTypes() const
+{
+    #ifdef multisphere
+        return liggghts_get_ntypes_ms(lmp);
+    #endif
+    Warning << "liggghts_get_maxtag_ms(lmp) is not available here!" << endl;
+    return -1;
+}
+
+double* Foam::twoWayMPI::getTypeVol() const
+{
+    #ifdef multisphere
+        return liggghts_get_vclump_ms(lmp);
+    #endif
+
+    Warning << "liggghts_get_vclump_ms(lmp) is not available here!" << endl;
+    return NULL;       
+}
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam

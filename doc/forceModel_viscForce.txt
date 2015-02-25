@@ -18,13 +18,11 @@ forceModels
 viscForceProps
 \{
     velocityFieldName "U";
-    densityFieldName "density";
-    interpolation;
+    interpolation "switch";
 \}; :pre
 
 {U} = name of the finite volume fluid velocity field :ulb,l
-{density} = name of the finite volume gravity field :l
-{interpolation} = flag to use interpolated stress values (normally off) :l
+{switch} = flag to use interpolated stress values (normally off) :l
 :ule
 
 [Examples:]
@@ -36,7 +34,6 @@ forceModels
 viscForceProps
 \{
     velocityFieldName "U";
-    densityFieldName "density";
 \} :pre
 
 [Description:]

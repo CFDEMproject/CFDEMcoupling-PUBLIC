@@ -20,21 +20,18 @@
 MeiLiftProps
 {
     velFieldName "U";
-    densityFieldName "density";
     useSecondOrderTerms;
-    interpolation;
-    verbose;
+    interpolation "switch1";
+    verbose "switch2";
 }; 
 </PRE>
 <UL><LI><I>U</I> = name of the finite volume fluid velocity field 
 
-<LI><I>density</I> = name of the finite volume fluid density field 
-
 <LI><I>useSecondOrderTerms</I> = switch to activate second order terms in the lift force model 
 
-<LI><I>interpolation</I> = switch to activate tri-linear interpolation of the flow quantities at the particle position 
+<LI><I>switch1</I> = switch to activate tri-linear interpolation of the flow quantities at the particle position 
 
-<LI><I>verbose</I> = switch to activate the report of per-particle quantities to the screen 
+<LI><I>switch2</I> = switch to activate the report of per-particle quantities to the screen 
 
 
 </UL>
@@ -47,10 +44,9 @@ MeiLiftProps
 MeiLiftProps
 {
     velFieldName "U";
-    densityFieldName "rho";
     useSecondOrderTerms;
-    interpolation;
-    verbose;
+    interpolation true;
+    verbose true;
 } 
 </PRE>
 <P><B>Description:</B>

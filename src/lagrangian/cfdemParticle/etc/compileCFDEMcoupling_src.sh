@@ -20,48 +20,48 @@ mkdir -p $logDir
 #================================================================================#
 # compile src
 #================================================================================#
-    whitelist="$CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/library-list.txt"
-    echo ""
-    echo "Please provide the libraries to be compiled in the $CWD/$whitelist file."
+whitelist="$CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/library-list.txt"
+echo ""
+echo "Please provide the libraries to be compiled in the $CWD/$whitelist file."
 
-    if [ ! -f "$CWD/$whitelist" ];then
-        echo "$whitelist does not exist in $CWD. Nothing will be done."
-        NLINES=0
-        COUNT=0
-    else
-        NLINES=`wc -l < $CWD/$whitelist`
-        COUNT=0
-    fi
+if [ ! -f "$CWD/$whitelist" ];then
+    echo "$whitelist does not exist in $CWD. Nothing will be done."
+    NLINES=0
+    COUNT=0
+else
+    NLINES=`wc -l < $CWD/$whitelist`
+    COUNT=0
+fi
 
-    while [ $COUNT -lt $NLINES ]
-    do
-            let COUNT++  
-            LINE=`head -n $COUNT $CWD/$whitelist | tail -1`
-  
-            # white lines
-            if [[ "$LINE" == "" ]]; then
-                echo "compile $LINE"
-                continue
-            # comments
-            elif [[ "$LINE" == \#* ]]; then
-                continue
-             # paths
-            elif [[ "$LINE" == */dir ]]; then
-                echo "will change path..."
-                LINE=$(echo "${LINE%????}")
-                path="$CFDEM_SRC_DIR/$LINE"
-                cd $path
-                #continue
-            fi
-            #--------------------------------------------------------------------------------#
-            #- define variables
-            logpath="$(dirname "$(readlink -f ${BASH_SOURCE[0]})")/$logDir"
-            logfileName="log_compileCFDEMcoupling_"$(basename $LINE)""
-            casePath="$path"
-            headerText="$logfileName""-$NOW"
-            #--------------------------------------------------------------------------------#
-            # remove old log file
-            rm "$logpath/$logfileName"*
-            compileLib $logpath $logfileName $casePath $headerText
-    done
+while [ $COUNT -lt $NLINES ]
+do
+        let COUNT++  
+        LINE=`head -n $COUNT $CWD/$whitelist | tail -1`
+
+        # white lines
+        if [[ "$LINE" == "" ]]; then
+            echo "compile $LINE"
+            continue
+        # comments
+        elif [[ "$LINE" == \#* ]]; then
+            continue
+         # paths
+        elif [[ "$LINE" == */dir ]]; then
+            echo "will change path..."
+            LINE=$(echo "${LINE%????}")
+            path="$CFDEM_SRC_DIR/$LINE"
+            cd $path
+            #continue
+        fi
+        #--------------------------------------------------------------------------------#
+        #- define variables
+        logpath="$(dirname "$(readlink -f ${BASH_SOURCE[0]})")/$logDir"
+        logfileName="log_compileCFDEMcoupling_"$(basename $LINE)""
+        casePath="$path"
+        headerText="$logfileName""-$NOW"
+        #--------------------------------------------------------------------------------#
+        # remove old log file
+        rm "$logpath/$logfileName"*
+        compileLib $logpath $logfileName $casePath $headerText
+done
 

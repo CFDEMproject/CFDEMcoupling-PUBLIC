@@ -18,15 +18,13 @@ forceModels
 gradPForceProps
 \{
     pFieldName "pressure";
-    densityFieldName "density";
     velocityFieldName "U";
-    interpolation;
+    interpolation switch1;
 \}; :pre
 
 {pressure} = name of the finite volume fluid pressure field :ulb,l
-{density} = name of the finite volume gravity field :l
 {U} = name of the finite volume fluid velocity field :l
-{interpolation} = flag to use interpolated pressure values (normally off) :l
+{switch1} = flag to use interpolated pressure values (normally off) :l
 :ule
 
 [Examples:]
@@ -38,9 +36,8 @@ forceModels
 gradPForceProps
 \{
     pFieldName "p";
-    densityFieldName "rho";
     velocityFieldName "U";
-    interpolation;
+    interpolation true;
 \} :pre
 
 [Description:]

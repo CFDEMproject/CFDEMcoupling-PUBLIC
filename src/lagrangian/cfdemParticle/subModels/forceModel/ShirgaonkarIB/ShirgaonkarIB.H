@@ -70,10 +70,6 @@ private:
 
     const volVectorField& U_;
 
-    word densityFieldName_;
-
-    const volScalarField& rho_;
-
     word pressureFieldName_;
 
     const volScalarField& p_;

@@ -20,15 +20,12 @@
 viscForceProps
 {
     velocityFieldName "U";
-    densityFieldName "density";
-    interpolation;
+    interpolation "switch";
 }; 
 </PRE>
 <UL><LI><I>U</I> = name of the finite volume fluid velocity field 
 
-<LI><I>density</I> = name of the finite volume gravity field 
-
-<LI><I>interpolation</I> = flag to use interpolated stress values (normally off) 
+<LI><I>switch</I> = flag to use interpolated stress values (normally off) 
 
 
 </UL>
@@ -41,7 +38,6 @@ viscForceProps
 viscForceProps
 {
     velocityFieldName "U";
-    densityFieldName "density";
 } 
 </PRE>
 <P><B>Description:</B>

@@ -164,7 +164,7 @@ In order to get the latest code version, please use the git repository at http:/
 </P>
 <PRE>modelType 
 </PRE>
-<P>"modelType" refers to the formulation of the equations to be solved. Choose "A" or "B", according to Zhou et al. (2010): "Discrete particle simulation of particle-fluid flow: model formulations and their applicability", JFM. "A" requires the use of the force models gradPForce and viscForce, whereas "B" requires the force model "Archimedes".
+<P>"modelType" refers to the formulation of the equations to be solved. Choose "A", "B" or "Bfull", according to Zhou et al. (2010): "Discrete particle simulation of particle-fluid flow: model formulations and their applicability", JFM. "A" requires the use of the force models gradPForce and viscForce, whereas "B" requires the force model "Archimedes". "Bfull" refers to model type I.
 </P>
 <PRE>couplingInterval 
 </PRE>
@@ -217,9 +217,11 @@ listing below of styles within certain commands.
 <TR ALIGN="center"><TD ><A HREF = "forceModel_DiFeliceDrag.html">forceModel_DiFeliceDrag</A></TD><TD ><A HREF = "forceModel_GidaspowDrag.html">forceModel_GidaspowDrag</A></TD></TR>
 <TR ALIGN="center"><TD ><A HREF = "forceModel_KochHillDrag.html">forceModel_KochHillDrag</A></TD><TD ><A HREF = "forceModel_LaEuScalarTemp.html">forceModel_LaEuScalarTemp</A></TD></TR>
 <TR ALIGN="center"><TD ><A HREF = "forceModel_MeiLift.html">forceModel_MeiLift</A></TD><TD ><A HREF = "forceModel_SchillerNaumannDrag.html">forceModel_SchillerNaumannDrag</A></TD></TR>
-<TR ALIGN="center"><TD ><A HREF = "forceModel_ShirgaonkarIB.html">forceModel_ShirgaonkarIB</A></TD><TD ><A HREF = "forceModel_gradPForce.html">forceModel_gradPForce</A></TD></TR>
-<TR ALIGN="center"><TD ><A HREF = "forceModel_noDrag.html">forceModel_noDrag</A></TD><TD ><A HREF = "forceModel_particleCellVolume.html">forceModel_particleCellVolume</A></TD></TR>
-<TR ALIGN="center"><TD ><A HREF = "forceModel_virtualMassForce.html">forceModel_virtualMassForce</A></TD><TD ><A HREF = "forceModel_viscForce.html">forceModel_viscForce</A></TD></TR>
+<TR ALIGN="center"><TD ><A HREF = "forceModel_ShirgaonkarIB.html">forceModel_ShirgaonkarIB</A></TD><TD ><A HREF = "forceModel_fieldStore.html">forceModel_fieldStore</A></TD></TR>
+<TR ALIGN="center"><TD ><A HREF = "forceModel_gradPForce.html">forceModel_gradPForce</A></TD><TD ><A HREF = "forceModel_noDrag.html">forceModel_noDrag</A></TD></TR>
+<TR ALIGN="center"><TD ><A HREF = "forceModel_particleCellVolume.html">forceModel_particleCellVolume</A></TD><TD ><A HREF = "forceModel_virtualMassForce.html">forceModel_virtualMassForce</A></TD></TR>
+<TR ALIGN="center"><TD ><A HREF = "forceModel_viscForce.html">forceModel_viscForce</A></TD><TD ><A HREF = "forceSubModel.html">forceSubModel</A></TD></TR>
+<TR ALIGN="center"><TD ><A HREF = "forceSubModel_ImEx.html">forceSubModel_ImEx</A></TD><TD ><A HREF = "forceSubModel_ImExCorr.html">forceSubModel_ImExCorr</A></TD></TR>
 <TR ALIGN="center"><TD ><A HREF = "liggghtsCommandModel.html">liggghtsCommandModel</A></TD><TD ><A HREF = "liggghtsCommandModel_execute.html">liggghtsCommandModel_execute</A></TD></TR>
 <TR ALIGN="center"><TD ><A HREF = "liggghtsCommandModel_readLiggghtsData.html">liggghtsCommandModel_readLiggghtsData</A></TD><TD ><A HREF = "liggghtsCommandModel_runLiggghts.html">liggghtsCommandModel_runLiggghts</A></TD></TR>
 <TR ALIGN="center"><TD ><A HREF = "liggghtsCommandModel_writeLiggghts.html">liggghtsCommandModel_writeLiggghts</A></TD><TD ><A HREF = "locateModel.html">locateModel</A></TD></TR>

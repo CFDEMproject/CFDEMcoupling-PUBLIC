@@ -19,28 +19,24 @@ LaEuScalarTempProps
 \{
     velFieldName "U";
     tempFieldName "T";
-    tempSourceFieldName "Tsource";
     voidfractionFieldName "voidfraction";
     partTempName "Temp";
     partHeatFluxName "convectiveHeatFlux";
     lambda value;
     Cp value1;
-    densityFieldName "density";
-    interpolation;
-    verbose;
+    interpolation "switch1";
+    verbose "switch2";
 \}; :pre
 
 {U} = name of the finite volume fluid velocity field :ulb,l
 {T} = name of the finite volume scalar temperature field :l
-{Tsource} = name of the finite volume scalar temperature source field :l
 {voidfraction} = name of the finite volume voidfraction field :l
 {Temp} = name of the DEM data representing the particles temperature :l
 {convectiveHeatFlux} = name of the DEM data representing the particle-fluid convective heat flux :l
 {value} = fluid thermal conductivity \[W/(m*K)\] :l
 {value1} = fluid specific heat capacity \[W*s/(kg*K)\] :l
-{density} = name of the finite volume fluid density field :l
-{interpolation} = (optional, normally off) flag to use interpolated voidfraction and fluid velocity values :l
-{verbose} = (normally off) for verbose run :l
+{switch1} = (optional, normally off) flag to use interpolated voidfraction and fluid velocity values :l
+{switch2} = (normally off) for verbose run :l
 :ule
 
 [Examples:]
@@ -53,13 +49,11 @@ LaEuScalarTempProps
 \{
     velFieldName "U";
     tempFieldName "T";
-    tempSourceFieldName "Tsource";
     voidfractionFieldName "voidfraction";
     partTempName "Temp";
     partHeatFluxName "convectiveHeatFlux";
     lambda 0.0256;
     Cp 1007;
-    densityFieldName "rho";
 \} :pre
 
 [Description:]
@@ -68,7 +62,7 @@ This "forceModel" does not influence the particles or the fluid flow! Using the 
 
 [Restrictions:]
 
-Goes only with cfdemSolverScalar.
+Goes only with cfdemSolverScalar. The force model has to be the second (!!!) model in the forces list.
 
 [Related commands:]
 

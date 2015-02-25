@@ -177,6 +177,15 @@ void Foam::voidFractionModel::reAllocArrays() const
     }
 }
 
+void Foam::voidFractionModel::reAllocArrays(int nP) const
+{
+    if(particleCloud_.numberOfParticlesChanged())
+    {
+        // get arrays of new length
+        particleCloud_.dataExchangeM().allocateArray(cellsPerParticle_,1,1,nP);
+    }
+}
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam

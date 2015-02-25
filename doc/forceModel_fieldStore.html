@@ -1,0 +1,68 @@
+<HTML>
+<CENTER><A HREF = "http://www.cfdem.com">CFDEMproject WWW Site</A> - <A HREF = "CFDEMcoupling_Manual.html#comm">CFDEM Commands</A> 
+</CENTER>
+
+
+
+
+<HR>
+
+<H3>forceModel_fieldStore command 
+</H3>
+<P><B>Syntax:</B>
+</P>
+<P>Defined in couplingProperties dictionary.
+</P>
+<PRE>forceModels
+(
+    fieldStore
+);
+fieldStoreProps
+{
+    scalarFieldNames
+    (
+        "scalarField"
+    );
+    vectorFieldNames
+    (
+        "vectorField"
+    );
+}; 
+</PRE>
+<UL><LI><I>scalarField</I> = names of the finite volume scalar fields to be stored 
+
+<LI><I>vectorField</I> = names of the finite volume vector fields to be stored 
+
+
+</UL>
+<P><B>Examples:</B>
+</P>
+<PRE>forceModels
+(
+    fieldStore
+);
+fieldStoreProps
+{
+    scalarFieldNames
+    (
+        "voidfraction"
+    );
+    vectorFieldNames
+    (
+        "U"
+    );
+} 
+</PRE>
+<P><B>Description:</B>
+</P>
+<P>This "forceModel" does not influence the particles or the flow - it is a tool to store a scalar/vector field! This is especially useful if you use a boundary condition which cannot interpreted correctly in your postporcessor (e.g. paraview).
+</P>
+<P><B>Restrictions:</B>
+</P>
+<P>none.
+</P>
+<P><B>Related commands:</B>
+</P>
+<P><A HREF = "forceModel.html">forceModel</A>
+</P>
+</HTML>

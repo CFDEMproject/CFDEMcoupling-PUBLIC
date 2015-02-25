@@ -1,0 +1,8 @@
+# paths for additional libraries
+CFDEM_ADD_LIB_PATHS = \
+
+# additional libraries to be linked to solvers
+CFDEM_ADD_LIBS = \
+
+# additional static libraries to be linked to lagrangian library
+CFDEM_ADD_STATICLIBS = \

@@ -18,11 +18,9 @@ forceModels
 SchillerNaumannDragProps
 \{
     velFieldName "U";
-    densityFieldName "density";
 \}; :pre
 
 {U} = name of the finite volume fluid velocity field :ulb,l
-{density} = name of the finite volume gravity field :l
 :ule
 
 [Examples:]
@@ -34,7 +32,6 @@ forceModels
 SchillerNaumannDragProps
 \{
     velFieldName "U";
-    densityFieldName "rho";
 \} :pre
 
 [Description:]

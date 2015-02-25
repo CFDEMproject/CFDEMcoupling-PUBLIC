@@ -17,12 +17,10 @@ forceModels
 );
 ArchimedesProps
 \{
-    densityFieldName "density";
     gravityFieldName "gravity";
 \}; :pre
 
-{density} = name of the finite volume density field :ulb,l
-{gravity} = name of the finite volume gravity field :l
+{gravity} = name of the finite volume gravity field :ulb,l
 :ule
 
 [Examples:]
@@ -33,7 +31,6 @@ forceModels
 );
 ArchimedesProps
 \{
-    densityFieldName "rho";
     gravityFieldName "g";
 \} :pre
 

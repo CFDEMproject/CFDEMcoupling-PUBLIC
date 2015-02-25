@@ -80,19 +80,7 @@ private:
 
     const volVectorField& U_;
 
-    word densityFieldName_;
-
-    const volScalarField& rho_;
-
     bool useSecondOrderTerms_;
-
-    bool  interpolation_;
-
-    bool  verbose_;
-
-    /*word vorticityFieldName_;
-
-    volVectorField& vorticity_;*/
 
 public:
 

@@ -12,7 +12,7 @@ runOctave="true"
 postproc="false"
 
 # check if mesh was built
-if [ -d "$casePath/CFD/constant/polyMesh/boundary" ]; then
+if [ -f "$casePath/CFD/constant/polyMesh/points" ]; then
     echo "mesh was built before - using old mesh"
 else
     echo "mesh needs to be built"
@@ -20,11 +20,18 @@ else
     blockMesh
 fi
 
+if [ -f "$casePath/DEM/post/restart/liggghts.restart" ];  then
+    echo "LIGGGHTS init was run before - using existing restart file"
+else
+    #- run DEM in new terminal
+    $casePath/parDEMrun.sh
+fi
+
 #-------------------------------------------------------#
 # adapt settings for init run
-cp $casePath/CFD/constant/liggghtsCommands_init $casePath/CFD/constant/liggghtsCommands
-cp $casePath/CFD/constant/couplingProperties_init $casePath/CFD/constant/couplingProperties
-cp $casePath/CFD/system/controlDict_init $casePath/CFD/system/controlDict
+cp $casePath/CFD/constant/liggghtsCommands_run $casePath/CFD/constant/liggghtsCommands
+cp $casePath/CFD/constant/couplingProperties_run $casePath/CFD/constant/couplingProperties
+cp $casePath/CFD/system/controlDict_run $casePath/CFD/system/controlDict
 #-------------------------------------------------------#
 
 #- run parallel CFD-DEM in new terminal
@@ -42,7 +49,8 @@ cp $casePath/CFD/constant/couplingProperties_restart $casePath/CFD/constant/coup
 cp $casePath/CFD/system/controlDict_restart $casePath/CFD/system/controlDict
 
 #- run parallel CFD-DEM in new terminal
-gnome-terminal --title='cfdemSolverPiso ErgunTestMPI_restart CFD'  -e "bash $casePath/parCFDDEMrun.sh" 
+#gnome-terminal --title='cfdemSolverPiso ErgunTestMPI_restart CFD'  -e "bash $casePath/parCFDDEMrun.sh" 
+bash $casePath/parCFDDEMrun.sh
 
 
 #- wait until sim has finished then run octave
@@ -102,7 +110,8 @@ source $WM_PROJECT_DIR/bin/tools/CleanFunctions
 cd $casePath/CFD
 cleanCase
 rm -r $casePath/CFD/clockData
-rm -r $casePath/DEM/post/*
-rm $casePath/DEM/liggghts.restartCFDEM*
-(cd $casePath/DEM/post && touch dummy)
+rm -r $casePath/DEM/post/*.*
+#rm -r $casePath/DEM/post/restart/*.*
+touch $casePath/DEM/post/.gitignore
+touch $casePath/DEM/post/restart/.gitignore
 echo "done"

@@ -71,6 +71,21 @@ compileLib()
 
     #- wclean and wmake
     #if [ $doClean != "noClean" ]; then
+        # check library to compile is compressible
+        str=$casePath
+        i=$((${#str}-4))
+        ending=${str:$i:4}
+        if [[ $ending == "Comp" ]]; then
+                echo "Compiling a compressible library - so doing an rmdepall of incomp library first."
+                echo "Please make sure to have the compressible libraries first in the library-list.txt!"
+                cd $CFDEM_SRC_DIR/lagrangian/cfdemParticle
+                echo "changing to $PWD"
+                rmdepall 2>&1 | tee -a $logpath/$logfileName
+                cd $casePath
+                echo "changing to $PWD"
+            else
+                echo "Compiling a incompressible library."
+        fi
         rmdepall 2>&1 | tee -a $logpath/$logfileName
         wclean 2>&1 | tee -a $logpath/$logfileName
     #fi
@@ -139,6 +154,7 @@ compileLIGGGHTS()
     logpath="$1"
     logfileName="$2"
     headerText="$3"
+    clean="$4"
     #--------------------------------------------------------------------------------#
 
     #- clean up old log file
@@ -157,9 +173,14 @@ compileLIGGGHTS()
     echo 2>&1 | tee -a $logpath/$logfileName
 
     #- wclean and wmake
-    rm $CFDEM_LIGGGHTS_SRC_DIR/"lmp_"$CFDEM_LIGGGHTS_MAKEFILE_NAME
-    rm $CFDEM_LIGGGHTS_SRC_DIR/"lib"$CFDEM_LIGGGHTS_LIB_NAME".a"
-    make clean-all 2>&1 | tee -a $logpath/$logfileName
+    if [[ $clean == "false" ]]; then
+        echo "not cleaning LIGGGHTS"
+    else
+        rm $CFDEM_LIGGGHTS_SRC_DIR/"lmp_"$CFDEM_LIGGGHTS_MAKEFILE_NAME
+        rm $CFDEM_LIGGGHTS_SRC_DIR/"lib"$CFDEM_LIGGGHTS_LIB_NAME".a"
+        make clean-all 2>&1 | tee -a $logpath/$logfileName
+        echo "cleaning LIGGGHTS"
+    fi
     if [[ $WM_NCOMPPROCS == "" ]]; then
         echo "compiling LIGGGHTS on one CPU"
         make $CFDEM_LIGGGHTS_MAKEFILE_NAME 2>&1 | tee -a $logpath/$logfileName
@@ -189,7 +210,13 @@ compileLMPlib()
     rm $logpath/$logfileName
 
     #- change path
-    cd $libraryPath
+    if [ -d "$libraryPath" ]; then
+        cd $libraryPath
+    else
+        echo ""
+        echo "lib path $libraryPath does not exist - check settings in .../etc/bashrc."
+        read
+    fi
 
     #- header
     echo 2>&1 | tee -a $logpath/$logfileName
@@ -550,6 +577,7 @@ parCFDDEMrun()
     machineFileName="$7"
     debugMode="$8"
     reconstuctCase="$9"
+    cleanCase="$10"
     #--------------------------------------------------------------------------------#
 
     if [ $debugMode == "on" ]; then
@@ -901,6 +929,52 @@ checkDirComment()
     else
         echo "valid:NO  critical:$critical - $varName = $filePath does not exist" 
     fi
+}
+
+#========================================#
+#- function to check if a variable exits
+checkEnv()
+{
+    #--------------------------------------------------------------------------------#
+    #- define variables
+    var="$1"
+    #--------------------------------------------------------------------------------#
+    if [[ $var == "" ]]; then
+        echo "false"
+    else
+        echo "true"
+    fi
+}
+
+#========================================#
+#- function to check if a variable exits
+checkEnvComment()
+{
+    #--------------------------------------------------------------------------------#
+    #- define variables
+    var="$1"
+    varName="$2"
+    critical="$3"
+    #--------------------------------------------------------------------------------#
+    if [ $(checkEnv $var) == "true" ]; then
+         echo "valid:yes critical:$critical - $varName = $var" 
+    else
+        echo "valid:NO  critical:$critical - $varName = $var variable not set!" 
+    fi
+}
+
+#========================================#
+#- function to print a header to terminal
+printHeader()
+{
+    echo ""
+    echo "*********************************************"
+    echo "* C F D E M (R) c o u p l i n g             *"
+    echo "*                                           *"
+    echo "* by DCS Computing GmbH                     *"
+    echo "* www.dcs-computing.com                     *"
+    echo "*********************************************"
+    echo "" 
 }
 
 #========================================#

@@ -77,7 +77,7 @@ int trackIO::dumpDEMdata() const
 {
     int npProcs(-1);
 
-    if (time_.outputTime())
+    if (dumpNow())
     {
         npProcs = sophIO::dumpDEMdata();
 

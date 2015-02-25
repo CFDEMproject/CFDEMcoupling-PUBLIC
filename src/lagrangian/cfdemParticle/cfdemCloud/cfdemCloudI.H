@@ -55,10 +55,20 @@ inline const bool& cfdemCloud::impDEMdrag() const
     return impDEMdrag_;
 };
 
+inline const bool& cfdemCloud::impDEMdragAcc() const
+{ 
+    return impDEMdragAcc_;
+};
+
 inline const scalar& cfdemCloud::imExSplitFactor() const
 {
 	    return imExSplitFactor_;
 };
+
+inline const bool& cfdemCloud::treatVoidCellsAsExplicitForce() const
+{
+    return treatVoidCellsAsExplicitForce_;
+}
 
 inline const scalar& cfdemCloud::cg() const
 { 
@@ -103,6 +113,11 @@ inline double ** cfdemCloud::velocities() const
 inline double ** cfdemCloud::fluidVels() const
 {
     return fluidVel_;
+}
+
+inline double ** cfdemCloud::fAccs() const
+{
+    return fAcc_;
 }
 
 inline double ** cfdemCloud::impForces() const
@@ -169,7 +184,7 @@ inline label Foam::cfdemCloud::body(int index)
 
 inline double cfdemCloud::particleVolume(int index)
 {
-    return particleVolumes_[index][0];
+    return particleV_[index][0];
 }
 
 inline scalar cfdemCloud::radius(int index)
@@ -180,6 +195,25 @@ inline scalar cfdemCloud::radius(int index)
 inline double cfdemCloud::d(int index)
 {
     return 2*radii_[index][0];
+}
+
+inline double cfdemCloud::d32(bool recalc)
+{
+    if(d32_<0 || recalc)
+    {
+        scalar Ntot(0);
+        scalar Dtot(0);
+        scalar r(0);
+        for(int index = 0;index <  numberOfParticles(); ++index)
+        {
+            r=radii_[index][0];
+            Ntot+=2*r*r*r;
+            Dtot+=r*r;
+        }
+        d32_=Ntot/Dtot;
+    }
+
+    return d32_;
 }
 
 inline int cfdemCloud::numberOfParticles() const
@@ -269,7 +303,7 @@ inline autoPtr<liggghtsCommandModel>* cfdemCloud::liggghtsCommand() const
 }
 
 #if defined(version21) || defined(version16ext)
-    #ifdef comp
+    #ifdef compre
         inline const compressible::turbulenceModel& cfdemCloud::turbulence() const
     #else
         inline const incompressible::turbulenceModel& cfdemCloud::turbulence() const

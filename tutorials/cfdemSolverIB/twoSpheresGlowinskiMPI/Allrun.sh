@@ -14,7 +14,7 @@ casePath="$(dirname "$(readlink -f ${BASH_SOURCE[0]})")"
 echo $casePath
 
 # check if mesh was built
-if [ -d "$casePath/CFD/constant/polyMesh/boundary" ]; then
+if [ -f "$casePath/CFD/constant/polyMesh/points" ]; then
     echo "mesh was built before - using old mesh"
 else
     echo "mesh needs to be built"
@@ -23,7 +23,5 @@ else
 fi
 
 
-#gnome-terminal --title='cfdemSolverIB two settling disks CFD' -e "CFDrun()"
-gnome-terminal --title='cfdemSolverIB twoSpheresGlowinskiMPI CFD' -e "bash $casePath/parCFDDEMrun.sh"
-#gnome-terminal --title='cfdemSolverIB two settling disks DEM' -e "DEMrun()"
-#gnome-terminal --title='cfdemSolverIB twoSpheresGlowinskiMPI DEM' -e "bash $casePath/DEMrun.sh"
+#gnome-terminal --title='cfdemSolverIB twoSpheresGlowinskiMPI CFD' -e "bash $casePath/parCFDDEMrun.sh"
+bash $casePath/parCFDDEMrun.sh

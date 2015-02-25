@@ -68,6 +68,75 @@ meshMotionModel::~meshMotionModel()
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+volVectorField& meshMotionModel::f() const
+{
+    volVectorField tmp
+    (
+        IOobject
+        (
+            "xxx",
+            particleCloud_.mesh().time().timeName(),
+            particleCloud_.mesh(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        particleCloud_.mesh(),
+        dimensionedVector
+        (
+            "zero",
+            dimensionSet(0, 1, -1, 0, 0),
+            vector::zero
+        )
+    );
+    return tmp;
+}
+
+volScalarField& meshMotionModel::body() const
+{
+    volScalarField tmp
+    (
+        IOobject
+        (
+            "xxx",
+            particleCloud_.mesh().time().timeName(),
+            particleCloud_.mesh(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        particleCloud_.mesh(),
+        dimensionedScalar
+        (
+            "zero",
+            dimensionSet(0, 1, -1, 0, 0),
+            0.
+        )
+    );
+    return tmp;
+}
+
+volScalarField& meshMotionModel::inside() const
+{
+    volScalarField tmp
+    (
+        IOobject
+        (
+            "xxx",
+            particleCloud_.mesh().time().timeName(),
+            particleCloud_.mesh(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        particleCloud_.mesh(),
+        dimensionedScalar
+        (
+            "zero",
+            dimensionSet(0, 1, -1, 0, 0),
+            0.
+        )
+    );
+    return tmp;
+}
+
 } // End namespace Foam
 
 // ************************************************************************* //

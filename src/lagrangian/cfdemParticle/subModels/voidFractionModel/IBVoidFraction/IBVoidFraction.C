@@ -90,7 +90,7 @@ IBVoidFraction::~IBVoidFraction()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void IBVoidFraction::setvoidFraction(double** const& mask,double**& voidfractions,double**& particleWeights,double**& particleVolumes) const
+void IBVoidFraction::setvoidFraction(double** const& mask,double**& voidfractions,double**& particleWeights,double**& particleVolumes,double**& particleV) const
 {
 
     int numprocs, me;
@@ -113,6 +113,7 @@ void IBVoidFraction::setvoidFraction(double** const& mask,double**& voidfraction
                 particleVolumes[index][subcell]=0;
             }
             cellsPerParticle_[index][0]=1.0;
+            particleV[index][0]=0;
 
             //collecting data
             label particleCenterCellID=particleCloud_.cellIDs()[index][0];

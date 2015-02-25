@@ -160,6 +160,8 @@ public:
 
         DynamicList<scalar> executionsWithinPeriod(scalar,scalar);
 
+        bool checkPath(fileName);
+
     // Access
 
         int nextRun(){return nextRun_;};

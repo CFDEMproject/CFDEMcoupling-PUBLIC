@@ -59,19 +59,12 @@ class viscForce
 private:
     dictionary propsDict_;
 
-    bool verbose_;
-
     word velocityFieldName_;
 
     const volVectorField& U_;
 
-    word densityFieldName_;
-
-    const volScalarField& rho_;
-
     mutable double addedMassCoeff_; //added mass coefficient
 
-    bool interpolation_; // use interpolated field values
 
 public:
 

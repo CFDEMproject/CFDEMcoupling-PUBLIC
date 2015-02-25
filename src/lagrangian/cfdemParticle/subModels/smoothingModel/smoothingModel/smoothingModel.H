@@ -59,6 +59,12 @@ protected:
     const dictionary& dict_;
     cfdemCloud& particleCloud_;
 
+    mutable volVectorField vSmoothField_;
+    mutable volScalarField sSmoothField_;
+
+    void checkFields(volScalarField&) const;
+    void checkFields(volVectorField&) const;
+
 public:
 
     //- Runtime type information

@@ -30,6 +30,7 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "error.H"
+#include <sys/stat.h>
 #include "liggghtsCommandModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -115,14 +116,14 @@ void liggghtsCommandModel::checkTimeSettings(const dictionary& propsDict)
         if(runLast_) // last run
         {
             // read time options from subdict
-            endTime_ = particleCloud_.mesh().time().endTime().value();
+            endTime_ = particleCloud_.mesh().time().endTime().value()-particleCloud_.mesh().time().startTime().value();
             startTime_ = endTime_;
-            timeInterval_ = 1;
+            timeInterval_ = -1;
 
             // calculate coupling times
             firstCouplingStep_ = floor(startTime_/DEMts/couplingInterval);
             lastCouplingStep_ = floor(endTime_/DEMts/couplingInterval);
-            couplingStepInterval_ = floor(timeInterval_/DEMts/couplingInterval);
+            couplingStepInterval_ = -1;
         }
         else         //runEveryCouplingStep of every n steps or every writeStep
         {
@@ -150,7 +151,7 @@ void liggghtsCommandModel::checkTimeSettings(const dictionary& propsDict)
     {
             firstCouplingStep_ =1;
             lastCouplingStep_ =1;
-            couplingStepInterval_ =1;
+            couplingStepInterval_ =-1;
     }
 
     if(verbose_){
@@ -237,6 +238,14 @@ DynamicList<scalar> liggghtsCommandModel::executionsWithinPeriod(scalar TSstart,
 
     return executions;
 }
+
+bool liggghtsCommandModel::checkPath(fileName path)
+{
+    string strPath = string(path);
+    struct stat buffer;   
+    return (stat (strPath.c_str(), &buffer) == 0); 
+}
+
 
 void liggghtsCommandModel::parseCommandList(wordList& commandList,labelList& labelList,scalarList& scalarList,word& command, dictionary& propsDict, bool timeStamp)
 {

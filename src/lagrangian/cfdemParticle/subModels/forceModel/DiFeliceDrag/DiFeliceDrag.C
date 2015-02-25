@@ -64,15 +64,10 @@ DiFeliceDrag::DiFeliceDrag
 :
     forceModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
-    verbose_(false),
     velFieldName_(propsDict_.lookup("velFieldName")),
     U_(sm.mesh().lookupObject<volVectorField> (velFieldName_)),
-    densityFieldName_(propsDict_.lookup("densityFieldName")),
-    rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_)),
     voidfractionFieldName_(propsDict_.lookup("voidfractionFieldName")),
     voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
-    interpolation_(false),
-    splitImplicitExplicit_(false),
     UsFieldName_(propsDict_.lookup("granVelFieldName")),
     UsField_(sm.mesh().lookupObject<volVectorField> (UsFieldName_)),
     scaleDia_(1.),
@@ -87,25 +82,24 @@ DiFeliceDrag::DiFeliceDrag
     particleCloud_.probeM().scalarFields_.append("voidfraction");       //other are debug
     particleCloud_.probeM().writeHeader();
 
-    if (propsDict_.found("verbose")) verbose_=true;
-    if (propsDict_.found("treatExplicit")) treatExplicit_=true;
-    if (propsDict_.found("interpolation"))
-    {
-        Info << "using interpolated value of U." << endl;
-        interpolation_=true;
-    }
-    if (propsDict_.found("splitImplicitExplicit"))
-    {
-        Info << "will split implicit / explicit force contributions." << endl;
-        splitImplicitExplicit_ = true;
-        if(!interpolation_) 
-            Info << "WARNING: will only consider fluctuating particle velocity in implicit / explicit force split!" << endl;
-    }
     particleCloud_.checkCG(true);
     if (propsDict_.found("scale"))
         scaleDia_=scalar(readScalar(propsDict_.lookup("scale")));
     if (propsDict_.found("scaleDrag"))
         scaleDrag_=scalar(readScalar(propsDict_.lookup("scaleDrag")));
+
+    // init force sub model
+    setForceSubModels(propsDict_);
+
+    // define switches which can be read from dict
+    forceSubM(0).setSwitchesList(0,true); // activate treatExplicit switch
+    forceSubM(0).setSwitchesList(2,true); // activate implDEM switch
+    forceSubM(0).setSwitchesList(3,true); // activate search for verbose switch
+    forceSubM(0).setSwitchesList(4,true); // activate search for interpolate switch
+    forceSubM(0).setSwitchesList(8,true); // activate scalarViscosity switch
+
+    // read those switches defined above, if provided in dict
+    forceSubM(0).readSwitches();
 }
 
 
@@ -125,18 +119,16 @@ void DiFeliceDrag::setForce() const
         scaleDia_=particleCloud_.cg();
         Info << "DiFeliceDrag using scale from liggghts cg = " << scaleDia_ << endl;
     }
-    
-    // get viscosity field
-    #ifdef comp
-        const volScalarField nufField = particleCloud_.turbulence().mu() / rho_;
-    #else
-        const volScalarField& nufField = particleCloud_.turbulence().nu();
-    #endif
 
+    const volScalarField& nufField = forceSubM(0).nuField();
+    const volScalarField& rhoField = forceSubM(0).rhoField();
+    
     vector position(0,0,0);
     scalar voidfraction(1);
     vector Ufluid(0,0,0);
     vector drag(0,0,0);
+    vector dragExplicit(0,0,0);
+  	scalar dragCoefficient(0);
     label cellI=0;
     vector Us(0,0,0);
     vector Ur(0,0,0);
@@ -147,11 +139,6 @@ void DiFeliceDrag::setForce() const
     scalar Rep(0);
     scalar Cd(0);
 
-	vector UfluidFluct(0,0,0);
-    vector UsFluct(0,0,0);
-    vector dragExplicit(0,0,0);
-  	scalar dragCoefficient(0);
-
     interpolationCellPoint<scalar> voidfractionInterpolator_(voidfraction_);
     interpolationCellPoint<vector> UInterpolator_(U_);
 
@@ -159,15 +146,15 @@ void DiFeliceDrag::setForce() const
 
     for(int index = 0;index <  particleCloud_.numberOfParticles(); index++)
     {
-        //if(mask[index][0])
-        //{
-
             cellI = particleCloud_.cellIDs()[index][0];
             drag = vector(0,0,0);
+            dragExplicit = vector(0,0,0);
+            dragCoefficient=0;
+            Ufluid =vector(0,0,0);
 
             if (cellI > -1) // particle Found
             {
-                if(interpolation_)
+                if(forceSubM(0).interpolation())
                 {
                     position = particleCloud_.position(index);
                     voidfraction = voidfractionInterpolator_.interpolate(position,cellI);
@@ -182,11 +169,10 @@ void DiFeliceDrag::setForce() const
                 Ur = Ufluid-Us;
                 ds = 2*particleCloud_.radius(index);
                 nuf = nufField[cellI];
-                rho = rho_[cellI];
+                rho = rhoField[cellI];
                 magUr = mag(Ur);
                 Rep = 0;
                 Cd = 0;
-                dragCoefficient = 0;
 
                 if (magUr > 0)
                 {
@@ -212,16 +198,10 @@ void DiFeliceDrag::setForce() const
 
                     drag = dragCoefficient*Ur; //total drag force!
 
-                    //Split forces
-                    if(splitImplicitExplicit_)
-                    {
-                        UfluidFluct  = Ufluid - U_[cellI];
-                        UsFluct      = Us     - UsField_[cellI];
-                        dragExplicit = dragCoefficient*(UfluidFluct - UsFluct); //explicit part of force
-                    }
+                    forceSubM(0).explicitCorr(drag,dragExplicit,dragCoefficient,Ufluid,U_[cellI],Us,UsField_[cellI],forceSubM(0).verbose(),index);
                 }
 
-                if(verbose_ && index >-1 && index <102)
+                if(forceSubM(0).verbose() && index >-1 && index <102)
                 {
                     Pout << "index = " << index << endl;
                     Pout << "Us = " << Us << endl;
@@ -233,12 +213,6 @@ void DiFeliceDrag::setForce() const
                     Pout << "Rep = " << Rep << endl;
                     Pout << "Cd = " << Cd << endl;
                     Pout << "drag (total) = " << drag << endl;
-                    if(splitImplicitExplicit_)
-                    {
-                        Pout << "UfluidFluct = " << UfluidFluct << endl;
-                        Pout << "UsFluct = " << UsFluct << endl;
-                        Pout << "dragExplicit = " << dragExplicit << endl;
-                    }
                 }
 
                 //Set value fields and write the probe
@@ -253,20 +227,10 @@ void DiFeliceDrag::setForce() const
                     particleCloud_.probeM().writeProbe(index, sValues, vValues);
                 }
             }
-            // set force on particle
-            if(treatExplicit_) for(int j=0;j<3;j++) expForces()[index][j] += drag[j];
-            else   //implicit treatment, taking explicit force contribution into account
-            {
-               for(int j=0;j<3;j++) 
-               { 
-                    impForces()[index][j] += drag[j] - dragExplicit[j]; //only consider implicit part!
-                    expForces()[index][j] += dragExplicit[j];
-               }
-            }
-            
-            for(int j=0;j<3;j++) DEMForces()[index][j] += drag[j];
+
+            // write particle based data to global array
+            forceSubM(0).partToArray(index,drag,dragExplicit,Ufluid,dragCoefficient);
         }
-    //}
 }
 
 

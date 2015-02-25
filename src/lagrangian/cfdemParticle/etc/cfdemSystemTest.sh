@@ -11,10 +11,15 @@ source $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/functions.sh
 #- show gcc settings
 checkGPP="true"
 
+#- sys check for add on
+checkAddOn="true"
+
 #- system settings
-echo "*******************"
-echo "system settings:"
-echo "*******************"
+printHeader
+
+echo "*********************************"
+echo "CFDEM(R)coupling system settings:"
+echo "*********************************"
 
 echo "CFDEM_VERSION=$CFDEM_VERSION"
 echo "couple to OF_VERSION=$WM_PROJECT_VERSION"
@@ -29,8 +34,10 @@ checkDirComment "$CFDEM_SOLVER_DIR" '$CFDEM_SOLVER_DIR' "yes"
 checkDirComment "$CFDEM_TUT_DIR" '$CFDEM_TUT_DIR' "yes"
 checkDirComment "$CFDEM_LIGGGHTS_SRC_DIR" '$CFDEM_LIGGGHTS_SRC_DIR' "yes"
 checkDirComment "$CFDEM_LPP_DIR" '$CFDEM_LPP_DIR' "yes"
+checkDirComment "$CFDEM_ADD_LIBS_DIR" '$CFDEM_ADD_LIBS_DIR' "yes"
 checkDirComment "$CFDEM_PIZZA_DIR" '$CFDEM_PIZZA_DIR' "no"
 checkDirComment "$CFDEM_TEST_HARNESS_PATH" '$CFDEM_TEST_HARNESS_PATH' "no"
+checkDirComment "$C3PO_SRC_DIR" '$C3PO_SRC_DIR' "no"
 echo ""
 
 echo "library names"
@@ -61,3 +68,16 @@ if [ $checkGPP == "true" ]
     mpirun --version
 fi
 
+echo "**********************"
+echo "additional packages..."
+
+if [ $checkAddOn == "true" ]
+  then
+    packageName=c3po
+    filePath=$CFDEM_SRC_DIR/$packageName
+    if [ $(checkDir $filePath) == "true" ]; then
+        source $filePath/etc/$packageName"SystemTest.sh"
+    else
+        echo "$packageName does not exist." 
+    fi
+fi

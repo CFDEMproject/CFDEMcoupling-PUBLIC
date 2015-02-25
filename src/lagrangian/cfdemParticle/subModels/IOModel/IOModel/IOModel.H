@@ -113,6 +113,8 @@ public:
 
     virtual int dumpDEMdata() const;
 
+    bool dumpNow() const;
+
     fileName createTimeDir(fileName) const;
 
     fileName createLagrangianDir(fileName) const;

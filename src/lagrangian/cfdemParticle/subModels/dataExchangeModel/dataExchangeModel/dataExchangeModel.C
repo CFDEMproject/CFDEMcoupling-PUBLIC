@@ -137,7 +137,7 @@ void Foam::dataExchangeModel::allocateArray
 {
     int len=0;
     if(strcmp(length,"nparticles")==0) len = particleCloud_.numberOfParticles();
-    else if (strcmp(length,"nbodies")==0) len = nClumpTypes_;
+    else if (strcmp(length,"nbodies")==0) len = particleCloud_.numberOfClumps();
     else FatalError<<"call allocateArray with length, nparticles or nbodies!\n" << abort(FatalError);
     allocateArray(array,initVal,width,len);
 }
@@ -203,7 +203,7 @@ void Foam::dataExchangeModel::destroy(double* array) const
 //====
 
 
-bool Foam::dataExchangeModel::couple() const
+bool Foam::dataExchangeModel::couple(int i) const
 {
     bool coupleNow = false;
     if (doCoupleNow())
@@ -226,7 +226,7 @@ scalar Foam::dataExchangeModel::timeStepFraction() const
 }
 int Foam::dataExchangeModel::getNumberOfParticles() const
 {
-    Warning << "ask for nr of clumps - which is not supported for this dataExchange model" << endl;
+    Warning << "ask for nr of particles - which is not supported for this dataExchange model" << endl;
     return -1;
 }
 
@@ -235,7 +235,17 @@ int Foam::dataExchangeModel::getNumberOfClumps() const
     Warning << "ask for nr of clumps - which is not supported for this dataExchange model" << endl;
     return -1;
 }
+int Foam::dataExchangeModel::getNumberOfTypes() const
+{
+    Warning << "ask for nr of types - which is not supported for this dataExchange model" << endl;
+    return -1;
+}
 
+double* Foam::dataExchangeModel::getTypeVol() const
+{
+    Warning << "ask for type volume - which is not supported for this dataExchange model" << endl;
+    return NULL;
+}
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 // Construct from components
@@ -248,7 +258,6 @@ dataExchangeModel::dataExchangeModel
     dict_(dict),
     particleCloud_(sm),
     maxNumberOfParticles_(0),
-    nClumpTypes_(1),
     couplingStep_(0),
     DEMts_(-1.),
     couplingInterval_(readScalar(dict_.lookup("couplingInterval")))

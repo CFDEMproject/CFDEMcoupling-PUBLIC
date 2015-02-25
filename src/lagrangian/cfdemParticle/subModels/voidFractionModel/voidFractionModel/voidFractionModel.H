@@ -122,7 +122,7 @@ public:
 
 
     // public member functions
-        virtual void setvoidFraction(double** const&,double**&,double**&,double**&) const = 0;
+        virtual void setvoidFraction(double** const&,double**&,double**&,double**&,double**&) const = 0;
 
         tmp<volScalarField> voidFractionInterp() const;
 
@@ -149,6 +149,8 @@ public:
         int maxCellsPerParticle() const;
 
         void reAllocArrays() const;
+
+        void reAllocArrays(int nP) const;  //force number of particles during reallocation, for CFD offline-use
 
         virtual void setParticleType(label type) const {};
 

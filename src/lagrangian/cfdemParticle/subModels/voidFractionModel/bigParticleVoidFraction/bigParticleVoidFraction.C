@@ -86,7 +86,7 @@ bigParticleVoidFraction::~bigParticleVoidFraction()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void bigParticleVoidFraction::setvoidFraction(double** const& mask,double**& voidfractions,double**& particleWeights,double**& particleVolumes) const
+void bigParticleVoidFraction::setvoidFraction(double** const& mask,double**& voidfractions,double**& particleWeights,double**& particleVolumes,double**& particleV) const
 {
     reAllocArrays();
 
@@ -108,6 +108,7 @@ void bigParticleVoidFraction::setvoidFraction(double** const& mask,double**& voi
                 particleVolumes[index][subcell]=0;
             }
             cellsPerParticle_[index][0]=1.0;
+            particleV[index][0]=0;
 
             //collecting data
             label particleCenterCellID=particleCloud_.cellIDs()[index][0];
@@ -153,6 +154,7 @@ void bigParticleVoidFraction::setvoidFraction(double** const& mask,double**& voi
 
                     particleWeights[index][0] += 1.0/hashSetLength;
                     particleVolumes[index][0] += occupiedVolume;
+                    particleV[index][0] += occupiedVolume;
 
                       //Info << "Centre:set voidfraction in cellI=" << particleCenterCellID
                       //     << ", voidfraction =" << voidfractionNext_[particleCenterCellID] << endl;
@@ -166,6 +168,7 @@ void bigParticleVoidFraction::setvoidFraction(double** const& mask,double**& voi
                         voidfractionNext_[cellI] -=occupiedVolume/particleCloud_.mesh().V()[cellI];
                         particleWeights[index][i+1] += 1.0/hashSetLength;
                         particleVolumes[index][i+1] += occupiedVolume;
+                        particleV[index][0] += occupiedVolume;
 
                           //Info << "AFTER:set voidfraction in cellI=" << cellI
                           //     << ", voidfraction =" << voidfractionNext_[cellI] << endl;

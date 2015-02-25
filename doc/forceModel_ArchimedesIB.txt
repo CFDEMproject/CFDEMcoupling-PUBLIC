@@ -17,13 +17,11 @@ forceModels
 );
 ArchimedesIBProps
 \{
-    densityFieldName "density";
     gravityFieldName "gravity";
     voidfractionFieldName "voidfraction";
 \}; :pre
 
-{density} = name of the finite volume density field :ulb,l
-{gravity} = name of the finite volume gravity field :l
+{gravity} = name of the finite volume gravity field :ulb,l
 {voidfraction} = name of the finite volume voidfraction field :l
 :ule
 
@@ -35,7 +33,6 @@ forceModels
 );
 ArchimedesIBProps
 \{
-    densityFieldName "rho";
     gravityFieldName "g";
     voidfractionFieldName "voidfractionNext";
 \} :pre

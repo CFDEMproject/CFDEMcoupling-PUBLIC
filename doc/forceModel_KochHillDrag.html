@@ -20,21 +20,18 @@
 KochHillDragProps
 {
     velFieldName "U";
-    densityFieldName "density";
     voidfractionFieldName "voidfraction"; 
-    interpolation;
-    implDEM;
+    interpolation "bool1";
+    implForceDEM "bool2";
 }; 
 </PRE>
 <UL><LI><I>U</I> = name of the finite volume fluid velocity field 
 
-<LI><I>density</I> = name of the finite volume gravity field 
-
 <LI><I>voidfraction</I> = name of the finite volume voidfraction field 
 
-<LI><I>interpolation</I> = (optional, normally off) flag to use interpolated voidfraction and fluid velocity values 
+<LI><I>bool1</I> = (optional, normally off) flag to use interpolated voidfraction and fluid velocity values 
 
-<I>implDEM</I> = (optional, normally off) flag to use implicit formulation of drag on DEM side:l
+<I>bool2</I> = (optional, normally off) flag to use implicit formulation of drag on DEM side:l
 
 </UL>
 <P><B>Examples:</B>
@@ -46,7 +43,6 @@ KochHillDragProps
 KochHillDragProps
 {
     velFieldName "U";
-    densityFieldName "rho";
     voidfractionFieldName "voidfraction"; 
 } 
 </PRE>

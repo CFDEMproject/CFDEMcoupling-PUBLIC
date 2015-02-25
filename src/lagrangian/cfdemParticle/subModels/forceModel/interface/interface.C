@@ -78,7 +78,15 @@ interface::interface
 {
     if (propsDict_.found("C")) C_=readScalar(propsDict_.lookup("C"));
     if (propsDict_.found("interpolation")) interpolation_=true;
-    if (propsDict_.found("treatExplicit")) treatExplicit_=true;
+
+    // init force sub model
+    setForceSubModels(propsDict_);
+
+    // define switches which can be read from dict
+    forceSubM(0).setSwitchesList(0,true); // activate treatExplicit switch
+
+    // read those switches defined above, if provided in dict
+    forceSubM(0).readSwitches();
 
     Info << "check if interpolation really works - use directly interpolationCellPoint<vector> ???" << endl;
     particleCloud_.checkCG(false);
@@ -179,9 +187,9 @@ Info << "interface::setForce" << endl;
                     Info << "interface force is limited to " << interfaceForce << endl;
                 }*/
 
-               if(treatExplicit_) for(int j=0;j<3;j++) expForces()[index][j] += interfaceForce[j];
-               else  for(int j=0;j<3;j++) impForces()[index][j] += interfaceForce[j];
-               for(int j=0;j<3;j++) DEMForces()[index][j] += interfaceForce[j];
+               // write particle based data to global array
+               forceSubM(0).partToArray(index,interfaceForce,vector::zero);
+
             } // end if particle found on proc domain
         //}// end if in mask
     }// end loop particles

@@ -20,18 +20,15 @@
 gradPForceProps
 {
     pFieldName "pressure";
-    densityFieldName "density";
     velocityFieldName "U";
-    interpolation;
+    interpolation switch1;
 }; 
 </PRE>
 <UL><LI><I>pressure</I> = name of the finite volume fluid pressure field 
 
-<LI><I>density</I> = name of the finite volume gravity field 
-
 <LI><I>U</I> = name of the finite volume fluid velocity field 
 
-<LI><I>interpolation</I> = flag to use interpolated pressure values (normally off) 
+<LI><I>switch1</I> = flag to use interpolated pressure values (normally off) 
 
 
 </UL>
@@ -44,9 +41,8 @@ gradPForceProps
 gradPForceProps
 {
     pFieldName "p";
-    densityFieldName "rho";
     velocityFieldName "U";
-    interpolation;
+    interpolation true;
 } 
 </PRE>
 <P><B>Description:</B>

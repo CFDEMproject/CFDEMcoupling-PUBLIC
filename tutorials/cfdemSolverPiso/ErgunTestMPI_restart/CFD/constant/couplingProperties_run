@@ -1,0 +1,226 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.4                                   |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+
+    root            "";
+    case            "";
+    instance        "";
+    local           "";
+
+    class           dictionary;
+    object          couplingProperties;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+//===========================================================================//
+// sub-models & settings
+
+modelType "A"; // A or B
+
+couplingInterval 100;
+
+voidFractionModel divided;//centre;//
+
+locateModel engine;//turboEngineM2M;//
+
+meshMotionModel noMeshMotion;
+
+regionModel allRegion;
+
+IOModel basicIO;
+
+probeModel off;
+
+dataExchangeModel twoWayMPI;//twoWayM2M;//twoWayFiles;//oneWayVTK;//
+
+averagingModel dense;//dilute;//
+
+clockModel standardClock;//off;
+
+smoothingModel off;// localPSizeDiffSmoothing;// constDiffSmoothing; //
+
+forceModels
+(
+    //GidaspowDrag
+    //BeetstraDrag
+    //DiFeliceDrag
+    KochHillDrag
+    gradPForce
+    viscForce
+    //Archimedes
+    //volWeightedAverage
+    //totalMomentumExchange
+    //particleCellVolume
+);
+
+momCoupleModels
+(
+    implicitCouple
+);
+
+turbulenceModelType "RASProperties";//"LESProperties";//
+
+//===========================================================================//
+// sub-model properties
+
+localPSizeDiffSmoothingProps
+{
+    lowerLimit 0.1;
+    upperLimit 1e10;
+    dSmoothingLength 1.5e-3;
+    Csmoothing    1.0; 
+}
+
+constDiffSmoothingProps
+{
+    lowerLimit 0.1;
+    upperLimit 1e10;
+    smoothingLength 1.5e-3;
+}
+
+implicitCoupleProps
+{
+    velFieldName "U";
+    granVelFieldName "Us";
+    voidfractionFieldName "voidfraction";
+}
+
+ArchimedesProps
+{
+    gravityFieldName "g";
+}
+gradPForceProps
+{
+    pFieldName "p";
+    voidfractionFieldName "voidfraction";
+    velocityFieldName "U";
+    //interpolation true;
+}
+
+viscForceProps
+{
+    velocityFieldName "U";
+    interpolation true;
+}
+volWeightedAverageProps
+{
+    scalarFieldNames
+    (
+        voidfraction
+    );
+    vectorFieldNames
+    (
+    );
+    upperThreshold 0.999;
+    lowerThreshold 0;
+    verbose;
+}
+totalMomentumExchangeProps
+{
+    implicitMomExFieldName "Ksl";
+    explicitMomExFieldName "none";
+    fluidVelFieldName "U";
+    granVelFieldName "Us";
+}
+GidaspowDragProps
+{
+    verbose;
+    velFieldName "U";
+    voidfractionFieldName "voidfraction";
+    phi 1;
+}
+DiFeliceDragProps
+{
+    velFieldName "U";
+    voidfractionFieldName "voidfraction";
+}
+
+KochHillDragProps
+{
+    //verbose;
+    velFieldName "U";
+    voidfractionFieldName "voidfraction";
+}
+
+BeetstraDragProps
+{
+    velFieldName "U";
+    gravityFieldName "g";
+    rhoParticle     2000.;
+    voidfractionFieldName "voidfraction";
+    interpolation ;
+    useFilteredDragModel ;
+    useParcelSizeDependentFilteredDrag ;
+    k       0.05;
+    aLimit  0.0;
+//    verbose ;
+}
+
+virtualMassForceProps
+{
+    velFieldName "U";
+}
+
+particleCellVolumeProps
+{
+    upperThreshold 0.999;
+    lowerThreshold 0.;
+    verbose;
+}
+
+oneWayVTKProps
+{
+    couplingFilename "vtk_out%4.4d.vtk";
+    maxNumberOfParticles 30000;
+}
+
+twoWayFilesProps
+{
+    maxNumberOfParticles 10100;
+}
+
+centreProps
+{
+    alphaMin 0.10;
+}
+
+engineProps
+{
+    treeSearch true;
+}
+
+turboEngineM2MProps
+{
+    turboEngineProps
+    {
+        treeSearch true;
+    }
+}
+
+dividedProps
+{
+    alphaMin 0.01;
+    scaleUpVol 1.0;
+}
+
+twoWayMPIProps
+{
+    liggghtsPath "../DEM/in.liggghts_run";
+}
+twoWayM2MProps
+{
+    maxNumberOfParticles 10100;
+    liggghtsPath "../DEM/in.liggghts_run";
+}
+// ************************************************************************* //

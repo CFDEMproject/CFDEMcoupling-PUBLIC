@@ -41,6 +41,7 @@ SourceFiles
 
 #include "fvCFD.H"
 #include "cfdemCloud.H"
+#include <vector>
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -139,7 +140,11 @@ public:
     virtual bool checkIDForPrint(int) const {return false;};
     virtual void setCounter() const {};
     virtual bool active() const {return true;}; 
+    virtual std::vector< std::vector<double*> >* getVprobe() {return NULL;};
+    virtual std::vector< std::vector<double> >* getSprobe() {return NULL;};
+    virtual void clearProbes() const {};
     const char* wordToChar(word&) const;
+   
 
     // Access
 

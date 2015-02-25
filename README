@@ -25,16 +25,17 @@ License
     Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 Description
-    This code is designed to realize coupled CFD-DEM simulations using LIGGGHTS
-    and OpenFOAM. Note: this code is not part of OpenFOAM (see DISCLAIMER).
+    This code provides models and solvers to realize coupled CFD-DEM simulations
+    using LIGGGHTS and OpenFOAM.
+    Note: this code is not part of OpenFOAM (see DISCLAIMER).
 \*---------------------------------------------------------------------------*/
 
 
-CFDEM coupling provides an open source parallel coupled CFD-DEM framework 
-combining the strengths of LIGGGHTS DEM code and the Open Source 
-CFD package OpenFOAM(R)(*). The CFDEMcoupling toolbox allows to expand 
+CFDEM(R) coupling provides an open source parallel coupled CFD-DEM framework 
+combining the strengths of LIGGGHTS(R) DEM code and the Open Source 
+CFD package OpenFOAM(R)(*). The CFDEM(R)coupling toolbox allows to expand 
 standard CFD solvers of OpenFOAM(R)(*) to include a coupling to the DEM 
-code LIGGGHTS. In this toolbox the particle representation within the 
+code LIGGGHTS(R). In this toolbox the particle representation within the 
 CFD solver is organized by "cloud" classes. Key functionalities are organised 
 in sub-models (e.g. force models, data exchange models, etc.) which can easily 
 be selected and combined by dictionary settings.
@@ -54,7 +55,7 @@ The file structure:
 
 - "src" directory including the source files of the coupling toolbox and models
 - "applications" directory including the solver files for coupled CFD-DEM simulations
-- "doc" directory including the documentation of CFDEMcoupling
+- "doc" directory including the documentation of CFDEM(R)coupling
 - "tutorials" directory including basic tutorial cases showing the functionality
 
 
@@ -64,18 +65,17 @@ Details on installation are given on the "www.cfdem.com"
 The functionality of this CFD-DEM framwork is described via "tutorial cases" showing 
 how to use different solvers and models.
 
-CFDEMcoupling stands for Computational Fluid Dynamics (CFD) -
+CFDEM(R)coupling stands for Computational Fluid Dynamics (CFD) -
 Discrete Element Method (DEM) coupling.
 
-CFDEMcoupling is an open-source code, distributed freely under the terms of the 
+CFDEM(R)coupling is an open-source code, distributed freely under the terms of the 
 GNU Public License (GPL).
 
-Core development of CFDEMcoupling is done by 
+Core development of CFDEM(R)coupling is done by 
 Christoph Goniva and Christoph Kloss, both at DCS Computing GmbH, 2012
 
 
 \*---------------------------------------------------------------------------*/
-(*) "OpenFOAM(R)"_of is a registered trade mark of the ESI Group.
-This offering is not affiliated, approved or endorsed by ESI Group, 
-the producer of the OpenFOAM® software and owner of the OpenFOAM® trade mark.
+(*) "OpenFOAM(R)"_of is a registered trade mark of OpenCFD Limited, a wholly owned subsidiary of the ESI Group.
+This offering is not approved or endorsed by OpenCFD Limited, the producer of the OpenFOAM software and owner of the OPENFOAM® and OpenCFD® trade marks.
 \*---------------------------------------------------------------------------*/

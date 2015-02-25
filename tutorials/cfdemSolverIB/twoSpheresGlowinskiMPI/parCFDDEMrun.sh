@@ -45,7 +45,7 @@ if [ $postproc == "true" ]
   then
     #- get VTK data from liggghts dump file
     cd $casePath/DEM/post
-    python -i $CFDEM_LPP_DIR/lpp.py  dump.liggghts_init
+    python -i $CFDEM_LPP_DIR/lpp.py  dump.liggghts_run
 
     #- get VTK data from CFD sim
     cd $casePath/CFD
@@ -65,20 +65,13 @@ cp ../../$logfileName $testHarnessPath
 
 #- clean up case
 echo "deleting data at: $casePath"
-rm -r $casePath/CFD/0.*
-rm -r $casePath/CFD/callgrind.*
-rm -r $casePath/CFD/*.out
-rm -r $casePath/CFD/VTK
-rm -r $casePath/CFD/couplingFiles/*
-rm -r $casePath/CFD/processor*
-rm -r $casePath/CFD/particles*
-rm -r $casePath/CFD/probes
-rm -r $casePath/DEM/post/*
-rm -r $casePath/DEM/log.*
-rm -r $casePath/log_*
-echo "done"
-
+source $WM_PROJECT_DIR/bin/tools/CleanFunctions
+cd $casePath/CFD
+cleanCase
+rm -r $casePath/CFD/clockData
+rm $casePath/DEM/post/*.*
+#rm -r $casePath/DEM/post/restart/*.*
 #- preserve post directory
-echo "dummyfile" >> $casePath/DEM/post/dummy
-
+touch $casePath/DEM/post/.gitignore
+echo "done"
 

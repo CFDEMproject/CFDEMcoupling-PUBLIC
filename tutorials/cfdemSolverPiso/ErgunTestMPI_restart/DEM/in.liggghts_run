@@ -1,0 +1,65 @@
+# Pour granular particles into chute container, then induce flow
+log             ../DEM/log.liggghts
+thermo_log      ../DEM/post/thermo.txt
+
+atom_style      granular
+atom_modify     map array
+communicate     single vel yes
+
+boundary        m m m
+newton          off
+
+units           si
+processors      2 2 1
+
+# read the restart file
+read_restart    ../DEM/post/restart/liggghts.restart
+
+neighbor        0.0005 bin
+neigh_modify    delay 0
+
+# Material properties required for granular pair styles
+
+fix         m1 all property/global youngsModulus peratomtype 5.e6
+fix         m2 all property/global poissonsRatio peratomtype 0.45
+fix         m3 all property/global coefficientRestitution peratomtypepair 1 0.3
+fix         m4 all property/global coefficientFriction peratomtypepair 1 0.5
+
+# pair style
+pair_style  gran model hertz tangential history # Hertzian without cohesion
+pair_coeff  * *
+
+# timestep, gravity
+timestep    0.00001
+fix         gravi all gravity 9.81 vector 0.0 0.0 -1.0
+
+fix     zwalls1  all wall/gran model hertz tangential history primitive type 1 zplane 0.0
+fix     zwalls2  all wall/gran model hertz tangential history primitive type 1 zplane 0.0553
+fix     cylwalls all wall/gran model hertz tangential history primitive type 1 zcylinder 0.01385 0. 0.
+
+# change the particles density
+set     group all density 2000
+
+# cfd coupling
+fix     cfd all couple/cfd couple_every 100 mpi
+fix     cfd2 all couple/cfd/force
+
+# apply nve integration to all particles that are inserted as single particles
+fix     integr all nve/sphere
+
+# center of mass
+compute     centerOfMass all com
+
+# compute total dragforce
+compute     dragtotal all reduce sum f_dragforce[1] f_dragforce[2] f_dragforce[3]
+
+# screen output
+compute         rke all erotate/sphere
+thermo_style    custom step atoms ke c_rke vol c_centerOfMass[3] c_dragtotal[1] c_dragtotal[2] c_dragtotal[3]
+thermo          10
+thermo_modify   lost ignore norm no
+compute_modify  thermo_temp dynamic yes
+
+dump        dmp all custom 5000 ../DEM/post/dump*.liggghts_restart id type x y z vx vy vz fx fy fz f_dragforce[1] f_dragforce[2] f_dragforce[3] radius 
+
+run         1

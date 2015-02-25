@@ -20,15 +20,12 @@
 DiFeliceDragProps
 {
     velFieldName "U";
-    densityFieldName "density";
-    interpolation;
+    interpolation switch1;
 }; 
 </PRE>
 <UL><LI><I>U</I> = name of the finite volume fluid velocity field 
 
-<LI><I>density</I> = name of the finite volume gravity field 
-
-<LI><I>interpolation</I> = flag to use interpolated voidfraction and velocity values (normally off) 
+<LI><I>switch1</I> = flag to use interpolated voidfraction and velocity values (normally off) 
 
 
 </UL>
@@ -41,8 +38,7 @@ DiFeliceDragProps
 DiFeliceDragProps
 {
     velFieldName "U";
-    densityFieldName "rho";
-    interpolation;
+    interpolation true;
 } 
 </PRE>
 <P><B>Description:</B>

@@ -21,22 +21,18 @@ LaEuScalarTempProps
 {
     velFieldName "U";
     tempFieldName "T";
-    tempSourceFieldName "Tsource";
     voidfractionFieldName "voidfraction";
     partTempName "Temp";
     partHeatFluxName "convectiveHeatFlux";
     lambda value;
     Cp value1;
-    densityFieldName "density";
-    interpolation;
-    verbose;
+    interpolation "switch1";
+    verbose "switch2";
 }; 
 </PRE>
 <UL><LI><I>U</I> = name of the finite volume fluid velocity field 
 
 <LI><I>T</I> = name of the finite volume scalar temperature field 
-
-<LI><I>Tsource</I> = name of the finite volume scalar temperature source field 
 
 <LI><I>voidfraction</I> = name of the finite volume voidfraction field 
 
@@ -48,11 +44,9 @@ LaEuScalarTempProps
 
 <LI><I>value1</I> = fluid specific heat capacity [W*s/(kg*K)] 
 
-<LI><I>density</I> = name of the finite volume fluid density field 
+<LI><I>switch1</I> = (optional, normally off) flag to use interpolated voidfraction and fluid velocity values 
 
-<LI><I>interpolation</I> = (optional, normally off) flag to use interpolated voidfraction and fluid velocity values 
-
-<LI><I>verbose</I> = (normally off) for verbose run 
+<LI><I>switch2</I> = (normally off) for verbose run 
 
 
 </UL>
@@ -66,13 +60,11 @@ LaEuScalarTempProps
 {
     velFieldName "U";
     tempFieldName "T";
-    tempSourceFieldName "Tsource";
     voidfractionFieldName "voidfraction";
     partTempName "Temp";
     partHeatFluxName "convectiveHeatFlux";
     lambda 0.0256;
     Cp 1007;
-    densityFieldName "rho";
 } 
 </PRE>
 <P><B>Description:</B>
@@ -81,7 +73,7 @@ LaEuScalarTempProps
 </P>
 <P><B>Restrictions:</B>
 </P>
-<P>Goes only with cfdemSolverScalar.
+<P>Goes only with cfdemSolverScalar. The force model has to be the second (!!!) model in the forces list.
 </P>
 <P><B>Related commands:</B>
 </P>

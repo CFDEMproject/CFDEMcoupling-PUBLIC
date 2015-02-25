@@ -63,8 +63,6 @@ class gradPForce
 private:
     dictionary propsDict_;
 
-    bool verbose_;
-
     word pFieldName_;
 
     const volScalarField& p_;
@@ -73,17 +71,11 @@ private:
 
     const volVectorField& U_;
 
-    word densityFieldName_;
-
-    const volScalarField& rho_;
-
     bool useRho_;
 
     bool useU_;          // if false: substitution p=0.5*rho*U^2
 
     mutable double addedMassCoeff_; //added mass coefficient
-
-    bool interpolation_; // use interpolated field values
 
 public:
 

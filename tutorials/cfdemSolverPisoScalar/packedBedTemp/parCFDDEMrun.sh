@@ -65,7 +65,7 @@ if [ $postproc == "true" ]
 
     #- get VTK data from liggghts dump file
     cd $casePath/DEM/post
-    python -i $CFDEM_LPP_DIR/lpp.py  dump.liggghts_init
+    python -i $CFDEM_LPP_DIR/lpp.py  dump.liggghts_run
 
     #- get VTK data from CFD sim
     cd $casePath/CFD
@@ -84,24 +84,16 @@ fi
 
 #- clean up case
 echo "deleting data at: $casePath : ???\n"
-rm -r $casePath/CFD/0.*
-rm -r $casePath/CFD/1
-rm -r $casePath/CFD/callgrind.*
-rm -r $casePath/CFD/*.out
-rm -r $casePath/CFD/octave/*.eps
-rm -r $casePath/CFD/octave/octave-core
-rm -r $casePath/CFD/VTK
-rm -r $casePath/CFD/processor*
-rm -r $casePath/DEM/post/*
-rm -r $casePath/DEM/log.*
-rm -r $casePath/CFD/log.*
-rm -r $casePath/DEM/log.*
-rm -r $casePath/CFD/probes
-rm -r $casePath/CFD/postProcessing
-rm -r $casePath/log_*
+source $WM_PROJECT_DIR/bin/tools/CleanFunctions
+cd $casePath/CFD
+cleanCase
+rm -r $casePath/CFD/clockData
+rm $casePath/DEM/post/*.*
+#rm -r $casePath/DEM/post/restart/*.*
 echo "done"
 
 #- preserve post directory
-echo "dummyfile" >> $casePath/DEM/post/dummy
+touch $casePath/DEM/post/.gitignore
+touch $casePath/DEM/post/restart/.gitignore
 
 

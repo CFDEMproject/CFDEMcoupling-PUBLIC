@@ -91,11 +91,12 @@ private:
 
     MPI_Comm comm_liggghts;
 
-    LAMMPS_NS::LAMMPS *lmp;
-
   // private member functions
 
     char* wordToChar(word&) const;
+
+protected:
+    LAMMPS_NS::LAMMPS *lmp;
 
 public:
 
@@ -118,6 +119,7 @@ public:
 
 
     // Member Functions
+
         void getData
         (
             word name,
@@ -160,10 +162,12 @@ public:
         void destroy(int*) const;
         //==============
 
-        bool couple() const;
+        bool couple(int) const;
 
         int getNumberOfParticles() const;
         int getNumberOfClumps() const;
+        int getNumberOfTypes() const;
+        double* getTypeVol() const;
 
         word myType() const{return typeName; };
 

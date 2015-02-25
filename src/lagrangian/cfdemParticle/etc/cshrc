@@ -37,11 +37,31 @@
 #- export environment variables (adapt to your paths)
 #------------------------------------------------------------------------------
 
+#check if default lammps lib path should be used
+if ( ! ($?CFDEM_LAMMPS_LIB_DIR) ) then
+    setenv CFDEM_LAMMPS_LIB_DIR $CFDEM_LIGGGHTS_SRC_DIR"/../lib/"
+else
+    echo "using CFDEM_LAMMPS_LIB_DIR=$CFDEM_LAMMPS_LIB_DIR defined by user."
+endif
+
 #- LIGGGHTS lib name
 setenv CFDEM_LIGGGHTS_LIB_NAME lmp_$CFDEM_LIGGGHTS_MAKEFILE_NAME
 
 #- CFDEM lib name
 setenv CFDEM_LIB_NAME lagrangianCFDEM-$CFDEM_VERSION-$WM_PROJECT_VERSION
+
+#- CFDEM compressible lib name
+setenv CFDEM_LIB_COMP_NAME lagrangianCFDEMcomp-$CFDEM_VERSION-$WM_PROJECT_VERSION
+
+#check if additional libraries should be compiled together with solvers
+if ( ! ($?CFDEM_ADD_LIBS_DIR) ) then
+    setenv CFDEM_ADD_LIBS_DIR $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc
+else
+    echo "using CFDEM_ADD_LIBS_DIR=$CFDEM_ADD_LIBS_DIR defined by user."
+endif
+
+#-----------------------------------------------------
+# additional libraries
 
 #- LMP Many2Many lib path and makefile
 setenv CFDEM_Many2ManyLIB_PATH $CFDEM_SRC_DIR/lagrangian/cfdemParticle/subModels/dataExchangeModel/twoWayMany2Many/library
@@ -142,6 +162,9 @@ alias cfdemCompCFDEMuti 'bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/compil
 
 #- shortcut to test basic tutorials
 alias cfdemTestTUT 'bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/testTutorials.sh'
+
+#- shortcut to visualize the clock model data
+alias vizClock 'python $CFDEM_UT_DIR/vizClock/matPlot.py'
 
 #- shortcut to run liggghts in serial
 alias cfdemLiggghts '$CFDEM_LIGGGHTS_SRC_DIR/lmp_$CFDEM_LIGGGHTS_MAKEFILE_NAME'

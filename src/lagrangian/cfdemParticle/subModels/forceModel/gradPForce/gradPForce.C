@@ -62,39 +62,50 @@ gradPForce::gradPForce
 :
     forceModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
-    verbose_(false),
     pFieldName_(propsDict_.lookup("pFieldName")),
     p_(sm.mesh().lookupObject<volScalarField> (pFieldName_)),
     velocityFieldName_(propsDict_.lookup("velocityFieldName")),
     U_(sm.mesh().lookupObject<volVectorField> (velocityFieldName_)),
-    densityFieldName_(propsDict_.lookup("densityFieldName")),
-    rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_)),
     useRho_(false),
     useU_(false),
-    addedMassCoeff_(0.0),
-    interpolation_(false)
+    addedMassCoeff_(0.0)
 {
+    // init force sub model
+    setForceSubModels(propsDict_);
+
+    // define switches which can be read from dict
+    forceSubM(0).setSwitchesList(0,true); // activate treatExplicit switch
+    forceSubM(0).setSwitchesList(1,true); // activate treatForceDEM switch
+    forceSubM(0).setSwitchesList(4,true); // activate search for interpolate switch
+
+    // read those switches defined above, if provided in dict
+    forceSubM(0).readSwitches();
+
     if (modelType_ == "B")
     {
         FatalError <<"using  model gradPForce with model type B is not valid\n" << abort(FatalError);
-    }else
+    }else if (modelType_ == "Bfull")
     {
-        treatDEM_=true;
-        Info << "gradPForce is applied only to DEM side" << endl;
+        if(forceSubM(0).switches()[1])
+        {
+            Info << "Using treatForceDEM false!" << endl;
+            forceSubM(0).setSwitches(1,false); // treatForceDEM = false
+        }
+    }else // modelType_=="A"
+    {
+        if(!forceSubM(0).switches()[1])
+        {
+            Info << "Using treatForceDEM true!" << endl;
+            forceSubM(0).setSwitches(1,true); // treatForceDEM = true
+        }
     }
-    if (propsDict_.found("verbose")) verbose_=true;
-    if (propsDict_.found("treatExplicit")) treatExplicit_=true;
+
     if (propsDict_.found("useU")) useU_=true;
     if (propsDict_.found("useAddedMass")) 
     {
         addedMassCoeff_ =  readScalar(propsDict_.lookup("useAddedMass"));
         Info << "gradP will also include added mass with coefficient: " << addedMassCoeff_ << endl;
         Info << "WARNING: use fix nve/sphere/addedMass in LIGGGHTS input script to correctly account for added mass effects!" << endl;
-    }
-    if (propsDict_.found("interpolation"))
-    {
-        Info << "using interpolated value of pressure gradient." << endl;
-        interpolation_=true;
     }
 
     if(p_.dimensions()==dimensionSet(0,2,-2,0,0))
@@ -128,10 +139,9 @@ void gradPForce::setForce() const
         if (useRho_)
             gradPField = fvc::grad(0.5*U2);
         else
-            gradPField = fvc::grad(0.5*rho_*U2);
+            gradPField = fvc::grad(0.5*forceSubM(0).rhoField()*U2);
     }*/
     vector gradP;
-    scalar ds;
     scalar Vs;
     scalar rho;
     vector position;
@@ -153,7 +163,7 @@ void gradPForce::setForce() const
             {
                 position = particleCloud_.position(index);
 
-                if(interpolation_) // use intepolated values for alpha (normally off!!!)
+                if(forceSubM(0).interpolation()) // use intepolated values for alpha (normally off!!!)
                 {
                     gradP = gradPInterpolator_.interpolate(position,cellI);
                 }else
@@ -162,7 +172,7 @@ void gradPForce::setForce() const
                 }
 
                 Vs = particleCloud_.particleVolume(index);
-                rho = rho_[cellI];
+                rho = forceSubM(0).rhoField()[cellI];
 
                 // calc particle's pressure gradient force
                 if (useRho_)
@@ -170,7 +180,7 @@ void gradPForce::setForce() const
                 else
                     force = -Vs*gradP*(1.0+addedMassCoeff_);
 
-                if(verbose_ && index >=0 && index <2)
+                if(forceSubM(0).verbose() && index >=0 && index <2)
                 {
                     Info << "index = " << index << endl;
                     Info << "gradP = " << gradP << endl;
@@ -188,12 +198,8 @@ void gradPForce::setForce() const
                 }
             }
 
-            // set force on particle
-            if(!treatDEM_){
-                if(!treatExplicit_) for(int j=0;j<3;j++) impForces()[index][j] += force[j];
-                else  for(int j=0;j<3;j++) expForces()[index][j] += force[j];
-            }
-            for(int j=0;j<3;j++) DEMForces()[index][j] += force[j];
+            // write particle based data to global array
+            forceSubM(0).partToArray(index,force,vector::zero);
 
         //}
     }

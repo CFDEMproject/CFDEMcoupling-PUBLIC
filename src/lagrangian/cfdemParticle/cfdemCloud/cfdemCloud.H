@@ -44,6 +44,7 @@ SourceFiles
 
 // choose version
 #include "OFversion.H"
+#include <vector>
 
 #include "fvCFD.H"
 #include "IFstream.H"
@@ -102,6 +103,8 @@ protected:
 
     mutable double **fluidVel_;
 
+    mutable double **fAcc_;
+
     mutable double **impForces_;
 
     mutable double **expForces_;
@@ -120,7 +123,11 @@ protected:
 
     mutable double **particleVolumes_;
 
+    mutable double **particleV_;
+
     int numberOfParticles_;
+
+    scalar d32_;
 
     bool numberOfParticlesChanged_;
 
@@ -140,14 +147,18 @@ protected:
 
     bool impDEMdrag_;
 
+    bool impDEMdragAcc_;
+
     mutable scalar imExSplitFactor_;
+
+    mutable bool treatVoidCellsAsExplicitForce_; //will treat the coupling force in cells with no Us data explicitly
 
     bool useDDTvoidfraction_;
 
     mutable volScalarField ddtVoidfraction_;
 
     #if defined(version21) || defined(version16ext)
-        #ifdef comp
+        #ifdef compre
             const compressible::turbulenceModel& turbulence_;
         #else
             const incompressible::turbulenceModel& turbulence_;
@@ -200,6 +211,7 @@ public:
     friend class dataExchangeModel;
     friend class voidFractionModel;
     friend class forceModel;
+    friend class forceSubModel;
 
 // Constructors
 
@@ -243,7 +255,11 @@ public:
 
        inline const bool& impDEMdrag() const;
 
+       inline const bool& impDEMdragAcc() const;
+
        inline const scalar& imExSplitFactor() const;
+
+       inline const bool& treatVoidCellsAsExplicitForce() const;
 
        inline const bool& ignore() const;
 
@@ -260,6 +276,8 @@ public:
        inline double ** velocities() const;
 
        inline double ** fluidVels() const;
+
+       inline double ** fAccs() const;
 
        inline double ** impForces() const;
 
@@ -289,6 +307,7 @@ public:
 
        virtual inline double d(int);
 
+       inline scalar d32(bool recalc=true);
        virtual inline double dMin() {return -1;}
        virtual inline double dMax() {return -1;}
        virtual inline int minType() {return -1;}
@@ -298,8 +317,18 @@ public:
        virtual inline double ** particleDensity() const {return NULL;};
        virtual inline int ** particleTypes() const {return NULL;};
        virtual label particleType(label index) const {return -1;};
+
+       //access to the particle's rotation and torque data
+       virtual inline double ** DEMTorques() const {return NULL;};
+       virtual inline double ** omegaArray() const {return NULL;};
+       virtual vector omega(int) const {return Foam::vector(0,0,0);};
+
+       //access to the particles' orientation information
        virtual inline double ** exArray() const {return NULL;};
        virtual vector ex(int) const {return Foam::vector(0,0,0);};
+
+       //Detector if SRF module is enable or not
+       virtual inline bool SRFOn(){return false;}
 
        inline int numberOfParticles() const;
 
@@ -336,7 +365,7 @@ public:
        inline autoPtr<liggghtsCommandModel>* liggghtsCommand() const;
 
        #if defined(version21) || defined(version16ext)
-            #ifdef comp
+            #ifdef compre
                 inline const compressible::turbulenceModel& turbulence() const;
             #else
                 inline const incompressible::turbulenceModel& turbulence() const;
@@ -351,6 +380,9 @@ public:
         virtual bool evolve(volScalarField&,volVectorField&,volVectorField&);
 
         virtual bool reAllocArrays() const;
+
+        virtual bool reAllocArrays(int nP, bool forceRealloc) const;  //force number of particles during reallocation
+
 
     // IO
         void writeScalarFieldToTerminal(double**&);
@@ -369,6 +401,11 @@ public:
         tmp<volScalarField> voidfractionNuEff(volScalarField&) const;
 
         void resetArray(double**&,int,int,double resetVal=0.);
+
+        std::vector< std::vector<double*> >* getVprobe();
+    
+        std::vector< std::vector<double> >* getSprobe();
+           
 };
 
 

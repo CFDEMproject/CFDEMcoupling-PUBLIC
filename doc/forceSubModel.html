@@ -1,0 +1,49 @@
+<HTML>
+<CENTER><A HREF = "http://www.cfdem.com">CFDEMproject WWW Site</A> - <A HREF = "CFDEMcoupling_Manual.html#comm">CFDEM Commands</A> 
+</CENTER>
+
+
+
+
+<HR>
+
+<H3>forceSubModel command 
+</H3>
+<P><B>Syntax:</B>
+</P>
+<P>Defined in couplingProperties sub-dictionary of the force model in use. If no force sub-model is applied ImEx is used as default. If the keyword "forceSubModels" is provided, a choice of sub model is demanded.
+</P>
+<PRE>forceSubModels
+(
+    model_x
+    model_y
+); 
+</PRE>
+<UL><LI>model = name of force sub-model to be applied 
+</UL>
+<P><B>Examples:</B>
+</P>
+<PRE>forceSubModels
+(
+    ImEx
+); 
+</PRE>
+<P>Note: This examples list might not be complete - please look for other models (forceSubModel_XY) in this documentation.
+</P>
+<P><B>Description:</B>
+</P>
+<P>The force sub model is designed to hold the settings a force model can have. For now it handles the treatExplicit, treatDEM and implDEM option. 
+</P>
+<P><B>Restrictions:</B>
+</P>
+<P>None.
+</P>
+<P><B>Related commands:</B>
+</P>
+<P><A HREF = "forceSubModel_ImEx.html">ImEx</A>
+</P>
+<P>Note: This examples list may be incomplete - please look for other models (forceSubModel_XY) in this documentation.
+</P>
+<P><B>Default:</B> none.
+</P>
+</HTML>

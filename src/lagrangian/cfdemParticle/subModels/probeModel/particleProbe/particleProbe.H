@@ -44,7 +44,7 @@ SourceFiles
 #include "polyMesh.H"
 #include "cfdemCloud.H"
 #include "OFstream.H"
-
+#include <vector>
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -101,6 +101,15 @@ private:
 
     mutable bool printNow_;
 
+    mutable std::vector< std::vector<double> > sProbes_;
+    
+    mutable std::vector< std::vector<double*> > vProbes_;
+    
+    mutable  std::vector<std::string> probeName_;
+    
+    mutable int probeIndex_;
+  
+    
 public:
 
     //- Runtime type information
@@ -123,12 +132,18 @@ public:
         ~particleProbe();
 
     // Member Functions
+    void updateProbes(int index, Field<scalar> sValues, Field<vector> vValues) const;
     void initialize(word typeName, word logFileName) const;
     void setOutputFile() const;
     void writeHeader() const;
     void writeProbe(int index, Field<scalar> sValues, Field<vector> vValues) const;
     bool checkIDForPrint(int) const;
     void setCounter() const;
+    void clearProbes() const;
+    std::vector< std::vector<double*> >* getVprobe() { return &vProbes_; };
+    std::vector< std::vector<double> >* getSprobe() {return &sProbes_; };
+    
+    
 };
 
 

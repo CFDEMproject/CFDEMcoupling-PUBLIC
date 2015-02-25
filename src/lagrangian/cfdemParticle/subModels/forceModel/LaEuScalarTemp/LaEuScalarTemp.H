@@ -65,8 +65,6 @@ private:
 
     dictionary propsDict_;
 
-    bool verbose_;
-
     word tempFieldName_;
 
     const volScalarField& tempField_;            // ref to temperature field
@@ -92,12 +90,6 @@ private:
     scalar lambda_;                              // fluid thermal conductivity [W/(m*K)]
 
     scalar Cp_;                                  // specific heat capacity [W*s/(kg*K)]
-
-    word densityFieldName_;
-
-    const volScalarField& rho_;                  // ref to fluid density field
-
-    bool interpolation_; // use interpolated field values
 
     void allocateMyArrays() const;
 

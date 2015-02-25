@@ -84,7 +84,7 @@ basicIO::~basicIO()
 
 int basicIO::dumpDEMdata() const
 {
-    if (time_.outputTime())
+    if (dumpNow())
     {
         // make time directory
         if (parOutput_) lagPath_=buildFilePath(dirName_);

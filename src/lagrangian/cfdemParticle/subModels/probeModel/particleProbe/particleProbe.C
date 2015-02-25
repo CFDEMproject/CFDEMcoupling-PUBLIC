@@ -101,7 +101,9 @@ particleProbe::particleProbe
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 particleProbe::~particleProbe()
-{}
+{
+ clearProbes();
+}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
@@ -114,6 +116,7 @@ void particleProbe::setOutputFile() const
     else
         currItemId_+=1;
     sPtr = sPtrList_[currItemId_-1]; //set the pointer to the output file from list
+    probeIndex_=currItemId_-1;
 }
 
 
@@ -127,7 +130,7 @@ void particleProbe::initialize(word typeName, word  logFileName) const
   //propsDict_ = particleCloud_.couplingProperties().subDict(typeName + "Props");
   name_ = typeName;
   const char* fileNameOut_ = wordToChar(logFileName);
-
+  
   if(verboseToFile_)
   {
 
@@ -204,7 +207,7 @@ void particleProbe::writeHeader() const
             *sPtr<<"||   scalarData:  "  << "   ";  
             forAll(scalarFields_, iter)
             {
-                 *sPtr << scalarFields_(iter)  << "   "; 
+                 *sPtr << scalarFields_(iter)  << "   ";
             }
          }
 
@@ -214,8 +217,86 @@ void particleProbe::writeHeader() const
 
 }
 
+void particleProbe::clearProbes() const
+{
+  for (unsigned int i=0; i<vProbes_.size(); i++)
+    vProbes_[i].clear();
+  
+  for (unsigned int j=0; j<sProbes_.size(); j++)
+    sProbes_[j].clear();
+      
+  sProbes_.clear();
+  vProbes_.clear();
+}
+
+void particleProbe::updateProbes(int index, Field<scalar> sValues, Field<vector> vValues) const
+{
+  int vSize_=vProbes_.size();
+  int sSize_=sProbes_.size();
+ 
+ //check if the particle already has an allocated vector. If not, create it. It should be only called at the beginning. 
+ while(index >= vSize_)
+ {
+   std::vector<double*> particleVector_;
+   vProbes_.push_back(particleVector_);
+   vSize_=vProbes_.size();
+ }
+  
+  while(index >= sSize_)
+  {
+   std::vector<double> particleScalar_;
+   sProbes_.push_back(particleScalar_);
+   sSize_=sProbes_.size();
+  }
+  
+ //register vector probes on the corresponding vector
+  forAll(vValues, iter)
+  {
+   int ProbeSize_=vProbes_[index].size();
+   
+   if(probeIndex_<ProbeSize_) //The corresponding probe for this particle already exists, values are overwritten.
+   {
+    vProbes_[index][probeIndex_][0]=vValues[iter][0];
+    vProbes_[index][probeIndex_][1]=vValues[iter][1];
+    vProbes_[index][probeIndex_][2]=vValues[iter][2];
+    
+   }
+   else //The corresponding probe for this particle has to be created
+   {
+    double * probe_= new double[3];
+   
+    probe_[0]=vValues[iter][0];
+    probe_[1]=vValues[iter][1];
+    probe_[2]=vValues[iter][2];
+              
+    vProbes_[index].push_back(probe_); 
+   }
+  }
+  
+  //register scalar probes on the corresponding vector
+  forAll(sValues, iter)
+  {
+   int ProbeSize_=sProbes_[index].size();
+   
+   if(probeIndex_<ProbeSize_) //The corresponding probe for this particle already exists, values are overwritten.
+   {
+    sProbes_[index][probeIndex_]=sValues[iter];
+   }
+   else //The corresponding probe for this particle has to be created
+   {           
+    sProbes_[index].push_back(sValues[iter]); 
+   } 
+  
+  }
+  
+  
+}
+
 void particleProbe::writeProbe(int index, Field<scalar> sValues, Field<vector> vValues) const
 {
+    updateProbes(index,sValues,vValues); //update probe vectors
+    
+   
     if(printNow_ && checkIDForPrint(index) &&  verboseToFile_) 
     {
 
@@ -224,15 +305,16 @@ void particleProbe::writeProbe(int index, Field<scalar> sValues, Field<vector> v
        *sPtr << index  << tab 
                 << particleCloud_.mesh().time().value()  << "   " ;
         *sPtr << "||   ";
-
+        
         //vectorFields
         *sPtr <<    setprecision(writePrecision_) ;
          forAll(vValues, iter)
          {
-              if(!probeDebug_ && iter>0) break;
+             // if(!probeDebug_ && iter>0) break;
              *sPtr << vValues[iter][0] << "   ";
-             *sPtr << vValues[iter][1] << "   "; 
-             *sPtr << vValues[iter][2] << "   ";  
+             *sPtr << vValues[iter][1] << "   ";
+             *sPtr << vValues[iter][2] << "   "; 
+   
           }
 
         //scalarFields
@@ -256,8 +338,9 @@ void particleProbe::writeProbe(int index, Field<scalar> sValues, Field<vector> v
         else *sPtr << endl;
 
     }
-
+    
     return;
+    
 }
 
 bool particleProbe::checkIDForPrint(int index) const

@@ -133,7 +133,7 @@ Reasonable example settings for the "couplingProperties" dictionary are given in
 
 modelType :pre
 
-"modelType" refers to the formulation of the equations to be solved. Choose "A" or "B", according to Zhou et al. (2010): "Discrete particle simulation of particle-fluid flow: model formulations and their applicability", JFM. "A" requires the use of the force models gradPForce and viscForce, whereas "B" requires the force model "Archimedes".
+"modelType" refers to the formulation of the equations to be solved. Choose "A", "B" or "Bfull", according to Zhou et al. (2010): "Discrete particle simulation of particle-fluid flow: model formulations and their applicability", JFM. "A" requires the use of the force models gradPForce and viscForce, whereas "B" requires the force model "Archimedes". "Bfull" refers to model type I.
 
 couplingInterval :pre
 
@@ -165,6 +165,10 @@ The dictionary is divided into two parts, first a list of "liggghtsCommandModels
 Reasonable example settings for the "liggghtsCommands" dictionary are given in the tutorial cases.
 
 :line
+
+
+
+
 
 
 
@@ -261,11 +265,15 @@ listing below of styles within certain commands.
 "forceModel_MeiLift"_forceModel_MeiLift.html,
 "forceModel_SchillerNaumannDrag"_forceModel_SchillerNaumannDrag.html,
 "forceModel_ShirgaonkarIB"_forceModel_ShirgaonkarIB.html,
+"forceModel_fieldStore"_forceModel_fieldStore.html,
 "forceModel_gradPForce"_forceModel_gradPForce.html,
 "forceModel_noDrag"_forceModel_noDrag.html,
 "forceModel_particleCellVolume"_forceModel_particleCellVolume.html,
 "forceModel_virtualMassForce"_forceModel_virtualMassForce.html,
 "forceModel_viscForce"_forceModel_viscForce.html,
+"forceSubModel"_forceSubModel.html,
+"forceSubModel_ImEx"_forceSubModel_ImEx.html,
+"forceSubModel_ImExCorr"_forceSubModel_ImExCorr.html,
 "liggghtsCommandModel"_liggghtsCommandModel.html,
 "liggghtsCommandModel_execute"_liggghtsCommandModel_execute.html,
 "liggghtsCommandModel_readLiggghtsData"_liggghtsCommandModel_readLiggghtsData.html,

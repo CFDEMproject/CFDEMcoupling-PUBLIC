@@ -11,11 +11,13 @@
 </H3>
 <P><B>Description:</B>
 </P>
-<P>"cfdemSolverPisoScalar" is a coupled CFD-DEM solver using CFDEMcoupling, an open source parallel coupled CFD-DEM framework. Based on pisoFoam(R)(*), a finite volume based solver for turbulent Navier-Stokes equations applying PISO algorithm, "cfdemSolverPisoScalar" has additional functionality for a coupling to the DEM code "LIGGGHTS" as well as a scalar transport equation. The volume averaged Navier-Stokes Equations are solved accounting for momentum exchange and volume displacement of discrete particles whose trajectories are calculated in the DEM code LIGGGHTS. The scalar transport equation is coupled to scalar properties of the particle phase, thus convective heat transfer in a fluid granular system can be modeled with "cfdemSolverPisoScalar".
+<P>"cfdemSolverPisoScalar" is a coupled CFD-DEM solver using CFDEMcoupling, an open source parallel coupled CFD-DEM framework. Based on pisoFoam(R)(*), a finite volume based solver for turbulent Navier-Stokes equations applying PISO algorithm, "cfdemSolverPisoScalar" has additional functionality for a coupling to the DEM code "LIGGGHTS" as well as a scalar transport equation. The volume averaged Navier-Stokes Equations are solved accounting for momentum exchange and volume displacement of discrete particles, whose trajectories are calculated in the DEM code LIGGGHTS. The scalar transport equation is coupled to scalar properties of the particle phase, thus convective heat transfer in a fluid granular system can be modeled with "cfdemSolverPisoScalar". 
 </P>
 <P>see:
 </P>
 <P>GONIVA, C., KLOSS, C., HAGER,A. and PIRKER, S. (2010): "An Open Source CFD-DEM Perspective", Proc. of OpenFOAM Workshop, Göteborg, June 22.-24.
+</P>
+<P>The heat transfer equation is implemented according to Nield & Bejan (2013), Convection in Porous Media, DOI 10.1007/978-1-4614-5541-7_2, Springer
 </P>
 <HR>
 

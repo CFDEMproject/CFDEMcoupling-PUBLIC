@@ -101,9 +101,10 @@ bool Foam::cfdemCloudIB::evolve()
     arraysReallocated_=false;
     bool doCouple=false;
 
-    if (dataExchangeM().couple())
+    if (dataExchangeM().doCoupleNow())
     {
         Info << "\n timeStepFraction() = " << dataExchangeM().timeStepFraction() << endl;
+        dataExchangeM().couple(0);
         doCouple=true;
 
 //        Info << "skipLagrangeToEulerMapping_: " << skipLagrangeToEulerMapping_ 
@@ -121,7 +122,7 @@ bool Foam::cfdemCloudIB::evolve()
 
           // set void fraction field
           if(verbose_) Info << "- setvoidFraction()" << endl;
-          voidFractionM().setvoidFraction(NULL,voidfractions_,particleWeights_,particleVolumes_);
+          voidFractionM().setvoidFraction(NULL,voidfractions_,particleWeights_,particleVolumes_,particleV_);
           if(verbose_) Info << "setvoidFraction done." << endl;
         }
         
@@ -140,6 +141,8 @@ bool Foam::cfdemCloudIB::evolve()
         // write DEM data
         if(verbose_) Info << " -giveDEMdata()" << endl;
         giveDEMdata();
+
+        dataExchangeM().couple(1);
         
         haveEvolvedOnce_=true;
     }
@@ -190,6 +193,7 @@ void Foam::cfdemCloudIB::calcVelocityCorrection
             }
         //}
     }
+    U.correctBoundaryConditions();
 
     // make field divergence free - set reference value in case it is needed
     fvScalarMatrix phiIBEqn

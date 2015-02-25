@@ -26,7 +26,7 @@
             IOobject::NO_WRITE
         ),
         mesh,
-        dimensionedVector("0", dimensionSet(0, 1, -1, 0, 0), vector::zero)
+        dimensionedVector("0", dimensionSet(0, 1, -1, 0, 0), Foam::vector::zero)
     );
 
 //========================
@@ -62,7 +62,7 @@
             IOobject::AUTO_WRITE
         ),
         mesh,
-        dimensionedVector("0", dimensionSet(0, 1, -1, 0, 0), vector::zero)
+        dimensionedVector("0", dimensionSet(0, 1, -1, 0, 0), Foam::vector::zero)
     );
 
 //========================

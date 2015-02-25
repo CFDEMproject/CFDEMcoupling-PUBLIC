@@ -68,6 +68,15 @@ noDrag::noDrag
     if(dict.found(word(typeName + "Props")))
         propsDict_=dictionary(dict.subDict(typeName + "Props"));
 
+    // init force sub model
+    setForceSubModels(propsDict_);
+
+    // define switches which can be read from dict
+    forceSubM(0).setSwitchesList(0,true); // activate treatExplicit
+
+    // read those switches defined above, if provided in dict
+    forceSubM(0).readSwitches();
+
     if (propsDict_.found("noDEMForce")) noDEMForce_=true;
 
     if (propsDict_.found("keepCFDForce")) keepCFDForce_=true;
@@ -89,15 +98,21 @@ void noDrag::setForce() const
     // Do nothing
     Info << "noDrag::setForce" << endl;
     label cellI=0;
+    bool treatExplicit=forceSubM(0).switches()[0];
     for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
     {
         cellI = particleCloud_.cellIDs()[index][0];
         if (cellI > -1) // particle Found
         {
-            // set force on particle
+            //==========================
+            // set force on particle (new code)
+            // write particle based data to global array
+            //forceSubM(0).partToArray(index,drag,dragExplicit);
+            //==========================
+            // set force on particle (old code)
             if(!keepCFDForce_)
             {
-                if(treatExplicit_) for(int j=0;j<3;j++) expForces()[index][j] = 0.;
+                if(treatExplicit) for(int j=0;j<3;j++) expForces()[index][j] = 0.;
                 else  for(int j=0;j<3;j++) impForces()[index][j] = 0.;
             }
             if(noDEMForce_)
@@ -109,6 +124,7 @@ void noDrag::setForce() const
                     for(int j=0;j<3;j++) fluidVel()[index][j] = 0.;
                 }
             }
+            //==========================
         }        
     }
 }

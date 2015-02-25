@@ -18,17 +18,15 @@ forceModels
 KochHillDragProps
 \{
     velFieldName "U";
-    densityFieldName "density";
     voidfractionFieldName "voidfraction"; 
-    interpolation;
-    implDEM;
+    interpolation "bool1";
+    implForceDEM "bool2";
 \}; :pre
 
 {U} = name of the finite volume fluid velocity field :ulb,l
-{density} = name of the finite volume gravity field :l
 {voidfraction} = name of the finite volume voidfraction field :l
-{interpolation} = (optional, normally off) flag to use interpolated voidfraction and fluid velocity values :l
-{implDEM} = (optional, normally off) flag to use implicit formulation of drag on DEM side:l
+{bool1} = (optional, normally off) flag to use interpolated voidfraction and fluid velocity values :l
+{bool2} = (optional, normally off) flag to use implicit formulation of drag on DEM side:l
 :ule
 
 [Examples:]
@@ -40,7 +38,6 @@ forceModels
 KochHillDragProps
 \{
     velFieldName "U";
-    densityFieldName "rho";
     voidfractionFieldName "voidfraction"; 
 \} :pre
 

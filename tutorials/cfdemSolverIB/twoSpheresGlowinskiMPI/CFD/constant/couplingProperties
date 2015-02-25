@@ -70,14 +70,12 @@ turbulenceModelType RASProperties;//LESProperties; //
 ShirgaonkarIBProps
 {
     velFieldName "U";
-    densityFieldName "rho";
     pressureFieldName "p";
     verbose;
 }
 
 ArchimedesIBProps
 {
-    densityFieldName "rho";
     gravityFieldName "g";
     voidfractionFieldName "voidfractionNext";
 }
@@ -91,7 +89,7 @@ twoWayFilesProps
 twoWayMPIProps
 {
     maxNumberOfParticles 10100;
-    liggghtsPath "../DEM/in.liggghts_init";
+    liggghtsPath "../DEM/in.liggghts_run";
 }
 
 IBProps

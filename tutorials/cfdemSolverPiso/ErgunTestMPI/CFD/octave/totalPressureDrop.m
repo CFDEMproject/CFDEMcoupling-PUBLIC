@@ -53,7 +53,7 @@ fprintf('so the result does not depend on density\n')
 %==================================
 % min fluidization velocity in m/s
 %==================================
-rhoP = 2000                      % particle density in kg/m3
+rhoP = 2000                     % particle density in kg/m3
 g = 9.81                        % gravity m/s2
 
 Umf = dp^2*(rhoP-rhoG)*g/(150*muG)*(epsilon^3*phip^2)/(1-epsilon);
@@ -96,8 +96,4 @@ axis([0,Uend,0,dpErgun(length(dpErgun))])
 
 %print('cfdemSolverPiso_settlingTest.eps','-deps2')
 print -color "cfdemSolverPiso_ErgunTestMPI.eps"
-replot;
-
-
-
 

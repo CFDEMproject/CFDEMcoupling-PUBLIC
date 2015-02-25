@@ -37,11 +37,31 @@
 #- export environment variables (adapt to your paths)
 #------------------------------------------------------------------------------
 
+#check if default lammps lib path should be used
+if [[ $CFDEM_LAMMPS_LIB_DIR == "" ]]; then
+    export CFDEM_LAMMPS_LIB_DIR=$CFDEM_LIGGGHTS_SRC_DIR/../lib/
+else
+    echo "using CFDEM_LAMMPS_LIB_DIR=$CFDEM_LAMMPS_LIB_DIR defined by user."
+fi
+
 #- LIGGGHTS lib name
 export CFDEM_LIGGGHTS_LIB_NAME=lmp_$CFDEM_LIGGGHTS_MAKEFILE_NAME
 
 #- CFDEM lib name
 export CFDEM_LIB_NAME=lagrangianCFDEM-$CFDEM_VERSION-$WM_PROJECT_VERSION
+
+#- CFDEM compressible lib name
+export CFDEM_LIB_COMP_NAME=lagrangianCFDEMcomp-$CFDEM_VERSION-$WM_PROJECT_VERSION
+
+#check if additional libraries should be compiled together with solvers
+if [[ $CFDEM_ADD_LIBS_DIR == "" ]]; then
+    export CFDEM_ADD_LIBS_DIR=$CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc
+else
+    echo "using CFDEM_ADD_LIBS_DIR=$CFDEM_ADD_LIBS_DIR defined by user."
+fi
+
+#-----------------------------------------------------
+# additional libraries
 
 #- LMP Many2Many lib path and makefile
 export CFDEM_Many2ManyLIB_PATH=$CFDEM_SRC_DIR/lagrangian/cfdemParticle/subModels/dataExchangeModel/twoWayMany2Many/library
@@ -52,8 +72,16 @@ export CFDEM_M2MLIB_PATH=$CFDEM_SRC_DIR/lagrangian/cfdemParticle/subModels/dataE
 export CFDEM_M2MLIB_MAKEFILENAME=$CFDEM_LIGGGHTS_MAKEFILE_NAME
 
 #- LMP POEMS lib path and makefile
-export CFDEM_POEMSLIB_PATH=$CFDEM_LIGGGHTS_SRC_DIR/../lib/poems
+export CFDEM_POEMSLIB_PATH=$CFDEM_LAMMPS_LIB_DIR/poems
 export CFDEM_POEMSLIB_MAKEFILENAME=g++
+
+#- LMP ASPHERE lib path and makefile
+export CFDEM_ASPHERELIB_PATH=$CFDEM_LAMMPS_LIB_DIR/poems
+export CFDEM_ASPHERELIB_MAKEFILENAME=g++
+
+#-C3PO library
+export C3PO_SRC_DIR=$CFDEM_SRC_DIR/c3po
+#-----------------------------------------------------
 
 #- path to test harness
 export CFDEM_TEST_HARNESS_PATH=$CFDEM_PROJECT_USER_DIR/log/logFilesCFDEM-$CFDEM_VERSION-$WM_PROJECT_VERSION
@@ -145,6 +173,9 @@ alias cfdemCompCFDEMuti='bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/compil
 #- shortcut to test basic tutorials
 alias cfdemTestTUT='bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/testTutorials.sh'
 
+#- shortcut to visualize the clock model data
+alias vizClock='python $CFDEM_UT_DIR/vizClock/matPlot.py'
+
 #- recursive touch of current directory
 alias touchRec='find ./* -exec touch {} \;'
 
@@ -159,6 +190,11 @@ export -f cfdemLiggghtsPar
 #- shortcut to open files including a pattern
 cfdemGrep() { grep -rl "$1" ./* | xargs gedit; }
 export -f cfdemGrep
+
+#- shortcut lo list files in a directory
+#cfdemListFiles() { find $1 | sed s:""$1"":: > listOfFiles.txt; }   #leave out the dir iteslf in list
+cfdemListFiles() { find $1 > listOfFiles.txt; }                     #keep the dir in list
+export -f cfdemListFiles
 
 # check if the run directory exists
 if [ -d "$CFDEM_PROJECT_USER_DIR" ]; then

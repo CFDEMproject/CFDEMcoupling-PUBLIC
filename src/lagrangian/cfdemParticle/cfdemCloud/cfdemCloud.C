@@ -31,6 +31,7 @@ Description
 
 #include "fileName.H"
 #include "cfdemCloud.H"
+#include "global.H"
 #include "forceModel.H"
 #include "locateModel.H"
 #include "momCoupleModel.H"
@@ -80,6 +81,7 @@ Foam::cfdemCloud::cfdemCloud
     positions_(NULL),
     velocities_(NULL),
     fluidVel_(NULL),
+    fAcc_(NULL),
     impForces_(NULL),
     expForces_(NULL),
     DEMForces_(NULL),
@@ -89,7 +91,9 @@ Foam::cfdemCloud::cfdemCloud
     cellIDs_(NULL),
     particleWeights_(NULL),
     particleVolumes_(NULL),
+    particleV_(NULL),
     numberOfParticles_(0),
+    d32_(-1),
     numberOfParticlesChanged_(false),
     arraysReallocated_(false),
     forceModels_(couplingProperties_.lookup("forceModels")),
@@ -99,7 +103,9 @@ Foam::cfdemCloud::cfdemCloud
     cg_(1.),
     cgOK_(true),
     impDEMdrag_(false),
+    impDEMdragAcc_(false),
     imExSplitFactor_(1.0),
+    treatVoidCellsAsExplicitForce_(false),
     useDDTvoidfraction_(false),
     ddtVoidfraction_
     (   
@@ -117,7 +123,7 @@ Foam::cfdemCloud::cfdemCloud
     turbulence_
     (
         #if defined(version21) || defined(version16ext)
-            #ifdef comp
+            #ifdef compre
                 mesh.lookupObject<compressible::turbulenceModel>
             #else
                 mesh.lookupObject<incompressible::turbulenceModel>
@@ -213,12 +219,16 @@ Foam::cfdemCloud::cfdemCloud
     )
 {
     #include "versionInfo.H"
+    global buildInfo(couplingProperties_,*this);
+    buildInfo.info();
 
     Info << "If BC are important, please provide volScalarFields -imp/expParticleForces-" << endl;
     if (couplingProperties_.found("solveFlow"))
         solveFlow_=Switch(couplingProperties_.lookup("solveFlow"));
     if (couplingProperties_.found("imExSplitFactor"))
         imExSplitFactor_ = readScalar(couplingProperties_.lookup("imExSplitFactor"));
+    if (couplingProperties_.found("treatVoidCellsAsExplicitForce"))
+        treatVoidCellsAsExplicitForce_ = readBool(couplingProperties_.lookup("treatVoidCellsAsExplicitForce"));
     if (couplingProperties_.found("verbose")) verbose_=true;
     if (couplingProperties_.found("ignore")) ignore_=true;
     if (turbulenceModelType_=="LESProperties")
@@ -276,6 +286,7 @@ Foam::cfdemCloud::~cfdemCloud()
     dataExchangeM().destroy(positions_,3);
     dataExchangeM().destroy(velocities_,3);
     dataExchangeM().destroy(fluidVel_,3);
+    dataExchangeM().destroy(fAcc_,3);
     dataExchangeM().destroy(impForces_,3);
     dataExchangeM().destroy(expForces_,3);
     dataExchangeM().destroy(DEMForces_,3);
@@ -285,6 +296,7 @@ Foam::cfdemCloud::~cfdemCloud()
     dataExchangeM().destroy(cellIDs_,1);
     dataExchangeM().destroy(particleWeights_,1);
     dataExchangeM().destroy(particleVolumes_,1);
+    dataExchangeM().destroy(particleV_,1);
 }
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
 void Foam::cfdemCloud::getDEMdata()
@@ -292,6 +304,9 @@ void Foam::cfdemCloud::getDEMdata()
     dataExchangeM().getData("radius","scalar-atom",radii_);
     dataExchangeM().getData("x","vector-atom",positions_);
     dataExchangeM().getData("v","vector-atom",velocities_);
+
+    if(impDEMdragAcc_)
+        dataExchangeM().getData("dragAcc","vector-atom",fAcc_); // array is used twice - might be necessary to clean it first
 }
 
 void Foam::cfdemCloud::giveDEMdata()
@@ -302,6 +317,7 @@ void Foam::cfdemCloud::giveDEMdata()
 
         if(impDEMdrag_)
         {
+            if(verbose_) Info << "sending Ksl and uf" << endl;
             dataExchangeM().giveData("Ksl","scalar-atom",Cds_);
             dataExchangeM().giveData("uf","vector-atom",fluidVel_);
         }
@@ -441,6 +457,16 @@ label Foam::cfdemCloud::liggghtsCommandModelIndex(word name)
     return index;
 }
 
+std::vector< std::vector<double*> >* Foam::cfdemCloud::getVprobe()
+{
+ return probeModel_->getVprobe();
+}
+
+std::vector< std::vector<double> >* Foam::cfdemCloud::getSprobe()
+{
+ return probeModel_->getSprobe();
+}
+
 // * * * * * * * * * * * * * * * WRITE  * * * * * * * * * * * * * //
 
 // * * *   write cfdemCloud internal data   * * * //
@@ -458,9 +484,10 @@ bool Foam::cfdemCloud::evolve
 
     if(!ignore())
     {
-        if (dataExchangeM().couple())
+        if (dataExchangeM().doCoupleNow())
         {
             Info << "\n Coupling..." << endl;
+            dataExchangeM().couple(0);
             doCouple=true;
 
             // reset vol Fields
@@ -496,7 +523,7 @@ bool Foam::cfdemCloud::evolve
             // set void fraction field
             clockM().start(19,"setvoidFraction");
             if(verbose_) Info << "- setvoidFraction()" << endl;
-            voidFractionM().setvoidFraction(NULL,voidfractions_,particleWeights_,particleVolumes_);
+            voidFractionM().setvoidFraction(NULL,voidfractions_,particleWeights_,particleVolumes_,particleV_);
             if(verbose_) Info << "setvoidFraction done." << endl;
             clockM().stop("setvoidFraction");
 
@@ -508,7 +535,12 @@ bool Foam::cfdemCloud::evolve
             //Smoothen "next" fields            
             smoothingM().dSmoothing();
             smoothingM().smoothen(voidFractionM().voidFractionNext());
-            smoothingM().smoothenReferenceField(averagingM().UsNext());
+
+            //only smoothen if we use implicit force coupling in cells void of particles
+            //because we need unsmoothened Us field to detect cells for explicit 
+            //force coupling
+            if(!treatVoidCellsAsExplicitForce())
+                smoothingM().smoothenReferenceField(averagingM().UsNext());
             
             clockM().stop("setVectorAverage");
         }
@@ -560,6 +592,8 @@ bool Foam::cfdemCloud::evolve
             clockM().start(23,"giveDEMdata");
             giveDEMdata();
             clockM().stop("giveDEMdata");
+
+            dataExchangeM().couple(1);
         }//end dataExchangeM().couple()
 
 
@@ -584,15 +618,40 @@ bool Foam::cfdemCloud::reAllocArrays() const
         dataExchangeM().allocateArray(positions_,0.,3);
         dataExchangeM().allocateArray(velocities_,0.,3);
         dataExchangeM().allocateArray(fluidVel_,0.,3);
+        dataExchangeM().allocateArray(fAcc_,0.,3);
         dataExchangeM().allocateArray(impForces_,0.,3);
         dataExchangeM().allocateArray(expForces_,0.,3);
         dataExchangeM().allocateArray(DEMForces_,0.,3);
         dataExchangeM().allocateArray(Cds_,0.,1);
         dataExchangeM().allocateArray(radii_,0.,1);
         dataExchangeM().allocateArray(voidfractions_,1.,voidFractionM().maxCellsPerParticle());
-        dataExchangeM().allocateArray(cellIDs_,0.,voidFractionM().maxCellsPerParticle());
+        dataExchangeM().allocateArray(cellIDs_,-1.,voidFractionM().maxCellsPerParticle());
         dataExchangeM().allocateArray(particleWeights_,0.,voidFractionM().maxCellsPerParticle());
         dataExchangeM().allocateArray(particleVolumes_,0.,voidFractionM().maxCellsPerParticle());
+        dataExchangeM().allocateArray(particleV_,0.,1);
+        arraysReallocated_ = true;
+        return true;
+    }
+    return false;
+}
+
+bool Foam::cfdemCloud::reAllocArrays(int nP, bool forceRealloc) const
+{
+    if( (numberOfParticlesChanged_ && !arraysReallocated_) || forceRealloc)
+    {
+        // get arrays of new length
+        dataExchangeM().allocateArray(positions_,0.,3,nP);
+        dataExchangeM().allocateArray(velocities_,0.,3,nP);
+        dataExchangeM().allocateArray(fluidVel_,0.,3,nP);
+        dataExchangeM().allocateArray(impForces_,0.,3,nP);
+        dataExchangeM().allocateArray(expForces_,0.,3,nP);
+        dataExchangeM().allocateArray(DEMForces_,0.,3,nP);
+        dataExchangeM().allocateArray(Cds_,0.,1,nP);
+        dataExchangeM().allocateArray(radii_,0.,1,nP);
+        dataExchangeM().allocateArray(voidfractions_,1.,voidFractionM().maxCellsPerParticle(),nP);
+        dataExchangeM().allocateArray(cellIDs_,0.,voidFractionM().maxCellsPerParticle(),nP);
+        dataExchangeM().allocateArray(particleWeights_,0.,voidFractionM().maxCellsPerParticle(),nP);
+        dataExchangeM().allocateArray(particleVolumes_,0.,voidFractionM().maxCellsPerParticle(),nP);
         arraysReallocated_ = true;
         return true;
     }
@@ -604,7 +663,7 @@ tmp<fvVectorMatrix> cfdemCloud::divVoidfractionTau(volVectorField& U,volScalarFi
     return
     (
       - fvm::laplacian(voidfractionNuEff(voidfraction), U)
-      - fvc::div(voidfractionNuEff(voidfraction)*dev(fvc::grad(U)().T()))
+      - fvc::div(voidfractionNuEff(voidfraction)*dev2(fvc::grad(U)().T()))
     );
 }
 
@@ -637,11 +696,11 @@ void cfdemCloud::calcDdtVoidfraction(volScalarField& voidfraction) const
 
 tmp<volScalarField> cfdemCloud::voidfractionNuEff(volScalarField& voidfraction) const
 {
-    if (modelType_=="B")
+    if (modelType_=="B" || modelType_=="Bfull")
     {
         return tmp<volScalarField>
         (
-            #ifdef comp
+            #ifdef compre
                 new volScalarField("viscousTerm", (turbulence_.mut() + turbulence_.mu()))
             #else
                 new volScalarField("viscousTerm", (turbulence_.nut() + turbulence_.nu()))
@@ -652,7 +711,7 @@ tmp<volScalarField> cfdemCloud::voidfractionNuEff(volScalarField& voidfraction) 
     {
         return tmp<volScalarField>
         (
-            #ifdef comp
+            #ifdef compre
                 new volScalarField("viscousTerm", voidfraction*(turbulence_.mut() + turbulence_.mu()))
             #else
                 new volScalarField("viscousTerm", voidfraction*(turbulence_.nut() + turbulence_.nu()))

@@ -53,7 +53,7 @@ smoothingModel off;
 forceModels
 (
     KochHillDrag
-    LaEuScalarTemp
+    LaEuScalarTemp  // must be 2nd pos!
     Archimedes
 );
 
@@ -72,12 +72,10 @@ LaEuScalarTempProps
     velFieldName "U";
     tempFieldName "T";
     voidfractionFieldName "voidfraction";
-    tempSourceFieldName "Tsource";
     partTempName "Temp";
     partHeatFluxName "convectiveHeatFlux";
     lambda 0.0256;
     Cp 1007;
-    densityFieldName "rho";
 }
 
 implicitCoupleProps
@@ -91,36 +89,31 @@ implicitCoupleProps
 KochHillDragProps
 {
     velFieldName "U";
-    densityFieldName "rho";
     voidfractionFieldName "voidfraction";
 }
 
 DiFeliceDragProps
 {
     velFieldName "U";
-    densityFieldName "rho";
-    //verbose;
+    //verbose true;
 }
 
 ArchimedesProps
 {
-    densityFieldName "rho";
     gravityFieldName "g";
 }
 gradPForceProps
 {
     pFieldName "p";
-    densityFieldName "rho";
     voidfractionFieldName "voidfraction";
     velocityFieldName "U";
-    //interpolation;
+    //interpolation true;
 }
 
 viscForceProps
 {
     velocityFieldName "U";
-    densityFieldName "rho";
-    interpolation;
+    interpolation true;
 }
 
 oneWayVTKProps
@@ -132,7 +125,7 @@ oneWayVTKProps
 twoWayMPIProps
 {
     maxNumberOfParticles 10000;
-    liggghtsPath "../DEM/in.liggghts_init";
+    liggghtsPath "../DEM/in.liggghts_run";
 }
 
 centreProps

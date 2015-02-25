@@ -25,7 +25,16 @@ FoamFile
 
 liggghtsCommandModels
 (
-   runLiggghts
+    runLiggghts
+    writeLiggghts
 );
 
 // ************************************************************************* //
+
+writeLiggghtsProps
+{
+    writeLast off;
+    //writeName "name";
+    overwrite on;
+    verbose;
+}

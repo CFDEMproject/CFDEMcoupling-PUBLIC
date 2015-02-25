@@ -181,7 +181,7 @@ void Foam::clockModel::evalFile() const
 {
 	std::ofstream outFile;
 	std::string fileName(path_/"timeEval.txt");
-	outFile.open(fileName.data(),ios_base::app);
+	outFile.open(fileName.data(),ios_base::trunc);
 	outFile << "Time Evaluation"<<nl;
 	outFile << eval();
 	outFile.close();
@@ -201,7 +201,7 @@ void Foam::clockModel::evalPar() const
 	strs << myrank;
 	fileName.append(strs.str());
 	fileName.append(".txt");
-	outFile.open(fileName.data(),ios_base::app);
+	outFile.open(fileName.data(),ios_base::trunc);
 	outFile << "Time Evaluation for Processor Nr." << myrank <<nl;
 	outFile << eval();
 	outFile.close();
@@ -280,7 +280,7 @@ void Foam::clockModel::evalPar() const
 	if(myrank == 0)
 	{
         std::string fileName(path_/"timeEvalFull.txt");
-		outFile.open(fileName.data(),ios_base::app);
+		outFile.open(fileName.data(),ios_base::trunc);
 		outFile << msg;
 		outFile.close();
 	}

@@ -78,7 +78,7 @@ centreVoidFraction::~centreVoidFraction()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void centreVoidFraction::setvoidFraction(double** const& mask,double**& voidfractions,double**& particleWeights,double**& particleVolumes) const
+void centreVoidFraction::setvoidFraction(double** const& mask,double**& voidfractions,double**& particleWeights,double**& particleVolumes,double**& particleV) const
 {
     reAllocArrays();
 
@@ -105,6 +105,7 @@ void centreVoidFraction::setvoidFraction(double** const& mask,double**& voidfrac
 
                 // store volume for each particle
                 particleVolumes[index][0] = volume;
+                particleV[index][0] = volume;
 
                 voidfractionNext_[cellI] -= volume/cellVol;
 

@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
     #include "initContinuityErrs.H"
 
     #if defined(version22)
-        #include "createFvOptions.H"
+    #include "createFvOptions.H"
     #endif
 
     // create cfdemCloud
@@ -128,10 +128,12 @@ int main(int argc, char *argv[])
             for (int corr=0; corr<nCorr; corr++)
             {
                 volScalarField rUA = 1.0/UEqn.A();
+                surfaceScalarField rUAf(fvc::interpolate(rUA));
 
                 U = rUA*UEqn.H();
                 #ifdef version23
-                phi = (fvc::interpolate(U) & mesh.Sf()); // there is a new version in 23x
+                phi = (fvc::interpolate(U) & mesh.Sf())
+                    + rUAf*fvc::ddtCorr(U, phi);
                 #else
                 phi = (fvc::interpolate(U) & mesh.Sf())
                     + fvc::ddtPhiCorr(rUA, U, phi);

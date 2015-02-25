@@ -51,15 +51,16 @@ else
     logpath="$(dirname "$(readlink -f ${BASH_SOURCE[0]})")/$logDir"
 
     ##number of solvers compiled at a time
-    nsteps=$WM_NCOMPPROCS
-    echo "do compilation on $nsteps procs"
-    nchunk=`echo $njobs/$nsteps+1 | bc`
-    if [[ $WM_NCOMPPROCS == "" ]]; then
-        echo "do compilation in serial"
+
+    if [[ $WM_NCOMPPROCS == "" ]] || [ $WM_NCOMPPROCS -eq 1 ]; then
         nsteps=1
-        nchunk=1
-    else
-        echo "do compilation on $nsteps procs in $nchunk chunks"      
+        let nchunk=$njobs+1 # +1, to wait for the last compilation too
+        echo "do compilation in serial"
+    else    
+        nsteps=$WM_NCOMPPROCS
+        nchunk=`echo $njobs/$nsteps+1 | bc`
+        echo "do compilation on $nsteps procs in $nchunk chunks" 
+        let nchunk++ # +1, to wait for the last compilation too     
     fi
 
     counter=0
@@ -108,6 +109,8 @@ else
                 let counter++
             fi
         done
+
+        sleep 1 # wait a second until compilation starts
     done
 
     echo "compilation done."

@@ -50,6 +50,15 @@ int IOModel::dumpDEMdata() const
     return -1;
 }
 
+bool IOModel::dumpNow() const
+{
+    //bool dmp(false);
+    //if (time_.value()+SMALL > time_.endTime().value()-time_.deltaT().value() || time_.outputTime())
+    //    dmp=true;
+
+    return time_.outputTime();
+}
+
 fileName IOModel::createTimeDir(fileName path) const
 {
     fileName timeDirPath(path/time_.timeName());

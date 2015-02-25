@@ -63,10 +63,6 @@ private:
 
     bool twoDimensional_;
 
-    word densityFieldName_;
-
-    const volScalarField& rho_;    // ref to fluid density
-
     word gravityFieldName_;
 
     #ifdef version21

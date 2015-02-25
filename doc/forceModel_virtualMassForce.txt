@@ -18,11 +18,9 @@ forceModels
 virtualMassForceProps
 \{
     velFieldName "U";
-    densityFieldName "density";
 \}; :pre
 
 {U} = name of the finite volume fluid velocity field :ulb,l
-{density} = name of the finite volume fluid density field :l
 :ule
 
 [Examples:]
@@ -34,7 +32,6 @@ forceModels
 virtualMassForceProps
 \{
     velFieldName "U";
-    densityFieldName "rho";
 \} :pre
 
 [Description:]

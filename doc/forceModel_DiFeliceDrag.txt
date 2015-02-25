@@ -18,13 +18,11 @@ forceModels
 DiFeliceDragProps
 \{
     velFieldName "U";
-    densityFieldName "density";
-    interpolation;
+    interpolation switch1;
 \}; :pre
 
 {U} = name of the finite volume fluid velocity field :ulb,l
-{density} = name of the finite volume gravity field :l
-{interpolation} = flag to use interpolated voidfraction and velocity values (normally off) :l
+{switch1} = flag to use interpolated voidfraction and velocity values (normally off) :l
 :ule
 
 [Examples:]
@@ -36,8 +34,7 @@ forceModels
 DiFeliceDragProps
 \{
     velFieldName "U";
-    densityFieldName "rho";
-    interpolation;
+    interpolation true;
 \} :pre
 
 [Description:]

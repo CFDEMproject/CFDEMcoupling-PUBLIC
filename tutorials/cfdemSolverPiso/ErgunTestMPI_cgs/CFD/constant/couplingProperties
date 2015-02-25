@@ -81,23 +81,20 @@ implicitCoupleProps
 
 ArchimedesProps
 {
-    densityFieldName "rho";
     gravityFieldName "g";
 }
 gradPForceProps
 {
     pFieldName "p";
-    densityFieldName "rho";
     voidfractionFieldName "voidfraction";
     velocityFieldName "U";
-    //interpolation;
+    //interpolation true;
 }
 
 viscForceProps
 {
     velocityFieldName "U";
-    densityFieldName "rho";
-    interpolation;
+    interpolation true;
 }
 volWeightedAverageProps
 {
@@ -118,17 +115,14 @@ totalMomentumExchangeProps
     explicitMomExFieldName "none";
     fluidVelFieldName "U";
     granVelFieldName "Us";
-    densityFieldName "rho";
 }
 GidaspowDragProps
 {
     velFieldName "U";
-    densityFieldName "rho";
 }
 DiFeliceDragProps
 {
     velFieldName "U";
-    densityFieldName "rho";
     voidfractionFieldName "voidfraction";
     granVelFieldName "Us";
 }
@@ -136,14 +130,12 @@ DiFeliceDragProps
 KochHillDragProps
 {
     velFieldName "U";
-    densityFieldName "rho";
     voidfractionFieldName "voidfraction";
 }
 
 virtualMassForceProps
 {
     velFieldName "U";
-    densityFieldName "rho";
 }
 
 oneWayVTKProps
@@ -184,11 +176,11 @@ dividedProps
 twoWayMPIProps
 {
     //maxNumberOfParticles 10100;
-    liggghtsPath "../DEM/in.liggghts_resume";
+    liggghtsPath "../DEM/in.liggghts_run";
 }
 twoWayM2MProps
 {
     maxNumberOfParticles 10100;
-    liggghtsPath "../DEM/in.liggghts_resume";
+    liggghtsPath "../DEM/in.liggghts_run";
 }
 // ************************************************************************* //

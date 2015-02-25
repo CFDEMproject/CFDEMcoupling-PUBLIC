@@ -62,10 +62,6 @@ class checkCouplingInterval
 private:
     dictionary propsDict_;
 
-    word densityFieldName_;
-
-    const volScalarField& rho_;
-
     const scalar rhoP_;
 
 public:

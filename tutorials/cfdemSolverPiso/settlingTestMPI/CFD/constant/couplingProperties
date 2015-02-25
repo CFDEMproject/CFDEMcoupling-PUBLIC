@@ -25,7 +25,6 @@ FoamFile
 
 //===========================================================================//
 // sub-models & settings
-
 modelType B; // A or B
 
 couplingInterval 100;
@@ -91,10 +90,13 @@ implicitCoupleProps
 DiFeliceDragProps
 {
     velFieldName "U";
-    densityFieldName "rho";
     voidfractionFieldName "voidfraction";
     granVelFieldName "Us";
-    verbose;
+    verbose true;
+    
+    //- use of scalar viscosity for drag
+    //scalarViscosity true;
+    //nu nu [ 0 2 -1 0 0 0 0 ] 1e-04;
 }
 
 SchillerNaumannDragProps
@@ -120,7 +122,6 @@ ArchimedesProps
 {
     densityFieldName "rho";
     gravityFieldName "g";
-    treatDEM;
 }
 
 virtualMassForceProps
@@ -137,7 +138,7 @@ oneWayVTKProps
 
 twoWayMPIProps
 {
-    liggghtsPath "../DEM/in.liggghts_init";
+    liggghtsPath "../DEM/in.liggghts_run";
 }
 
 twoWayFilesProps
@@ -166,7 +167,7 @@ bigParticleProps
 
 engineProps
 {
-        treeSearch true;
+    treeSearch true;
 }
 
 // ************************************************************************* //

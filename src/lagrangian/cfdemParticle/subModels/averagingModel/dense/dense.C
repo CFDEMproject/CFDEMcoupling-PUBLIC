@@ -150,6 +150,9 @@ void dense::setVectorAverage
                 {
                     for(int i=0;i<3;i++) valueVec[i] = value[index][i];
                     weightP = weight[index][subCell];
+
+                    if(weightP<SMALL) Warning << "error in dense::setVectorAverage" << endl;
+
                     // not yet implemented:
                     //if(weightWithParticleDensity) weightP *= particleCloud_.particleDensity()[index][0];
 

@@ -69,7 +69,8 @@ dividedVoidFraction::dividedVoidFraction
     alphaMin_(readScalar(propsDict_.lookup("alphaMin"))),
     alphaLimited_(0),
     tooMuch_(0.0),
-    interpolation_(false)
+    interpolation_(false),
+    cfdemUseOnly_(false)
 {
     maxCellsPerParticle_ = 29;
 
@@ -83,6 +84,11 @@ dividedVoidFraction::dividedVoidFraction
     checkWeightNporosity(propsDict_);
 
     if (propsDict_.found("verbose")) verbose_=true;
+
+    if (propsDict_.found("cfdemUseOnly"))
+    {
+        cfdemUseOnly_ = readBool(propsDict_.lookup("cfdemUseOnly"));
+    }
 }
 
 
@@ -94,9 +100,13 @@ dividedVoidFraction::~dividedVoidFraction()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfractions,double**& particleWeights,double**& particleVolumes) const
+void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfractions,double**& particleWeights,double**& particleVolumes, double**& particleV) const
 {
-    reAllocArrays();
+
+    if(cfdemUseOnly_)
+        reAllocArrays(particleCloud_.numberOfParticles());
+    else
+        reAllocArrays();
 
     scalar pi = M_PI;
     vector position(0,0,0);
@@ -114,11 +124,13 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
         //if(mask[index][0])
         //{
             // reset
+
             for(int subcell=0;subcell<cellsPerParticle_[index][0];subcell++)
             {
                 particleWeights[index][subcell]=0;
                 particleVolumes[index][subcell]=0;
             }
+            particleV[index][0]=0;
 
             cellsPerParticle_[index][0]=1;
             position = particleCloud_.position(index);
@@ -190,6 +202,7 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
 
                 // store particleVolume for each particle
                 particleVolumes[index][0] += volume*centreWeight;
+                particleV[index][0] += volume*centreWeight;
 
                 /*//OUTPUT
                 if (index==0 && verbose_)

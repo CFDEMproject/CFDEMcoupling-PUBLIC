@@ -33,6 +33,8 @@ mkdir -p $logDir
         COUNT=0
     fi
 
+    logpath="$(dirname "$(readlink -f ${BASH_SOURCE[0]})")/$logDir"
+
     while [ $COUNT -lt $NLINES ]
     do
             let COUNT++  
@@ -57,7 +59,7 @@ mkdir -p $logDir
 
             #--------------------------------------------------------------------------------#
             #- define variables
-            logpath="$(dirname "$(readlink -f ${BASH_SOURCE[0]})")/$logDir"
+            #logpath="$(dirname "$(readlink -f ${BASH_SOURCE[0]})")/$logDir"
             logfileName="log_compile$LINE""lib"
             headerText="$logfileName""-$NOW"
             libVarMakefileName="CFDEM_$LINE""LIB_MAKEFILENAME"

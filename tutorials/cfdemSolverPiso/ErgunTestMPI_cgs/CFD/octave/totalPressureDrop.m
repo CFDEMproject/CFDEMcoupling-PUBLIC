@@ -5,6 +5,7 @@ clc;
 %====================================%
 % simulation data 1
 %====================================%
+rhoG = 0.01			% density in g/cm3
 %path = '../probes/0/p'; % 2.1.x
 path = '../postProcessing/probes/0/p'; % 2.2.x
 columns=22;
@@ -12,7 +13,7 @@ headerlines=4;
 data = loaddata(path,columns,headerlines);
 data=transpose(data);
 [x,y]=size(data)
-dp_sim = (data(:,2)-data(:,y))*0.01/10; % *rhoG to get pressure, then *10 to get from Ba in Pa
+dp_sim = (data(:,2)-data(:,y))*rhoG*0.1; % *rhoG to get pressure, then *0.1 to get from Ba in Pa
 t_sim = data(:,1);
 %fprintf('final pressureDrop of sim = %f Pa\n',dp_sim(length(dp_sim)) )
 
@@ -96,8 +97,4 @@ ylabel("pressure drop [Pa]")
 
 %print('cfdemSolverPiso_settlingTest.eps','-deps2')
 print -color "cfdemSolverPiso_ErgunTestMPI.eps"
-replot;
-
-
-
 

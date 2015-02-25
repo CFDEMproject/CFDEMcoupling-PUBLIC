@@ -42,6 +42,7 @@ SourceFiles
 #include "fvCFD.H"
 #include "cfdemCloud.H"
 #include "probeModel.H"
+#include "forceSubModel.H"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -61,11 +62,9 @@ protected:
 
         cfdemCloud& particleCloud_;
 
-        Switch treatExplicit_;                      // marker to treat force in implicit way (otherwise explicit)
-
-        Switch treatDEM_;                           // marker to use the force only on DEM side
-
-        Switch implDEM_;                           // marker to use the implicit force on DEM side
+        //Switch treatExplicit_;                      // marker to treat force in implicit way (otherwise explicit)
+        //Switch treatDEM_;                           // marker to use the force only on DEM side
+        //Switch implDEM_;                           // marker to use the implicit force on DEM side
 
         mutable volVectorField impParticleForces_;  // sum of implicit particle forces [N]
 
@@ -78,6 +77,10 @@ protected:
         bool probeIt_;
         
         bool requiresEx_;           //requires a orientation vector
+
+        wordList forceSubModels_;
+
+        autoPtr<forceSubModel>* forceSubModel_;
 
 public:
 
@@ -150,12 +153,19 @@ public:
 
         inline const bool& coupleForce() const { return coupleForce_;};
 
-        void const setImpDEMdrag() const {particleCloud_.impDEMdrag_=true;};
-        
         virtual inline bool& requiresEx() { return requiresEx_;};
         
-    //Repartition Implixit/Explicit forces
-        void repartitionImExForces() const;
+        void repartitionImExForces() const; //Repartition Implixit/Explicit forces
+
+        void treatVoidCells() const;
+
+        inline const wordList& forceSubModels(){ return forceSubModels_; };
+
+        inline const forceSubModel& forceSubM(int i) const { return forceSubModel_[i]; };
+
+        inline int nrForceSubModels(){ return forceSubModels_.size(); };
+
+        void setForceSubModels(dictionary& dict);
 };
 
 

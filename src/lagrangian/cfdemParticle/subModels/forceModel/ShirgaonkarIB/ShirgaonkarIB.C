@@ -68,8 +68,6 @@ ShirgaonkarIB::ShirgaonkarIB
     depth_(1),
     velFieldName_(propsDict_.lookup("velFieldName")),
     U_(sm.mesh().lookupObject<volVectorField> (velFieldName_)),
-    densityFieldName_(propsDict_.lookup("densityFieldName")),
-    rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_)),
     pressureFieldName_(propsDict_.lookup("pressureFieldName")),
     p_(sm.mesh().lookupObject<volScalarField> (pressureFieldName_))
 {
@@ -86,7 +84,16 @@ ShirgaonkarIB::ShirgaonkarIB
         Info << "2-dimensional simulation - make sure DEM side is 2D" << endl;
         Info << "depth of domain is assumed to be :" << depth_ << endl;
     }
-    if (propsDict_.found("treatExplicit")) treatExplicit_=true;
+
+    // init force sub model
+    setForceSubModels(propsDict_);
+
+    // define switches which can be read from dict
+    forceSubM(0).setSwitchesList(0,true); // activate treatExplicit switch
+
+    // read those switches defined above, if provided in dict
+    forceSubM(0).readSwitches();
+
     particleCloud_.checkCG(false);
 }
 
@@ -105,15 +112,7 @@ void ShirgaonkarIB::setForce() const
     label cellI;
     vector drag;
 
-    #ifdef comp
-        // get viscosity field
-        const volScalarField& mufField = particleCloud_.turbulence().mu();
-        volVectorField h = (mufField*fvc::laplacian(U_)-fvc::grad(p_));
-    #else
-        // get viscosity field
-        const volScalarField& nufField = particleCloud_.turbulence().nu();
-        volVectorField h = rho_*(nufField*fvc::laplacian(U_)-fvc::grad(p_));
-    #endif
+    volVectorField h=forceSubM(0).IBDragPerV(U_,p_);
 
     #include "setupProbeModel.H"
 
@@ -146,9 +145,8 @@ void ShirgaonkarIB::setForce() const
                 particleCloud_.probeM().writeProbe(index, sValues, vValues);
             }
 
-            if(treatExplicit_) for(int j=0;j<3;j++) expForces()[index][j] += drag[j];
-            else  for(int j=0;j<3;j++) impForces()[index][j] += drag[j];
-            for(int j=0;j<3;j++) DEMForces()[index][j] += drag[j];
+            // write particle based data to global array
+            forceSubM(0).partToArray(index,drag,vector::zero);
 
             if(verbose_) Info << "impForces = " << impForces()[index][0]<<","<<impForces()[index][1]<<","<<impForces()[index][2] << endl;
         //}
