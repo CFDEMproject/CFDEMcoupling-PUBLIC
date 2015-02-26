@@ -1,3 +1,0 @@
-cfdemSolverPiso/dir
-cfdemSolverIB/dir
-cfdemSolverPisoScalar/dir

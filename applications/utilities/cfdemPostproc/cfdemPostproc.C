@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
         particleCloud.averagingM().resetWeightFields();
         particleCloud.momCoupleM(0).resetMomSourceField();
 
-        particleCloud.dataExchangeM().couple();
+        particleCloud.dataExchangeM().couple(0);
 
         particleCloud.dataExchangeM().getData("x","vector-atom",positions_,count);
         particleCloud.dataExchangeM().getData("v","vector-atom",velocities_,count);

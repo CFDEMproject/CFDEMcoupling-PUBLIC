@@ -121,8 +121,8 @@ void liggghtsCommandModel::checkTimeSettings(const dictionary& propsDict)
             timeInterval_ = -1;
 
             // calculate coupling times
-            firstCouplingStep_ = floor(startTime_/DEMts/couplingInterval);
-            lastCouplingStep_ = floor(endTime_/DEMts/couplingInterval);
+            firstCouplingStep_ = floor((startTime_+SMALL)/DEMts/couplingInterval);
+            lastCouplingStep_ = floor((endTime_+SMALL)/DEMts/couplingInterval);
             couplingStepInterval_ = -1;
         }
         else         //runEveryCouplingStep of every n steps or every writeStep
@@ -135,6 +135,7 @@ void liggghtsCommandModel::checkTimeSettings(const dictionary& propsDict)
                 timeInterval_ = readScalar(propsDict.lookup("timeInterval"));
 
                 // calculate coupling times
+                // if this makes troubles try floor((startTime_+SMALL)/.. as above
                 firstCouplingStep_ = floor(startTime_/DEMts/couplingInterval)+1;
                 lastCouplingStep_ = floor(endTime_/DEMts/couplingInterval)+1;
                 couplingStepInterval_ = floor(timeInterval_/DEMts/couplingInterval)+1;
