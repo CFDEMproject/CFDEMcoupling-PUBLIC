@@ -1,0 +1,3 @@
+#syntax: makefileName/dir
+#note: dir is not a path, just a keyword here
+###############################################
