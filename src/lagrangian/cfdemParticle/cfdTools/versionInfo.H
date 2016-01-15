@@ -33,7 +33,7 @@ Description
 #ifndef versionInfo_H
 #define versionInfo_H
 
-word CFDEMversion="cfdem-2.6.0";
+word CFDEMversion="cfdem-3.0.0";
 word compatibleLIGGGHTSversion="3.3.1";
 word OFversion="2.4.x-commit-3d8da0e960c717ff582f1517a27724144f086b83";
 
