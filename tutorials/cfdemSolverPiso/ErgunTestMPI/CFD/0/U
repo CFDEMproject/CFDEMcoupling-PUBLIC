@@ -44,13 +44,13 @@ boundaryField
         valueExpression "((time() < tEnd) ? Uend/tEnd*time():Uend)";
         value           uniform (0 0 0);*/
 
-        /*// 2.0.x, 1.6,ext
-        type            timeVaryingUniformFixedValue;
+        // 2.0.x, 1.6,ext
+        /*type            timeVaryingUniformFixedValue;
         fileName        "steps_0p1s";
         outOfBounds     clamp;
         value           uniform (0 0 0);*/
 
-        // 2.1.x
+        // 2.1.x or higher
         type            uniformFixedValue;
         uniformValue     table
         (

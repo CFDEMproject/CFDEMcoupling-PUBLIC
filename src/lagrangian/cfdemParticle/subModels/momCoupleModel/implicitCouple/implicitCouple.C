@@ -120,6 +120,15 @@ implicitCouple::~implicitCouple()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
+void Foam::implicitCouple::applyDebugSettings(bool debug) const
+{
+    if(!debug)
+    {
+        KslPrev_.writeOpt() = IOobject::NO_WRITE;
+        KslNext_.writeOpt() = IOobject::NO_WRITE;
+    }
+}
+
 tmp<volScalarField> implicitCouple::impMomSource() const
 {
     tmp<volScalarField> tsource

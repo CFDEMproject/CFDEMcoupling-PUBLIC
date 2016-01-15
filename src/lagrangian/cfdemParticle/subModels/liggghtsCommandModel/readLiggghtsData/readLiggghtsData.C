@@ -101,6 +101,8 @@ readLiggghtsData::readLiggghtsData
         command_ += add;
     }
 
+    checkTimeMode(propsDict_);
+
     checkTimeSettings(propsDict_);
 }
 

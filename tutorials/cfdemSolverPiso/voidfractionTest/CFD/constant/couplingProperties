@@ -1,0 +1,215 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.4                                   |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+
+    root            "";
+    case            "";
+    instance        "";
+    local           "";
+
+    class           dictionary;
+    object          couplingProperties;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+//===========================================================================//
+// sub-models & settings
+
+solveFlow off;
+
+useDDTvoidfraction b;
+
+modelType B; // A or B
+
+couplingInterval 100;
+
+voidFractionModel trilinear;//centre;//divided;//bigParticle;//
+
+locateModel engine;//ijk;//standard;//
+
+meshMotionModel noMeshMotion;
+
+regionModel allRegion;
+
+IOModel basicIO; //trackIO; // 
+
+probeModel off;
+
+dataExchangeModel twoWayMPI;//twoWayFiles;//oneWayVTK;//
+
+averagingModel dense;//dilute;//
+
+clockModel off; //standardClock;//
+
+smoothingModel off;//constDiffSmoothing; // 
+
+//useDDTvoidfraction;
+
+forceModels
+(
+    DiFeliceDrag
+    Archimedes
+    noDrag
+    particleCellVolume
+    volWeightedAverage
+);
+
+momCoupleModels
+(
+    implicitCouple
+);
+
+turbulenceModelType RASProperties;//LESProperties;//
+
+//===========================================================================//
+// sub-model properties
+
+
+particleCellVolumeProps
+{
+    upperThreshold 1e20;
+    lowerThreshold 0.;
+    verbose true;
+    writeToFile true;
+}
+
+volWeightedAverageProps
+{
+    scalarFieldNames
+    (
+        ddtVoidfraction
+    );
+    vectorFieldNames
+    (
+    );
+    upperThreshold 1e20;
+    lowerThreshold 0;
+    writeToFile true;
+    verbose;
+}
+
+particleProbeProps
+{
+    particleIDsToSample (0 0);
+    verboseToFile;      //main switch
+    printEvery 1;       //print every this many CFD time steps
+    sampleAll;          //Activate sampling for all particles
+    probeDebug;         //probes additional fields
+    includePosition;    //will include particle position in the output file
+    writePrecision 4;   //number of significant digits to print
+}
+
+constDiffSmoothingProps
+{
+    lowerLimit 0.0;
+    upperLimit 1e99;
+    smoothingLength 1e-3;
+} 
+
+implicitCoupleProps
+{
+    velFieldName "U";
+    granVelFieldName "Us";
+    voidfractionFieldName "voidfraction";
+}
+
+DiFeliceDragProps
+{
+    velFieldName "U";
+    voidfractionFieldName "voidfraction";
+    granVelFieldName "Us";
+    verbose false;
+    
+    //- use of scalar viscosity for drag
+    //scalarViscosity true;
+    //nu nu [ 0 2 -1 0 0 0 0 ] 1e-04;
+}
+
+SchillerNaumannDragProps
+{
+    velFieldName "U";
+    densityFieldName "rho";
+}
+
+KochHillDragProps
+{
+    velFieldName "U";
+    densityFieldName "rho";
+    voidfractionFieldName "voidfraction";
+}
+
+MeiLiftProps
+{
+    velFieldName "U";
+    densityFieldName "rho";
+}
+
+ArchimedesProps
+{
+    densityFieldName "rho";
+    gravityFieldName "g";
+}
+
+virtualMassForceProps
+{
+    velFieldName "U";
+    densityFieldName "rho";
+}
+
+oneWayVTKProps
+{
+    couplingFilename "vtk_out%4.4d.vtk";
+    maxNumberOfParticles 30000;
+}
+
+twoWayMPIProps
+{
+    liggghtsPath "../DEM/in.liggghts_run";
+}
+
+twoWayFilesProps
+{
+    maxNumberOfParticles 10000;
+    DEMts 0.00001;
+}
+
+centreProps
+{
+    alphaMin 0.30;
+}
+
+dividedProps
+{
+    alphaMin 0.3;
+    scaleUpVol 1.0;
+}
+
+trilinearProps
+{
+    alphaMin 0.3; // not yet used in code!
+}
+
+bigParticleProps
+{
+    maxCellsPerParticle 1000;
+    alphaMin 0.30;
+    scaleUpVol 1.0;
+}
+
+engineProps
+{
+    treeSearch true;
+}
+
+// ************************************************************************* //

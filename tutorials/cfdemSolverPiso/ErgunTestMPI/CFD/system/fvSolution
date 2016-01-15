@@ -17,7 +17,7 @@ FoamFile
 
 solvers
 {
-    "(p)"
+    p
     {
         solver          PCG;
         preconditioner  DIC;
@@ -27,9 +27,7 @@ solvers
 
     pFinal
     {
-        solver          PCG;
-        preconditioner  DIC;
-        tolerance       1e-06;
+        $p;
         relTol          0;
     }
 
@@ -38,10 +36,16 @@ solvers
         solver          PBiCG;
         preconditioner  DILU;
         tolerance       1e-05;
+        relTol          0.1;
+    }
+
+    "(U|k|epsilon|R|nuTilda)Final"
+    {
+        $U;
         relTol          0;
     }
 
-    "(voidfraction|Us|Ksl|dSmoothing|UsNext|voidfractionNext)"
+    "(voidfraction|Us|Ksl|dSmoothing|UsNext|voidfractionNext|sSmoothField|vSmoothField)"
     {
         solver          PCG;
         preconditioner  DIC;
@@ -56,6 +60,27 @@ PISO
     nNonOrthogonalCorrectors 1;
     pRefCell        0;
     pRefValue       0;
+}
+PIMPLE
+{
+    nOuterCorrectors 1;
+    nCorrectors     4;
+    nNonOrthogonalCorrectors 0;
+    pRefCell        0;
+    pRefValue       0;
+}
+relaxationFactors
+{
+    fields
+    {
+	    p	1.0;
+    }
+    equations
+    {
+        "U.*"           1.0;
+        "k.*"           1.;
+        "epsilon.*"    1.;
+    }
 }
 
 

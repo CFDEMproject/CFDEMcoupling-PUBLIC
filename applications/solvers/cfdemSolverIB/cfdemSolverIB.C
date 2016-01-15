@@ -39,7 +39,14 @@ Contributions
 
 #include "fvCFD.H"
 #include "singlePhaseTransportModel.H"
-#include "turbulenceModel.H"
+#include "OFversion.H"
+
+#if defined(version30)
+    #include "turbulentTransportModel.H"
+    #include "pisoControl.H"
+#else
+    #include "turbulenceModel.H"
+#endif
 
 #include "cfdemCloudIB.H"
 #include "implicitCouple.H"
@@ -48,7 +55,7 @@ Contributions
 #include "regionModel.H"
 #include "voidFractionModel.H"
 
-#include "dynamicFvMesh.H" //dyM
+#include "dynamicFvMesh.H"
 
 #include "cellSet.H"
 
@@ -67,12 +74,17 @@ int main(int argc, char *argv[])
 
     #include "createDynamicFvMesh.H"
 
+    #if defined(version30)
+        pisoControl piso(mesh);
+        #include "createTimeControls.H"
+    #endif
+
     #include "createFields.H"
 
     #include "initContinuityErrs.H"
 
     #if defined(version22)
-    #include "createFvOptions.H"
+        #include "createFvOptions.H"
     #endif
 
     // create cfdemCloud
@@ -91,12 +103,18 @@ int main(int argc, char *argv[])
         interFace = mag(mesh.lookupObject<volScalarField>("voidfractionNext"));
         mesh.update(); //dyM
 
-        #include "readPISOControls.H"
-        #include "CourantNo.H"
+        #if defined(version30)
+            #include "readTimeControls.H"
+            #include "CourantNo.H"
+            #include "setDeltaT.H"
+        #else
+            #include "readPISOControls.H"
+            #include "CourantNo.H"
+        #endif
 
         // do particle stuff
         Info << "- evolve()" << endl;
-        particleCloud.evolve();
+        particleCloud.evolve(voidfraction);
 
         // Pressure-velocity PISO corrector
         {
@@ -104,7 +122,7 @@ int main(int argc, char *argv[])
 
             fvVectorMatrix UEqn
             (
-                fvm::ddt(voidfraction,U)
+                fvm::ddt(U) //fvm::ddt(voidfraction,U)
               + fvm::div(phi, U)
               + turbulence->divDevReff(U)
                 #if defined(version22)
@@ -119,13 +137,21 @@ int main(int argc, char *argv[])
             fvOptions.constrain(UEqn);
             #endif
 
-            if (momentumPredictor)
+            #if defined(version30)
+                if (piso.momentumPredictor())
+            #else
+                if (momentumPredictor)
+            #endif
             {
                 solve(UEqn == -fvc::grad(p));
             }
 
             // --- PISO loop
-            for (int corr=0; corr<nCorr; corr++)
+            #if defined(version30)
+                while (piso.correct())
+            #else
+                for (int corr=0; corr<nCorr; corr++)
+            #endif
             {
                 volScalarField rUA = 1.0/UEqn.A();
                 surfaceScalarField rUAf(fvc::interpolate(rUA));
@@ -145,7 +171,11 @@ int main(int argc, char *argv[])
                 #endif
 
                 // Non-orthogonal pressure corrector loop
-                for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
+                #if defined(version30)
+                    while (piso.correctNonOrthogonal())
+                #else
+                    for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
+                #endif
                 {
                     // Pressure corrector
 
@@ -156,23 +186,23 @@ int main(int argc, char *argv[])
 
                     pEqn.setReference(pRefCell, pRefValue);
 
-                    if
-                    (
-                        corr == nCorr-1
-                     && nonOrth == nNonOrthCorr
-                    )
-                    {
-                        pEqn.solve(mesh.solver("pFinal"));
-                    }
-                    else
-                    {
-                        pEqn.solve();
-                    }
+                    #if defined(version30)
+                        pEqn.solve(mesh.solver(p.select(piso.finalInnerIter())));
+                        if (piso.finalNonOrthogonalIter())
+                            phi -= pEqn.flux();
+                    #else
+                        if( corr == nCorr-1 && nonOrth == nNonOrthCorr )
+                            #if defined(versionExt32)
+                                pEqn.solve(mesh.solutionDict().solver("pFinal"));
+                            #else
+                                pEqn.solve(mesh.solver("pFinal"));
+                            #endif
+                        else
+                            pEqn.solve();
 
-                    if (nonOrth == nNonOrthCorr)
-                    {
-                        phi -= pEqn.flux();
-                    }
+                        if (nonOrth == nNonOrthCorr)
+                            phi -= pEqn.flux();
+                    #endif
                 }
 
                 #include "continuityErrs.H"

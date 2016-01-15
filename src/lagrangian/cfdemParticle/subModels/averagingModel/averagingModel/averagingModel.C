@@ -67,28 +67,25 @@ void averagingModel::undoVectorAverage
 
     for(int index=0; index< particleCloud_.numberOfParticles(); index++)
     {
-        //if(mask[index][0])
-        //{
-            for(int subCell=0;subCell<particleCloud_.voidFractionM().cellsPerParticle()[index][0];subCell++)
+        for(int subCell=0;subCell<particleCloud_.cellsPerParticle()[index][0];subCell++)
+        {
+            //Info << "subCell=" << subCell << endl;
+            cellI = particleCloud_.cellIDs()[index][subCell];
+
+            if (cellI >= 0)
             {
-                //Info << "subCell=" << subCell << endl;
-                cellI = particleCloud_.cellIDs()[index][subCell];
+                for(int i=0;i<3;i++) valueVec[i] = value[index][i];
+                weightP = weight[index][subCell];
 
-                if (cellI >= 0)
+                if(weightField[cellI] == weightP)
                 {
-                    for(int i=0;i<3;i++) valueVec[i] = value[index][i];
-                    weightP = weight[index][subCell];
-
-                    if(weightField[cellI] == weightP)
-                    {
-                        fieldNext[cellI] = vector(0,0,0);
-                    }else
-                    {
-                        fieldNext[cellI] = (fieldNext[cellI]*weightField[cellI]-valueVec*weightP)/(weightField[cellI]-weightP);
-                    }
+                    fieldNext[cellI] = vector(0,0,0);
+                }else
+                {
+                    fieldNext[cellI] = (fieldNext[cellI]*weightField[cellI]-valueVec*weightP)/(weightField[cellI]-weightP);
                 }
             }
-        //}
+        }
     }
 
     // correct cell values to patches
@@ -109,22 +106,19 @@ void averagingModel::undoVectorSum
 
     for(int index=0; index< particleCloud_.numberOfParticles(); index++)
     {
-        //if(mask[index][0])
-        //{
-            for(int subCell=0;subCell<particleCloud_.voidFractionM().cellsPerParticle()[index][0];subCell++)
+        for(int subCell=0;subCell<particleCloud_.cellsPerParticle()[index][0];subCell++)
+        {
+            //Info << "subCell=" << subCell << endl;
+            cellI = particleCloud_.cellIDs()[index][subCell];
+
+            if (cellI >= 0)
             {
-                //Info << "subCell=" << subCell << endl;
-                cellI = particleCloud_.cellIDs()[index][subCell];
+                for(int i=0;i<3;i++) valueVec[i] = value[index][i];
+                weightP = weight[index][subCell];
 
-                if (cellI >= 0)
-                {
-                    for(int i=0;i<3;i++) valueVec[i] = value[index][i];
-                    weightP = weight[index][subCell];
-
-                    field[cellI] -= valueVec*weightP;
-                }
-            }//forAllSubPoints
-        //}
+                field[cellI] -= valueVec*weightP;
+            }
+        }//forAllSubPoints
     }
 
     // correct cell values to patches
@@ -147,7 +141,7 @@ void averagingModel::setVectorSum
     {
         //if(mask[index][0])
         //{
-            for(int subCell=0;subCell<particleCloud_.voidFractionM().cellsPerParticle()[index][0];subCell++)
+            for(int subCell=0;subCell<particleCloud_.cellsPerParticle()[index][0];subCell++)
             {
                 cellI = particleCloud_.cellIDs()[index][subCell];
 
@@ -210,7 +204,7 @@ void averagingModel::setScalarSum
     {
         //if(mask[index][0])
         //{
-            for(int subCell=0;subCell<particleCloud_.voidFractionM().cellsPerParticle()[index][0];subCell++)
+            for(int subCell=0;subCell<particleCloud_.cellsPerParticle()[index][0];subCell++)
             {
                 //Info << "subCell=" << subCell << endl;
                 cellI = particleCloud_.cellIDs()[index][subCell];
@@ -271,7 +265,7 @@ void averagingModel::setDSauter
         radiusPow3 = radiusPow2*radius;
         weightP      = weight[index][0];
 
-        for(int subCell=0;subCell<particleCloud_.voidFractionM().cellsPerParticle()[index][0];subCell++)
+        for(int subCell=0;subCell<particleCloud_.cellsPerParticle()[index][0];subCell++)
         {
 
             cellI = particleCloud_.cellIDs()[index][subCell];
@@ -425,6 +419,16 @@ averagingModel::~averagingModel()
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+void Foam::averagingModel::applyDebugSettings(bool debug) const
+{
+    if(!debug)
+    {
+        UsWeightField_.writeOpt() = IOobject::NO_WRITE;
+        UsPrev_.writeOpt() = IOobject::NO_WRITE;
+        UsNext_.writeOpt() = IOobject::NO_WRITE;
+    }
+}
 
 } // End namespace Foam
 

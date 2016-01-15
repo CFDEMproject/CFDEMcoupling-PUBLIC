@@ -1,3 +1,4 @@
+%
 close all;
 clear;
 clc;
@@ -6,12 +7,16 @@ clc;
 % simulation data 1
 %====================================%
 rhoG = 10			% density in kg/m3
-%path = '../probes/0/p'; % 2.1.x
-path = '../postProcessing/probes/0/p'; % 2.2.x
-columns=22;
-headerlines=4;
-data = loaddata(path,columns,headerlines);
-data=transpose(data);
+%path = '../probes/0/p'; % ext32
+path = '../postProcessing/probes/0/p';
+
+%- nomenclature before 2.4.x
+%columns=22;
+%headerlines=4;
+%data = loaddata(path,columns,headerlines);
+%data=transpose(data);
+
+data = load(path);
 [x,y]=size(data)
 dp_sim = (data(:,2)-data(:,y))*rhoG; %conversion to Pa!
 t_sim = data(:,1);
@@ -27,7 +32,7 @@ t_sim = data(:,1);
 fprintf('\ncalc Ergun eqn:\n')
 dp = 0.001			% particle diameter
 phip = 1			% sphericity
-epsilon = 0.451335              % void fraction
+epsilon = 0.451335  % voidfraction
 Ustart = 0.002
 Uend = 0.02
 timeStepSize = 0.0005;            % time interval of pressure data
@@ -72,6 +77,7 @@ dpUmf= L * (
                 150*((1-epsilon)^2/epsilon^3)*((muG.*Umf)/(phip*dp)^2) 
               +1.75*((1-epsilon)/epsilon^3)*((rhoG.*Umf.^2)/(phip*dp))
         );
+%pHydr=0;
 %dpUmf2=(L*(1-epsilon)*(rhoP-rhoG)*g+pHydr)
 %====================================%
 % plot data
@@ -95,5 +101,5 @@ ylabel("pressure drop [Pa]")
 axis([0,Uend,0,dpErgun(length(dpErgun))])
 
 %print('cfdemSolverPiso_settlingTest.eps','-deps2')
-print -color "cfdemSolverPiso_ErgunTestMPI.eps"
+print -color "cfdemSolverPiso_ErgunTestMPI.png"
 

@@ -1,5 +1,5 @@
-# Pour granular particles into chute container, then induce flow
-echo both
+echo            both
+log             ../DEM/log.liggghts
 atom_style      granular
 atom_modify     map array
 communicate     single vel yes

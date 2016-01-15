@@ -25,6 +25,7 @@ debugMode="off"          # on | off| strict
 testHarnessPath="$CFDEM_TEST_HARNESS_PATH"
 runOctave="true"
 postproc="false"
+cleanup="true"
 #--------------------------------------------------------------------------------#
 
 #- call function to run a parallel CFD-DEM case
@@ -83,17 +84,20 @@ if [ $postproc == "true" ]
 fi
 
 #- clean up case
-echo "deleting data at: $casePath : ???\n"
-source $WM_PROJECT_DIR/bin/tools/CleanFunctions
-cd $casePath/CFD
-cleanCase
-rm -r $casePath/CFD/clockData
-rm $casePath/DEM/post/*.*
-#rm -r $casePath/DEM/post/restart/*.*
-echo "done"
+if [ $cleanup == "true" ]
+  then
+    echo "deleting data at: $casePath : \n"
+    source $WM_PROJECT_DIR/bin/tools/CleanFunctions
+    cd $casePath/CFD
+    cleanCase
+    rm -r $casePath/CFD/clockData
+    rm $casePath/DEM/post/*.*
+    #rm -r $casePath/DEM/post/restart/*.*
+    echo "done"
 
-#- preserve post directory
-touch $casePath/DEM/post/.gitignore
-touch $casePath/DEM/post/restart/.gitignore
+    #- preserve post directory
+    touch $casePath/DEM/post/.gitignore
+    touch $casePath/DEM/post/restart/.gitignore
+fi
 
 

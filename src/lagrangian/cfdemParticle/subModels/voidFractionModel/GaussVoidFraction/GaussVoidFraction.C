@@ -69,10 +69,10 @@ GaussVoidFraction::GaussVoidFraction
     alphaLimited_(0)
 {
     Info << "\n\n W A R N I N G - do not use in combination with differentialRegion model! \n\n" << endl;
-    Info << "\n\n W A R N I N G - this model does not yet work properly! \n\n" << endl;
+    FatalError << "\n\n This model does not yet work properly - Eqns need to be revised!!! \n\n" << abort(FatalError);
     //reading maxCellsPerParticle from dictionary
     maxCellsPerParticle_=readLabel(propsDict_.lookup("maxCellsPerParticle"));
-
+    //particleCloud_.setMaxCellsPerParticle(readLabel(propsDict_.lookup("maxCellsPerParticle"))); // alternative to line above
     if(alphaMin_ > 1 || alphaMin_ < 0.01){ FatalError<< "alphaMin shloud be > 1 and < 0.01." << abort(FatalError); }
 
     checkWeightNporosity(propsDict_);
@@ -96,7 +96,7 @@ void GaussVoidFraction::setvoidFraction(double** const& mask,double**& voidfract
     scalar radius(-1);
     scalar volume(0);
     scalar scaleVol= weight();
-    scalar scaleRadius = pow(porosity(),1/3);
+    scalar scaleRadius = pow(porosity(),1./3.);
 
     for(int index=0; index< particleCloud_.numberOfParticles(); index++)
     {
@@ -113,11 +113,9 @@ void GaussVoidFraction::setvoidFraction(double** const& mask,double**& voidfract
 
             //collecting data
             label particleCenterCellID=particleCloud_.cellIDs()[index][0];
-
             radius = particleCloud_.radius(index);
             volume = 4.188790205*radius*radius*radius*scaleVol;
             radius *= scaleRadius;
-
             vector positionCenter=particleCloud_.position(index);
 	        scalar core;
 	        scalar dist;
@@ -137,7 +135,7 @@ void GaussVoidFraction::setvoidFraction(double** const& mask,double**& voidfract
                 if (hashSetLength > maxCellsPerParticle_)
                 {
                     FatalError<< "big particle algo found more cells ("<< hashSetLength
-                              <<") than storage is prepered ("<<maxCellsPerParticle_<<")" << abort(FatalError);
+                              <<") than storage is prepared ("<<maxCellsPerParticle_<<")" << abort(FatalError);
                 }
                 else if (hashSetLength > 0)
                 {
@@ -151,8 +149,11 @@ void GaussVoidFraction::setvoidFraction(double** const& mask,double**& voidfract
                     //==========================//
                     //setting the voidfractions
 
-		    dist = mag(particleCloud_.mesh().C()[particleCenterCellID]-particleCloud_.position(index));
-		    core = pow(2.0/radius/radius/M_PI,1.5)*exp(-dist*dist/2.0/radius/radius)*particleCloud_.mesh().V()[particleCenterCellID];
+                    // ===
+		            dist = mag(particleCloud_.mesh().C()[particleCenterCellID]-particleCloud_.position(index));
+		            core = pow(2.0/radius/radius/M_PI,1.5)*exp(-dist*dist/2.0/radius/radius)*particleCloud_.mesh().V()[particleCenterCellID]; //TODO revise!!!
+
+                    // ===
 
                     // volume occupied in every covered cell
                     scalar occupiedVolume = volume*core;
@@ -173,9 +174,12 @@ void GaussVoidFraction::setvoidFraction(double** const& mask,double**& voidfract
                         label cellI=hashSett.toc()[i];
                         particleCloud_.cellIDs()[index][i+1]=cellI; //adding subcell represenation
 
-		    dist = mag(particleCloud_.mesh().C()[cellI]-particleCloud_.position(index));
-		    core = pow(2.0/radius/radius/M_PI,1.5)*exp(-dist*dist/2.0/radius/radius)*particleCloud_.mesh().V()[cellI];
-                    scalar occupiedVolume = volume*core;
+                        //===
+		                dist = mag(particleCloud_.mesh().C()[cellI]-particleCloud_.position(index));
+		                core = pow(2.0/radius/radius/M_PI,1.5)*exp(-dist*dist/2.0/radius/radius)*particleCloud_.mesh().V()[cellI]; //TODO revise!!!
+                        scalar occupiedVolume = volume*core;
+                        //===
+
                         voidfractionNext_[cellI] -=occupiedVolume/particleCloud_.mesh().V()[cellI];
                         particleWeights[index][i+1] += core;
                         particleVolumes[index][i+1] += occupiedVolume;

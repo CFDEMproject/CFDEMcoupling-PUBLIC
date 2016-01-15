@@ -34,8 +34,6 @@ Description
 #include "SchillerNaumannDrag.H"
 #include "addToRunTimeSelectionTable.H"
 
-//#include "mpi.h"
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -68,13 +66,18 @@ SchillerNaumannDrag::SchillerNaumannDrag
     velFieldName_(propsDict_.lookup("velFieldName")),
     U_(sm.mesh().lookupObject<volVectorField> (velFieldName_))
 {
-    //Append the field names to be probed
-    particleCloud_.probeM().initialize(typeName, "schillerNaumannDrag.logDat");
-    particleCloud_.probeM().vectorFields_.append("dragForce"); //first entry must the be the force
-    particleCloud_.probeM().vectorFields_.append("Urel");        //other are debug
-    particleCloud_.probeM().scalarFields_.append("Rep");          //other are debug
-    particleCloud_.probeM().scalarFields_.append("Cd");                 //other are debug
-    particleCloud_.probeM().writeHeader();
+    // suppress particle probe
+    if (probeIt_ && propsDict_.found("suppressProbe"))
+        probeIt_=!Switch(propsDict_.lookup("suppressProbe"));
+    if(probeIt_)
+    {
+        particleCloud_.probeM().initialize(typeName, "schillerNaumannDrag.logDat");
+        particleCloud_.probeM().vectorFields_.append("dragForce"); //first entry must the be the force
+        particleCloud_.probeM().vectorFields_.append("Urel");      //other are debug
+        particleCloud_.probeM().scalarFields_.append("Rep");       //other are debug
+        particleCloud_.probeM().scalarFields_.append("Cd");        //other are debug
+        particleCloud_.probeM().writeHeader();
+    }
 
     if (propsDict_.found("verbose")) verbose_=true;
 
@@ -159,10 +162,13 @@ void SchillerNaumannDrag::setForce() const
                 if(probeIt_)
                 {
                     #include "setupProbeModelfields.H"
-                    vValues.append(drag);           //first entry must the be the force
-                    vValues.append(Ur);
-                    sValues.append(Rep);
-                    sValues.append(Cd);
+
+                    // Note: for other than ext one could use vValues.append(x)
+                    // instead of setSize
+                    vValues.setSize(vValues.size()+1, drag);           //first entry must the be the force
+                    vValues.setSize(vValues.size()+1, Ur);
+                    sValues.setSize(sValues.size()+1, Rep);
+                    sValues.setSize(sValues.size()+1, Cd);
                     particleCloud_.probeM().writeProbe(index, sValues, vValues);
                 }
             }

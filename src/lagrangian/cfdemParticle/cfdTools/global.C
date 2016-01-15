@@ -52,6 +52,17 @@ void global::info()
     Info << "CFDEM build: " << CFDEMversion << "\n" << endl;
 }
 
+bool global::debugMode()
+{
+    if(word(DEBUG)!=word("Opt"))
+    {
+        return true;
+    }else
+    {
+        return false;
+    }
+}
+
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 // Construct from components
@@ -63,7 +74,8 @@ global::global
 :
     dict_(dict),
     particleCloud_(sm),
-    CFDEMversion(GITVERSION)
+    CFDEMversion(GITVERSION),
+    DEBUG(DEBUGFLAG)
 {}
 
 

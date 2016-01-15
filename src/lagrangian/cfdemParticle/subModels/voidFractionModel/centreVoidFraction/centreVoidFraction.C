@@ -140,6 +140,7 @@ void centreVoidFraction::setvoidFraction(double** const& mask,double**& voidfrac
             }
         //}
     }
+    voidfractionNext_.correctBoundaryConditions();
 
     // bring voidfraction from Eulerian Field to particle array
     for(int index=0; index< particleCloud_.numberOfParticles(); index++)

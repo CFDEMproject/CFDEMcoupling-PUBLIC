@@ -25,7 +25,7 @@ FoamFile
 
 //===========================================================================//
 // sub-models & settings
-
+debug false;
 modelType "A"; // A or B
 
 couplingInterval 100;
@@ -176,7 +176,7 @@ particleCellVolumeProps
 {
     upperThreshold 0.999;
     lowerThreshold 0.;
-    verbose;
+    verbose true;
 }
 
 oneWayVTKProps

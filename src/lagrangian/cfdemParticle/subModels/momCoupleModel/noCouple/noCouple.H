@@ -79,6 +79,10 @@ public:
 
     // Member Functions
         void resetMomSourceField() const;
+
+        tmp<volScalarField> impMomSource() const;
+
+        tmp<volVectorField> expMomSource() const;
 };
 
 

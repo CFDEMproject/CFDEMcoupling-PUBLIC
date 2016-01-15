@@ -93,6 +93,8 @@ protected:
 
     bool verbose_;
 
+    bool debug_;
+
     bool ignore_;
 
     const word modelType_;
@@ -127,6 +129,8 @@ protected:
 
     int numberOfParticles_;
 
+    //mutable int maxCellsPerParticle_; // lives now in voidFractionModel.H
+
     scalar d32_;
 
     bool numberOfParticlesChanged_;
@@ -141,6 +145,8 @@ protected:
 
     const word turbulenceModelType_;
 
+    mutable bool isLES_;
+
     mutable scalar cg_;
 
     bool cgOK_;
@@ -153,11 +159,13 @@ protected:
 
     mutable bool treatVoidCellsAsExplicitForce_; //will treat the coupling force in cells with no Us data explicitly
 
-    bool useDDTvoidfraction_;
+    mutable word useDDTvoidfraction_;
 
     mutable volScalarField ddtVoidfraction_;
 
-    #if defined(version21) || defined(version16ext)
+    #if defined(version24Dev)
+        const turbulenceModel& turbulence_;
+    #elif defined(version21) || defined(version16ext)
         #ifdef compre
             const compressible::turbulenceModel& turbulence_;
         #else
@@ -166,6 +174,9 @@ protected:
     #elif defined(version15)
         const incompressible::RASModel& turbulence_;
     #endif
+  
+    //Multiphase Turbulence (e.g., slip-induced turbulence)
+    mutable volScalarField turbulenceMultiphase_;
 
     autoPtr<forceModel>* forceModel_;
 
@@ -202,6 +213,12 @@ protected:
 
     virtual void setForces();
 
+    virtual void setVoidFraction();
+
+    virtual void resetVoidFraction();
+
+    virtual void setAlpha(volScalarField&);
+
     virtual void setParticleForceField();
 
     virtual void setVectorAverages();
@@ -227,6 +244,10 @@ public:
 // public Member Functions
 
     // Access
+       bool isLES() const {return isLES_; };
+    
+       bool debugMode(){ return debug_;};
+
        void checkCG(bool);
 
        void setPos(double **&);
@@ -244,6 +265,8 @@ public:
        virtual const forceModel& forceM(int);
 
        virtual int nrForceModels();
+
+       virtual double** cellsPerParticle();
 
        scalar voidfraction(int);
 
@@ -326,6 +349,16 @@ public:
        //access to the particles' orientation information
        virtual inline double ** exArray() const {return NULL;};
        virtual vector ex(int) const {return Foam::vector(0,0,0);};
+       virtual inline double ** shapeArray() const {return NULL;};
+       virtual vector shape(int) const {return Foam::vector(0,0,0);};
+
+       //Optinoal Extra arrays for implicit coupling with anisotropic drag
+       virtual inline double ** CdsExtra() const { return NULL;};       //only TWO extra components of drag coefficient
+       virtual inline double ** CdsRotation() const { return NULL;};    //three extra components of rotational drag
+       virtual inline double ** omegaFluid() const { return NULL;};     //the fluid rotation rate
+
+       virtual inline bool implicitAnisotropicDrag() const {return false;}
+       virtual inline bool implicitRotation()        const {return false;}
 
        //Detector if SRF module is enable or not
        virtual inline bool SRFOn(){return false;}
@@ -335,6 +368,10 @@ public:
        inline bool numberOfParticlesChanged() const;
 
        inline int numberOfClumps() const;
+
+       //inline void setMaxCellsPerParticle(int) const;
+
+       //inline int maxCellsPerParticle() const;
 
        inline bool arraysReallocated() const;
 
@@ -364,7 +401,9 @@ public:
 
        inline autoPtr<liggghtsCommandModel>* liggghtsCommand() const;
 
-       #if defined(version21) || defined(version16ext)
+       #if defined(version24Dev)
+            inline const turbulenceModel& turbulence() const;
+       #elif defined(version21) || defined(version16ext)
             #ifdef compre
                 inline const compressible::turbulenceModel& turbulence() const;
             #else
@@ -394,7 +433,11 @@ public:
 
         tmp<volScalarField> ddtVoidfraction() const;
 
-        void calcDdtVoidfraction(volScalarField& voidfraction) const;
+        void calcDdtVoidfraction(volScalarField& voidfraction, volVectorField& Us) const;
+        
+        void calcMultiphaseTurbulence();
+
+        volScalarField& turbulenceMultiphase() const {return turbulenceMultiphase_;};
 
         //tmp<fvVectorMatrix> ddtVoidfractionU(volVectorField& ,volScalarField&) const;
 

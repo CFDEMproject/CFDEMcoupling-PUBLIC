@@ -63,10 +63,12 @@ engineSearch::engineSearch
     propsDict_(dict.subDict(typeName + "Props")),
     //faceDecomp_(propsDict_.lookup("faceDecomp")),
     treeSearch_(propsDict_.lookup("treeSearch")),
-    #ifdef version16ext
-        searchEngine_(particleCloud_.mesh(),false) //(particleCloud_.mesh(),faceDecomp_)
+    #if defined(version30)
+        searchEngine_(particleCloud_.mesh(),polyMesh::FACE_PLANES)
     #elif defined(version21)
         searchEngine_(particleCloud_.mesh(),polyMesh::FACEPLANES) // FACEPLANES or FACECENTRETETS; FACEDIAGTETS not stable
+    #elif defined(version16ext)
+        searchEngine_(particleCloud_.mesh(),false) //(particleCloud_.mesh(),faceDecomp_)
     #endif
     //searchEngine_(particleCloud_.mesh(),faceDecomp_) // only 2.0.x
 {}

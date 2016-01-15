@@ -87,6 +87,9 @@ public:
 
 
     // Member Functions
+
+        void applyDebugSettings(bool) const;
+
         tmp<volVectorField> expMomSource() const;
 
         void resetMomSourceField() const;

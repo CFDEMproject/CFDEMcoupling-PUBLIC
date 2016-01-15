@@ -6,12 +6,16 @@ clc;
 % simulation data 1
 %====================================%
 rhoG = 0.01			% density in g/cm3
-%path = '../probes/0/p'; % 2.1.x
-path = '../postProcessing/probes/0/p'; % 2.2.x
-columns=22;
-headerlines=4;
-data = loaddata(path,columns,headerlines);
-data=transpose(data);
+%path = '../probes/0/p'; % ext32
+path = '../postProcessing/probes/0/p';
+
+%- nomenclature before 2.4.x
+%columns=22;
+%headerlines=4;
+%data = loaddata(path,columns,headerlines);
+%data=transpose(data);
+
+data = load(path);
 [x,y]=size(data)
 dp_sim = (data(:,2)-data(:,y))*rhoG*0.1; % *rhoG to get pressure, then *0.1 to get from Ba in Pa
 t_sim = data(:,1);

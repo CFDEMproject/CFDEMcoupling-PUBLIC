@@ -27,6 +27,10 @@ logfileName="log_compileLIGGGHTS" #alternative: logfileName="log_compileLIGGGHTS
 headerText="$logfileName""-$NOW"
 #--------------------------------------------------------------------------------#
 
+#================================================================================#
+# compile LIGGGHTS libraries
+#================================================================================#
+bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/compileLIGGGHTS_lib.sh
 
 #================================================================================#
 # compile LIGGGHTS src
@@ -35,7 +39,3 @@ headerText="$logfileName""-$NOW"
 compileLIGGGHTS $logpath $logfileName $headerText
 
 
-#================================================================================#
-# compile LIGGGHTS libraries
-#================================================================================#
-bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/compileLIGGGHTS_lib.sh

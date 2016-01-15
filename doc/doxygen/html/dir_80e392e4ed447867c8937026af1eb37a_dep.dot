@@ -1,0 +1,9 @@
+digraph "/home/cgoniva/CFDEM/CFDEM-x.x-2.1.x/CFDEMcoupling-PUBLIC/src/lagrangian/cfdemParticle/subModels/liggghtsCommandModel/liggghtsCommandModel" {
+  compound=true
+  node [ fontsize="10", fontname="FreeSans"];
+  edge [ labelfontsize="10", labelfontname="FreeSans"];
+  subgraph clusterdir_a5c5685d15dffcce249b298c0addd7ab {
+    graph [ bgcolor="#ddddee", pencolor="black", label="liggghtsCommandModel" fontname="FreeSans", fontsize="10", URL="dir_a5c5685d15dffcce249b298c0addd7ab.html"]
+  dir_80e392e4ed447867c8937026af1eb37a [shape=box, label="liggghtsCommandModel", style="filled", fillcolor="#eeeeff", pencolor="black", URL="dir_80e392e4ed447867c8937026af1eb37a.html"];
+  }
+}

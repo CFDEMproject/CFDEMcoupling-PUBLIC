@@ -1,0 +1,9 @@
+digraph "/home/cgoniva/CFDEM/CFDEM-x.x-2.1.x/CFDEMcoupling-PUBLIC/src/lagrangian/cfdemParticle/subModels/probeModel/particleProbe" {
+  compound=true
+  node [ fontsize="10", fontname="FreeSans"];
+  edge [ labelfontsize="10", labelfontname="FreeSans"];
+  subgraph clusterdir_b9b3eebf008279dacd13a948380a3b0e {
+    graph [ bgcolor="#ddddee", pencolor="black", label="probeModel" fontname="FreeSans", fontsize="10", URL="dir_b9b3eebf008279dacd13a948380a3b0e.html"]
+  dir_265914e1b7619d4c30a4a9c35af3ebb5 [shape=box, label="particleProbe", style="filled", fillcolor="#eeeeff", pencolor="black", URL="dir_265914e1b7619d4c30a4a9c35af3ebb5.html"];
+  }
+}

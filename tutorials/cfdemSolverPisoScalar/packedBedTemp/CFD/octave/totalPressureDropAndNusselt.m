@@ -29,12 +29,10 @@ fprintf('final pressure drop = %f Pa\n',dpErgun)
 %====================================%
 % simulation data
 %====================================%
-%path = '../probes/0/p'; % 2.1.x
-path = '../postProcessing/probes/0/p'; % 2.2.x
-columns=3;
-headerlines=5;
-data = loaddata(path,columns,headerlines);
-data=transpose(data);
+%path = '../probes/0/p'; % ext32
+path = '../postProcessing/probes/0/p';
+
+data = load(path);
 [x,y]=size(data);
 dp_sim = data(:,2)-data(:,y);
 t_sim = data(:,1);
@@ -70,12 +68,10 @@ Tp = 600;
 Np = 1005;
 lambda = 0.0256;
 
-%path = '../probes/0/T'; % 2.1.x
-path = '../postProcessing/probes/0/T'; % 2.2.x
-columns=3;
-headerlines=5;
-data = loaddata(path,columns,headerlines);
-data=transpose(data);
+%path = '../probes/0/T'; % ext32
+path = '../postProcessing/probes/0/T';
+
+data = load(path);
 [x,y]=size(data);
 Tin_sim =  data(:,2);                                          % mean temp inlet temp [K]
 Tout_sim = data(:,3);                                          % mean temp outlet temp [K]

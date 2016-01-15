@@ -17,14 +17,9 @@ cd $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc
 mkdir -p $logDir
 
 #================================================================================#
-# compile LIGGGHTS src
+# compile LIGGGHTS src + libraries
 #================================================================================#
 bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/compileLIGGGHTS.sh
-
-#================================================================================#
-# compile LIGGGHTS libraries
-#================================================================================#
-bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/compileLIGGGHTS_lib.sh
 
 #================================================================================#
 # compile CFDEMcoupling

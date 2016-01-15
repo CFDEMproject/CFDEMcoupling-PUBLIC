@@ -1,0 +1,15 @@
+digraph "/home/cgoniva/CFDEM/CFDEM-x.x-2.1.x/CFDEMcoupling-PUBLIC/src/lagrangian/cfdemParticle/subModels/probeModel" {
+  compound=true
+  node [ fontsize="10", fontname="FreeSans"];
+  edge [ labelfontsize="10", labelfontname="FreeSans"];
+  subgraph clusterdir_b4405a94eb03d3869e7a57a48055cc50 {
+    graph [ bgcolor="#ddddee", pencolor="black", label="subModels" fontname="FreeSans", fontsize="10", URL="dir_b4405a94eb03d3869e7a57a48055cc50.html"]
+  subgraph clusterdir_b9b3eebf008279dacd13a948380a3b0e {
+    graph [ bgcolor="#eeeeff", pencolor="black", label="" URL="dir_b9b3eebf008279dacd13a948380a3b0e.html"];
+    dir_b9b3eebf008279dacd13a948380a3b0e [shape=plaintext label="probeModel"];
+    dir_1ee262ef771f9341030ca830df80787c [shape=box label="noProbe" color="black" fillcolor="white" style="filled" URL="dir_1ee262ef771f9341030ca830df80787c.html"];
+    dir_265914e1b7619d4c30a4a9c35af3ebb5 [shape=box label="particleProbe" color="black" fillcolor="white" style="filled" URL="dir_265914e1b7619d4c30a4a9c35af3ebb5.html"];
+    dir_8f7652bf98b5ec280511431bd871bfe3 [shape=box label="probeModel" color="black" fillcolor="white" style="filled" URL="dir_8f7652bf98b5ec280511431bd871bfe3.html"];
+  }
+  }
+}

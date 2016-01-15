@@ -226,24 +226,24 @@ scalar Foam::dataExchangeModel::timeStepFraction() const
 }
 int Foam::dataExchangeModel::getNumberOfParticles() const
 {
-    Warning << "ask for nr of particles - which is not supported for this dataExchange model" << endl;
+    FatalError << "ask for nr of particles - which is not supported for this dataExchange model" << abort(FatalError);
     return -1;
 }
 
 int Foam::dataExchangeModel::getNumberOfClumps() const
 {
-    Warning << "ask for nr of clumps - which is not supported for this dataExchange model" << endl;
+    FatalError << "ask for nr of clumps - which is not supported for this dataExchange model" << abort(FatalError);
     return -1;
 }
 int Foam::dataExchangeModel::getNumberOfTypes() const
 {
-    Warning << "ask for nr of types - which is not supported for this dataExchange model" << endl;
+    FatalError << "ask for nr of types - which is not supported for this dataExchange model" << abort(FatalError);
     return -1;
 }
 
 double* Foam::dataExchangeModel::getTypeVol() const
 {
-    Warning << "ask for type volume - which is not supported for this dataExchange model" << endl;
+    FatalError << "ask for type volume - which is not supported for this dataExchange model" << abort(FatalError);
     return NULL;
 }
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //

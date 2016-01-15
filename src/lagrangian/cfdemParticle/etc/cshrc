@@ -54,6 +54,11 @@ setenv CFDEM_LIB_NAME lagrangianCFDEM-$CFDEM_VERSION-$WM_PROJECT_VERSION
 setenv CFDEM_LIB_COMP_NAME lagrangianCFDEMcomp-$CFDEM_VERSION-$WM_PROJECT_VERSION
 
 #check if additional libraries should be compiled together with solvers
+if ( ! ($?CFDEM_ADD_LIBS_NAME) ) then
+    setenv CFDEM_ADD_LIBS_NAME additionalLibs
+else
+    echo "using CFDEM_ADD_LIBS_NAME=$CFDEM_ADD_LIBS_NAME defined by user."
+endif
 if ( ! ($?CFDEM_ADD_LIBS_DIR) ) then
     setenv CFDEM_ADD_LIBS_DIR $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc
 else
@@ -105,6 +110,9 @@ alias cfdem 'cd $CFDEM_PROJECT_DIR'
 
 #- shortcut to src path
 alias cfdemSrc 'cd $CFDEM_SRC_DIR'
+
+#- shortcut to etc path
+alias cfdemEtc 'cd $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc'
 
 #- shortcut to tutorial path
 alias cfdemTut 'cd $CFDEM_TUT_DIR'

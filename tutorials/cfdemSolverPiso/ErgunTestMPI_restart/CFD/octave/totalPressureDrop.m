@@ -6,12 +6,16 @@ clc;
 % simulation data 1
 %====================================%
 rhoG = 10			% density in kg/m3
-%path = '../probes/0/p'; % 2.1.x
-path = '../postProcessing/probes/0/p'; % 2.2.x
-columns=22;
-headerlines=4;
-data = loaddata(path,columns,headerlines);
-data=transpose(data);
+%path = '../probes/0/p'; % ext32
+path = '../postProcessing/probes/0/p';
+
+%- nomenclature before 2.4.x
+%columns=22;
+%headerlines=4;
+%data = loaddata(path,columns,headerlines);
+%data=transpose(data);
+
+data = load(path);
 [x,y]=size(data)
 dp_sim = (data(:,2)-data(:,y))*rhoG; % conversion to Pa
 t_sim = data(:,1);
@@ -20,12 +24,16 @@ t_sim = data(:,1);
 %====================================%
 % simulation data 2
 %====================================%
-%path = '../probes/0.05/p'; % 2.1.x
-path = '../postProcessing/probes/0.05/p'; % 2.2.x
-columns=22;
-headerlines=4;
-data = loaddata(path,columns,headerlines);
-data=transpose(data);
+%path = '../probes/0.05/p'; % ext32
+path = '../postProcessing/probes/0.05/p';
+
+%- nomenclature before 2.4.x
+%columns=22;
+%headerlines=4;
+%data = loaddata(path,columns,headerlines);
+%data=transpose(data);
+
+data = load(path);
 [x,y]=size(data)
 dp_sim_2 = (data(:,2)-data(:,y))*rhoG; % conversion to Pa
 t_sim_2 = data(:,1);

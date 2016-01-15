@@ -73,28 +73,34 @@ KochHillDrag::KochHillDrag
     scaleDia_(1.),
     scaleDrag_(1.)
 {
-    //Append the field names to be probed
-    particleCloud_.probeM().initialize(typeName, "kochHillDrag.logDat");
-    particleCloud_.probeM().vectorFields_.append("dragForce"); //first entry must the be the force
-    particleCloud_.probeM().vectorFields_.append("Urel");        //other are debug
-    particleCloud_.probeM().scalarFields_.append("Rep");          //other are debug
-    particleCloud_.probeM().scalarFields_.append("beta");                 //other are debug
-    particleCloud_.probeM().scalarFields_.append("voidfraction");       //other are debug
-    particleCloud_.probeM().writeHeader();
+    // suppress particle probe
+    if (probeIt_ && propsDict_.found("suppressProbe"))
+        probeIt_=!Switch(propsDict_.lookup("suppressProbe"));
+    if(probeIt_)
+    {
+        particleCloud_.probeM().initialize(typeName, "kochHillDrag.logDat");
+        particleCloud_.probeM().vectorFields_.append("dragForce"); //first entry must the be the force
+        particleCloud_.probeM().vectorFields_.append("Urel");        //other are debug
+        particleCloud_.probeM().scalarFields_.append("Rep");          //other are debug
+        particleCloud_.probeM().scalarFields_.append("beta");                 //other are debug
+        particleCloud_.probeM().scalarFields_.append("voidfraction");       //other are debug
+        particleCloud_.probeM().writeHeader();
+    }
 
     // init force sub model
     setForceSubModels(propsDict_);
 
     // define switches which can be read from dict
-    forceSubM(0).setSwitchesList(0,true); // activate treatExplicit switch
-    forceSubM(0).setSwitchesList(2,true); // activate implDEM switch
+    forceSubM(0).setSwitchesList(0,true); // activate search for treatExplicit switch
+    forceSubM(0).setSwitchesList(2,true); // activate search for implDEM switch
     forceSubM(0).setSwitchesList(3,true); // activate search for verbose switch
     forceSubM(0).setSwitchesList(4,true); // activate search for interpolate switch
     forceSubM(0).setSwitchesList(7,true); // activate implForceDEMacc switch
     forceSubM(0).setSwitchesList(8,true); // activate scalarViscosity switch
 
     // read those switches defined above, if provided in dict
-    forceSubM(0).readSwitches();
+    for (int iFSub=0;iFSub<nrForceSubModels();iFSub++)
+        forceSubM(iFSub).readSwitches();
 
     particleCloud_.checkCG(true);
 
@@ -116,14 +122,20 @@ KochHillDrag::~KochHillDrag()
 void KochHillDrag::setForce() const
 {
     if (scaleDia_ > 1)
-        Info << "KochHill using scale = " << scaleDia_ << endl;
+        Info << typeName << " using scale = " << scaleDia_ << endl;
     else if (particleCloud_.cg() > 1){
         scaleDia_=particleCloud_.cg();
-        Info << "KochHill using scale from liggghts cg = " << scaleDia_ << endl;
+        Info << typeName << " using scale from liggghts cg = " << scaleDia_ << endl;
     }
 
     const volScalarField& nufField = forceSubM(0).nuField();
     const volScalarField& rhoField = forceSubM(0).rhoField();
+
+
+    //update force submodels to prepare for loop
+    for (int iFSub=0;iFSub<nrForceSubModels();iFSub++)
+        forceSubM(iFSub).preParticleLoop(forceSubM(iFSub).verbose());
+
 
     vector position(0,0,0);
     scalar voidfraction(1);
@@ -143,6 +155,9 @@ void KochHillDrag::setForce() const
 	scalar Vs(0);
 	scalar volumefraction(0);
     scalar betaP(0);
+
+    scalar piBySix(M_PI/6);
+
 
     int couplingInterval(particleCloud_.dataExchangeM().couplingInterval());
 
@@ -179,14 +194,30 @@ void KochHillDrag::setForce() const
                     Ufluid = U_[cellI];
                 }
 
-                Us = particleCloud_.velocity(index);
-                Ur = Ufluid-Us;
                 ds = particleCloud_.d(index);
                 nuf = nufField[cellI];
                 rho = rhoField[cellI];
+
+                Us = particleCloud_.velocity(index);
+
+                //Update any scalar or vector quantity
+                for (int iFSub=0;iFSub<nrForceSubModels();iFSub++)
+                      forceSubM(iFSub).update(  scaleDia_, 
+                                                index, 
+                                                cellI, 
+                                                Ufluid, 
+                                                Us, 
+                                                nuf,
+                                                rho,
+                                                forceSubM(0).verbose()
+                                             );
+
+                Ur = Ufluid-Us;
                 magUr = mag(Ur);
 				Rep = 0;
-                Vs = ds*ds*ds*M_PI/6;
+
+                Vs = ds*ds*ds*piBySix;
+
                 volumefraction = max(SMALL,min(1-SMALL,1-voidfraction));
 
                 if (magUr > 0)
@@ -232,7 +263,13 @@ void KochHillDrag::setForce() const
                         drag = dragCoefficient * Ur;
 
                         // explicitCorr
-                        forceSubM(0).explicitCorr(drag,dragExplicit,dragCoefficient,Ufluid,U_[cellI],Us,UsField_[cellI],forceSubM(0).verbose());
+                        for (int iFSub=0;iFSub<nrForceSubModels();iFSub++)
+                            forceSubM(iFSub).explicitCorr( drag, 
+                                                           dragExplicit,
+                                                           dragCoefficient,
+                                                           Ufluid, U_[cellI], Us, UsField_[cellI],
+                                                           forceSubM(iFSub).verbose()
+                                                         );
                     }
                 }
 
@@ -256,11 +293,13 @@ void KochHillDrag::setForce() const
                 if(probeIt_)
                 {
                     #include "setupProbeModelfields.H"
-                    vValues.append(drag);           //first entry must the be the force
-                    vValues.append(Ur);
-                    sValues.append(Rep);
-                    sValues.append(betaP);
-                    sValues.append(voidfraction);
+                    // Note: for other than ext one could use vValues.append(x)
+                    // instead of setSize
+                    vValues.setSize(vValues.size()+1, drag);           //first entry must the be the force
+                    vValues.setSize(vValues.size()+1, Ur);
+                    sValues.setSize(sValues.size()+1, Rep); 
+                    sValues.setSize(sValues.size()+1, betaP);
+                    sValues.setSize(sValues.size()+1, voidfraction);
                     particleCloud_.probeM().writeProbe(index, sValues, vValues);
                 }    
             }

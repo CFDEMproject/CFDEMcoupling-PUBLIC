@@ -76,8 +76,12 @@ viscForce::viscForce
     forceSubM(0).setSwitchesList(4,true); // activate search for interpolate switch
     forceSubM(0).setSwitchesList(8,true); // activate scalarViscosity switch
 
-    // read those switches defined above, if provided in dict
-    forceSubM(0).readSwitches();
+    //set default switches (hard-coded default = false)
+    forceSubM(0).setSwitches(0,true);  // enable treatExplicit, otherwise this force would be implicit in slip vel! - IMPORTANT!
+
+    for (int iFSub=0;iFSub<nrForceSubModels();iFSub++)
+        forceSubM(iFSub).readSwitches();
+
 
     if (modelType_ == "B")
     {
@@ -109,10 +113,17 @@ viscForce::viscForce
     particleCloud_.checkCG(true);
 
     //Append the field names to be probed
-    particleCloud_.probeM().initialize(typeName, "visc.logDat");
-    particleCloud_.probeM().vectorFields_.append("viscForce"); //first entry must the be the force
-    particleCloud_.probeM().scalarFields_.append("Vs");
-    particleCloud_.probeM().writeHeader();
+    // suppress particle probe
+    if (probeIt_ && propsDict_.found("suppressProbe"))
+        probeIt_=!Switch(propsDict_.lookup("suppressProbe"));
+
+    if(probeIt_)
+    {
+        particleCloud_.probeM().initialize(typeName, "visc.logDat");
+        particleCloud_.probeM().vectorFields_.append("viscForce"); //first entry must the be the force
+        particleCloud_.probeM().scalarFields_.append("Vs");
+        particleCloud_.probeM().writeHeader();
+    }
 }
 
 
@@ -175,8 +186,10 @@ void viscForce::setForce() const
                 if(probeIt_)
                 {
                     #include "setupProbeModelfields.H"
-                    vValues.append(force);  //first entry must the be the force
-                    sValues.append(Vs);
+                    // Note: for other than ext one could use vValues.append(x)
+                    // instead of setSize
+                    vValues.setSize(vValues.size()+1, force);           //first entry must the be the force
+                    sValues.setSize(sValues.size()+1, Vs);
                     particleCloud_.probeM().writeProbe(index, sValues, vValues);
                 }
             }

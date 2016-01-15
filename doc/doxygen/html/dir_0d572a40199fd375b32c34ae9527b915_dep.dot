@@ -1,0 +1,18 @@
+digraph "/home/cgoniva/CFDEM/CFDEM-x.x-2.1.x/CFDEMcoupling-PUBLIC/src/lagrangian/cfdemParticle/subModels/voidFractionModel" {
+  compound=true
+  node [ fontsize="10", fontname="FreeSans"];
+  edge [ labelfontsize="10", labelfontname="FreeSans"];
+  subgraph clusterdir_b4405a94eb03d3869e7a57a48055cc50 {
+    graph [ bgcolor="#ddddee", pencolor="black", label="subModels" fontname="FreeSans", fontsize="10", URL="dir_b4405a94eb03d3869e7a57a48055cc50.html"]
+  subgraph clusterdir_0d572a40199fd375b32c34ae9527b915 {
+    graph [ bgcolor="#eeeeff", pencolor="black", label="" URL="dir_0d572a40199fd375b32c34ae9527b915.html"];
+    dir_0d572a40199fd375b32c34ae9527b915 [shape=plaintext label="voidFractionModel"];
+    dir_7717944b52cfb0b7eaca336a958b97a5 [shape=box label="bigParticleVoidFraction" color="black" fillcolor="white" style="filled" URL="dir_7717944b52cfb0b7eaca336a958b97a5.html"];
+    dir_25b786b440f97b4828271f732d5ccebf [shape=box label="centreVoidFraction" color="black" fillcolor="white" style="filled" URL="dir_25b786b440f97b4828271f732d5ccebf.html"];
+    dir_7085880b7fb3d2fa9f5fa9b2af31309e [shape=box label="dividedVoidFraction" color="black" fillcolor="white" style="filled" URL="dir_7085880b7fb3d2fa9f5fa9b2af31309e.html"];
+    dir_169a1a729970a0305a83dbbc177052f7 [shape=box label="GaussVoidFraction" color="black" fillcolor="white" style="filled" URL="dir_169a1a729970a0305a83dbbc177052f7.html"];
+    dir_dfb065c64998235760d33756fa2d3d00 [shape=box label="IBVoidFraction" color="black" fillcolor="white" style="filled" URL="dir_dfb065c64998235760d33756fa2d3d00.html"];
+    dir_ec28ef2e4687b5e37e60407d61c5479d [shape=box label="voidFractionModel" color="black" fillcolor="white" style="filled" URL="dir_ec28ef2e4687b5e37e60407d61c5479d.html"];
+  }
+  }
+}

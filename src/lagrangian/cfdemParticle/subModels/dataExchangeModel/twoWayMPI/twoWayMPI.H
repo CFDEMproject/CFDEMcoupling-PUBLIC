@@ -155,12 +155,6 @@ public:
         void allocateArray(int**&, int, int,const char* ="nparticles") const;
         void destroy(int**,int) const;
         //==============
-        // double *
-        void destroy(double*) const;
-        //============
-        // int **
-        void destroy(int*) const;
-        //==============
 
         bool couple(int) const;
 

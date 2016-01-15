@@ -54,6 +54,11 @@ export CFDEM_LIB_NAME=lagrangianCFDEM-$CFDEM_VERSION-$WM_PROJECT_VERSION
 export CFDEM_LIB_COMP_NAME=lagrangianCFDEMcomp-$CFDEM_VERSION-$WM_PROJECT_VERSION
 
 #check if additional libraries should be compiled together with solvers
+if [[ $CFDEM_ADD_LIBS_NAME == "" ]]; then
+    export CFDEM_ADD_LIBS_NAME=additionalLibs
+else
+    echo "using CFDEM_ADD_LIBS_NAME=$CFDEM_ADD_LIBS_NAME defined by user."
+fi
 if [[ $CFDEM_ADD_LIBS_DIR == "" ]]; then
     export CFDEM_ADD_LIBS_DIR=$CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc
 else
@@ -73,11 +78,15 @@ export CFDEM_M2MLIB_MAKEFILENAME=$CFDEM_LIGGGHTS_MAKEFILE_NAME
 
 #- LMP POEMS lib path and makefile
 export CFDEM_POEMSLIB_PATH=$CFDEM_LAMMPS_LIB_DIR/poems
-export CFDEM_POEMSLIB_MAKEFILENAME=g++
+export CFDEM_POEMSLIB_MAKEFILENAME=Install
 
 #- LMP ASPHERE lib path and makefile
-export CFDEM_ASPHERELIB_PATH=$CFDEM_LAMMPS_LIB_DIR/poems
-export CFDEM_ASPHERELIB_MAKEFILENAME=g++
+export CFDEM_ASPHERELIB_PATH=$CFDEM_LAMMPS_LIB_DIR/ASPHERE
+export CFDEM_ASPHERELIB_MAKEFILENAME=Install
+
+#- PARSCALE lib path and makefile
+export CFDEM_PARSCALELIB_PATH=$CFDEM_LAMMPS_LIB_DIR/PASCAL
+export CFDEM_PARSCALELIB_MAKEFILENAME=Install
 
 #-C3PO library
 export C3PO_SRC_DIR=$CFDEM_SRC_DIR/c3po
@@ -99,7 +108,7 @@ export CFDEM_OFVERSION_DIR=$CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/OFversion
 #------------------------------------------------------------------------------
 
 #- nr of procs for lpp tool
-export CFDEM_LPP_NPROCS=4
+export CFDEM_LPP_NPROCS=1
 
 #- nr of procs for lpp tool
 export CFDEM_LPP_CHUNKSIZE=1
@@ -115,6 +124,9 @@ alias cfdem='cd $CFDEM_PROJECT_DIR'
 
 #- shortcut to src path
 alias cfdemSrc='cd $CFDEM_SRC_DIR'
+
+#- shortcut to etc path
+alias cfdemEtc='cd $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc'
 
 #- shortcut to tutorial path
 alias cfdemTut='cd $CFDEM_TUT_DIR'

@@ -42,6 +42,9 @@ SourceFiles
 #define cfdemCloudIB_H
 
 #include "cfdemCloud.H"
+#include  <vector>
+#include "interpolation.H"
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -65,6 +68,31 @@ protected:
     mutable bool haveEvolvedOnce_;
     mutable bool skipLagrangeToEulerMapping_;
 
+    //===
+    mutable bool useHFDIBM_;
+    mutable bool checkPeriodicCells_;
+    
+    //HFDIBM members    
+    std::vector< std::vector< Foam::vector > > interpP_[2];
+    std::vector< std::vector< label > > interpCells_[2];
+    std::vector< std::vector< label > > surfaceCells_;
+    std::vector<double> remoteInterpolationPoints;
+    double* remoteScalarInterp_;
+    double* remoteVectorInterp_;
+    std::vector<int> remoteInterpLegend;
+    std::vector<label> remoteInterpCells;
+    dictionary  HFDIBMinterpDict_;
+    int me;
+    int nprocs;
+    int* displs_;
+    std::vector<int> switchRemoteToFD_;
+    void setInterpolationPoints();
+    void reallocateHFDIBMarrays();
+    void communicateRemoteInterpolationPoints(std::vector<double> localRemoteInterpolationPoints_);
+    void vectorInterpolateRemote( volVectorField   &V, volVectorField  &Vs);
+    void scalarInterpolateRemote(  volScalarField  &S, volScalarField  &Ss);
+    //===
+
 public:
 
     // Constructors
@@ -85,9 +113,11 @@ public:
 
         bool reAllocArrays() const;
     
-        bool evolve();
+        bool evolve(volScalarField&);
 
-        void calcVelocityCorrection(volScalarField&,volVectorField&,volScalarField&,volScalarField&); // this could be moved to an IB mom couple model
+        void calcVelocityCorrection(volScalarField&,volVectorField&,volScalarField&,volScalarField&);
+
+        void setParticleVelocity(volVectorField&);
 
       // Access
         vector angularVelocity(int);
@@ -97,6 +127,16 @@ public:
             return angularVelocities_;
         };
 
+
+       void interpolateVectorField( volVectorField   &V,  //main field
+                                    volVectorField  &Vs   //imposed field
+                                  );
+
+       void interpolateScalarField( volScalarField   &S,  //main field
+                                    volScalarField  &Ss   //imposed field
+                                  );
+
+       void checkInterfaceFlowRate();
 };
 
 

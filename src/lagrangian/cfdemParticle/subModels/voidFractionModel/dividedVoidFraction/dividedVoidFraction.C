@@ -33,10 +33,7 @@ Description
 
 #include "dividedVoidFraction.H"
 #include "addToRunTimeSelectionTable.H"
-#include "locateModel.H"
-#include "dataExchangeModel.H"
 
-//#include "mpi.h"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -73,6 +70,7 @@ dividedVoidFraction::dividedVoidFraction
     cfdemUseOnly_(false)
 {
     maxCellsPerParticle_ = 29;
+    //particleCloud_.setMaxCellsPerParticle(29);
 
     if(alphaMin_ > 1 || alphaMin_ < 0.01){ FatalError<< "alphaMin should be < 1 and > 0.01 !!!" << abort(FatalError); }
     if (propsDict_.found("interpolation")){
@@ -115,7 +113,7 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
     scalar volume(0);
     scalar cellVol(0);
     scalar scaleVol= weight();
-    scalar scaleRadius = pow(porosity(),1/3);
+    scalar scaleRadius = pow(porosity(),1./3.);
 
     for(int index=0; index< particleCloud_.numberOfParticles(); index++)
     {
@@ -135,7 +133,7 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
             cellsPerParticle_[index][0]=1;
             position = particleCloud_.position(index);
             cellID = particleCloud_.cellIDs()[index][0];
-            radius = particleCloud_.radius(index);
+            radius = particleRadius(index);//particleCloud_.radius(index);
             volume = Vp(index,radius,scaleVol);
             radius *= scaleRadius;
             cellVol=0;
@@ -222,6 +220,7 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
             }// end if in cell
         //}// end if in mask
     }// end loop all particles
+    voidfractionNext_.correctBoundaryConditions();
 
     // reset counter of lost volume
     if (verbose_) Pout << "Total particle volume neglected: " << tooMuch_<< endl;
@@ -279,6 +278,10 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
     }
 }
 
+inline double dividedVoidFraction::particleRadius(label index) const
+{
+    return particleCloud_.radius(index);
+}
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

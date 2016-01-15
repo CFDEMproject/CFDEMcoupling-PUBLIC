@@ -232,6 +232,16 @@ inline int cfdemCloud::numberOfClumps() const
     return -1;
 }
 
+/*inline void cfdemCloud::setMaxCellsPerParticle(int maxCellsPerParticle) const
+{ 
+    maxCellsPerParticle_ = maxCellsPerParticle;
+};
+
+inline int cfdemCloud::maxCellsPerParticle() const
+{
+    return maxCellsPerParticle_;
+}*/
+
 inline bool cfdemCloud::arraysReallocated() const
 {
     return arraysReallocated_;
@@ -302,7 +312,9 @@ inline autoPtr<liggghtsCommandModel>* cfdemCloud::liggghtsCommand() const
     return liggghtsCommand_;
 }
 
-#if defined(version21) || defined(version16ext)
+#if defined(version24Dev)
+    inline const turbulenceModel& cfdemCloud::turbulence() const
+#elif defined(version21) || defined(version16ext)
     #ifdef compre
         inline const compressible::turbulenceModel& cfdemCloud::turbulence() const
     #else
@@ -314,6 +326,5 @@ inline autoPtr<liggghtsCommandModel>* cfdemCloud::liggghtsCommand() const
 {
     return turbulence_;
 }
-
 }
 // ************************************************************************* //

@@ -94,107 +94,105 @@ void oneWayVTK::getData
     label step
 ) const
 {
-if (type == "scalar-atom")
-{
-    // get path to particle VTK files
-    char index[100];
-    sprintf(index, charFilename_, step);
-    //fileName H(particleCloud_.mesh().time().path()/".."/"DEM"/"post"/index);
-    fileName H(particleCloud_.mesh().time().path()/relativePath_/index);
-    Info << "opening file: " <<H << endl;
-
-    // set file pointer
-    string HH=string(H);
-    const char * paricleFilePath=HH.c_str();
-    ifstream* inputPtr;
-    inputPtr = new ifstream(paricleFilePath);
-
-    if (name == "radius")
+    if (type == "scalar-atom")
     {
-        // read data
-        string just_read = " ";
-        while(just_read.compare(name) != 0)  *inputPtr >> just_read;   //read until we read "name"
-        *inputPtr >> just_read;                                    // skip text for dataType
-        *inputPtr >> just_read;                                    // skip text for "1"
-        *inputPtr >> just_read;                                    // skip text for "LookUp"
-        *inputPtr >> just_read;                                    // skip text for "default"
-        for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
+        // get path to particle VTK files
+        char index[100];
+        sprintf(index, charFilename_, step);
+        //fileName H(particleCloud_.mesh().time().path()/".."/"DEM"/"post"/index);
+        fileName H(particleCloud_.mesh().time().path()/relativePath_/index);
+        Info << "opening file: " <<H << endl;
+
+        // set file pointer
+        string HH=string(H);
+        const char * paricleFilePath=HH.c_str();
+        ifstream* inputPtr;
+        inputPtr = new ifstream(paricleFilePath);
+
+        if (name == "radius")
         {
-            *inputPtr >> field[index][0];
+            // read data
+            string just_read = " ";
+            while(just_read.compare(name) != 0)  *inputPtr >> just_read;   //read until we read "name"
+            *inputPtr >> just_read;                                    // skip text for dataType
+            *inputPtr >> just_read;                                    // skip text for "1"
+            *inputPtr >> just_read;                                    // skip text for "LookUp"
+            *inputPtr >> just_read;                                    // skip text for "default"
+            for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
+            {
+                *inputPtr >> field[index][0];
+            }
         }
+        else
+        {
+            // read data
+            string just_read = " ";
+            while(just_read.compare(name) != 0)  *inputPtr >> just_read;   //read until we read "name"
+            *inputPtr >> just_read;                                    // skip text for dataType
+            for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
+            {
+                *inputPtr >> field[index][0];
+            }
+        }
+
+        // clean up inputStream
+        delete inputPtr;
+    } else if (type == "vector-atom")
+    {
+        // get path to particle VTK files
+        char index[100];
+        sprintf(index, charFilename_, step);
+        //fileName H(particleCloud_.mesh().time().path()/".."/"DEM"/"post"/index);
+        fileName H(particleCloud_.mesh().time().path()/relativePath_/index);
+        Info << "opening file: " <<H << endl;
+
+        // set file pointer
+        string HH=string(H);
+        const char * paricleFilePath=HH.c_str();
+        ifstream* inputPtr;
+        inputPtr = new ifstream(paricleFilePath);
+
+        // read position data from VTK file
+        //NP: secial case as position data has no "name" in the vtk file
+        if (name == "x")
+        {
+            int numberOfParticles;  // remove this?
+
+            string just_read = " ";
+            if(!*inputPtr) cerr << "File not found!, " << H << endl;
+            while(just_read.compare("POINTS") != 0)  *inputPtr >> just_read;   //read until we read "POINTS"
+            *inputPtr >> numberOfParticles;                           //this is now the number of points in the file
+            *inputPtr >> just_read;                                    // skip text for dataType
+
+            // give nr of particles to cloud
+            setNumberOfParticles(numberOfParticles);
+
+            // re-allocate arrays of cloud
+            particleCloud_.reAllocArrays();
+
+            for(int index = 0;index <  numberOfParticles; ++index)
+            {
+                *inputPtr >> field[index][0] >> field[index][1] >> field[index][2];
+            }
+        }
+        else
+        {
+            string just_read = " ";
+            while(just_read.compare(name) != 0)  *inputPtr >> just_read;   //read until we read "name"
+            *inputPtr >> just_read;                                    // skip text for dataType
+            for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
+            {
+                *inputPtr >> field[index][0] >> field[index][1] >> field[index][2];
+            }
+        }
+
+        // clean up inputStream
+        delete inputPtr;
     }
     else
     {
-        // read data
-        string just_read = " ";
-        while(just_read.compare(name) != 0)  *inputPtr >> just_read;   //read until we read "name"
-        *inputPtr >> just_read;                                    // skip text for dataType
-        for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
-        {
-            *inputPtr >> field[index][0];
-        }
+        Info << "unknown type in getData!!!" << endl;
     }
-
-    // clean up inputStream
-    delete inputPtr;
-} else if (type == "vector-atom")
-{
-    // get path to particle VTK files
-    char index[100];
-    sprintf(index, charFilename_, step);
-    //fileName H(particleCloud_.mesh().time().path()/".."/"DEM"/"post"/index);
-    fileName H(particleCloud_.mesh().time().path()/relativePath_/index);
-    Info << "opening file: " <<H << endl;
-
-    // set file pointer
-    string HH=string(H);
-    const char * paricleFilePath=HH.c_str();
-    ifstream* inputPtr;
-    inputPtr = new ifstream(paricleFilePath);
-
-    // read position data from VTK file
-    //NP: secial case as position data has no "name" in the vtk file
-    if (name == "x")
-    {
-        int numberOfParticles;  // remove this?
-
-        string just_read = " ";
-        if(!*inputPtr) cerr << "File not found!, " << H << endl;
-        while(just_read.compare("POINTS") != 0)  *inputPtr >> just_read;   //read until we read "POINTS"
-        *inputPtr >> numberOfParticles;                           //this is now the number of points in the file
-        *inputPtr >> just_read;                                    // skip text for dataType
-
-        // give nr of particles to cloud
-        setNumberOfParticles(numberOfParticles);
-
-        // re-allocate arrays of cloud
-        particleCloud_.reAllocArrays();
-
-        for(int index = 0;index <  numberOfParticles; ++index)
-        {
-            *inputPtr >> field[index][0] >> field[index][1] >> field[index][2];
-        }
-    }
-    else
-    {
-        string just_read = " ";
-        while(just_read.compare(name) != 0)  *inputPtr >> just_read;   //read until we read "name"
-        *inputPtr >> just_read;                                    // skip text for dataType
-        for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
-        {
-            *inputPtr >> field[index][0] >> field[index][1] >> field[index][2];
-        }
-    }
-
-    // clean up inputStream
-    delete inputPtr;
-}
-else
-{
-    Info << "unknown type in getData!!!" << endl;
-}
-
-
 }
 
 void oneWayVTK::giveData

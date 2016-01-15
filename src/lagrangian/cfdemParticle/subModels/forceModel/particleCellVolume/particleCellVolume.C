@@ -94,14 +94,35 @@ particleCellVolume::particleCellVolume
     ),
     upperThreshold_(readScalar(propsDict_.lookup("upperThreshold"))),
     lowerThreshold_(readScalar(propsDict_.lookup("lowerThreshold"))),
-    verbose_(false)
+    path_("postProcessing/particleCellVolume"),
+    sPtr_(NULL),
+    writeToFile_(false)
 {
     if (propsDict_.found("startTime")){
         startTime_=readScalar(propsDict_.lookup("startTime"));
     }
 
-    if (propsDict_.found("verbose")){
-        verbose_ = true;
+    if (propsDict_.found("writeToFile")){
+        writeToFile_=Switch(propsDict_.lookup("writeToFile"));
+    }
+
+    // init force sub model
+    setForceSubModels(propsDict_);
+
+    // define switches which can be read from dict
+    forceSubM(0).setSwitchesList(3,true); // activate search for verbose switch
+
+    // read those switches defined above, if provided in dict
+    forceSubM(0).readSwitches();
+
+    particleCloud_.checkCG(true);
+
+    // create the path and generate output file
+    if(writeToFile_)
+    {
+        path_=particleCloud_.IOM().createTimeDir(path_);
+	    sPtr_ = new OFstream(path_/"particleCellVolume.txt");
+        //*sPtr_ << "time | total particle volume in cells | total volume of cells with particles | average volume fraction" << nl;
     }
 }
 
@@ -118,7 +139,7 @@ void particleCellVolume::setForce() const
 {
     if(mesh_.time().value() >= startTime_)
     {
-        if(verbose_) Info << "particleCellVolume.C - setForce()" << endl;
+        if(forceSubM(0).verbose()) Info << "particleCellVolume.C - setForce()" << endl;
 
         scalarField_.internalField()=0.;
 
@@ -127,6 +148,8 @@ void particleCellVolume::setForce() const
 
         scalar fieldValue=-1;
         scalar cellVol=-1;
+        scalar minFieldVal=1e18;
+        scalar maxFieldVal=-1e18;
 
         forAll(field,cellI)
         {
@@ -136,6 +159,8 @@ void particleCellVolume::setForce() const
                 cellVol = mesh_.V()[cellI];
                 scalarField_[cellI] = (1-fieldValue) * cellVol;
                 scalarField2_[cellI] = cellVol;
+                minFieldVal=min(minFieldVal,fieldValue);
+                maxFieldVal=max(maxFieldVal,fieldValue);
             }
             else
             {
@@ -145,8 +170,10 @@ void particleCellVolume::setForce() const
         }
         scalarField_.internalField() = gSum(scalarField_);
         scalarField2_.internalField() = gSum(scalarField2_);
+        reduce(minFieldVal, minOp<scalar>());
+        reduce(maxFieldVal, maxOp<scalar>());
 
-        if(verbose_)
+        if(forceSubM(0).verbose())
         {
            Info << "calculated integral particle volume "
                 << " = " << scalarField_[0]
@@ -154,7 +181,20 @@ void particleCellVolume::setForce() const
                 << ", and > " << lowerThreshold_
                 << ",\n the total volume of cells holding particles = " << scalarField2_[0]
                 << ",\n this results in an average volume fraction of:" << scalarField_[0]/(scalarField2_[0]+SMALL)
+                << ",\n the min occurring " << scalarFieldName_ << " is:" << minFieldVal
+                << ",\n the max occurring " << scalarFieldName_ << " is:" << maxFieldVal
                 << endl;
+        }
+
+        // write to file
+        if(writeToFile_)
+        {
+            *sPtr_<< mesh_.time().value() << " " ;
+            *sPtr_<< scalarField_[0] << " " ;
+            *sPtr_<< scalarField2_[0] << " " ;
+            *sPtr_<< scalarField_[0]/(scalarField2_[0]+SMALL) << " " ;
+            *sPtr_<< minFieldVal << " " ;
+            *sPtr_<< maxFieldVal << endl;
         }
     }// end if time >= startTime_
 }

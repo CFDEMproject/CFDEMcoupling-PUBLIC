@@ -78,8 +78,11 @@ gradPForce::gradPForce
     forceSubM(0).setSwitchesList(1,true); // activate treatForceDEM switch
     forceSubM(0).setSwitchesList(4,true); // activate search for interpolate switch
 
-    // read those switches defined above, if provided in dict
-    forceSubM(0).readSwitches();
+    //set default switches (hard-coded default = false)
+    forceSubM(0).setSwitches(0,true);  // enable treatExplicit, otherwise this force would be implicit in slip vel! - IMPORTANT!
+
+    for (int iFSub=0;iFSub<nrForceSubModels();iFSub++)
+        forceSubM(iFSub).readSwitches();
 
     if (modelType_ == "B")
     {
@@ -113,11 +116,17 @@ gradPForce::gradPForce
 
     particleCloud_.checkCG(true);
 
-    particleCloud_.probeM().initialize(typeName, "gradP.logDat");
-    particleCloud_.probeM().vectorFields_.append("gradPForce"); //first entry must the be the force
-    particleCloud_.probeM().scalarFields_.append("Vs");
-    particleCloud_.probeM().scalarFields_.append("rho");
-    particleCloud_.probeM().writeHeader();
+    // suppress particle probe
+    if (probeIt_ && propsDict_.found("suppressProbe"))
+        probeIt_=!Switch(propsDict_.lookup("suppressProbe"));
+    if(probeIt_)
+    {
+        particleCloud_.probeM().initialize(typeName, "gradP.logDat");
+        particleCloud_.probeM().vectorFields_.append("gradPForce"); //first entry must the be the force
+        particleCloud_.probeM().scalarFields_.append("Vs");
+        particleCloud_.probeM().scalarFields_.append("rho");
+        particleCloud_.probeM().writeHeader();
+    }
 }
 
 
@@ -191,9 +200,11 @@ void gradPForce::setForce() const
                 if(probeIt_)
                 {
                     #include "setupProbeModelfields.H"
-                    vValues.append(force);           //first entry must the be the force
-                    sValues.append(Vs);
-                    sValues.append(rho);
+                    // Note: for other than ext one could use vValues.append(x)
+                    // instead of setSize
+                    vValues.setSize(vValues.size()+1, force);           //first entry must the be the force
+                    sValues.setSize(sValues.size()+1, Vs);
+                    sValues.setSize(sValues.size()+1, rho);
                     particleCloud_.probeM().writeProbe(index, sValues, vValues);
                 }
             }
@@ -204,8 +215,6 @@ void gradPForce::setForce() const
         //}
     }
 }
-
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam

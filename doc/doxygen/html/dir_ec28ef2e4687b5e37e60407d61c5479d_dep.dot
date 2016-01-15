@@ -1,0 +1,9 @@
+digraph "/home/cgoniva/CFDEM/CFDEM-x.x-2.1.x/CFDEMcoupling-PUBLIC/src/lagrangian/cfdemParticle/subModels/voidFractionModel/voidFractionModel" {
+  compound=true
+  node [ fontsize="10", fontname="FreeSans"];
+  edge [ labelfontsize="10", labelfontname="FreeSans"];
+  subgraph clusterdir_0d572a40199fd375b32c34ae9527b915 {
+    graph [ bgcolor="#ddddee", pencolor="black", label="voidFractionModel" fontname="FreeSans", fontsize="10", URL="dir_0d572a40199fd375b32c34ae9527b915.html"]
+  dir_ec28ef2e4687b5e37e60407d61c5479d [shape=box, label="voidFractionModel", style="filled", fillcolor="#eeeeff", pencolor="black", URL="dir_ec28ef2e4687b5e37e60407d61c5479d.html"];
+  }
+}

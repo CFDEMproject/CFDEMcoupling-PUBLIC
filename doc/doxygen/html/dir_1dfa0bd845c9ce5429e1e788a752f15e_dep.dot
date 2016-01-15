@@ -1,0 +1,17 @@
+digraph "/home/cgoniva/CFDEM/CFDEM-x.x-2.1.x/CFDEMcoupling-PUBLIC/src/lagrangian/cfdemParticle/subModels/IOModel" {
+  compound=true
+  node [ fontsize="10", fontname="FreeSans"];
+  edge [ labelfontsize="10", labelfontname="FreeSans"];
+  subgraph clusterdir_b4405a94eb03d3869e7a57a48055cc50 {
+    graph [ bgcolor="#ddddee", pencolor="black", label="subModels" fontname="FreeSans", fontsize="10", URL="dir_b4405a94eb03d3869e7a57a48055cc50.html"]
+  subgraph clusterdir_1dfa0bd845c9ce5429e1e788a752f15e {
+    graph [ bgcolor="#eeeeff", pencolor="black", label="" URL="dir_1dfa0bd845c9ce5429e1e788a752f15e.html"];
+    dir_1dfa0bd845c9ce5429e1e788a752f15e [shape=plaintext label="IOModel"];
+    dir_d53ee78dae844792d401496c9021cae0 [shape=box label="basicIO" color="black" fillcolor="white" style="filled" URL="dir_d53ee78dae844792d401496c9021cae0.html"];
+    dir_851163e49e301dc0e87a1e650ec7f4be [shape=box label="IOModel" color="black" fillcolor="white" style="filled" URL="dir_851163e49e301dc0e87a1e650ec7f4be.html"];
+    dir_a5c13f8f97c1903d2a661919553661c6 [shape=box label="noIO" color="black" fillcolor="white" style="filled" URL="dir_a5c13f8f97c1903d2a661919553661c6.html"];
+    dir_8cdd67186f4dabb75e87e9ce44e3e255 [shape=box label="sophIO" color="black" fillcolor="white" style="filled" URL="dir_8cdd67186f4dabb75e87e9ce44e3e255.html"];
+    dir_1583f51d63ea7ada92cd1c6be4a851d2 [shape=box label="trackIO" color="black" fillcolor="white" style="filled" URL="dir_1583f51d63ea7ada92cd1c6be4a851d2.html"];
+  }
+  }
+}

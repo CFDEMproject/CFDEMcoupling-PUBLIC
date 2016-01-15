@@ -335,25 +335,25 @@ void Foam::clockModel::normHist() const
 	//Global = 1
 	buffIn = double(deltaT_[1]);
 	MPI_Allreduce(&buffIn, &buffOut, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-    if(buffOut>SMALL) buffIn /= buffOut;
+    if(buffOut>SMALL) buffIn = buffIn*double(numprocs)/buffOut;
     plotHist(buffIn,identifier_[1],numprocs,myrank);
 
 	//LIGGGHTS = 3
 	buffIn = double(deltaT_[3]);
 	MPI_Allreduce(&buffIn, &buffOut, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-    if(buffOut>SMALL) buffIn /= buffOut;
+    if(buffOut>SMALL) buffIn = buffIn*double(numprocs)/buffOut;
     plotHist(buffIn,identifier_[3],numprocs,myrank);
 
 	//Coupling - LIGGGHTS = 2 - 3
 	buffIn = double(deltaT_[2]) - buffIn;
 	MPI_Allreduce(&buffIn, &buffOut, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-    if(buffOut>SMALL) buffIn /= buffOut;
+    if(buffOut>SMALL) buffIn = buffIn*double(numprocs)/buffOut;
     plotHist(buffIn,"Coupling (routines)",numprocs,myrank);
 
 	//Flow = 26
 	buffIn = double(deltaT_[26]);
 	MPI_Allreduce(&buffIn, &buffOut, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-    if(buffOut>SMALL) buffIn /= buffOut;
+    if(buffOut>SMALL) buffIn = buffIn*double(numprocs)/buffOut;
     plotHist(buffIn,identifier_[26],numprocs,myrank);
     Info << "===========================" << endl;
 

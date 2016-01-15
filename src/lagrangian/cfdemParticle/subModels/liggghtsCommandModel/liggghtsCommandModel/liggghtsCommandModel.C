@@ -104,6 +104,12 @@ void liggghtsCommandModel::checkTimeMode(dictionary& propsDict)
             }
         }
     }
+    if(verbose_){
+        Info << "runFirst = " << runFirst_ << endl;
+        Info << "runLast = " << runLast_ << endl;
+        Info << "runEveryCouplingStep = " << runEveryCouplingStep_ << endl;
+        Info << "runEveryWriteStep = " << runEveryWriteStep_ << endl;
+    }
 }
 
 void liggghtsCommandModel::checkTimeSettings(const dictionary& propsDict)
@@ -112,11 +118,12 @@ void liggghtsCommandModel::checkTimeSettings(const dictionary& propsDict)
     {
         scalar DEMts = particleCloud_.dataExchangeM().DEMts();
         scalar couplingInterval = particleCloud_.dataExchangeM().couplingInterval();
+        scalar simStartTime = particleCloud_.mesh().time().startTime().value();
 
         if(runLast_) // last run
         {
             // read time options from subdict
-            endTime_ = particleCloud_.mesh().time().endTime().value()-particleCloud_.mesh().time().startTime().value();
+            endTime_ = particleCloud_.mesh().time().endTime().value()-simStartTime;
             startTime_ = endTime_;
             timeInterval_ = -1;
 
@@ -136,8 +143,8 @@ void liggghtsCommandModel::checkTimeSettings(const dictionary& propsDict)
 
                 // calculate coupling times
                 // if this makes troubles try floor((startTime_+SMALL)/.. as above
-                firstCouplingStep_ = floor(startTime_/DEMts/couplingInterval)+1;
-                lastCouplingStep_ = floor(endTime_/DEMts/couplingInterval)+1;
+                firstCouplingStep_ = floor((startTime_-simStartTime)/DEMts/couplingInterval)+1;
+                lastCouplingStep_ = floor((endTime_-simStartTime)/DEMts/couplingInterval)+1;
                 couplingStepInterval_ = floor(timeInterval_/DEMts/couplingInterval)+1;
             }
             else      //runEveryCouplingStep  or writeStep
@@ -148,7 +155,7 @@ void liggghtsCommandModel::checkTimeSettings(const dictionary& propsDict)
             }
         }
     }
-    else
+    else // runFirst
     {
             firstCouplingStep_ =1;
             lastCouplingStep_ =1;

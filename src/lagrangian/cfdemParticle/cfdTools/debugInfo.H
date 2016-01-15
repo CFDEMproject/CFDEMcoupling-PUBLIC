@@ -13,6 +13,7 @@
   vector meanUs_field(0,0,0);      // mean solid velocity based on field Us
   scalar meanAlpha_field=0;        // mean voidfraction
   vector meanU_field(0,0,0);       // mean fluid velocity based on field U
+  scalar fpth=4.188790204786390525;// 4.*pi/3.
   //========================================================================//
 
   // get particle based data
@@ -23,10 +24,10 @@
           meanUs_array[i] += velocities_[index][i];
       }
       meanR_array += radii_[index][0];
-      particleVolume_radius += radii_[index][0]*radii_[index][0]*radii_[index][0]*4./3.*3.1415;
+      particleVolume_radius += radii_[index][0]*radii_[index][0]*radii_[index][0]*fpth;
       
       // loop subCells
-      for(int subCell=0;subCell<voidFractionM().cellsPerParticle()[index][0];subCell++)
+      for(int subCell=0;subCell<cellsPerParticle()[index][0];subCell++)
       {
           points++;
           totalParticleWeights += particleWeights_[index][subCell];
@@ -40,7 +41,7 @@
       // check if a particle is inside cell
       bool particleInside=false;
       for(int index = 0;index <  numberOfParticles(); ++index){
-          for(int subCell=0;subCell<voidFractionM().cellsPerParticle()[index][0];subCell++){
+          for(int subCell=0;subCell<cellsPerParticle()[index][0];subCell++){
               if(cellIDs_[index][subCell] == cellI){
                   particleInside=true;
                   break;

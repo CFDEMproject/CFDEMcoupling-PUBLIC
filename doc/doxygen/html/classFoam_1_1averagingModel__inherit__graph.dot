@@ -1,0 +1,10 @@
+digraph "Foam::averagingModel"
+{
+  edge [fontname="FreeSans",fontsize="10",labelfontname="FreeSans",labelfontsize="10"];
+  node [fontname="FreeSans",fontsize="10",shape=record];
+  Node1 [label="Foam::averagingModel",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
+  Node1 -> Node2 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="FreeSans"];
+  Node2 [label="Foam::dense",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classFoam_1_1dense.html"];
+  Node1 -> Node3 [dir="back",color="midnightblue",fontsize="10",style="solid",fontname="FreeSans"];
+  Node3 [label="Foam::dilute",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classFoam_1_1dilute.html"];
+}

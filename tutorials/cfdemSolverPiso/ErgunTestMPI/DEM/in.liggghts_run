@@ -1,4 +1,4 @@
-# Pour granular particles into chute container, then induce flow
+echo            both
 log             ../DEM/log.liggghts
 thermo_log      ../DEM/post/thermo.txt
 
@@ -64,5 +64,6 @@ thermo_modify   lost ignore norm no
 compute_modify  thermo_temp dynamic yes
 
 dump            dmp all custom 5000 ../DEM/post/dump*.liggghts_run id type x y z vx vy vz fx fy fz f_dragforce[1] f_dragforce[2] f_dragforce[3] radius 
+#dump            dmp all custom/vtk 5000 ../DEM/post/dump_liggghts_run.*.vtk id type x y z vx vy vz fx fy fz f_dragforce[1] f_dragforce[2] f_dragforce[3] radius 
 
 run             1

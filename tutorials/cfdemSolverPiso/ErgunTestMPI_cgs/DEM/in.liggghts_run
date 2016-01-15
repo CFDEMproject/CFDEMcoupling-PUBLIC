@@ -1,4 +1,4 @@
-# Pour granular particles into chute container, then induce flow
+echo            both
 log             ../DEM/log.liggghts
 thermo_log      ../DEM/post/thermo.txt
 

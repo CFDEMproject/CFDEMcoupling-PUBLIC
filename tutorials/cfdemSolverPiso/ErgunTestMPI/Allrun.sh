@@ -2,7 +2,7 @@
 
 #===================================================================#
 # allrun script for testcase as part of test routine 
-# run settlingTest
+# run ErgunTestMPI
 # Christoph Goniva - Sept. 2010
 #===================================================================#
 

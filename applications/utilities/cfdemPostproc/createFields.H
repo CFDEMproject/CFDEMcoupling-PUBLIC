@@ -33,6 +33,20 @@
 // drag law modelling
 //========================
 
+    Info<< "\nCreating dummy density field rho\n" << endl;
+    volScalarField rho
+    (
+        IOobject
+        (
+            "rho",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh,
+        dimensionedScalar("0", dimensionSet(1, -3, 0, 0, 0), 1.0)
+    );
 
     Info<< "\nReading voidfraction field voidfraction = (Vgas/Vparticle)\n" << endl;
     volScalarField voidfraction

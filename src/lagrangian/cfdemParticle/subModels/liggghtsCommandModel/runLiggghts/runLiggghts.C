@@ -64,7 +64,7 @@ runLiggghts::runLiggghts
     liggghtsCommandModel(dict,sm,i),
     propsDict_(dict),
     command_("run"),
-    preNo_(true),
+    preNo_(false),
     stdInterval_(0)
 {
     word myName=word(typeName + "Props");

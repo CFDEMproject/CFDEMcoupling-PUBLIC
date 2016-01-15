@@ -62,6 +62,8 @@ protected:
 
     const char* const CFDEMversion;
 
+    const char* const DEBUG;
+
 
     // Protected member functions
 
@@ -113,6 +115,8 @@ public:
     void info();
 
     // Access
+
+    bool debugMode();
 
 };
 

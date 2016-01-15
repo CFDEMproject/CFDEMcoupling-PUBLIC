@@ -1,0 +1,9 @@
+digraph "/home/cgoniva/CFDEM/CFDEM-x.x-2.1.x/CFDEMcoupling-PUBLIC/src/lagrangian/cfdemParticle/subModels/forceModel/ShirgaonkarIB" {
+  compound=true
+  node [ fontsize="10", fontname="FreeSans"];
+  edge [ labelfontsize="10", labelfontname="FreeSans"];
+  subgraph clusterdir_0abfdb325e722c517996fb9c43aac5bd {
+    graph [ bgcolor="#ddddee", pencolor="black", label="forceModel" fontname="FreeSans", fontsize="10", URL="dir_0abfdb325e722c517996fb9c43aac5bd.html"]
+  dir_96d695052d0c017223be9bb26575349b [shape=box, label="ShirgaonkarIB", style="filled", fillcolor="#eeeeff", pencolor="black", URL="dir_96d695052d0c017223be9bb26575349b.html"];
+  }
+}

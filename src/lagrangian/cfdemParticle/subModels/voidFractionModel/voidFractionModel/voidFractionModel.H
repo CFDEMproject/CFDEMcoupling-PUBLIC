@@ -122,6 +122,8 @@ public:
 
 
     // public member functions
+        void applyDebugSettings(bool) const;
+
         virtual void setvoidFraction(double** const&,double**&,double**&,double**&,double**&) const = 0;
 
         tmp<volScalarField> voidFractionInterp() const;

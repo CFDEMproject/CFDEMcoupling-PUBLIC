@@ -63,7 +63,8 @@ noDrag::noDrag
     forceModel(dict,sm),
     propsDict_(dict),
     verbose_(false),
-    noDEMForce_(false)
+    noDEMForce_(false),
+    keepCFDForce_(false)
 {
     if(dict.found(word(typeName + "Props")))
         propsDict_=dictionary(dict.subDict(typeName + "Props"));
@@ -95,7 +96,6 @@ noDrag::~noDrag()
 
 void noDrag::setForce() const
 {
-    // Do nothing
     Info << "noDrag::setForce" << endl;
     label cellI=0;
     bool treatExplicit=forceSubM(0).switches()[0];
@@ -105,7 +105,7 @@ void noDrag::setForce() const
         if (cellI > -1) // particle Found
         {
             //==========================
-            // set force on particle (new code)
+            // set force on particle (proposed new code)
             // write particle based data to global array
             //forceSubM(0).partToArray(index,drag,dragExplicit);
             //==========================

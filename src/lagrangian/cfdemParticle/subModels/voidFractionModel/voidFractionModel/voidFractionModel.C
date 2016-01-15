@@ -100,6 +100,16 @@ voidFractionModel::~voidFractionModel()
 }
 
 // * * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * * //
+
+void Foam::voidFractionModel::applyDebugSettings(bool debug) const
+{
+    if(!debug)
+    {
+        voidfractionPrev_.writeOpt() = IOobject::NO_WRITE;
+        voidfractionNext_.writeOpt() = IOobject::NO_WRITE;
+    }
+}
+
 tmp<volScalarField> Foam::voidFractionModel::voidFractionInterp() const
 {
     tmp<volScalarField> tsource

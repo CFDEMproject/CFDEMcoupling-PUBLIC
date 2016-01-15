@@ -21,23 +21,9 @@ internalField   uniform (0 0 0);
 
 boundaryField
 {
-    wall
+    ".*"
     {
         type            zeroGradient;
-        //type            fixedValue;
-        //value           uniform (1 0 0);
-    }
-    inlet
-    {
-        type            zeroGradient;
-        //type            fixedValue;
-        //value           uniform (1 0 0);;
-    }
-    outlet
-    {
-        type            zeroGradient;
-        //type            fixedValue;
-        //value           uniform (1 0 0);
     }
 }
 

@@ -82,8 +82,7 @@ twoWayFiles::~twoWayFiles()
 
 const char* twoWayFiles::wordToChar(word& inWord) const
 {
-    string HH = string(inWord);
-    return HH.c_str();
+    return const_cast<char*>(inWord.c_str());
 }
 
 const char* twoWayFiles::fileNameToChar(fileName& inWord) const

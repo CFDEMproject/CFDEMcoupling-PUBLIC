@@ -1,0 +1,21 @@
+include $(CFDEM_ADD_LIBS_DIR)/additionalLibs
+
+EXE_INC = \
+    $(CFDEM_ADD_INCOMPTURBMOD_PATHS) \
+    -I$(LIB_SRC)/transportModels \
+    -I$(LIB_SRC)/transportModels/incompressible/singlePhaseTransportModel \
+    -I$(LIB_SRC)/finiteVolume/lnInclude \
+    -I$(CFDEM_SRC_DIR)/lagrangian/cfdemParticle/lnInclude \
+    -I$(LIB_SRC)/fvOptions/lnInclude \
+    -I$(LIB_SRC)/meshTools/lnInclude \
+    -I$(LIB_SRC)/sampling/lnInclude \
+
+LIB_LIBS = \
+    -L$(CFDEM_LIB_DIR)\
+    $(CFDEM_ADD_INCOMPTURBMOD_LIBS) \
+    -lincompressibleTransportModels \
+    -lfiniteVolume \
+    -l$(CFDEM_LIB_NAME) \
+    -lfvOptions \
+    -lmeshTools \
+    -lsampling \

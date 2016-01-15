@@ -31,7 +31,7 @@ couplingInterval 100;
 
 voidFractionModel divided;//centre;//bigParticle;//
 
-locateModel engine;//standard;
+locateModel engine;///ijk;//standard;
 
 meshMotionModel noMeshMotion;
 

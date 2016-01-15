@@ -1,0 +1,9 @@
+digraph "/home/cgoniva/CFDEM/CFDEM-x.x-2.1.x/CFDEMcoupling-PUBLIC/src/lagrangian/cfdemParticle/subModels/forceModel/virtualMassForce" {
+  compound=true
+  node [ fontsize="10", fontname="FreeSans"];
+  edge [ labelfontsize="10", labelfontname="FreeSans"];
+  subgraph clusterdir_0abfdb325e722c517996fb9c43aac5bd {
+    graph [ bgcolor="#ddddee", pencolor="black", label="forceModel" fontname="FreeSans", fontsize="10", URL="dir_0abfdb325e722c517996fb9c43aac5bd.html"]
+  dir_79e77983c480bc47046e917e9bb22b61 [shape=box, label="virtualMassForce", style="filled", fillcolor="#eeeeff", pencolor="black", URL="dir_79e77983c480bc47046e917e9bb22b61.html"];
+  }
+}

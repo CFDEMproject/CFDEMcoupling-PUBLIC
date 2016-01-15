@@ -73,30 +73,46 @@ inline void outerProduct(double *vec1, double *vec2, double **m)
     
     
 }
+
 //--------------------------------------------------------------------
-// Compute the major, minor axis and eccentricity parameters of a prolate spheroid
-inline bool spheroidGeometry(double radius, double aspectRatio,  //inputs
-                                 double& ai,    double& bi,              //outputs
-                                 double& ei,    double& Le              //outputs
-                                ) //
+// Compute the diameter of the hydrodynamically equivalent cylinder
+inline double spheroidDiameter(
+                                double shapeX, double shapeY, double shapeZ,
+                                double& aspectRatio
+                              )
 {
     //INPUT
-    //  radius      ...volume-equivalent radius of the spheroid
+    //  shape       ...values with the half-axes of the spheroid
+    
+    //OUTPUT
+    //  aspectRatio ...the aspect ratio of the spheroid (ai/bi)
+    //                 is also that of the cylinder element
+    //  return value... the hydrodynamically equivalent diameter 
+
+     double   bi = std::min( shapeX, std::min(shapeY,shapeZ) );
+     aspectRatio = std::max( shapeX, std::max(shapeY,shapeZ) ) 
+                 / std::max(bi,1e-32);
+     aspectRatio = std::max(1.000001,aspectRatio);
+
+     return 2.48 * bi / std::sqrt( std::log(aspectRatio) );
+
+}
+
+//--------------------------------------------------------------------
+// Compute the major, minor axis and eccentricity parameters of a prolate spheroid
+inline bool spheroidGeometry(double aspectRatio,     //input
+                             double& ei, double& Le              //outputs
+                            ) //
+{
+    //INPUT
     //  aspectRatio ...major/minor aspect ratio
     
     //OUTPUT
-    //  ai  ... 
-    //  bi  ... 
     //  ei  ... 
     //  Le  ... 
-  
-    if(radius<=0.0)     //avoid troubles in case radius is 0 or negative
-        return false;
 
- 	ai = radius * std::pow(aspectRatio*aspectRatio,0.33333333333333333333333);
-    bi = ai / aspectRatio;
  	ei = std::sqrt( 
- 	                1.0
+                     1.0
                    - 1.0 / (aspectRatio*aspectRatio)
  	              );
  	Le = std::log(
@@ -116,17 +132,15 @@ inline double Pi()
 
 
 //--------------------------------------------------------------------
-// Compute the major, minor axis and eccentricity parameters of a prolate spheroid
-inline bool spheroidGeometry2(double radius, double aspectRatio,  //inputs
-                                 double& ai,     double& bi,           //outputs
+// Compute the eccentricity parameters of a prolate spheroid
+inline bool spheroidGeometry2(   double  aspectRatio,                 //inputs
                                  double& XAe,    double& YAe,         //outputs
                                  double& XCe,    double& YCe,         //outputs
-                                 double& YHe
+                                 double& YHe                          //outputs
                                 ) //
 {
     //INPUT
-    //  radius      ...volume-equivalent radius of the spheroid
-    //  aspectRatio ...major/minor aspect ratio
+    //  aspectRatio ...major/minor aspect ratio of the spheroid
     
     //OUTPUT
     //  XAe  ...Eccentricity dependet parameter
@@ -139,10 +153,9 @@ inline bool spheroidGeometry2(double radius, double aspectRatio,  //inputs
 
     double ei(0.0), Le(0.0);  
     bool   result = 
-          spheroidGeometry(radius, aspectRatio,  //inputs
-                                 ai,     bi,              //outputs
-                                 ei,    Le              //outputs
-                              );
+           spheroidGeometry(aspectRatio,  //inputs
+                            ei,    Le     //outputs
+                           );
     if(!result)
         return false;
         

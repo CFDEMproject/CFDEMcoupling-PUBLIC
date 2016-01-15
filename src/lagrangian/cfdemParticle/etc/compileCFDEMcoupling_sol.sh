@@ -40,6 +40,11 @@ echo "example:"
 echo "cfdemSolverPiso/dir"
 echo ""
 
+#- create a tmp file and delete comments in it - work with tmp file then.
+cp $whitelist "tmpFile.txt"
+sed -i '/^#/d' "tmpFile.txt"
+whitelist="tmpFile.txt"
+
 if [ ! -f "$CWD/$whitelist" ];then
     echo "$whitelist does not exist in $CWD"
 else
@@ -104,7 +109,7 @@ else
                 parallel="true"
                 #--------------------------------------------------------------------------------#
 
-                #echo "compiling $LINE"
+                echo "compiling $LINE"
                 compileSolver $logpath $logfileName $casePath $headerText $parallel
                 let counter++
             fi
@@ -167,4 +172,4 @@ else
         done
     done
 fi
-
+rm "$CWD/tmpFile.txt"

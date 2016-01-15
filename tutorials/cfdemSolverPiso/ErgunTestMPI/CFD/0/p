@@ -24,18 +24,16 @@ boundaryField
     wall
     {
         type            zeroGradient;
+        value           $internalField;
     }
 
     inlet
     {
         type            zeroGradient;
-        //type            fixedValue;
-        //value           uniform 100000;
+        value           $internalField;
     }
     outlet
     {
-        //type            zeroGradient;
-
         type            fixedValue;
         value           $internalField;
     }

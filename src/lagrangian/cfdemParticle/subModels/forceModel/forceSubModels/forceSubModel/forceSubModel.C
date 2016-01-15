@@ -76,6 +76,19 @@ forceSubModel::forceSubModel
         sm.mesh(),
         dimensionedScalar("nu0", dimensionSet(0, 2, -1, 0, 0), 1.)
     ),
+    /*mu_
+    (
+        IOobject
+        (
+            "scalarViscosity",
+            sm.mesh().time().timeName(),
+            sm.mesh(),
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        sm.mesh(),
+        dimensionedScalar("mu0", dimensionSet(1, -1, -1, 0, 0), 1.)
+    ),*/
     divTau_
     (
         IOobject
@@ -107,8 +120,8 @@ forceSubModel::forceSubModel
 {
     // init standard switch list
     int iCounter(0);
-    switchesNameList_[iCounter]="treatForceExplicit"; iCounter++;   //0
-    switchesNameList_[iCounter]="treatForceDEM";iCounter++;         //1
+    switchesNameList_[iCounter]="treatForceExplicit"; iCounter++;   //0 - will treat force explicity (based on slip velocity)
+    switchesNameList_[iCounter]="treatForceDEM";iCounter++;         //1 - will treat forces on DEM side only
     switchesNameList_[iCounter]="implForceDEM";iCounter++;          //2
     switchesNameList_[iCounter]="verbose";iCounter++;               //3
     switchesNameList_[iCounter]="interpolation";iCounter++;         //4
@@ -178,7 +191,58 @@ void forceSubModel::partToArray
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+void forceSubModel::partToArrayAnisotropic
+(
+    label& index,
+    vector& CdExtra,
+    const vector& dragEx //this is the remaining explictit drag
+) const
+{
 
+    if(switches_[2]) // implForceDEM
+    {
+        for(int iDir=0;iDir<3;iDir++)
+        {
+            myForceM().CdsExtra()[index][iDir]   = CdExtra[iDir];
+            myForceM().DEMForces()[index][iDir] += dragEx[iDir];
+        }
+        if(switches_[3]) Pout << "*********forceSubModel::partToArrayAnisotropic: CdExtra: " 
+                              << CdExtra 
+                              << ", dragEx: " << dragEx << endl;
+    }
+    else
+         FatalError<< "You are not using 'implForceDEM', but you want to update anisotropic drag data. This will not work." << abort(FatalError);   
+    
+}
+
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+void forceSubModel::partToArrayAnisotropicTorque
+(
+    label&        index,
+    vector&       CdTorque,
+    const vector& torqueTotal  //this is the total torque
+) const
+{
+
+    if(switches_[2]) // implForceDEM - also implies implicit torque!
+    {
+        for(int iDir=0;iDir<3;iDir++)
+        {
+            myForceM().CdsRotation()[index][iDir]   = CdTorque[iDir];
+            myForceM().DEMTorques()[index][iDir]   += torqueTotal[iDir];
+           
+        }
+        if(switches_[3]) Pout << "*********forceSubModel::partToArrayAnisotropic: CdTorque: " 
+                              << CdTorque 
+                              << ", torqueTotal: " << torqueTotal << endl;
+    }
+    else
+         FatalError<< "You are not using 'implForceDEM', but you want to update anisotropic torque data. This will not work." << abort(FatalError);   
+    
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 void forceSubModel::explicitCorr
 (
     vector& dragImplicit,
@@ -190,6 +254,60 @@ void forceSubModel::explicitCorr
     const vector& UsCell,
     bool verbose,
     label index    
+) const
+{
+    dragExplicit=vector::zero;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+void forceSubModel::explicitCorrScalar(scalar& sourceKImplicit, 
+                                       scalar& sourceExplicit, 
+                                       scalar& areaTimesTransferCoefficient, 
+                                       scalar& fluidProperty, 
+                                       const   scalar& fluidPropertyCell, 
+                                       scalar& particleProperty, 
+                                       bool    verbose, 
+                                       label   index) const
+{
+
+    //everything is explicit, no verbose
+    sourceExplicit  = areaTimesTransferCoefficient * (fluidProperty - particleProperty);
+    sourceKImplicit = 0.0;
+
+}
+
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+void forceSubModel::update(            scalar&  deltaT, 
+                                       label    particleI, 
+                                       label    cellI, 
+                                       scalar&  scalToUpdate1, 
+                                       scalar&  scalToUpdate2, 
+                                       bool     verbose
+                          ) const
+{
+    //no action
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+void forceSubModel::update(            scalar&  deltaT, 
+                                       label    particleI, 
+                                       label    cellI, 
+                                       vector&  vecToUpdate1, 
+                                       vector&  vecToUpdate2, 
+                                       scalar&  scalToUpdate1, 
+                                       scalar&  scalToUpdate2, 
+                                       bool     verbose
+                          ) const
+{
+    //no action
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+void forceSubModel::explicitLimit
+(
+    vector& dragImplicit,
+    vector& dragExplicit,
+    scalar& d
 ) const
 {
     dragExplicit=vector::zero;
@@ -260,6 +378,25 @@ void forceSubModel::readSwitches() const
             particleCloud_.mesh(),
             nu0_
         );
+
+        /*if (dict_.found("mu"))
+        {
+            Info << "Using a constant viscosity for this force model." << endl;
+            dimensionedScalar  mu0_("mu", dimensionSet(1, -1, -1, 0, 0), dict_.lookup("mu"));
+            mu_=volScalarField
+            (
+                IOobject
+                (
+                    "scalarViscosity",
+                    particleCloud_.mesh().time().timeName(),
+                    particleCloud_.mesh(),
+                    IOobject::NO_READ,
+                    IOobject::NO_WRITE
+                ),
+                particleCloud_.mesh(),
+                mu0_
+            );
+        }*/
     }
 
     // look for old nomenclature
@@ -292,12 +429,15 @@ const volScalarField& forceSubModel::muField() const
     #ifdef compre
         return particleCloud_.turbulence().mu();
     #else
-        // passing the ref to nu*rho will not work->generate a mu_ field like nu_
-        FatalError<< "implementation not complete!" << abort(FatalError);
-
         if(switches_[8]) // scalarViscosity=true
-            return nu_*rho_;
-        else
+        {
+            // usage of constant mu_ is still commented, as not tested
+            // particleCloud_.turbulence().nu()*rho_ does not work properly
+            FatalError<< "implementation not complete!" << abort(FatalError);
+            //return mu_; // to be used with above code to set mu_ in readSwitches()
+
+            return particleCloud_.turbulence().nu()*rho_;// for now just to have a return
+        }else
             return particleCloud_.turbulence().nu()*rho_;
     #endif
 }

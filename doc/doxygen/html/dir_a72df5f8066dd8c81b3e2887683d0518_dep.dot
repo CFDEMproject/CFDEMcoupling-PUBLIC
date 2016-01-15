@@ -1,0 +1,13 @@
+digraph "/home/cgoniva/CFDEM/CFDEM-x.x-2.1.x/CFDEMcoupling-PUBLIC/src/lagrangian" {
+  compound=true
+  node [ fontsize="10", fontname="FreeSans"];
+  edge [ labelfontsize="10", labelfontname="FreeSans"];
+  subgraph clusterdir_65b34c68b7766a18c66b794c4cdee1fc {
+    graph [ bgcolor="#ddddee", pencolor="black", label="src" fontname="FreeSans", fontsize="10", URL="dir_65b34c68b7766a18c66b794c4cdee1fc.html"]
+  subgraph clusterdir_a72df5f8066dd8c81b3e2887683d0518 {
+    graph [ bgcolor="#eeeeff", pencolor="black", label="" URL="dir_a72df5f8066dd8c81b3e2887683d0518.html"];
+    dir_a72df5f8066dd8c81b3e2887683d0518 [shape=plaintext label="lagrangian"];
+    dir_f5ebe8e05b100ab91e8716760c049809 [shape=box label="cfdemParticle" color="red" fillcolor="white" style="filled" URL="dir_f5ebe8e05b100ab91e8716760c049809.html"];
+  }
+  }
+}

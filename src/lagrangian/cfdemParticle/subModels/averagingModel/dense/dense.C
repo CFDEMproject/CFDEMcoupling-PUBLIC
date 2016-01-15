@@ -80,43 +80,45 @@ void dense::setScalarAverage
     double**& value,
     double**& weight,
     volScalarField& weightField,
-    double**const& mask
+    double**const& mask,
+    double**const& weight2,          //allows the specification of a 2nd weight field
+    bool      weightWithWeight2      //switch to activate 2nd weight field
 ) const
 {
     label cellI;
     scalar valueScal;
     scalar weightP;
 
+    if(weightWithWeight2) 
+        FatalError << "dense::setScalarAverage: attempt to weight with weight2, which is not implemented" << abort(FatalError);
+
     for(int index=0; index< particleCloud_.numberOfParticles(); index++)
     {
         if(!checkParticleType(index)) continue; //skip this particle if not correct type
 
-        //if(mask[index][0])
-        //{
-            for(int subCell=0;subCell<particleCloud_.voidFractionM().cellsPerParticle()[index][0];subCell++)
+        for(int subCell=0;subCell<particleCloud_.cellsPerParticle()[index][0];subCell++)
+        {
+            //Info << "subCell=" << subCell << endl;
+            cellI = particleCloud_.cellIDs()[index][subCell];
+
+            if (cellI >= 0)
             {
-                //Info << "subCell=" << subCell << endl;
-                cellI = particleCloud_.cellIDs()[index][subCell];
+                valueScal = value[index][0];
+                weightP = weight[index][0];
 
-                if (cellI >= 0)
+                // first entry in this cell
+                if(weightField[cellI] == 0)
                 {
-                    valueScal = value[index][0];
-                    weightP = weight[index][0];
-
-                    // first entry in this cell
-                    if(weightField[cellI] == 0)
-                    {
-                        field[cellI] = valueScal;
-                        weightField[cellI] = weightP;
-                    }
-                    else
-                    {
-                        field[cellI] = (field[cellI]*weightField[cellI]+valueScal*weightP)/(weightField[cellI]+weightP);
-                        weightField[cellI] += weightP;
-                    }
+                    field[cellI] = valueScal;
+                    weightField[cellI] = weightP;
+                }
+                else
+                {
+                    field[cellI] = (field[cellI]*weightField[cellI]+valueScal*weightP)/(weightField[cellI]+weightP);
+                    weightField[cellI] += weightP;
                 }
             }
-        //}
+        }
     }
 
     // correct cell values to patches
@@ -129,47 +131,91 @@ void dense::setVectorAverage
     double**& value,
     double**& weight,
     volScalarField& weightField,
-    double**const& mask
+    double**const& mask,
+    double**const& weight2,                  //allows the specification of a 2nd weight field
+    bool      weightWithWeight2   //switch to activate 2nd weight field
 ) const
 {
     label cellI;
     vector valueVec;
     scalar weightP;
 
+    //====================
+    // debug
+    /*for(int index=0; index< particleCloud_.numberOfParticles(); index++)
+    {
+        Pout << "--index=" << index << endl;
+        for(int subCell=0;subCell<particleCloud_.cellsPerParticle()[index][0];subCell++)
+        {
+            cellI = particleCloud_.cellIDs()[index][subCell];
+
+            if (cellI >= 0)
+            {
+                Pout << "---subCell=" << subCell << endl;
+                Pout << "---weight=" << weight[index][subCell] << endl;
+                if(weightWithWeight2)    
+                    Pout << "---weight2=" << weight2[index][subCell] << endl;
+            }
+            else
+                Pout << "---subCell not found" << endl;
+        }
+    }*/
+    //====================
+    if(weightWithWeight2) //use weight2, e.g., mass-averaged
     for(int index=0; index< particleCloud_.numberOfParticles(); index++)
     {
         if(!checkParticleType(index)) continue; //skip this particle if not correct type
 
-        //if(mask[index][0])
-        //{
-            for(int subCell=0;subCell<particleCloud_.voidFractionM().cellsPerParticle()[index][0];subCell++)
+        for(int subCell=0;subCell<particleCloud_.cellsPerParticle()[index][0];subCell++)
+        {
+            cellI = particleCloud_.cellIDs()[index][subCell];
+
+            if (cellI >= 0)
             {
-                cellI = particleCloud_.cellIDs()[index][subCell];
+                for(int i=0;i<3;i++) valueVec[i] = value[index][i];
+                weightP = weight[index][subCell]*weight2[index][subCell];
 
-                if (cellI >= 0)
+                // first entry in this cell
+                if(weightField[cellI] == 0)
                 {
-                    for(int i=0;i<3;i++) valueVec[i] = value[index][i];
-                    weightP = weight[index][subCell];
-
-                    if(weightP<SMALL) Warning << "error in dense::setVectorAverage" << endl;
-
-                    // not yet implemented:
-                    //if(weightWithParticleDensity) weightP *= particleCloud_.particleDensity()[index][0];
-
-                    // first entry in this cell
-                    if(weightField[cellI] == 0)
-                    {
-                        field[cellI] = valueVec;
-                        weightField[cellI] = weightP;
-                    }
-                    else
-                    {
-                        field[cellI] = (field[cellI]*weightField[cellI]+valueVec*weightP)/(weightField[cellI]+weightP);
-                        weightField[cellI] += weightP;
-                    }
+                    field[cellI] = valueVec;
+                    weightField[cellI] = weightP;
                 }
-            }//forAllSubPoints
-        //}
+                else
+                {
+                    field[cellI] = (field[cellI]*weightField[cellI]+valueVec*weightP)/(weightField[cellI]+weightP); //Running average calc. style
+                    weightField[cellI] += weightP;
+                }
+            }
+        }//forAllSubPoints
+    }
+    else //standard, i.e., volume-averaged
+    for(int index=0; index< particleCloud_.numberOfParticles(); index++)
+    {
+        if(!checkParticleType(index)) continue; //skip this particle if not correct type
+
+        for(int subCell=0;subCell<particleCloud_.cellsPerParticle()[index][0];subCell++)
+        {
+            cellI = particleCloud_.cellIDs()[index][subCell];
+
+            if (cellI >= 0)
+            {
+                for(int i=0;i<3;i++) valueVec[i] = value[index][i];
+                weightP = weight[index][subCell];
+
+                // first entry in this cell
+                if(weightField[cellI] == 0)
+                {
+                    field[cellI] = valueVec;
+                    weightField[cellI] = weightP;
+                }
+                else
+                {
+                    field[cellI] = (field[cellI]*weightField[cellI]+valueVec*weightP)/(weightField[cellI]+weightP); //Running average calc. style
+                    weightField[cellI] += weightP;
+                }
+            }
+        }//forAllSubPoints
     }
 
     // correct cell values to patches

@@ -26,16 +26,13 @@ FoamFile
 //===========================================================================//
 // sub-models & settings
 
-syncMode false;
-//verbose;
-
 modelType "A"; // A or B
 
 couplingInterval 100;
 
 voidFractionModel divided;//centre;//
 
-locateModel engine;//turboEngineM2M;//
+locateModel engine;
 
 meshMotionModel noMeshMotion;
 
@@ -45,7 +42,7 @@ IOModel basicIO;
 
 probeModel off;
 
-dataExchangeModel twoWayMPI;//twoWayM2M;//twoWayFiles;//oneWayVTK;//
+dataExchangeModel twoWayMPI;
 
 averagingModel dense;//dilute;//
 
@@ -144,6 +141,7 @@ GidaspowDragProps
     verbose true;
     velFieldName "U";
     voidfractionFieldName "voidfraction";
+    granVelFieldName "Us";
     interpolation true;
     phi 1;
 }
@@ -267,7 +265,6 @@ twoWayMPIProps
 }
 twoWayM2MProps
 {
-    maxNumberOfParticles 10100;
     liggghtsPath "../DEM/in.liggghts_run";
 }
 // ************************************************************************* //

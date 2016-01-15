@@ -1,0 +1,10 @@
+digraph "/home/cgoniva/CFDEM/CFDEM-x.x-2.1.x/CFDEMcoupling-PUBLIC" {
+  compound=true
+  node [ fontsize="10", fontname="FreeSans"];
+  edge [ labelfontsize="10", labelfontname="FreeSans"];
+  subgraph clusterdir_4fbf97bbfdfd3d303fb68dbfdf9eca50 {
+    graph [ bgcolor="#eeeeff", pencolor="black", label="" URL="dir_4fbf97bbfdfd3d303fb68dbfdf9eca50.html"];
+    dir_4fbf97bbfdfd3d303fb68dbfdf9eca50 [shape=plaintext label="CFDEMcoupling-PUBLIC"];
+    dir_65b34c68b7766a18c66b794c4cdee1fc [shape=box label="src" color="red" fillcolor="white" style="filled" URL="dir_65b34c68b7766a18c66b794c4cdee1fc.html"];
+  }
+}

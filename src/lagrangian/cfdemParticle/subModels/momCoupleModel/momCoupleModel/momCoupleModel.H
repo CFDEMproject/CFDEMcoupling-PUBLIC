@@ -110,6 +110,8 @@ public:
 
     // Member Functions
 
+        virtual void applyDebugSettings(bool) const {};
+
         // implicit momentum source field
         virtual tmp<volScalarField> impMomSource() const;
 

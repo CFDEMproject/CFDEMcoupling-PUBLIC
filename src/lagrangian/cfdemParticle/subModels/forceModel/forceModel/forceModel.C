@@ -87,6 +87,10 @@ forceModel::forceModel
     modelType_(sm.modelType()),
     probeIt_(sm.probeM().active()),
     requiresEx_(false),
+    requiresShape_(false),
+    pullPushRotation_(false),
+    implicitAnisotropicDrag_(false),
+    implicitRotation_(false),
     forceSubModels_(wordList(0)),
     forceSubModel_(new autoPtr<forceSubModel>[nrForceSubModels()])
 {}
@@ -98,6 +102,16 @@ forceModel::~forceModel()
 {}
 
 // * * * * * * * * * * * * * * * * Member Fct  * * * * * * * * * * * * * * * //
+
+void Foam::forceModel::applyDebugSettings(bool debug) const
+{
+    if(!debug)
+    {
+        impParticleForces_.writeOpt() = IOobject::NO_WRITE;
+        expParticleForces_.writeOpt() = IOobject::NO_WRITE;
+    }
+}
+
 /*tmp<volScalarField> forceModel::provideScalarField()
 {
 Info << "now providing a scalar field" << endl;
@@ -127,10 +141,26 @@ Info << "now providing a scalar field" << endl;
     return tsource;
 };*/
 
+//Function for to add turbulence due to multiphase interaction
+void forceModel::multiphaseTurbulence(volScalarField& field, bool) const
+{
+    // just return zero
+    field     *= 0.0;
+}
+
+//Function for simple explicit treatment of coupling terms, only for temperature
 void forceModel::manipulateScalarField(volScalarField& field) const
 {
-    Info << "no scalar manipulation done" << endl;
-    // do nothing
+    // just return zero
+    field     *= 0.0;
+}
+
+//Function for explicit or implicit treatment of coupling terms, for heat and species balance equations
+void forceModel::manipulateScalarField(volScalarField& field, volScalarField& fieldImpl, int speciesID) const
+{
+    // just return zero
+    field     *= 0.0;
+    fieldImpl *= 0.0;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -1,0 +1,9 @@
+digraph "/home/cgoniva/CFDEM/CFDEM-x.x-2.1.x/CFDEMcoupling-PUBLIC/src/lagrangian/cfdemParticle/subModels/dataExchangeModel/twoWayFiles" {
+  compound=true
+  node [ fontsize="10", fontname="FreeSans"];
+  edge [ labelfontsize="10", labelfontname="FreeSans"];
+  subgraph clusterdir_6088fb60336f5ae13c9242ffda1677a9 {
+    graph [ bgcolor="#ddddee", pencolor="black", label="dataExchangeModel" fontname="FreeSans", fontsize="10", URL="dir_6088fb60336f5ae13c9242ffda1677a9.html"]
+  dir_03c543e80e8cc6bf541ab801a3b5b2a5 [shape=box, label="twoWayFiles", style="filled", fillcolor="#eeeeff", pencolor="black", URL="dir_03c543e80e8cc6bf541ab801a3b5b2a5.html"];
+  }
+}

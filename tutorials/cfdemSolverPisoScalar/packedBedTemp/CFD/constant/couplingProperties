@@ -135,7 +135,7 @@ centreProps
 
 dividedProps
 {
-    alphaMin 0.1;
+    alphaMin 0.4;
     scaleUpVol 1.0;
 }
 

@@ -79,32 +79,34 @@ void dilute::setScalarAverage
     double**& value,
     double**& weight,
     volScalarField& weightField,
-    double**const& mask
+    double**const& mask,
+    double**const& weight2,       //allows the specification of a 2nd weight field
+    bool      weightWithWeight2   //switch to activate 2nd weight field
 ) const
 {
     label cellI;
     scalar valueScal;
     scalar weightP;
 
+    if(weightWithWeight2) 
+        FatalError << "dilute::setScalarAverage: attempt to weight with weight2, which is not implemented" << abort(FatalError);
+
     for(int index=0; index< particleCloud_.numberOfParticles(); index++)
     {
-        //if(mask[index][0])
-        //{
-            for(int subCell=0;subCell<particleCloud_.voidFractionM().cellsPerParticle()[index][0];subCell++)
+        for(int subCell=0;subCell<particleCloud_.cellsPerParticle()[index][0];subCell++)
+        {
+            //Info << "subCell=" << subCell << endl;
+            cellI = particleCloud_.cellIDs()[index][subCell];
+
+            if (cellI >= 0)
             {
-                //Info << "subCell=" << subCell << endl;
-                cellI = particleCloud_.cellIDs()[index][subCell];
+                valueScal = value[index][0];
+                weightP = weight[index][0];
+                weightField[cellI] += weightP;
 
-                if (cellI >= 0)
-                {
-                    valueScal = value[index][0];
-                    weightP = weight[index][0];
-                    weightField[cellI] += weightP;
-
-                    field[cellI] = valueScal/weightP;
-                }
+                field[cellI] = valueScal/weightP;
             }
-        //}
+        }
     }
 
     // correct cell values to patches
@@ -117,32 +119,47 @@ void dilute::setVectorAverage
     double**& value,
     double**& weight,
     volScalarField& weightField,
-    double**const& mask
+    double**const& mask,
+    double**const& weight2,         //allows the specification of a 2nd weight field
+    bool weightWithWeight2    //switch to activate 2nd weight field
 ) const
 {
     label cellI;
     vector valueVec;
     scalar weightP;
 
+    if(weightWithWeight2) //use weight2, e.g., mass-averaged - has no effect, just weight is DIFFERENT!
     for(int index=0; index< particleCloud_.numberOfParticles(); index++)
     {
-        //if(mask[index][0])
-        //{
-            for(int subCell=0;subCell<particleCloud_.voidFractionM().cellsPerParticle()[index][0];subCell++)
+        for(int subCell=0;subCell<particleCloud_.cellsPerParticle()[index][0];subCell++)
+        {
+            cellI = particleCloud_.cellIDs()[index][subCell];
+            if (cellI >= 0)
             {
-                //Info << "subCell=" << subCell << endl;
-                cellI = particleCloud_.cellIDs()[index][subCell];
-
-                if (cellI >= 0)
-                {
-                    for(int i=0;i<3;i++) valueVec[i] = value[index][i];
-                    weightP = weight[index][subCell];
-                    weightField[cellI] += weightP;
-                    if(weightP > 0) field[cellI] = valueVec; //field[cellI] = valueVec/weightP;
-                    else Warning << "!!! W A R N I N G --- weightP <= 0" << endl;
-                }
+                for(int i=0;i<3;i++) valueVec[i] = value[index][i];
+                weightP = weight[index][subCell]*weight2[index][subCell];
+                weightField[cellI] += weightP;
+                if(weightP > 0) field[cellI] = valueVec; //field[cellI] = valueVec/weightP;
             }
-        //}
+        }
+    }
+    else //standard, i.e., volume-averaged - has no effect, just weight is DIFFERENT!
+    for(int index=0; index< particleCloud_.numberOfParticles(); index++)
+    {
+        for(int subCell=0;subCell<particleCloud_.cellsPerParticle()[index][0];subCell++)
+        {
+            //Info << "subCell=" << subCell << endl;
+            cellI = particleCloud_.cellIDs()[index][subCell];
+
+            if (cellI >= 0)
+            {
+                for(int i=0;i<3;i++) valueVec[i] = value[index][i];
+                weightP = weight[index][subCell];
+                weightField[cellI] += weightP;
+                if(weightP > 0) field[cellI] = valueVec; //field[cellI] = valueVec/weightP;
+                else Warning << "!!! W A R N I N G --- weightP <= 0" << endl;
+            }
+        }
     }
 
     // correct cell values to patches

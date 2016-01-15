@@ -33,6 +33,9 @@ Description
     Li and Mason (2000), A computational investigation of transient heat
     transfer in  pneumatic transport of granular particles, Pow.Tech 112
 
+    This model will put all the source into the explicit coupling term
+    for the fluid-side integration (might be unstable)
+
 Class
     LaEuScalarTemp
 
@@ -81,15 +84,31 @@ private:
 
     word partTempName_;
 
-    mutable double **partTemp_;                          // Lagrangian array
+    mutable double **partTemp_;                  // Lagrangian array
 
     word partHeatFluxName_;
 
     mutable double **partHeatFlux_;              // Lagrangian array
+    
+    bool           validPartHeatFlux_;           //indicator if found
+
+    word partHeatTransCoeffName_;
+
+    mutable double **partHeatTransCoeff_;        // Lagrangian array
+    
+    bool           validPartHeatTransCoeff_;     //indicator if found
+    
+    word partHeatFluidName_;
+
+    mutable double **partHeatFluid_;             // Lagrangian array
+    
+    bool           validPartHeatFluid_;           //indicator if found
 
     scalar lambda_;                              // fluid thermal conductivity [W/(m*K)]
 
     scalar Cp_;                                  // specific heat capacity [W*s/(kg*K)]
+
+    mutable scalar scaleDia_;
 
     void allocateMyArrays() const;
 

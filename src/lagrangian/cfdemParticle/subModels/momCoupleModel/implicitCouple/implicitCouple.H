@@ -98,6 +98,9 @@ public:
 
 
     // Member Functions
+
+        void applyDebugSettings(bool) const;
+
         tmp<volScalarField> impMomSource() const;
 
         void resetMomSourceField() const;

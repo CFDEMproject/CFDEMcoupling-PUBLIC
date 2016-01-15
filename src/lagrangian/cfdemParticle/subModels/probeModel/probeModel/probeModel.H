@@ -63,13 +63,13 @@ protected:
 
         //- Class used for grouping field types
         template<class Type>
-        class fieldGroup
+        class cfdemFieldGroup
         :
             public DynamicList<word>
         {
         public:
             //- Construct null
-            fieldGroup()
+            cfdemFieldGroup()
             :
                 DynamicList<word>(0)
             {}
@@ -81,8 +81,8 @@ public:
 
     // Variables
     //- Categorized scalar/vector/tensor vol fields
-    mutable fieldGroup<scalar> scalarFields_;
-    mutable fieldGroup<vector> vectorFields_;
+    mutable cfdemFieldGroup<scalar> scalarFields_;
+    mutable cfdemFieldGroup<vector> vectorFields_;
 
     //- Runtime type information
     TypeName("probeModel");

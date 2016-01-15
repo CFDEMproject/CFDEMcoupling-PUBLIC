@@ -1,0 +1,72 @@
+<HTML>
+<CENTER><A HREF = "http://www.cfdem.com">CFDEMproject WWW Site</A> - <A HREF = "CFDEMcoupling_Manual.html#comm">CFDEM Commands</A> 
+</CENTER>
+
+
+
+
+<HR>
+
+<H3>forceModel_fieldTimeAverage command 
+</H3>
+<P><B>Syntax:</B>
+</P>
+<P>Defined in couplingProperties dictionary.
+</P>
+<PRE>forceModels
+(
+    fieldTimeAverage
+);
+fieldTimeAverageProps
+{
+    startTime time;
+    scalarFieldNames
+    (
+        "scalarField"
+    );
+    vectorFieldNames
+    (
+        "vectorField"
+    );
+}; 
+</PRE>
+<UL><LI><I>time</I> = time to start temporal averaging 
+
+<LI><I>scalarField</I> = names of the finite volume scalar fields to be temporally averaged 
+
+<LI><I>vectorField</I> = names of the finite volume vector fields to be temporally averaged 
+
+
+</UL>
+<P><B>Examples:</B>
+</P>
+<PRE>forceModels
+(
+    fieldTimeAverage
+);
+fieldTimeAverageProps
+{
+    startTime 1.0;
+    scalarFieldNames
+    (
+        "voidfraction"
+    );
+    vectorFieldNames
+    (
+        "Us"
+    );
+} 
+</PRE>
+<P><B>Description:</B>
+</P>
+<P>This "forceModel" does not influence the particles or the simulation - it is a postprocessing tool! Starting at start time the specified fields are temporally averaged and written at "writeTime". They can then be probed using standard function object probes. The output name is timeAverage_scalarField, where scalarField is the name of the original field.
+</P>
+<P><B>Restrictions:</B>
+</P>
+<P>none.
+</P>
+<P><B>Related commands:</B>
+</P>
+<P><A HREF = "forceModel.html">forceModel</A>
+</P>
+</HTML>

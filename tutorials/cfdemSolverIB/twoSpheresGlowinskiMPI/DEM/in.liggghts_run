@@ -1,6 +1,6 @@
-#echo both
-log         ../DEM/log.liggghts
-thermo_log  ../DEM/post/thermo.txt
+echo            both
+log             ../DEM/log.liggghts
+thermo_log      ../DEM/post/thermo.txt
 
 atom_style      granular
 atom_modify     map array

@@ -106,6 +106,16 @@ explicitCouple::~explicitCouple()
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+
+void Foam::explicitCouple::applyDebugSettings(bool debug) const
+{
+    if(!debug)
+    {
+        fPrev_.writeOpt() = IOobject::NO_WRITE;
+        fNext_.writeOpt() = IOobject::NO_WRITE;
+    }
+}
+
 tmp<volVectorField> explicitCouple::expMomSource() const
 {
     tmp<volVectorField> tsource
@@ -142,7 +152,7 @@ tmp<volVectorField> explicitCouple::expMomSource() const
             // limiter
             for (int i=0;i<3;i++)
             {
-                if (fNext_[cellI][i] > fLimit_[i]) fNext_[cellI][i] = fLimit_[i];
+                if (mag(fNext_[cellI][i]) > fLimit_[i]) fNext_[cellI][i] = fLimit_[i];
             }
         }
         tsource() = fPrev_;

@@ -1,10 +1,12 @@
+echo            both
+log             ../DEM/log.liggghts
+
 # Particle packing by insertion and successive growing of particles
 
 atom_style      granular
 atom_modify     map array
 boundary        m m m
 newton          off
-echo            both
 
 communicate     single vel yes
 

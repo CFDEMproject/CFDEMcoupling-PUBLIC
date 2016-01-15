@@ -62,7 +62,11 @@ class checkCouplingInterval
 private:
     dictionary propsDict_;
 
+    const volVectorField& U_;
+
     const scalar rhoP_;
+
+    scalar maxCFL_;
 
 public:
 

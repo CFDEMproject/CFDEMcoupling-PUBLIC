@@ -31,7 +31,7 @@ PROJECT_NAME           = CFDEMcoupling
 # This could be handy for archiving the generated documentation or
 # if some version control system is used.
 
-PROJECT_NUMBER         = 2.4
+PROJECT_NUMBER         = 2.4.18
 
 # The OUTPUT_DIRECTORY tag is used to specify the (relative or absolute)
 # base path where the generated documentation will be put.
@@ -574,7 +574,8 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories
 # with spaces.
 
-INPUT                  = /home/cfdem/CFDEM/CFDEM-x.x-2.0.x/src/lagrangian/cfdemParticle
+#INPUT                  = /home/cgoniva/CFDEM/CFDEM-x.x-2.1.x/CFDEMcoupling-src/lagrangian/cfdemParticle
+INPUT                  = /home/cgoniva/CFDEM/CFDEM-x.x-2.1.x/CFDEMcoupling-PUBLIC/src/lagrangian/cfdemParticle
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding, which is

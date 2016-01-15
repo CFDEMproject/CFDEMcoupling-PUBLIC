@@ -64,7 +64,7 @@ private:
 
     bool twoDimensional_;
 
-    bool depth_;
+    double depth_;
 
     word velFieldName_;
 

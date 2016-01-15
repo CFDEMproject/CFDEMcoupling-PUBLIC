@@ -34,8 +34,6 @@ Description
 #include "DiFeliceDrag.H"
 #include "addToRunTimeSelectionTable.H"
 
-//#include "mpi.h"
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -73,14 +71,19 @@ DiFeliceDrag::DiFeliceDrag
     scaleDia_(1.),
     scaleDrag_(1.)
 {
-    //Append the field names to be probed
-    particleCloud_.probeM().initialize(typeName, "diFeliceDrag.logDat");
-    particleCloud_.probeM().vectorFields_.append("dragForce"); //first entry must the be the force
-    particleCloud_.probeM().vectorFields_.append("Urel");        //other are debug
-    particleCloud_.probeM().scalarFields_.append("Rep");          //other are debug
-    particleCloud_.probeM().scalarFields_.append("Cd");                 //other are debug
-    particleCloud_.probeM().scalarFields_.append("voidfraction");       //other are debug
-    particleCloud_.probeM().writeHeader();
+    // suppress particle probe
+    if (probeIt_ && propsDict_.found("suppressProbe"))
+        probeIt_=!Switch(propsDict_.lookup("suppressProbe"));
+    if(probeIt_)
+    {
+        particleCloud_.probeM().initialize(typeName, "diFeliceDrag.logDat");
+        particleCloud_.probeM().vectorFields_.append("dragForce"); //first entry must the be the force
+        particleCloud_.probeM().vectorFields_.append("Urel");        //other are debug
+        particleCloud_.probeM().scalarFields_.append("Rep");          //other are debug
+        particleCloud_.probeM().scalarFields_.append("Cd");                 //other are debug
+        particleCloud_.probeM().scalarFields_.append("voidfraction");       //other are debug
+        particleCloud_.probeM().writeHeader();
+    }
 
     particleCloud_.checkCG(true);
     if (propsDict_.found("scale"))
@@ -99,7 +102,8 @@ DiFeliceDrag::DiFeliceDrag
     forceSubM(0).setSwitchesList(8,true); // activate scalarViscosity switch
 
     // read those switches defined above, if provided in dict
-    forceSubM(0).readSwitches();
+    for (int iFSub=0;iFSub<nrForceSubModels();iFSub++)
+        forceSubM(iFSub).readSwitches();
 }
 
 
@@ -114,15 +118,19 @@ DiFeliceDrag::~DiFeliceDrag()
 void DiFeliceDrag::setForce() const
 {
     if (scaleDia_ > 1)
-        Info << "DiFeliceDrag using scale = " << scaleDia_ << endl;
+        Info << typeName << " using scale = " << scaleDia_ << endl;
     else if (particleCloud_.cg() > 1){
         scaleDia_=particleCloud_.cg();
-        Info << "DiFeliceDrag using scale from liggghts cg = " << scaleDia_ << endl;
+        Info << typeName << " using scale from liggghts cg = " << scaleDia_ << endl;
     }
 
     const volScalarField& nufField = forceSubM(0).nuField();
     const volScalarField& rhoField = forceSubM(0).rhoField();
-    
+
+    //update force submodels to prepare for loop
+    for (int iFSub=0;iFSub<nrForceSubModels();iFSub++)
+        forceSubM(iFSub).preParticleLoop(forceSubM(iFSub).verbose());
+
     vector position(0,0,0);
     scalar voidfraction(1);
     vector Ufluid(0,0,0);
@@ -149,7 +157,6 @@ void DiFeliceDrag::setForce() const
             cellI = particleCloud_.cellIDs()[index][0];
             drag = vector(0,0,0);
             dragExplicit = vector(0,0,0);
-            dragCoefficient=0;
             Ufluid =vector(0,0,0);
 
             if (cellI > -1) // particle Found
@@ -173,6 +180,7 @@ void DiFeliceDrag::setForce() const
                 magUr = mag(Ur);
                 Rep = 0;
                 Cd = 0;
+                dragCoefficient = 0;
 
                 if (magUr > 0)
                 {
@@ -198,12 +206,20 @@ void DiFeliceDrag::setForce() const
 
                     drag = dragCoefficient*Ur; //total drag force!
 
-                    forceSubM(0).explicitCorr(drag,dragExplicit,dragCoefficient,Ufluid,U_[cellI],Us,UsField_[cellI],forceSubM(0).verbose(),index);
+                    // explicitCorr
+                    for (int iFSub=0;iFSub<nrForceSubModels();iFSub++)
+                        forceSubM(iFSub).explicitCorr( drag, 
+                                                       dragExplicit,
+                                                       dragCoefficient,
+                                                       Ufluid, U_[cellI], Us, UsField_[cellI],
+                                                       forceSubM(iFSub).verbose()
+                                                     );
                 }
 
                 if(forceSubM(0).verbose() && index >-1 && index <102)
                 {
                     Pout << "index = " << index << endl;
+                    Pout << "scaleDrag_ = " << scaleDrag_ << endl;
                     Pout << "Us = " << Us << endl;
                     Pout << "Ur = " << Ur << endl;
                     Pout << "ds/scale = " << ds/scaleDia_ << endl;
@@ -219,11 +235,13 @@ void DiFeliceDrag::setForce() const
                 if(probeIt_)
                 {
                     #include "setupProbeModelfields.H"
-                    vValues.append(drag);   //first entry must the be the force
-                    vValues.append(Ur);
-                    sValues.append(Rep);
-                    sValues.append(Cd);
-                    sValues.append(voidfraction);
+                    // Note: for other than ext one could use vValues.append(x)
+                    // instead of setSize
+                    vValues.setSize(vValues.size()+1, drag);           //first entry must the be the force
+                    vValues.setSize(vValues.size()+1, Ur);
+                    sValues.setSize(sValues.size()+1, Rep); 
+                    sValues.setSize(sValues.size()+1, Cd);
+                    sValues.setSize(sValues.size()+1, voidfraction);
                     particleCloud_.probeM().writeProbe(index, sValues, vValues);
                 }
             }

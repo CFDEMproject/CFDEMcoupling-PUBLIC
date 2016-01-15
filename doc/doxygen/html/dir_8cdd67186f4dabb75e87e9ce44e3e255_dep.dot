@@ -1,0 +1,9 @@
+digraph "/home/cgoniva/CFDEM/CFDEM-x.x-2.1.x/CFDEMcoupling-PUBLIC/src/lagrangian/cfdemParticle/subModels/IOModel/sophIO" {
+  compound=true
+  node [ fontsize="10", fontname="FreeSans"];
+  edge [ labelfontsize="10", labelfontname="FreeSans"];
+  subgraph clusterdir_1dfa0bd845c9ce5429e1e788a752f15e {
+    graph [ bgcolor="#ddddee", pencolor="black", label="IOModel" fontname="FreeSans", fontsize="10", URL="dir_1dfa0bd845c9ce5429e1e788a752f15e.html"]
+  dir_8cdd67186f4dabb75e87e9ce44e3e255 [shape=box, label="sophIO", style="filled", fillcolor="#eeeeff", pencolor="black", URL="dir_8cdd67186f4dabb75e87e9ce44e3e255.html"];
+  }
+}

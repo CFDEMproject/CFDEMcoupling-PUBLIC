@@ -79,6 +79,60 @@ void Foam::noCouple::resetMomSourceField() const
               //<< abort(FatalError);
 }
 
+tmp<volScalarField> noCouple::impMomSource() const
+{
+    tmp<volScalarField> tsource
+    (
+        new volScalarField
+        (
+            IOobject
+            (
+                "Ksl_implicitCouple",
+                particleCloud_.mesh().time().timeName(),
+                particleCloud_.mesh(),
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            ),
+            particleCloud_.mesh(),
+            dimensionedScalar
+            (
+                "zero",
+                dimensionSet(1, -3, -1, 0, 0), // N/m3 / m/s
+                0
+            )
+        )
+    );
+
+    return tsource;
+}
+
+tmp<volVectorField> noCouple::expMomSource() const
+{
+    tmp<volVectorField> tsource
+    (
+        new volVectorField
+        (
+            IOobject
+            (
+                "f_explicitCouple",
+                particleCloud_.mesh().time().timeName(),
+                particleCloud_.mesh(),
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            ),
+            particleCloud_.mesh(),
+            dimensionedVector
+            (
+                "zero",
+                dimensionSet(1, -2, -2, 0, 0), // N/m3
+                vector::zero
+            )
+        )
+    );
+
+    return tsource;
+}
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam

@@ -1,0 +1,169 @@
+<HTML>
+<CENTER><A HREF = "http://www.cfdem.com">CFDEMproject WWW Site</A> - <A HREF = "CFDEMcoupling_Manual.html#comm">CFDEM Commands</A> 
+</CENTER>
+
+
+
+
+<HR>
+
+<H3>forceModel_scalarGeneralExchange command 
+</H3>
+<P><B>Syntax:</B>
+</P>
+<P>Defined in couplingProperties dictionary.
+</P>
+<PRE>forceModels
+(
+    scalarGeneralExchange  // must be 2nd position!
+);
+scalarGeneralExchangeProps
+{
+    useLiMason "switch1"; //default: DeenEtAl
+    verbose "switch2";
+    velFieldName "U";
+    voidfractionFieldName "voidfraction";
+    tempFieldName "T";
+    partTempName "Temp";
+    /* partHeatFluxName "convectiveHeatFlux"; //switch off for implicit coupling, e.g., to ParScale */
+    partHeatTransCoeffName "heatTransCoeff";
+    partHeatFluidName "heatFluid";
+    lambda value;
+    Cp value1;
+    //Lists with information for each species FOR THE PARTICLES
+    //MUST be in the same order as eulerian species in 'scalarTransportProperties'
+    //MUST correspond to property/atom in ligghts (use 'couple/cfd/speciesConvection' to auto-generate individual fields)
+    partSpeciesNames
+    (
+    speciesC
+    );
+    partSpeciesFluxNames
+    (
+    speciesCFlux
+    );
+    partSpeciesTransCoeffNames
+    (
+    speciesCTransCoeff
+    );
+    partSpeciesFluidNames
+    (
+    speciesCFluid
+    );
+    DMolecular
+    (
+    value2
+    );
+} 
+</PRE>
+<UL><LI><I>switch1</I> = (optional) flag to use Nusselt correlations of Li and Mason (2000) 
+
+<LI><I>switch2</I> = (normally off) for verbose run 
+
+<LI><I>U</I> = name of the finite volume fluid velocity field 
+
+<LI><I>voidfraction</I> = name of the finite volume voidfraction field 
+
+<LI><I>T</I> = name of the finite volume scalar temperature field 
+
+<LI><I>Temp</I> = name of the DEM data representing the particles temperature 
+
+<LI><I>convectiveHeatFlux</I> = name of the DEM data representing the particle-fluid convective heat flux 
+
+<LI><I>heatTransCoeff</I> = name of the DEM data representing the particle-fluid heat transfer coefficient 
+
+<LI><I>heatFluid</I> = name of the DEM data representing the fluid heat 
+
+<LI><I>value</I> = fluid thermal conductivity [W/(m*K)] 
+
+<LI><I>value1</I> = fluid specific heat capacity [W*s/(kg*K)] 
+
+<LI><I>speciesC</I> = name of the DEM data representing the transport species of the particles 
+
+<LI><I>speciesCFlux</I> = name of the DEM data representing the particle-fluid species flux 
+
+<LI><I>speciesCTransCoeff</I> = name of the DEM data representing the particle-fluid species transfer coefficient 
+
+<LI><I>speciesCFluid</I> = name of the DEM data representing the transport species of the fluid 
+
+<LI><I>value2</I> = molecular diffusion coefficient [m^2/s] 
+
+
+</UL>
+<P><B>Examples:</B>
+</P>
+<PRE>forceModels
+(
+    scalarGeneralExchange  // must be 2nd position!
+);
+scalarGeneralExchangeProps
+{
+    useLiMason false; //default: DeenEtAl
+    verbose false;
+    velFieldName "U";
+    voidfractionFieldName "voidfraction";
+    tempFieldName "T";
+    partTempName "Temp";
+    /* partHeatFluxName "convectiveHeatFlux"; //switch off for implicit coupling, e.g., to ParScale */
+    partHeatTransCoeffName "heatTransCoeff";
+    partHeatFluidName "heatFluid";
+    lambda 0.0271;
+    Cp 1007;
+    //Lists with information for each species FOR THE PARTICLES
+    //MUST be in the same order as eulerian species in 'scalarTransportProperties'
+    //MUST correspond to property/atom in ligghts (use 'couple/cfd/speciesConvection' to auto-generate individual fields)
+    partSpeciesNames
+    (
+    speciesC
+    );
+    partSpeciesFluxNames
+    (
+    speciesCFlux
+    );
+    partSpeciesTransCoeffNames
+    (
+    speciesCTransCoeff
+    );
+    partSpeciesFluidNames
+    (
+    speciesCFluid
+    );
+    DMolecular
+    (
+    1e-5
+    );
+} 
+</PRE>
+<P><B>Description:</B>
+</P>
+<P>This "forceModel" does not influence the particles or the fluid flow! 
+Using the particles' temperature and/or species a scalar field 
+representing "particle-fluid heatflux" and/or "particle-fluid speciesflux" is calculated. 
+</P>
+<P>This code is designed to realize coupled CFD-DEM simulations using LIGGGHTS
+and OpenFOAM(R). Note: this code is not part of OpenFOAM(R) (see DISCLAIMER).
+</P>
+<P>Two way general scalar exchange between DEM and CFD
+convective heat and species transfer model. The standard model is that of
+Deen, N.G. et al., Review of direct numerical simulation of
+fluid-particle mass, momentum and heat transfer in dense gas-solid flows.
+Chemical Engineering Science 116 (2014) 710-724. 
+This correlation is based on that of Gunn (1978).
+</P>
+<P>Alternatively, the correclation of
+Li and Mason (2000), A computational investigation of transient heat
+transfer in pneumatic transport of granular particles, Pow.Tech 112
+can be activated. However, this correlation is not suitable for
+dense granular flows.
+</P>
+<P>WARNING:
+This model REQUIRES the 'generalManual' speciesTransportModel
+</P>
+<P><B>Restrictions:</B>
+</P>
+<P>Goes only with cfdemSolverPimpleImEx and cfdemSolverPisoSTM. The force model has to be the second (!!!) model in the forces list.
+</P>
+<P><B>Related commands:</B>
+</P>
+<P><A HREF = "forceModel.html">forceModel</A> <A HREF = "forceModel_LaEuScalarTemp.html">forceModel_LaEuScalarTemp</A>
+</P>
+</HTML>

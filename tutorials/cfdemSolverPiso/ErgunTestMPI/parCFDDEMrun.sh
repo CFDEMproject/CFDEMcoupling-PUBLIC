@@ -21,7 +21,7 @@ logfileName="log_$headerText"
 solverName="cfdemSolverPiso"
 nrProcs="4"
 machineFileName="none"   # yourMachinefileName | none
-debugMode="off"          # on | off| strict
+debugMode="off"          # on | off| strict | profile
 testHarnessPath="$CFDEM_TEST_HARNESS_PATH"
 runOctave="true"
 postproc="false"
@@ -40,24 +40,24 @@ if [ $runOctave == "true" ]
         cd octave
 
         #- rmove old graph
-        rm cfdemSolverPiso_ErgunTestMPI.eps
+        rm cfdemSolverPiso_ErgunTestMPI.png
 
         #- run octave
         octave totalPressureDrop.m
 
         #- show plot 
-        evince cfdemSolverPiso_ErgunTestMPI.eps
+        eog cfdemSolverPiso_ErgunTestMPI.png
 
         #- copy log file to test harness
         cp ../../$logfileName $testHarnessPath
-        cp cfdemSolverPiso_ErgunTestMPI.eps $testHarnessPath
+        cp cfdemSolverPiso_ErgunTestMPI.png $testHarnessPath
 fi
 
 if [ $postproc == "true" ]
   then
 
     #- keep terminal open (if started in new terminal)
-    echo "simulation finisehd? ...press enter to proceed"
+    echo "simulation finished? ...press enter to proceed"
     read
 
     #- get VTK data from liggghts dump file
@@ -86,6 +86,8 @@ source $WM_PROJECT_DIR/bin/tools/CleanFunctions
 cd $casePath/CFD
 cleanCase
 rm -r $casePath/CFD/clockData
+rm $casePath/CFD/octave/octave-workspace
+rm -r $casePath/CFD/hpctoolkit-*
 rm $casePath/DEM/post/*.*
 touch $casePath/DEM/post/.gitignore
 #rm $casePath/DEM/post/restart/*.*

@@ -23,7 +23,7 @@ startTime       0;
 
 stopAt          endTime;
 
-endTime         0.05;
+endTime         0.1;
 
 deltaT          0.0003;
 
@@ -66,11 +66,14 @@ functions
         name        drag;
         probeLocations
         (
-            (0.0 0.0 0.0)
+            (0.5001 0.5001 0.0001)
+            (0.5001 0.5001 1.0001)
+            (0.5001 0.5001 2.0001)
+            (0.5001 0.5001 3.0001)
         );
 
         // Fields to be probed
-        fields ( particleForces );
+        fields ( p );
 
         // Write at same frequency as fields
         outputControl   timeStep;//outputTime;

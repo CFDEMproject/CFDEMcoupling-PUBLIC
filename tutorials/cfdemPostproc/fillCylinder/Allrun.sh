@@ -77,7 +77,8 @@ if [ $postproc == "true" ]
     #- start paraview
     echo ""
     echo "trying to start paraview..."
-    paraview
+    #paraview4 # use your start command for paraview here
+    $HOME/software/ParaView-4.3.1-Linux-64bit/bin/paraview
     read
 fi
 

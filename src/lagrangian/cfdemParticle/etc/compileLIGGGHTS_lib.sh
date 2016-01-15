@@ -22,7 +22,7 @@ mkdir -p $logDir
     echo ""
     echo "Compiling sub-libraries of LIGGGHTS now..."
     echo "Please provide the libraries to be compiled in the $CWD/$whitelist file."
-    echo "Libraries must be in the $CFDEM_LIGGGHTS_SRC_DIR/../lib directory."
+    echo "Libraries must be in: $CFDEM_LAMMPS_LIB_DIR"
 
     if [ ! -f "$CWD/$whitelist" ];then
         echo "$whitelist does not exist in $CWD. Nothing will be done."
@@ -51,7 +51,7 @@ mkdir -p $logDir
             elif [[ "$LINE" == */dir ]]; then
                 echo "will change path..."
                 LINE=$(echo "${LINE%????}")
-                path="$CFDEM_LIGGGHTS_SRC_DIR/../lib"
+                path="$CFDEM_LAMMPS_LIB_DIR"
                 cd $path
                 echo $PWD
                 #continue

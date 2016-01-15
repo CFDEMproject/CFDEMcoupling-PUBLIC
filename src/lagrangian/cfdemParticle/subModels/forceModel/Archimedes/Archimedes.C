@@ -72,11 +72,16 @@ Archimedes::Archimedes
 {
 
     //Append the field names to be probed
-    particleCloud_.probeM().initialize(typeName, "archimedesF.logDat");
-    particleCloud_.probeM().vectorFields_.append("archimedesForce");  //first entry must the be the force
-    particleCloud_.probeM().scalarFields_.append("Vp");
-    particleCloud_.probeM().writeHeader();  
-
+    // suppress particle probe
+    if (probeIt_ && propsDict_.found("suppressProbe"))
+        probeIt_=!Switch(propsDict_.lookup("suppressProbe"));
+    if(probeIt_)
+    {
+        particleCloud_.probeM().initialize(typeName, "archimedesF.logDat");
+        particleCloud_.probeM().vectorFields_.append("archimedesForce");  //first entry must the be the force
+        particleCloud_.probeM().scalarFields_.append("Vp");
+        particleCloud_.probeM().writeHeader(); 
+    }
 
     if (propsDict_.found("twoDimensional"))
     {
@@ -87,10 +92,14 @@ Archimedes::Archimedes
     // init force sub model
     setForceSubModels(propsDict_);
 
-    // define switches which can be read from dict
-    forceSubM(0).setSwitchesList(0,true); // activate treatExplicit switch
-    forceSubM(0).setSwitchesList(1,true); // activate treatForceDEM switch
-    forceSubM(0).readSwitches();
+    // define switches which can be read from dict (default = false)
+    forceSubM(0).setSwitchesList(1,true); // activate treatForceDEM switch (DEM side only treatment)
+
+    //set default switches (hard-coded default = false)
+    forceSubM(0).setSwitches(1,true);  // will treat forces on DEM side only - IMPORTANT!
+
+    for (int iFSub=0;iFSub<nrForceSubModels();iFSub++)
+        forceSubM(iFSub).readSwitches();
 
     if (modelType_=="A" || modelType_=="Bfull"){
         if(!forceSubM(0).switches()[1]) // treatDEM != true
@@ -155,8 +164,10 @@ void Archimedes::setForce() const
                 if(probeIt_)
                 {
                     #include "setupProbeModelfields.H"
-                    vValues.append(force);           //first entry must the be the force
-                    sValues.append(particleCloud_.particleVolume(index));
+                    // Note: for other than ext one could use vValues.append(x)
+                    // instead of setSize
+                    vValues.setSize(vValues.size()+1, force);           //first entry must the be the force
+                    sValues.setSize(sValues.size()+1, particleCloud_.particleVolume(index)); 
                     particleCloud_.probeM().writeProbe(index, sValues, vValues);
                 }
             }

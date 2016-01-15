@@ -77,16 +77,24 @@ compileLib()
         ending=${str:$i:4}
         if [[ $ending == "Comp" ]]; then
                 echo "Compiling a compressible library - so doing an rmdepall of incomp library first."
-                echo "Please make sure to have the compressible libraries first in the library-list.txt!"
+                echo "Please make sure to have the incompressible libraries first in the library-list.txt!"
                 cd $CFDEM_SRC_DIR/lagrangian/cfdemParticle
                 echo "changing to $PWD"
-                rmdepall 2>&1 | tee -a $logpath/$logfileName
+                if [[ $WM_PROJECT_VERSION == "dev" ]]; then
+                    wrmdep 2>&1 | tee -a $logpath/$logfileName
+                else
+                    rmdepall 2>&1 | tee -a $logpath/$logfileName
+                fi
                 cd $casePath
                 echo "changing to $PWD"
             else
                 echo "Compiling a incompressible library."
         fi
-        rmdepall 2>&1 | tee -a $logpath/$logfileName
+        if [[ $WM_PROJECT_VERSION == "dev" ]]; then
+            wrmdep 2>&1 | tee -a $logpath/$logfileName
+        else
+            rmdepall 2>&1 | tee -a $logpath/$logfileName
+        fi
         wclean 2>&1 | tee -a $logpath/$logfileName
     #fi
     wmake libso 2>&1 | tee -a $logpath/$logfileName
@@ -126,11 +134,18 @@ compileSolver()
     pwd 2>&1 | tee -a $logpath/$logfileName
     echo 2>&1 | tee -a $logpath/$logfileName
 
-    #- wclean and wmake
-    #if [ $doClean != "noClean" ]; then
-        rmdepall 2>&1 | tee -a $logpath/$logfileName
-        wclean 2>&1 | tee -a $logpath/$logfileName
-    #fi
+    # check if there is an Allwmake
+    if [ -f "Allwmake" ]; then
+        echo "doing Allwclean and Allwmake for the solver"
+        bash Allwclean 2>&1 | tee -a $logpath/$logfileName
+        bash Allwmake 2>&1 | tee -a $logpath/$logfileName
+    else
+        #- wclean and wmake
+        #if [ $doClean != "noClean" ]; then
+            rmdepall 2>&1 | tee -a $logpath/$logfileName
+            wclean 2>&1 | tee -a $logpath/$logfileName
+        #fi
+    fi
     
     # compile parallel?
     if [[ $parallel == "true" ]]; then
@@ -178,7 +193,7 @@ compileLIGGGHTS()
     else
         rm $CFDEM_LIGGGHTS_SRC_DIR/"lmp_"$CFDEM_LIGGGHTS_MAKEFILE_NAME
         rm $CFDEM_LIGGGHTS_SRC_DIR/"lib"$CFDEM_LIGGGHTS_LIB_NAME".a"
-        make clean-all 2>&1 | tee -a $logpath/$logfileName
+        make clean-$CFDEM_LIGGGHTS_MAKEFILE_NAME 2>&1 | tee -a $logpath/$logfileName
         echo "cleaning LIGGGHTS"
     fi
     if [[ $WM_NCOMPPROCS == "" ]]; then
@@ -186,7 +201,8 @@ compileLIGGGHTS()
         make $CFDEM_LIGGGHTS_MAKEFILE_NAME 2>&1 | tee -a $logpath/$logfileName
     else
         echo "compiling LIGGGHTS on $WM_NCOMPPROCS CPUs"
-        make $CFDEM_LIGGGHTS_MAKEFILE_NAME -j $WM_NCOMPPROCS  2>&1 | tee -a $logpath/$logfileName
+        make $CFDEM_LIGGGHTS_MAKEFILE_NAME -j $WM_NCOMPPROCS 2>&1 | tee -a $logpath/$logfileName
+        #make $CFDEM_LIGGGHTS_MAKEFILE_NAME -j $WM_NCOMPPROCS yes-XYZ 2>&1 | tee -a $logpath/$logfileName
     fi
     make makelib 2>&1 | tee -a $logpath/$logfileName
     make -f Makefile.lib $CFDEM_LIGGGHTS_MAKEFILE_NAME 2>&1 | tee -a $logpath/$logfileName
@@ -227,15 +243,21 @@ compileLMPlib()
     pwd 2>&1 | tee -a $logpath/$logfileName
     echo 2>&1 | tee -a $logpath/$logfileName
 
-    #- clean up
-    echo "make clean" 2>&1 | tee -a $logpath/$logfileName
-    echo 2>&1 | tee -a $logpath/$logfileName
-    make -f $makeFileName clean 2>&1 | tee -a $logpath/$logfileName
+    if [[ $makeFileName == "Makefile.Install" ]]; then
+        echo "using Install.sh"
+        bash Install.sh 0 2>&1 | tee -a $logpath/$logfileName
+        bash Install.sh 1 2>&1 | tee -a $logpath/$logfileName
+    else
+        #- clean up
+        echo "make clean" 2>&1 | tee -a $logpath/$logfileName
+        echo 2>&1 | tee -a $logpath/$logfileName
+        make -f $makeFileName clean 2>&1 | tee -a $logpath/$logfileName
 
-    #- compile
-    echo "make" 2>&1 | tee -a $logpath/$logfileName
-    echo 2>&1 | tee -a $logpath/$logfileName
-    make -f $makeFileName 2>&1 | tee -a $logpath/$logfileName
+        #- compile
+        echo "make" 2>&1 | tee -a $logpath/$logfileName
+        echo 2>&1 | tee -a $logpath/$logfileName
+        make -f $makeFileName 2>&1 | tee -a $logpath/$logfileName
+    fi
 }
 #==================================#
 
@@ -538,7 +560,21 @@ parCFDrun()
     rm $logpath/$logfileName
 
     #- change path
-    cd $casePath/CFD
+    cd $casePath
+
+    #- remove old data
+    rm -rf processor*
+
+    #- decompose case
+    decomposePar
+
+    #- make proc dirs visible
+    count=0
+    for i in `seq $nrProcs`
+    do
+        let count=$i-1
+        (cd $casePath/processor$count && touch file.foam)
+    done
 
     #- header
     echo 2>&1 | tee -a /$logpath/$logfileName
@@ -551,7 +587,7 @@ parCFDrun()
 
     #- run applictaion
     if [ $machineFileName == "none" ]; then
-        mpirun -np $nrProcs $solverName -parallel 2>&1 | tee -a $logpath/$logfileName
+        mpirun -np $nrProcs $debugMode $solverName -parallel 2>&1 | tee -a $logpath/$logfileName
     else
         mpirun -machinefile $machineFileName -np $nrProcs $debugMode $solverName -parallel 2>&1 | tee -a $logpath/$logfileName
     fi
@@ -584,7 +620,10 @@ parCFDDEMrun()
         debugMode="valgrind"
     elif [ $debugMode == "strict" ]; then
         #debugMode="valgrind --leak-check=full -v --trace-children=yes --track-origins=yes" 
-        debugMode="valgrind --tool=memcheck --leak-check=yes --show-reachable=yes --num-callers=20 --track-fds=yes"  
+        debugMode="valgrind --tool=memcheck --leak-check=yes --show-reachable=yes --num-callers=20 --track-fds=yes"
+    elif [ $debugMode == "profile" ]; then
+        debugMode="hpcrun"
+        rm -r $casePath/CFD/hpctoolkit-$solverName-measurements
     else
         debugMode=""
     fi
@@ -640,6 +679,12 @@ parCFDDEMrun()
         fi
     fi
 
+    if [[ $debugMode == "hpcrun" ]]; then
+        rm hpctoolkit-$solverName-database*
+        hpcprof -S $CFDEM_APP_DIR/$solverName.hpcstruct -I ./'*' hpctoolkit-$solverName-measurements
+        echo "huhu"      
+    fi
+
     #- keep terminal open (if started in new terminal)
     #read
 }
@@ -688,7 +733,7 @@ collectLogCFDEMcoupling_sol()
     LASTWORD=$(basename $LASTSTRING)
 
     # log if compilation was success  
-    if [[ $LASTWORD == $SOLVERNAME ]]; then
+    if [[ $LASTWORD == $SOLVERNAME || $LASTWORD == "date." ]]; then
         echo "$SOLVERNAME" >> $logpath/log_compile_results_success
     else
         echo "$SOLVERNAME" >> $logpath/log_compile_results_fail

@@ -65,6 +65,22 @@ turbulenceModelType RASProperties;
 //===========================================================================//
 // sub-model properties
 
+typeConcentrationProps
+{
+    verbose true;
+    useDivided true;
+    normConcentrationReference 0.07;
+    typesA
+    (
+        1
+    );
+
+    typesB
+    (
+        2
+    );
+}
+
 oneWayVTKProps
 {
     DEMts 0.0001;

@@ -1,0 +1,31 @@
+digraph "/home/cgoniva/CFDEM/CFDEM-x.x-2.1.x/CFDEMcoupling-PUBLIC/src/lagrangian/cfdemParticle/subModels/forceModel" {
+  compound=true
+  node [ fontsize="10", fontname="FreeSans"];
+  edge [ labelfontsize="10", labelfontname="FreeSans"];
+  subgraph clusterdir_b4405a94eb03d3869e7a57a48055cc50 {
+    graph [ bgcolor="#ddddee", pencolor="black", label="subModels" fontname="FreeSans", fontsize="10", URL="dir_b4405a94eb03d3869e7a57a48055cc50.html"]
+  subgraph clusterdir_0abfdb325e722c517996fb9c43aac5bd {
+    graph [ bgcolor="#eeeeff", pencolor="black", label="" URL="dir_0abfdb325e722c517996fb9c43aac5bd.html"];
+    dir_0abfdb325e722c517996fb9c43aac5bd [shape=plaintext label="forceModel"];
+    dir_9e2f63d76b718a4db936666723aa010d [shape=box label="Archimedes" color="black" fillcolor="white" style="filled" URL="dir_9e2f63d76b718a4db936666723aa010d.html"];
+    dir_9a9746f6b9fcc9a827f65f22f9668c09 [shape=box label="ArchimedesIB" color="black" fillcolor="white" style="filled" URL="dir_9a9746f6b9fcc9a827f65f22f9668c09.html"];
+    dir_b7ead4a288dd7b4c5e559a6b33a1a3e2 [shape=box label="checkCouplingInterval" color="black" fillcolor="white" style="filled" URL="dir_b7ead4a288dd7b4c5e559a6b33a1a3e2.html"];
+    dir_8a5d2524df77ee33768751e07fa890d8 [shape=box label="DiFeliceDrag" color="black" fillcolor="white" style="filled" URL="dir_8a5d2524df77ee33768751e07fa890d8.html"];
+    dir_1c372ee731879f448f41632d3c79ae0b [shape=box label="fieldStore" color="black" fillcolor="white" style="filled" URL="dir_1c372ee731879f448f41632d3c79ae0b.html"];
+    dir_19829f27f762f8d6eeaba3b4af263f82 [shape=box label="forceModel" color="black" fillcolor="white" style="filled" URL="dir_19829f27f762f8d6eeaba3b4af263f82.html"];
+    dir_b297239694a2e10be46256863cb1f43c [shape=box label="forceSubModels" color="red" fillcolor="white" style="filled" URL="dir_b297239694a2e10be46256863cb1f43c.html"];
+    dir_deaf1478ea940733618ac341e6037e93 [shape=box label="GidaspowDrag" color="black" fillcolor="white" style="filled" URL="dir_deaf1478ea940733618ac341e6037e93.html"];
+    dir_175a49326ecadeeed6a46ae0c46bde77 [shape=box label="gradPForce" color="black" fillcolor="white" style="filled" URL="dir_175a49326ecadeeed6a46ae0c46bde77.html"];
+    dir_d91e4ace354a4ebb0f4aa6927f98e49d [shape=box label="interface" color="black" fillcolor="white" style="filled" URL="dir_d91e4ace354a4ebb0f4aa6927f98e49d.html"];
+    dir_e639e38e6cfc1eb702632608ebd16d0e [shape=box label="KochHillDrag" color="black" fillcolor="white" style="filled" URL="dir_e639e38e6cfc1eb702632608ebd16d0e.html"];
+    dir_3cd8941dcc84ec1d62ad8ac23c320b6e [shape=box label="LaEuScalarTemp" color="black" fillcolor="white" style="filled" URL="dir_3cd8941dcc84ec1d62ad8ac23c320b6e.html"];
+    dir_fd7cc3b05d191063c819306003d9ce7c [shape=box label="MeiLift" color="black" fillcolor="white" style="filled" URL="dir_fd7cc3b05d191063c819306003d9ce7c.html"];
+    dir_c2d073683ef8d96022b31436c62bad0c [shape=box label="noDrag" color="black" fillcolor="white" style="filled" URL="dir_c2d073683ef8d96022b31436c62bad0c.html"];
+    dir_302df9359dc774834a1d2946e7a18406 [shape=box label="particleCellVolume" color="black" fillcolor="white" style="filled" URL="dir_302df9359dc774834a1d2946e7a18406.html"];
+    dir_ed1e40efa372d8909b613dfd51d4d334 [shape=box label="SchillerNaumannDrag" color="black" fillcolor="white" style="filled" URL="dir_ed1e40efa372d8909b613dfd51d4d334.html"];
+    dir_96d695052d0c017223be9bb26575349b [shape=box label="ShirgaonkarIB" color="black" fillcolor="white" style="filled" URL="dir_96d695052d0c017223be9bb26575349b.html"];
+    dir_79e77983c480bc47046e917e9bb22b61 [shape=box label="virtualMassForce" color="black" fillcolor="white" style="filled" URL="dir_79e77983c480bc47046e917e9bb22b61.html"];
+    dir_2fa6c2ff8910515b1ac33b7a5b58d088 [shape=box label="viscForce" color="black" fillcolor="white" style="filled" URL="dir_2fa6c2ff8910515b1ac33b7a5b58d088.html"];
+  }
+  }
+}

@@ -40,7 +40,6 @@ SourceFiles
 #define dividedVoidFraction_H
 
 #include "voidFractionModel.H"
-#include "interpolationCellPoint.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -98,6 +97,8 @@ public:
 
     // Member Functions
         void setvoidFraction(double** const& ,double**&, double**&, double**&, double**&) const;
+
+        virtual double particleRadius(label) const;
 };
 
 

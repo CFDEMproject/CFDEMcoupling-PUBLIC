@@ -1,0 +1,185 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.4                                   |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+
+    root            "";
+    case            "";
+    instance        "";
+    local           "";
+
+    class           dictionary;
+    object          couplingProperties;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+//===========================================================================//
+// sub-models & settings
+solveFlow   true;
+
+modelType B; // A or B
+
+couplingInterval 500;
+
+voidFractionModel divided;
+
+locateModel engine;
+
+meshMotionModel noMeshMotion;
+
+regionModel allRegion;
+
+IOModel basicIO;
+
+probeModel off;
+
+dataExchangeModel twoWayMPI;
+
+averagingModel dense;//dilute;//
+
+clockModel off;//standardClock;//
+
+smoothingModel off;
+
+forceModels
+(
+    KochHillDrag
+    scalarGeneralExchange  // must be 2nd pos!
+    Archimedes
+);
+
+momCoupleModels
+(
+    implicitCouple
+);
+
+turbulenceModelType RASProperties;//LESProperties;//
+
+//===========================================================================//
+// sub-model properties
+
+scalarGeneralExchangeProps
+{
+/*    verbose                 true;*/
+    velFieldName            "U";
+    voidfractionFieldName   "voidfraction";
+    tempFieldName           "T";
+    partTempName            "Temp";
+    partHeatFluxName        "convectiveHeatFlux";
+    lambda                  0.0256;
+    Prandtl                 70.097; //WARNING: this is not a typical gas - just for testing purposes!
+    useLiMason              true; 
+    
+    //Lists with information for each species FOR THE PARTICLES
+    //MUST be in the same order as eulerian species in 'scalarTransportProperties'
+    //MUST correspond to property/atom in ligghts (use 'couple/cfd/speciesConvection' to auto-generate individual fields)
+    partSpeciesNames
+    (
+        speciesC
+    );
+    partSpeciesFluxNames
+    (
+        speciesCFlux
+    );
+    partSpeciesTransCoeffNames
+    (
+        speciesCTransCoeff
+    );
+    partSpeciesFluidNames
+    (
+        speciesCFluid
+    );
+    DMolecular
+    (
+        1e-5
+    );
+    //parameters for the vapor pressure model
+    parameterVap
+    (
+        0
+    );
+
+}
+
+implicitCoupleProps
+{
+    velFieldName            "U";
+    granVelFieldName        "Us";
+    voidfractionFieldName   "voidfraction";
+    //KslLimit 0;  // source switched off!!!
+}
+
+explicitCoupleProps
+{
+    //fLimit (0 0 0);
+}
+
+KochHillDragProps
+{
+    velFieldName "U";
+    voidfractionFieldName "voidfraction";
+}
+
+DiFeliceDragProps
+{
+    velFieldName "U";
+    //verbose true;
+}
+
+ArchimedesProps
+{
+    gravityFieldName "g";
+}
+gradPForceProps
+{
+    pFieldName "p";
+    voidfractionFieldName "voidfraction";
+    velocityFieldName "U";
+    //interpolation true;
+}
+
+viscForceProps
+{
+    velocityFieldName "U";
+    interpolation true;
+}
+
+oneWayVTKProps
+{
+    couplingFilename "vtk_out%4.4d.vtk";
+    maxNumberOfParticles 30000;
+}
+
+twoWayMPIProps
+{
+    maxNumberOfParticles 10000;
+    liggghtsPath "../DEM/in.liggghts_run";
+}
+
+centreProps
+{
+    alphaMin 0.1;
+}
+
+dividedProps
+{
+    alphaMin 0.4;
+    scaleUpVol 1.0;
+}
+
+engineProps
+{
+    treeSearch true;
+}
+
+// ************************************************************************* //

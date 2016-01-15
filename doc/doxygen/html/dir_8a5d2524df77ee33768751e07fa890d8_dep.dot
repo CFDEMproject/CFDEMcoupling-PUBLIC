@@ -1,0 +1,9 @@
+digraph "/home/cgoniva/CFDEM/CFDEM-x.x-2.1.x/CFDEMcoupling-PUBLIC/src/lagrangian/cfdemParticle/subModels/forceModel/DiFeliceDrag" {
+  compound=true
+  node [ fontsize="10", fontname="FreeSans"];
+  edge [ labelfontsize="10", labelfontname="FreeSans"];
+  subgraph clusterdir_0abfdb325e722c517996fb9c43aac5bd {
+    graph [ bgcolor="#ddddee", pencolor="black", label="forceModel" fontname="FreeSans", fontsize="10", URL="dir_0abfdb325e722c517996fb9c43aac5bd.html"]
+  dir_8a5d2524df77ee33768751e07fa890d8 [shape=box, label="DiFeliceDrag", style="filled", fillcolor="#eeeeff", pencolor="black", URL="dir_8a5d2524df77ee33768751e07fa890d8.html"];
+  }
+}

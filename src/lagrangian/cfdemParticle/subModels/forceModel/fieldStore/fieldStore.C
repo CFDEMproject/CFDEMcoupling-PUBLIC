@@ -135,6 +135,8 @@ fieldStore::~fieldStore()
 
 void fieldStore::setForce() const
 {
+    if(particleCloud_.mesh().time().outputTime())
+    {
         if(particleCloud_.verbose()) Info << "fieldStore.C - setForce()" << endl;
 
         for (int i=0;i < scalarFieldNames_.size(); i++)
@@ -154,6 +156,7 @@ void fieldStore::setForce() const
             // save field
             vectorFields_[i] = field;
         }
+    }
 }
 
 

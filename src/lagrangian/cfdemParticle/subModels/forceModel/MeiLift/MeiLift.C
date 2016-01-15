@@ -77,7 +77,12 @@ MeiLift::MeiLift
     forceSubM(0).setSwitchesList(3,true); // activate search for verbose switch
     forceSubM(0).setSwitchesList(4,true); // activate search for interpolate switch
     forceSubM(0).setSwitchesList(8,true); // activate scalarViscosity switch
-    forceSubM(0).readSwitches();
+
+    //set default switches (hard-coded default = false)
+    forceSubM(0).setSwitches(0,true);  // enable treatExplicit, otherwise this force would be implicit in slip vel! - IMPORTANT!
+
+    for (int iFSub=0;iFSub<nrForceSubModels();iFSub++)
+        forceSubM(iFSub).readSwitches();
 
     particleCloud_.checkCG(false);
 
@@ -243,12 +248,14 @@ void MeiLift::setForce() const
                 if(probeIt_)
                 {
                     #include "setupProbeModelfields.H"
-                    vValues.append(lift);   //first entry must the be the force
-                    vValues.append(Ur);
-                    vValues.append(vorticity);
-                    sValues.append(Rep);
-                    sValues.append(Rew);
-                    sValues.append(J_star);
+                    // Note: for other than ext one could use vValues.append(x)
+                    // instead of setSize
+                    vValues.setSize(vValues.size()+1, lift);           //first entry must the be the force
+                    vValues.setSize(vValues.size()+1, Ur);
+                    vValues.setSize(vValues.size()+1, vorticity); 
+                    sValues.setSize(sValues.size()+1, Rep);
+                    sValues.setSize(sValues.size()+1, Rew);
+                    sValues.setSize(sValues.size()+1, J_star);
                     particleCloud_.probeM().writeProbe(index, sValues, vValues);
                 }
                 // END OF SAMPLING AND VERBOSE OUTOUT

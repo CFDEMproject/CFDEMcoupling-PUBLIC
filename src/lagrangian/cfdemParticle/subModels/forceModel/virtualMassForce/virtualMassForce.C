@@ -84,8 +84,14 @@ virtualMassForce::virtualMassForce
     setForceSubModels(propsDict_);
     // define switches which can be read from dict
     forceSubM(0).setSwitchesList(0,true); // activate treatExplicit switch
+    forceSubM(0).setSwitchesList(1,true); // activate treatForceDEM switch (DEM side only treatment)
     forceSubM(0).setSwitchesList(4,true); // activate search for interpolate switch
-    forceSubM(0).readSwitches();
+
+    //set default switches (hard-coded default = false)
+    forceSubM(0).setSwitches(0,true);  // will treat forces explicitly on CFD side - IMPORTANT!
+
+    for (int iFSub=0;iFSub<nrForceSubModels();iFSub++)
+        forceSubM(iFSub).readSwitches();
 
     //Extra switches/settings
     if(propsDict_.found("splitUrelCalculation"))
@@ -119,7 +125,7 @@ virtualMassForce::virtualMassForce
 
 virtualMassForce::~virtualMassForce()
 {
-    delete UrelOld_;
+    particleCloud_.dataExchangeM().destroy(UrelOld_,3);
 }
 
 
@@ -218,17 +224,17 @@ void virtualMassForce::setForce() const
                 if(probeIt_)
                 {
                     #include "setupProbeModelfields.H"
-                    vValues.append(virtualMassForce);           //first entry must the be the force
-                    vValues.append(Ur);
-                    vValues.append(UrelOld);
-                    vValues.append(ddtUrel);
-                    sValues.append(Vs);
-                    sValues.append(rho);
+                    // Note: for other than ext one could use vValues.append(x)
+                    // instead of setSize
+                    vValues.setSize(vValues.size()+1, virtualMassForce);           //first entry must the be the force
+                    vValues.setSize(vValues.size()+1, Ur);
+                    vValues.setSize(vValues.size()+1, UrelOld); 
+                    vValues.setSize(vValues.size()+1, ddtUrel);
+                    sValues.setSize(sValues.size()+1, Vs);
+                    sValues.setSize(sValues.size()+1, rho);
                     particleCloud_.probeM().writeProbe(index, sValues, vValues);
                 }
             }
-            else    //particle not on this CPU
-                UrelOld_[index][0]=NOTONCPU;
     
             // write particle based data to global array
             forceSubM(0).partToArray(index,virtualMassForce,vector::zero);
@@ -239,10 +245,11 @@ void virtualMassForce::setForce() const
 void Foam::virtualMassForce::reAllocArrays() const
 {
     if(particleCloud_.numberOfParticlesChanged())
-    {
-        Pout << "virtualMassForce::reAllocArrays..." << endl;
         particleCloud_.dataExchangeM().allocateArray(UrelOld_,NOTONCPU,3);
-    }
+
+    // get DEM data
+    particleCloud_.dataExchangeM().getData("UrelOld", "vector-atom", UrelOld_);
+    
 }
 
 

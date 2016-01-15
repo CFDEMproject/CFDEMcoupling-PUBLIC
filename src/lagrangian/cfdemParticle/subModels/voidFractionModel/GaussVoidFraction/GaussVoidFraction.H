@@ -61,7 +61,7 @@ class GaussVoidFraction
 private:
         dictionary propsDict_;
 
-        const scalar alphaMin_;          //NP min value of voidFraction
+        const scalar alphaMin_;          //min value of voidFraction
 
 	    mutable bool alphaLimited_;
 

@@ -119,8 +119,7 @@ twoWayMPI::~twoWayMPI()
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
 char* twoWayMPI::wordToChar(word& inWord) const
 {
-    string HH = string(inWord);
-    return const_cast<char*>(HH.c_str());
+    return const_cast<char*>(inWord.c_str());
 }
 
 
@@ -237,21 +236,6 @@ void Foam::twoWayMPI::destroy(int** array,int len) const
 
     free(array);
 }
-//============
-// int *
-void Foam::twoWayMPI::destroy(int* array) const
-{
-    if (array == NULL) return;
-    free(array);
-}
-//============
-// double *
-void Foam::twoWayMPI::destroy(double* array) const
-{
-    if (array == NULL) return;
-    free(array);
-}
-//============
 
 bool Foam::twoWayMPI::couple(int i) const
 {
