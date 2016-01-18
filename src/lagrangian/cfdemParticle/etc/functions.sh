@@ -80,7 +80,7 @@ compileLib()
                 echo "Please make sure to have the incompressible libraries first in the library-list.txt!"
                 cd $CFDEM_SRC_DIR/lagrangian/cfdemParticle
                 echo "changing to $PWD"
-                if [[ $WM_PROJECT_VERSION == "dev" ]]; then
+                if [[ $WM_PROJECT_VERSION == "dev" || $WM_PROJECT_VERSION == "3.0.x" ]]; then
                     wrmdep 2>&1 | tee -a $logpath/$logfileName
                 else
                     rmdepall 2>&1 | tee -a $logpath/$logfileName
@@ -90,7 +90,7 @@ compileLib()
             else
                 echo "Compiling a incompressible library."
         fi
-        if [[ $WM_PROJECT_VERSION == "dev" ]]; then
+        if [[ $WM_PROJECT_VERSION == "dev" || $WM_PROJECT_VERSION == "3.0.x" ]]; then
             wrmdep 2>&1 | tee -a $logpath/$logfileName
         else
             rmdepall 2>&1 | tee -a $logpath/$logfileName
@@ -142,7 +142,11 @@ compileSolver()
     else
         #- wclean and wmake
         #if [ $doClean != "noClean" ]; then
-            rmdepall 2>&1 | tee -a $logpath/$logfileName
+            if [[ $WM_PROJECT_VERSION == "dev" || $WM_PROJECT_VERSION == "3.0.x" ]]; then
+                wrmdep 2>&1 | tee -a $logpath/$logfileName
+            else
+                rmdepall 2>&1 | tee -a $logpath/$logfileName
+            fi
             wclean 2>&1 | tee -a $logpath/$logfileName
         #fi
     fi
@@ -307,7 +311,11 @@ cleanCFDEM()
 
             cd  $path
             echo "cleaning library $PWD"
-            rmdepall
+            if [[ $WM_PROJECT_VERSION == "dev" || $WM_PROJECT_VERSION == "3.0.x" ]]; then
+                wrmdep
+            else
+                rmdepall
+            fi
             wclean    
             rm -r ./Make/linux*
             rm -r ./lnInclude
@@ -361,7 +369,11 @@ cleanCFDEM()
 
             cd  $path            
             echo "cleaning solver $PWD"
-            rmdepall
+            if [[ $WM_PROJECT_VERSION == "dev" || $WM_PROJECT_VERSION == "3.0.x" ]]; then
+                wrmdep
+            else
+                rmdepall
+            fi
             wclean    
     done
 }

@@ -27,9 +27,9 @@
         mesh
     );
 
-//========================
-// drag law modelling
-//========================
+//===============================
+// particle interaction modelling
+//===============================
 
     Info<< "\nReading momentum exchange field Ksl\n" << endl;
     volScalarField Ksl
@@ -43,7 +43,7 @@
             IOobject::AUTO_WRITE
         ),
         mesh
-        //dimensionedScalar("0", dimensionSet(0, 0, -1, 0, 0), 1.0)
+        //dimensionedScalar("0", dimensionSet(1, -3, -1, 0, 0), 1.0)
     );
 
     Info<< "\nReading voidfraction field voidfraction = (Vgas/Vparticle)\n" << endl;
@@ -68,11 +68,11 @@
             "rho",
             runTime.timeName(),
             mesh,
-            IOobject::READ_IF_PRESENT,
+            IOobject::MUST_READ,
             IOobject::AUTO_WRITE
         ),
-        mesh,
-        dimensionedScalar("0", dimensionSet(1, -3, 0, 0, 0), 1.0)
+        mesh//,
+        //dimensionedScalar("0", dimensionSet(1, -3, 0, 0, 0), 1.0)
     );
 
     Info<< "Reading particle velocity field Us\n" << endl;

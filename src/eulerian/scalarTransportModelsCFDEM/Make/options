@@ -1,4 +1,4 @@
-include $(CFDEM_ADD_LIBS_DIR)/additionalLibs
+include $(CFDEM_ADD_LIBS_DIR)/$(CFDEM_ADD_LIBS_NAME)
 
 EXE_INC = \
     $(CFDEM_ADD_INCOMPTURBMOD_PATHS) \

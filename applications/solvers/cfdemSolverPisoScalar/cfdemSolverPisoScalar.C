@@ -44,9 +44,13 @@ Description
 #else
     #include "turbulenceModel.H"
 #endif
-
+#include "fixedFluxPressureFvPatchScalarField.H"
 #include "cfdemCloud.H"
+#if defined(anisotropicRotation)
+    #include "cfdemCloudRotation.H"
+#endif
 #include "implicitCouple.H"
+#include "clockModel.H"
 #include "smoothingModel.H"
 #include "forceModel.H"
 
@@ -66,13 +70,19 @@ int main(int argc, char *argv[])
 
     // create cfdemCloud
     #include "readGravitationalAcceleration.H"
-    cfdemCloud particleCloud(mesh);
+    #if defined(anisotropicRotation)
+        cfdemCloudRotation particleCloud(mesh);
+    #else
+        cfdemCloud particleCloud(mesh);
+    #endif
     #include "checkModelType.H"
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
     Info<< "\nStarting time loop\n" << endl;
     while (runTime.loop())
     {
+        particleCloud.clockM().start(1,"Global");
+
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
         #if defined(version30)
@@ -85,6 +95,7 @@ int main(int argc, char *argv[])
         #endif
 
         // do particle stuff
+        particleCloud.clockM().start(2,"Coupling");
         bool hasEvolved = particleCloud.evolve(voidfraction,Us,U);
 
         if(hasEvolved)
@@ -96,8 +107,13 @@ int main(int argc, char *argv[])
         Ksl = particleCloud.momCoupleM(0).impMomSource();
         Ksl.correctBoundaryConditions();
 
+        //Force Checks
+        #include "forceCheckIm.H"
 
         #include "solverDebugInfo.H"
+        particleCloud.clockM().stop("Coupling");
+
+        particleCloud.clockM().start(26,"Flow");
 
         // get scalar source from DEM        
         particleCloud.forceM(1).manipulateScalarField(Tsource);
@@ -131,21 +147,20 @@ int main(int argc, char *argv[])
                 );
 
                 UEqn.relax();
+
                 #if defined(version30)
                     if (piso.momentumPredictor())
                 #else
                     if (momentumPredictor)
                 #endif
                 {
-                    if(modelType=="B" || modelType=="Bfull")
+                    if (modelType=="B" || modelType=="Bfull")
                         solve(UEqn == - fvc::grad(p) + Ksl/rho*Us);
                     else
                         solve(UEqn == - voidfraction*fvc::grad(p) + Ksl/rho*Us);
                 }
 
                 // --- PISO loop
-
-                //for (int corr=0; corr<nCorr; corr++)
                 #if defined(version30)
                     while (piso.correct())
                 #else
@@ -162,17 +177,43 @@ int main(int argc, char *argv[])
                     U = rUA*UEqn.H();
 
                     #ifdef version23
-                    phi = ( fvc::interpolate(U*voidfraction) & mesh.Sf() )
-                        + rUAfvoidfraction*fvc::ddtCorr(U, phi);
+                        phi = ( fvc::interpolate(U*voidfraction) & mesh.Sf() )
+                            + rUAfvoidfraction*fvc::ddtCorr(U, phi);
                     #else
-                    phi = ( fvc::interpolate(U*voidfraction) & mesh.Sf() )
-                        + fvc::ddtPhiCorr(rUAvoidfraction, U, phi);
+                        phi = ( fvc::interpolate(U*voidfraction) & mesh.Sf() )
+                            + fvc::ddtPhiCorr(rUAvoidfraction, U, phi);
                     #endif
                     surfaceScalarField phiS(fvc::interpolate(Us*voidfraction) & mesh.Sf());
                     surfaceScalarField phiGes = phi + rUAf*(fvc::interpolate(Ksl/rho) * phiS);
 
                     if (modelType=="A")
                         rUAvoidfraction = volScalarField("(voidfraction2|A(U))",rUA*voidfraction*voidfraction);
+
+                    // Update the fixedFluxPressure BCs to ensure flux consistency
+                    #ifndef versionExt32
+                        if (modelType=="A")
+                        {
+                            surfaceScalarField voidfractionf(fvc::interpolate(voidfraction));
+                            setSnGrad<fixedFluxPressureFvPatchScalarField>
+                            (
+                                p.boundaryField(),
+                                (
+                                    phi.boundaryField()
+                                  - (mesh.Sf().boundaryField() & U.boundaryField())
+                                )/(mesh.magSf().boundaryField()*rUAf.boundaryField()*voidfractionf.boundaryField())
+                            );
+                        }else
+                        {
+                            setSnGrad<fixedFluxPressureFvPatchScalarField>
+                            (
+                                p.boundaryField(),
+                                (
+                                    phi.boundaryField()
+                                  - (mesh.Sf().boundaryField() & U.boundaryField())
+                                )/(mesh.magSf().boundaryField()*rUAf.boundaryField())
+                            );
+                        }
+                    #endif
 
                     // Non-orthogonal pressure corrector loop
                     #if defined(version30)
@@ -238,6 +279,9 @@ int main(int argc, char *argv[])
         Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
             << "  ClockTime = " << runTime.elapsedClockTime() << " s"
             << nl << endl;
+
+        particleCloud.clockM().stop("Flow");
+        particleCloud.clockM().stop("Global");
     }
 
     Info<< "End\n" << endl;
