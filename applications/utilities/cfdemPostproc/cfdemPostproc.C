@@ -33,7 +33,13 @@ Description
 
 #include "fvCFD.H"
 #include "singlePhaseTransportModel.H"
-#include "turbulenceModel.H"
+
+#include "OFversion.H"
+#if defined(version30)
+    #include "turbulentTransportModel.H"
+#else
+    #include "turbulenceModel.H"
+#endif
 
 #include "cfdemCloud.H"
 #include "dataExchangeModel.H"
