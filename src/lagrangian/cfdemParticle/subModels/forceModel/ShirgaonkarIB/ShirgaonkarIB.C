@@ -63,7 +63,6 @@ ShirgaonkarIB::ShirgaonkarIB
 :
     forceModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
-    verbose_(false),
     twoDimensional_(false),
     depth_(1),
     velFieldName_(propsDict_.lookup("velFieldName")),
@@ -77,7 +76,6 @@ ShirgaonkarIB::ShirgaonkarIB
     particleCloud_.probeM().writeHeader();
 
 
-    if (propsDict_.found("verbose")) verbose_=true;
     if (propsDict_.found("twoDimensional"))
     {
         twoDimensional_=true;
@@ -91,9 +89,11 @@ ShirgaonkarIB::ShirgaonkarIB
 
     // define switches which can be read from dict
     forceSubM(0).setSwitchesList(0,true); // activate treatExplicit switch
+    forceSubM(0).setSwitchesList(3,true); // activate search for verbose switch
 
     // read those switches defined above, if provided in dict
-    forceSubM(0).readSwitches();
+    for (int iFSub=0;iFSub<nrForceSubModels();iFSub++)
+        forceSubM(iFSub).readSwitches();
 
     particleCloud_.checkCG(false);
 }
@@ -151,7 +151,7 @@ void ShirgaonkarIB::setForce() const
             // write particle based data to global array
             forceSubM(0).partToArray(index,drag,vector::zero);
 
-            if(verbose_) Info << "impForces = " << impForces()[index][0]<<","<<impForces()[index][1]<<","<<impForces()[index][2] << endl;
+            if(forceSubM(0).verbose()) Info << "impForces = " << impForces()[index][0]<<","<<impForces()[index][1]<<","<<impForces()[index][2] << endl;
         //}
     }
 }

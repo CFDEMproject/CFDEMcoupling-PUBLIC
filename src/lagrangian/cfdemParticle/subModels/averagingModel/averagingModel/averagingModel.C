@@ -139,8 +139,6 @@ void averagingModel::setVectorSum
 
     for(int index=0; index< particleCloud_.numberOfParticles(); index++)
     {
-        //if(mask[index][0])
-        //{
             for(int subCell=0;subCell<particleCloud_.cellsPerParticle()[index][0];subCell++)
             {
                 cellI = particleCloud_.cellIDs()[index][subCell];
@@ -152,7 +150,6 @@ void averagingModel::setVectorSum
                     field[cellI] += valueVec*weightP;
                 }
             }//forAllSubPoints
-        //}
     }
 
     // correct cell values to patches
@@ -232,12 +229,10 @@ void averagingModel::setDSauter
 ) const
 {
     label cellI;
-    scalar valueScal;
     scalar weightP;
     scalar radius(-1);
     scalar radiusPow2(-1);
     scalar radiusPow3(-1);
-    scalar volume(-1);
 
     scalar scale_ = particleCloud_.cg(); //scaling of parcel vs. primary particle diameter
     dSauter = 0.0 * dSauter; //set to zero, because we will use it to calc sum(wi*ri^3)

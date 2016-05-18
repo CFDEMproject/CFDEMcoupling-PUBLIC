@@ -70,7 +70,7 @@ private:
 
     word tempFieldName_;
 
-    const volScalarField& tempField_;            // ref to temperature field
+    const volScalarField& T_;            // ref to temperature field
 
     word voidfractionFieldName_;
 

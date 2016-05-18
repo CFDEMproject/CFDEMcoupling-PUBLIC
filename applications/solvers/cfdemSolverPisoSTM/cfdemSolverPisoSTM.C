@@ -174,8 +174,7 @@ int main(int argc, char *argv[])
                 #if defined(version30)
                     while (piso.correct())
                 #else
-                    int nCorrSoph = nCorr + 5 * pow((1-particleCloud.dataExchangeM().timeStepFraction()),1);
-                    for (int corr=0; corr<nCorrSoph; corr++)
+                    for (int corr=0; corr<nCorr; corr++)
                 #endif
                 {
                     volScalarField rUA = 1.0/UEqn.A();

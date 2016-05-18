@@ -89,7 +89,19 @@ explicitCouple::explicitCouple
         //sm.mesh(),
         //dimensionedVector("zero", dimensionSet(1,-2,-2,0,0), vector(0,0,0)) // N/m3
     ),
-    fLimit_(1e10,1e10,1e10)
+    fLimit_(1e10,1e10,1e10),
+    sourceField_
+    (   IOobject
+        (
+            "sourceField",
+            sm.mesh().time().timeName(),
+            sm.mesh(),
+            IOobject::READ_IF_PRESENT,
+            IOobject::AUTO_WRITE
+        ),
+        sm.mesh(),
+        dimensionedVector("zero", dimensionSet(1,-2,-2,0,0), vector(0,0,0)) // N/m3
+    )
 {
     if (propsDict_.found("fLimit"))
     {
@@ -171,7 +183,12 @@ void Foam::explicitCouple::resetMomSourceField() const
 
 inline vector Foam::explicitCouple::arrayToField(label cellI) const
 {
-    return particleCloud_.forceM(0).expParticleForces()[cellI] / particleCloud_.mesh().V()[cellI];
+    return particleCloud_.forceM(0).expParticleForces()[cellI] / particleCloud_.mesh().V()[cellI] + sourceField_[cellI];
+}
+
+void Foam::explicitCouple::setSourceField(volVectorField & field) const
+{
+    sourceField_ = field;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

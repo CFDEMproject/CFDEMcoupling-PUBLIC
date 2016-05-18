@@ -28,19 +28,31 @@ volWeightedAverageProps
     (
         vectorField
     );
-    upperThreshold value;
-    lowerThreshold value2;
+    upperThreshold scalar1;
+    lowerThreshold scalar2;
+    useVolumeFraction switch0;
+    volumeFractionName word1;
+    verbose ;
+    writeToFile switch1;
 }; 
 </PRE>
-<UL><LI><I>time</I> = time to start the averaging (default 0) 
+<UL><LI><I>time</I> = (optional, default 0.) time to start the averaging 
 
 <LI><I>scalarField</I> = names of the finite volume scalar fields to be temporally averaged 
 
 <LI><I>vectorField</I> = names of the finite volume vector fields to be temporally averaged 
 
-<LI><I>value</I> = only cells with a field value (magnitude) lower than this upper threshold are considered 
+<LI><I>scalar1</I> = only cells with a field value (magnitude) lower than this upper threshold are considered 
 
-<LI><I>value2</I> = only cells with a field value (magnitude) greater than this lower threshold are considered 
+<LI><I>scalar2</I> = only cells with a field value (magnitude) greater than this lower threshold are considered 
+
+<LI><I>switch0</I> = (optional, default false) consider a volume fraction for the calculation 
+
+<LI><I>word1</I> = (optional, default "voidfraction") name of the volume fraction, only used if useVolumeFraction is true 
+
+<LI><I>verbose</I> = (optional, default false) keyword only (mostly used for debugging) 
+
+<LI><I>switch1</I> = (optional, default false) switch for the output. 
 
 
 </UL>

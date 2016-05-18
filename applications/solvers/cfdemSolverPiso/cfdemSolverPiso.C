@@ -46,13 +46,19 @@ Description
 #endif
 #include "fixedFluxPressureFvPatchScalarField.H"
 #include "cfdemCloud.H"
+
 #if defined(anisotropicRotation)
     #include "cfdemCloudRotation.H"
+#endif
+#include "superquadric_flag.h"
+#if defined(SUPERQUADRIC_ACTIVE_FLAG)
+    #include "cfdemCloudRotationSuperquadric.H"
 #endif
 #include "implicitCouple.H"
 #include "clockModel.H"
 #include "smoothingModel.H"
 #include "forceModel.H"
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -72,6 +78,8 @@ int main(int argc, char *argv[])
     #include "readGravitationalAcceleration.H"
     #if defined(anisotropicRotation)
         cfdemCloudRotation particleCloud(mesh);
+    #elif defined(SUPERQUADRIC_ACTIVE_FLAG)
+        cfdemCloudRotationSuperquadric particleCloud(mesh);
     #else
         cfdemCloud particleCloud(mesh);
     #endif
@@ -148,8 +156,7 @@ int main(int argc, char *argv[])
                 #if defined(version30)
                     while (piso.correct())
                 #else
-                    int nCorrSoph = nCorr + 5 * pow((1-particleCloud.dataExchangeM().timeStepFraction()),1);
-                    for (int corr=0; corr<nCorrSoph; corr++)
+                    for (int corr=0; corr<nCorr; corr++)
                 #endif
                 {
                     volScalarField rUA = 1.0/UEqn.A();
@@ -172,32 +179,6 @@ int main(int argc, char *argv[])
 
                     if (modelType=="A")
                         rUAvoidfraction = volScalarField("(voidfraction2|A(U))",rUA*voidfraction*voidfraction);
-
-                    // Update the fixedFluxPressure BCs to ensure flux consistency
-                    #ifndef versionExt32
-                        if (modelType=="A")
-                        {
-                            surfaceScalarField voidfractionf(fvc::interpolate(voidfraction));
-                            setSnGrad<fixedFluxPressureFvPatchScalarField>
-                            (
-                                p.boundaryField(),
-                                (
-                                    phi.boundaryField()
-                                  - (mesh.Sf().boundaryField() & U.boundaryField())
-                                )/(mesh.magSf().boundaryField()*rUAf.boundaryField()*voidfractionf.boundaryField())
-                            );
-                        }else
-                        {
-                            setSnGrad<fixedFluxPressureFvPatchScalarField>
-                            (
-                                p.boundaryField(),
-                                (
-                                    phi.boundaryField()
-                                  - (mesh.Sf().boundaryField() & U.boundaryField())
-                                )/(mesh.magSf().boundaryField()*rUAf.boundaryField())
-                            );
-                        }
-                    #endif
 
                     // Non-orthogonal pressure corrector loop
                     #if defined(version30)

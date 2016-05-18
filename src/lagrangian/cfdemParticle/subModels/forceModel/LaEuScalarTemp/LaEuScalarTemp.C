@@ -64,7 +64,7 @@ LaEuScalarTemp::LaEuScalarTemp
     forceModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
     tempFieldName_(propsDict_.lookup("tempFieldName")),
-    tempField_(sm.mesh().lookupObject<volScalarField> (tempFieldName_)),
+    T_(sm.mesh().lookupObject<volScalarField> (tempFieldName_)),
     voidfractionFieldName_(propsDict_.lookup("voidfractionFieldName")),
     voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
     maxSource_(1e30),
@@ -119,6 +119,8 @@ LaEuScalarTemp::LaEuScalarTemp
 
     // read those switches defined above, if provided in dict
     forceSubM(0).readSwitches();
+    //for (int iFSub=0;iFSub<nrForceSubModels();iFSub++)
+    //    forceSubM(iFSub).readSwitches();
 
     particleCloud_.checkCG(true);
 
@@ -201,12 +203,10 @@ void LaEuScalarTemp::manipulateScalarField(volScalarField& EuField) const
     scalar n = 3.5; // model parameter
     scalar sDth(scaleDia_*scaleDia_*scaleDia_);
 
-    interpolationCellPoint<scalar> voidfractionInterpolator_(voidfraction_);
-    interpolationCellPoint<vector> UInterpolator_(U_);
-    interpolationCellPoint<scalar> TInterpolator_(tempField_);
+    #include "resetVoidfractionInterpolator.H"
+    #include "resetUInterpolator.H"
+    #include "resetTInterpolator.H"
 
-    scalar h1(0);
-    scalar h2(0);
     for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
     {
         //if(particleCloud_.regionM().inRegion()[index][0])
@@ -217,14 +217,14 @@ void LaEuScalarTemp::manipulateScalarField(volScalarField& EuField) const
                 if(forceSubM(0).interpolation())
                 {
 	                position = particleCloud_.position(index);
-                    voidfraction = voidfractionInterpolator_.interpolate(position,cellI);
-                    Ufluid = UInterpolator_.interpolate(position,cellI);
-                    Tfluid = TInterpolator_.interpolate(position,cellI);
+                    voidfraction = voidfractionInterpolator_().interpolate(position,cellI);
+                    Ufluid = UInterpolator_().interpolate(position,cellI);
+                    Tfluid = TInterpolator_().interpolate(position,cellI);
                 }else
                 {
 					voidfraction = voidfraction_[cellI];
                     Ufluid = U_[cellI];
-                    Tfluid = tempField_[cellI];
+                    Tfluid = T_[cellI];
                 }
 
                 // calc relative velocity
@@ -242,9 +242,7 @@ void LaEuScalarTemp::manipulateScalarField(volScalarField& EuField) const
                 }
                 else if (Rep < 1500)
                 {
-                    h1=pow(voidfraction,n);
-                    h2=pow(Pr,0.33);
-                    Nup = 2+0.5*h1*sqrt(Rep)*h2+0.02*h1*pow(Rep,0.8)*h2;
+                    Nup = 2. + (0.5 * sqrt(Rep) + 0.02 * pow(Rep,0.8)) * pow(voidfraction,n) * pow(Pr,0.33);
                 }
                 else
                 {

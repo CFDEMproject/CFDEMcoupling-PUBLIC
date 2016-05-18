@@ -86,7 +86,8 @@ voidFractionModel::voidFractionModel
     cellsPerParticle_(NULL),
     maxCellsPerParticle_(1),
     weight_(1.),
-    porosity_(1.)
+    porosity_(1.),
+    requiresSuperquadric_(false)
 {
     particleCloud_.dataExchangeM().allocateArray(cellsPerParticle_,1,maxCellsPerParticle_);
 }
@@ -194,6 +195,11 @@ void Foam::voidFractionModel::reAllocArrays(int nP) const
         // get arrays of new length
         particleCloud_.dataExchangeM().allocateArray(cellsPerParticle_,1,1,nP);
     }
+}
+
+bool Foam::voidFractionModel::requiresSuperquadric() const
+{
+  return requiresSuperquadric_;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

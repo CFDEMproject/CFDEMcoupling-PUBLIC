@@ -141,11 +141,10 @@ void Archimedes::setForce() const
 
             if (cellI > -1) // particle Found
             {
-                scalar dp = 2*particleCloud_.radius(index);
-
                 if(twoDimensional_)
                 {
-                    force = -g_.value()*forceSubM(0).rhoField()[cellI]*pow(dp,2)/4*M_PI;
+                    scalar r = particleCloud_.radius(index);
+                    force = -g_.value()*forceSubM(0).rhoField()[cellI]*r*r*M_PI; // circle area
                     Warning << "Archimedes::setForce() : this functionality is not tested!" << endl;
                 }else{
                     force = -g_.value()*forceSubM(0).rhoField()[cellI]*particleCloud_.particleVolume(index);

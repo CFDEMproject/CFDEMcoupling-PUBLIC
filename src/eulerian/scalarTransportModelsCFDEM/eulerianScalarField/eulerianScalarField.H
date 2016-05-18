@@ -31,7 +31,9 @@ Description
 
 #include "cfdemCloud.H"
 #include "forceModel.H"
+#ifndef versionExt32
 #include "fvOptionList.H"
+#endif
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -76,7 +78,9 @@ protected:
 
         mutable word            fieldType_;
 
+        #ifndef versionExt32
         mutable fv::optionList  fvOptions_;
+        #endif
 
         int                     speciesID_;
 

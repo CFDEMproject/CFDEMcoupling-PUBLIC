@@ -24,10 +24,17 @@ LaEuScalarTempProps
     voidfractionFieldName "voidfraction";
     partTempName "Temp";
     partHeatFluxName "convectiveHeatFlux";
-    lambda value;
-    Cp value1;
-    interpolation "switch1";
-    verbose "switch2";
+    partHeatTransCoeffName "heatTransCoeff";
+    partHeatFluidName "heatFluid";
+    lambda scalar1;
+    Cp scalar2;
+    interpolation switch1;
+    TInterpolationType "type1"
+    verbose switch2;
+    maxSource scalar3;
+    scale scalar4;
+    scalarViscosity switch3;
+    nu scalar5;
 }; 
 </PRE>
 <UL><LI><I>U</I> = name of the finite volume fluid velocity field 
@@ -40,13 +47,26 @@ LaEuScalarTempProps
 
 <LI><I>convectiveHeatFlux</I> = name of the DEM data representing the particle-fluid convective heat flux 
 
-<LI><I>value</I> = fluid thermal conductivity [W/(m*K)] 
+<LI><I>heatTransCoeff</I> = name of heat transfer coefficient 
 
-<LI><I>value1</I> = fluid specific heat capacity [W*s/(kg*K)] 
+<LI><I>heatFluid</I> = 
+<I>scalar1</I> = fluid thermal conductivity [W/(m*K)] 
+
+<LI><I>scalar2</I> = fluid specific heat capacity [W*s/(kg*K)] 
 
 <LI><I>switch1</I> = (optional, normally off) flag to use interpolated voidfraction and fluid velocity values 
 
-<LI><I>switch2</I> = (normally off) for verbose run 
+<LI><I>type1</I> = (optional, default cellPoint) interpolation type for T field 
+
+<LI><I>switch2</I> = (optional, default false) sub model switch, see <A HREF = "forceSubModel.html">forceSubModel</A> for details 
+
+<LI><I>scalar3</I> = (optional) limit maximal turbulence 
+
+<LI><I>scalar4</I> = scaling of particle diameter 
+
+<LI><I>switch3</I> = (optional, default false) sub model switch, see <A HREF = "forceSubModel.html">forceSubModel</A> for details 
+
+<LI><I>scalar5</I> = optional, only if switch3 is true 
 
 
 </UL>

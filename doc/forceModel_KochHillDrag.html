@@ -21,17 +21,50 @@ KochHillDragProps
 {
     velFieldName "U";
     voidfractionFieldName "voidfraction";
-    interpolation "bool1";
-    implForceDEM "bool2";
+    granVelFieldName "Us"
+    interpolation       "switch1";
+    voidfractionInterpolationType "type1"
+    UInterpolationType  "type2"
+    implForceDEM        "switch2";
+    suppressProbe       "switch3";
+    scale               "scalar1";
+    scaleDrag           "scalar2";
+    treatForceExplicit  "switch4";
+    verbose             "switch5";
+    implForceDEMaccumulated "switch6";
+    scalarViscosity     "switch7";
+    nu                  "scalar3";
 }; 
 </PRE>
 <UL><LI><I>U</I> = name of the finite volume fluid velocity field 
 
 <LI><I>voidfraction</I> = name of the finite volume voidfraction field 
 
-<LI><I>bool1</I> = (optional, normally off) flag to use interpolated voidfraction and fluid velocity values 
+<LI><I>Us</I> = (optional) name of finite volume granular velocity field 
 
-<I>bool2</I> = (optional, normally off) flag to use implicit formulation of drag on DEM side:l
+<LI><I>switch1</I> = (optional, normally off) flag to use interpolated voidfraction and fluid velocity values 
+
+<LI><I>type1</I> = (optional, default cellPoint) interpolation type for voidfraction field 
+
+<LI><I>type2</I> = (optional, default cellPointFace) interpolation type for velocity field 
+
+<LI><I>switch2</I> = (optional, normally off) flag to use implicit formulation of drag on DEM side:l
+<I>switch3</I> = (optional, default false) can be used to suppress the output of the probe model 
+
+<LI><I>scalar1</I> = (optional) scaling of particle diameter 
+
+<LI><I>scalar2</I> = (optional) scaling of drag law 
+
+<LI><I>switch4</I> = (optional, default false) sub model switch, see <A HREF = "forceSubModel.html">forceSubModel</A> for details 
+
+<LI><I>switch5</I> = (optional, default false) sub model switch, see <A HREF = "forceSubModel.html">forceSubModel</A> for details 
+
+<LI><I>switch6</I> = (optional, default false) sub model switch, see <A HREF = "forceSubModel.html">forceSubModel</A> for details 
+
+<LI><I>switch7</I> = (optional, default false) sub model switch, see <A HREF = "forceSubModel.html">forceSubModel</A> for details 
+
+<LI><I>scalar3</I> = optional, only if switch7 is true 
+
 
 </UL>
 <P><B>Examples:</B>

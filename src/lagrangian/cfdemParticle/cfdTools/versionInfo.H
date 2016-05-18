@@ -33,9 +33,9 @@ Description
 #ifndef versionInfo_H
 #define versionInfo_H
 
-word CFDEMversion="cfdem-3.0.2";
-word compatibleLIGGGHTSversion="3.3.1";
-word OFversion="2.4.x-commit-3d8da0e960c717ff582f1517a27724144f086b83";
+word CFDEMversion="cfdem-3.4.0";
+word compatibleLIGGGHTSversion="3.4.0";
+word OFversion="3.0.x-commit-ac3f6c67e02f0aac3777c27f9fb7558fc3536e37";
 
 Info << "\nCFDEMcoupling version: " << CFDEMversion <<  endl;
 Info << ", compatible to LIGGGHTS version: " << compatibleLIGGGHTSversion <<  endl;

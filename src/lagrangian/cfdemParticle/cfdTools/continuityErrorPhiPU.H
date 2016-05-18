@@ -34,7 +34,7 @@ Description
 \*---------------------------------------------------------------------------*/
 
 {
-    volScalarField contErr( fvc::div(phiGes) + fvc::ddt(voidfraction) );
+    volScalarField contErr( fvc::div(phi) + particleCloud.ddtVoidfraction() );
 
     scalar sumLocalContErr = runTime.deltaTValue()*
         mag(contErr)().weightedAverage(mesh.V()).value();

@@ -63,7 +63,8 @@ momCoupleModels
     implicitCouple
 );
 
-turbulenceModelType RASProperties;//LESProperties;//
+//turbulenceModelType RASProperties;//LESProperties;//OFversion24x
+turbulenceModelType turbulenceProperties;//OFversion30x
 
 //===========================================================================//
 // sub-model properties
@@ -93,11 +94,11 @@ scalarGeneralExchangeProps
     );
     partSpeciesTransCoeffNames
     (
-        speciesCTransCoeff
+        none //speciesCTransCoeff
     );
     partSpeciesFluidNames
     (
-        speciesCFluid
+        none //speciesCFluid
     );
     DMolecular
     (

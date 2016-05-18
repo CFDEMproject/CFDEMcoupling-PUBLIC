@@ -13,4 +13,3 @@ source $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/functions.sh
 #================================================================================#
 cleanCFDEM
 
-

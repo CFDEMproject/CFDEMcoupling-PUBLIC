@@ -31,6 +31,7 @@ rm -r $casePath/CFD/clockData
 rm -r $casePath/CFD/*.dat
 rm -r $casePath/CFD/octave/*.dat
 rm -r $casePath/CFD/octave/*.eps
+rm -r $casePath/CFD/octave/octave-workspace
 rm -r $casePath/CFD/processor*
 rm -r $casePath/CFD/VTK
 rm -r $casePath/CFD/volAvU

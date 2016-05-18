@@ -74,7 +74,7 @@ else
 
         #wait until prev. compilation is finished
         echo "waiting..."
-        until [ `ps -C make | wc -l` -eq 1 ]; 
+        until [ `ps -a | grep make | wc -l` -eq 0 ]; 
         do 
             sleep 2
         done
@@ -115,7 +115,7 @@ else
             fi
         done
 
-        sleep 1 # wait a second until compilation starts
+        #sleep 1 # wait a second until compilation starts
     done
 
     echo "compilation done."
@@ -127,7 +127,7 @@ fi
 
 #wait until prev. compilation is finished
 echo "waiting..."
-until [ `ps -C make | wc -l` -eq 1 ]; 
+until [ `ps -a | grep make | wc -l` -eq 0 ]; 
 do 
     sleep 2
 done

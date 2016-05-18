@@ -88,14 +88,18 @@ fi
 #read
 
 #- clean up case
-echo "deleting data at: $casePath ?"
+echo "deleting data at: $casePath ?\n"
 read
-rm -r $casePath/CFD/0.*
+source $WM_PROJECT_DIR/bin/tools/CleanFunctions
+cd $casePath/CFD
+cleanCase
 rm -r $casePath/CFD/lagrangian
-rm -r $casePath/CFD/VTK
-rm -r $casePath/DEM/post/*
-rm -r $casePath/DEM/log.*
+rm -r $casePath/CFD/clockData
+rm $casePath/CFD/octave/octave-workspace
+rm -r $casePath/CFD/hpctoolkit-*
+rm $casePath/DEM/post/*.*
+touch $casePath/DEM/post/.gitignore
+#rm $casePath/DEM/post/restart/*.*
+rm $casePath/DEM/post/restart/liggghts.restartCFDEM*
+touch $casePath/DEM/post/restart/.gitignore
 echo "done"
-
-#- preserve post directory
-echo "dummyfile" >> $casePath/DEM/post/dummy

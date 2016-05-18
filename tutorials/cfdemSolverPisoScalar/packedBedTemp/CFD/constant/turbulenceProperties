@@ -15,7 +15,8 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-simulationType  RASModel;//LESModel; //
+//simulationType  RASModel;//LESModel; //OFversion24x
+simulationType  laminar; //OFversion30x
 
 
 // ************************************************************************* //

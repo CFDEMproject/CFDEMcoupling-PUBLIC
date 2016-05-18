@@ -147,9 +147,8 @@ void DiFeliceDrag::setForce() const
     scalar Rep(0);
     scalar Cd(0);
 
-    interpolationCellPoint<scalar> voidfractionInterpolator_(voidfraction_);
-    interpolationCellPoint<vector> UInterpolator_(U_);
-
+    #include "resetVoidfractionInterpolator.H"
+    #include "resetUInterpolator.H"
     #include "setupProbeModel.H"
 
     for(int index = 0;index <  particleCloud_.numberOfParticles(); index++)
@@ -164,8 +163,8 @@ void DiFeliceDrag::setForce() const
                 if(forceSubM(0).interpolation())
                 {
                     position = particleCloud_.position(index);
-                    voidfraction = voidfractionInterpolator_.interpolate(position,cellI);
-                    Ufluid = UInterpolator_.interpolate(position,cellI);
+                    voidfraction = voidfractionInterpolator_().interpolate(position,cellI);
+                    Ufluid = UInterpolator_().interpolate(position,cellI);
                 }else
                 {
                     voidfraction = voidfraction_[cellI];
@@ -173,6 +172,19 @@ void DiFeliceDrag::setForce() const
                 }
 
                 Us = particleCloud_.velocity(index);
+
+                //Update any scalar or vector quantity
+                for (int iFSub=0;iFSub<nrForceSubModels();iFSub++)
+                      forceSubM(iFSub).update(  scaleDia_, 
+                                                index, 
+                                                cellI, 
+                                                Ufluid, 
+                                                Us, 
+                                                nuf,
+                                                rho,
+                                                forceSubM(0).verbose()
+                                             );
+
                 Ur = Ufluid-Us;
                 ds = 2*particleCloud_.radius(index);
                 nuf = nufField[cellI];

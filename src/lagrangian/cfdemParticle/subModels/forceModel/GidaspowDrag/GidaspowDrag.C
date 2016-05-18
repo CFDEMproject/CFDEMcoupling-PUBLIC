@@ -159,9 +159,8 @@ void GidaspowDrag::setForce() const
     vector dragExplicit(0,0,0);
     scalar dragCoefficient(0);
     
-    interpolationCellPoint<scalar> voidfractionInterpolator_(voidfraction_);
-    interpolationCellPoint<vector> UInterpolator_(U_);
-
+    #include "resetVoidfractionInterpolator.H"
+    #include "resetUInterpolator.H"
     #include "setupProbeModel.H"
 
     for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
@@ -183,8 +182,8 @@ void GidaspowDrag::setForce() const
                 if( forceSubM(0).interpolation() )
                 {
 	                position     = particleCloud_.position(index);
-                    voidfraction = voidfractionInterpolator_.interpolate(position,cellI);
-                    Ufluid       = UInterpolator_.interpolate(position,cellI);
+                    voidfraction = voidfractionInterpolator_().interpolate(position,cellI);
+                    Ufluid       = UInterpolator_().interpolate(position,cellI);
                     //Ensure interpolated void fraction to be meaningful
                     // Info << " --> voidfraction: " << voidfraction << endl;
                     if(voidfraction>1.00) voidfraction = 1.0;

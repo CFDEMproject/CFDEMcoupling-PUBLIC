@@ -66,7 +66,9 @@ MeiLift::MeiLift
     propsDict_(dict.subDict(typeName + "Props")),
     velFieldName_(propsDict_.lookup("velFieldName")),
     U_(sm.mesh().lookupObject<volVectorField> (velFieldName_)),
-    useSecondOrderTerms_(false)
+    useSecondOrderTerms_(false),
+    scaleDia_(1.),
+    numParticlesParcel_(1)
 {
     if (propsDict_.found("useSecondOrderTerms")) useSecondOrderTerms_=true;
 
@@ -85,6 +87,8 @@ MeiLift::MeiLift
         forceSubM(iFSub).readSwitches();
 
     particleCloud_.checkCG(false);
+    if (propsDict_.found("scale"))
+        scaleDia_=scalar(readScalar(propsDict_.lookup("scale")));
 
     //Append the field names to be probed
     particleCloud_.probeM().initialize(typeName, "meiLift.logDat");
@@ -109,6 +113,14 @@ MeiLift::~MeiLift()
 
 void MeiLift::setForce() const
 {
+    if (scaleDia_ > 1)
+        Info << typeName << " using scale = " << scaleDia_ << endl;
+    else if (particleCloud_.cg() > 1){
+        scaleDia_=particleCloud_.cg();
+        Info << typeName << " using scale from liggghts cg = " << scaleDia_ << endl;
+    }
+    numParticlesParcel_ = scaleDia_*scaleDia_*scaleDia_;
+
     const volScalarField& nufField = forceSubM(0).nuField();
     const volScalarField& rhoField = forceSubM(0).rhoField();
 
@@ -127,15 +139,16 @@ void MeiLift::setForce() const
     scalar Cl(0);
     scalar Cl_star(0);
     scalar J_star(0);
+    scalar dPrim(0);
     scalar Omega_eq(0);
     scalar alphaStar(0);
     scalar epsilon(0);
     scalar omega_star(0);
     vector vorticity(0,0,0);
-    volVectorField vorticityField = fvc::curl(U_);
+    volVectorField vorticity_ = fvc::curl(U_);
 
-    interpolationCellPoint<vector> UInterpolator_(U_);
-    interpolationCellPoint<vector> VorticityInterpolator_(vorticityField);
+    #include "resetVorticityInterpolator.H"
+    #include "resetUInterpolator.H"
 
     #include "setupProbeModel.H"
 
@@ -153,15 +166,15 @@ void MeiLift::setForce() const
                 if( forceSubM(0).interpolation() )
                 {
 	                position       = particleCloud_.position(index);
-                    Ur               = UInterpolator_.interpolate(position,cellI) 
+                    Ur               = UInterpolator_().interpolate(position,cellI) 
                                         - Us;
-                    vorticity       = VorticityInterpolator_.interpolate(position,cellI);
+                    vorticity       = vorticityInterpolator_().interpolate(position,cellI);
                 }
                 else
                 {
                     Ur =  U_[cellI]
                           - Us;
-                    vorticity=vorticityField[cellI];
+                    vorticity=vorticity_[cellI];
                 }
 
                 magUr           = mag(Ur);
@@ -170,15 +183,16 @@ void MeiLift::setForce() const
                 if (magUr > 0 && magVorticity > 0)
                 {
                     ds  = 2*particleCloud_.radius(index);
+                    dPrim = ds/scaleDia_;
                     nuf = nufField[cellI];
                     rho = rhoField[cellI];
 
                     // calc dimensionless properties
-                    Rep = ds*magUr/nuf;
-		            Rew = magVorticity*ds*ds/nuf;
+                    Rep = dPrim*magUr/nuf;
+		            Rew = magVorticity*dPrim*dPrim/nuf;
 
-                    alphaStar   = magVorticity*ds/magUr/2.0;
-                    epsilon       =  sqrt(2.0*alphaStar /Rep );
+                    alphaStar   = magVorticity*dPrim/magUr/2.0;
+                    epsilon     = sqrt(2.0*alphaStar /Rep );
                     omega_star=2.0*alphaStar;
 
                     //Basic model for the correction to the Saffman lift
@@ -216,7 +230,8 @@ void MeiLift::setForce() const
                            *rho
                            *Cl  
                            *magUr*Ur^vorticity/magVorticity
-                           *ds*ds;
+                           *dPrim*dPrim
+                           *numParticlesParcel_; //total force on all particles in parcel
 
                     if (modelType_=="B")
                     {
@@ -233,7 +248,7 @@ void MeiLift::setForce() const
                     Pout << "Us = " << Us << endl;
                     Pout << "Ur = " << Ur << endl;
                     Pout << "vorticity = " << vorticity << endl;
-                    Pout << "ds = " << ds << endl;
+                    Pout << "dPrim = " << dPrim << endl;
                     Pout << "rho = " << rho << endl;
                     Pout << "nuf = " << nuf << endl;
                     Pout << "Rep = " << Rep << endl;

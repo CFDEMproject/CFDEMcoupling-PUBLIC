@@ -55,7 +55,8 @@ export CFDEM_LIB_COMP_NAME=lagrangianCFDEMcomp-$CFDEM_VERSION-$WM_PROJECT_VERSIO
 
 #check if additional libraries should be compiled together with solvers
 if [[ $CFDEM_ADD_LIBS_NAME == "" ]]; then
-    export CFDEM_ADD_LIBS_NAME=additionalLibs
+    export CFDEM_ADD_LIBS_NAME=additionalLibs_$WM_PROJECT_VERSION
+    echo "using CFDEM_ADD_LIBS_NAME=$CFDEM_ADD_LIBS_NAME ."
 else
     echo "using CFDEM_ADD_LIBS_NAME=$CFDEM_ADD_LIBS_NAME defined by user."
 fi
@@ -63,6 +64,11 @@ if [[ $CFDEM_ADD_LIBS_DIR == "" ]]; then
     export CFDEM_ADD_LIBS_DIR=$CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc
 else
     echo "using CFDEM_ADD_LIBS_DIR=$CFDEM_ADD_LIBS_DIR defined by user."
+fi
+
+# check addLibs path and file name
+if [[ ! -f $CFDEM_ADD_LIBS_DIR/$CFDEM_ADD_LIBS_NAME ]]; then
+    echo "!!! ERROR !!!: CFDEM_ADD_LIBS_DIR/CFDEM_ADD_LIBS_NAME=$CFDEM_ADD_LIBS_DIR/$CFDEM_ADD_LIBS_NAME does not exist."
 fi
 
 #-----------------------------------------------------
@@ -167,6 +173,9 @@ alias cfdemCleanCFDEM='bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/cleanCFD
 #- shortcut to compile LIGGGHTS + sublibraries
 alias cfdemCompLIG='bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/compileLIGGGHTS.sh'
 
+#- shortcut to compile LIGGGHTS' sublibraries
+alias cfdemCompLIGlibs='bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/compileLIGGGHTS_lib.sh'
+
 #- shortcut to compile CFDEMcoupling +LIGGGHTS
 alias cfdemCompCFDEMall='bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/compileCFDEMcoupling_all.sh'
 
@@ -184,6 +193,10 @@ alias cfdemCompCFDEMuti='bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/compil
 
 #- shortcut to test basic tutorials
 alias cfdemTestTUT='bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/testTutorials.sh'
+
+#- shortcut to change dictionaries according to OF version
+cfdemChangeTutOFversion() { bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/OFVersionChange/shellScripts/cfdemChangeTutOFversion_all.sh $1; }
+export -f cfdemChangeTutOFversion
 
 #- shortcut to visualize the clock model data
 alias vizClock='python $CFDEM_UT_DIR/vizClock/matPlot.py'
@@ -224,4 +237,13 @@ else
             echo "aborted by user."
             #exit
         fi
+fi
+
+# detect OF version
+if [ $WM_PROJECT_VERSION == "3.0.x" ]; then
+    export CFDEM_WM_PROJECT_VERSION=30
+elif [ $WM_PROJECT_VERSION == "2.4.x" ]; then
+    export CFDEM_WM_PROJECT_VERSION=24
+elif [[ $WM_PROJECT_VERSION == "3.2" && $WM_FORK == "extend" ]]; then
+    export CFDEM_WM_PROJECT_VERSION=132
 fi

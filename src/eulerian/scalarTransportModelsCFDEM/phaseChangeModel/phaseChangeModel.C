@@ -20,6 +20,7 @@ License
 
 #include "error.H"
 #include "phaseChangeModel.H"
+#include "IOmanip.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -79,13 +80,12 @@ phaseChangeModel::phaseChangeModel
     alphaImExSplit_(dict_.lookupOrDefault<scalar>("alphaImExSplit", 0.5)),
     cpFromField_(0.0),
     cpToField_(0.0),
-    deltaHEvap_("deltaHEvap", dimLength*dimLength/dimTime/dimTime, 1),
-    tEvap_("tEvap", dimTime, 1)
+    deltaHEvap_(dict_.lookup("deltaHEvap")),
+    tEvap_(dict_.lookup("tEvap")),
+    verboseDiskIntervall_(-1), //zero or negative--> deaktivate output to disk
+    verboseDiskCounter_(0),
+    sPtr_(NULL)
 {
-
-    deltaHEvap_  = dict_.lookup("deltaHEvap");
-    tEvap_       = dict_.lookup("tEvap");
-
     if(parameterVap_.size()<5)
         FatalError <<"phaseChangeModel: parameterVap_.size()<5! Provide more parameters to this model. \n" 
                    << abort(FatalError);  
@@ -93,6 +93,14 @@ phaseChangeModel::phaseChangeModel
     if(alphaImExSplit_<0 || alphaImExSplit_>1)
         FatalError <<"alphaImExSplit must be between 0 and 1. \n" 
                    << abort(FatalError);  
+    if(dict_.found("verboseDiskIntervall"))
+        verboseDiskIntervall_=readScalar(dict_.lookup("verboseDiskIntervall"));
+
+    if (verboseDiskIntervall_>0)
+    {
+        Info << "phaseChangeModel will report to disk with intervall " << verboseDiskIntervall_ << endl;
+        initialzeSummation(typeName, "phaseChange.logDat");
+    }
 }
 
 
@@ -108,6 +116,7 @@ void phaseChangeModel::update(const volScalarField&      voidfraction,   //this 
 {
     //To implement phase change model updates that directly affect "fromField", and "toField"
     //MUST ADD to sources (not reset sources!)
+    //MUST be per m³ TOTAL volume, since scalar transport solver is based on this
     
     //update the saturation field and cp quantities
     cpFromField_ = fromField.cpCarrier();
@@ -117,13 +126,14 @@ void phaseChangeModel::update(const volScalarField&      voidfraction,   //this 
         mSaturation_.internalField()[iter] = pVapor( temp.internalField()[iter] )  / temp[iter] / Rvap_; 
 
     //update the reference quantities
-    volScalarField tempF =      1.0   / ( 
+    volScalarField tempF =      voidfraction 
+	                              / ( 
                                               fromField.m()
                                             + toField.m() * fromField.rho() / toField.rho()
                                             +               fromField.rho() / fromField.rhoCarrier()
-                                        ); //phi_liquid ... (global) liquid volume fraction
-                                           //divided by fromField.m()
-                                        
+                                        ); //phi_liquid ... (global) liquid volume fraction (per m³ total!)
+                                           //divided by fromField.m() 
+
 
     //leaving mass rate - implicit/explicit term (divided by fromFiel.m())
     fromField.mSource().internalField()    -= (1-alphaImExSplit_) * tempF.internalField() * fromField.m().internalField()
@@ -145,6 +155,7 @@ void phaseChangeModel::update(const volScalarField&      voidfraction,   //this 
     tempF *= fromField.m() / tEvap_.value(); //phi_liquid ... (global) liquid volume fraction
                                              //divided by evaporation time scale
 
+
     //entering mass rate - explicit & implicit term
     toField.mSource().internalField()     += tempF * mSaturation_.internalField();
     toField.mSourceKImpl().internalField()-= tempF * toField.rhoCarrier();
@@ -156,8 +167,11 @@ void phaseChangeModel::update(const volScalarField&      voidfraction,   //this 
                                   - toField.m().internalField()
                                   * toField.rhoCarrier() 
                                 );
+    if(verboseToDisk())
+        computeIntegral(mSource_);
 }
 
+//************************************************
 void phaseChangeModel::setEnthalpySource(const eulerianScalarField& Temperature) const
 {
     //update the heat source
@@ -168,6 +182,61 @@ void phaseChangeModel::setEnthalpySource(const eulerianScalarField& Temperature)
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+void phaseChangeModel::initialzeSummation(word typeName, word  logFileName) const
+{
+    if (Pstream::master())
+    {
+        fileName file_ =logFileName;
+        fileName probeDir;
+        fileName probeSubDir =  typeName;
+
+        Info << "Integral quantity for model " <<  typeName << " will write to file " << file_ << endl;
+
+        if (particleCloud_.mesh().name() != polyMesh::defaultRegion)
+        {
+            probeSubDir = probeSubDir/particleCloud_.mesh().name();
+        }
+        probeSubDir = "postProcessing"/probeSubDir/particleCloud_.mesh().time().timeName();
+
+        if (Pstream::parRun())
+        {
+            // Put in undecomposed case
+            // (Note: gives problems for distributed data running)
+            probeDir = particleCloud_.mesh().time().path()/".."/probeSubDir;
+        }
+        else
+        {
+            probeDir = particleCloud_.mesh().time().path()/probeSubDir;
+        }
+
+
+        // Create directory if does not exist.
+        mkDir(probeDir);
+
+        sPtr_ = new OFstream(probeDir+"/"+file_);
+
+        *sPtr_ << '#' 
+              << "Time" << "  " 
+              << "sourceValue" << endl;
+    }
+}
+
+//*******************************************************************
+void phaseChangeModel::computeIntegral(volScalarField& explicitEulerSource) const
+{
+    scalar integralValue = gSum( explicitEulerSource.internalField() 
+                                *explicitEulerSource.mesh().V()
+                               );
+
+    if (Pstream::master() )
+    {
+      *sPtr_ << setprecision(IOstream::defaultPrecision()) ;
+      *sPtr_ << particleCloud_.mesh().time().value() 
+            << "  " //setw(IOstream::defaultPrecision() + 6)
+            << integralValue
+            << endl;
+    }
+}
 
 } // End namespace Foam
 

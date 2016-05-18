@@ -70,7 +70,8 @@ momCoupleModels
     implicitCouple
 );
 
-turbulenceModelType RASProperties;//LESProperties;//
+//turbulenceModelType "RASProperties";//"LESProperties";//OFversion24x
+turbulenceModelType turbulenceProperties;//"LESProperties";//OFversion30x
 
 //===========================================================================//
 // sub-model properties
@@ -86,6 +87,7 @@ particleCellVolumeProps
 
 volWeightedAverageProps
 {
+    useVolumeFraction true;
     scalarFieldNames
     (
         ddtVoidfraction
@@ -96,7 +98,7 @@ volWeightedAverageProps
     upperThreshold 1e20;
     lowerThreshold 0;
     writeToFile true;
-    verbose;
+    verbose true;
 }
 
 particleProbeProps

@@ -43,6 +43,7 @@ SourceFiles
 #include "cfdemCloud.H"
 #include "probeModel.H"
 #include "forceSubModel.H"
+#include "interpolationCellPointFace.H"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -79,6 +80,10 @@ protected:
         bool requiresEx_;           //requires an orientation vector
 
         bool requiresShape_;        //requires shape information 
+
+        bool requiresQuaternion_;
+
+        bool requiresSuperquadric_;
         
         bool pullPushRotation_;     //will exchange rotation information
         
@@ -90,6 +95,45 @@ protected:
 
         autoPtr<forceSubModel>* forceSubModel_;
 
+        mutable autoPtr<interpolation<scalar> > voidfractionInterpolator_;
+
+        mutable autoPtr<interpolation<vector> > UInterpolator_;
+
+        mutable autoPtr<interpolation<vector> > vorticityInterpolator_;
+
+        mutable autoPtr<interpolation<vector> > gradPInterpolator_;
+
+        mutable autoPtr<interpolation<vector> > gradUInterpolator_;
+
+        mutable autoPtr<interpolation<vector> > gradVoidfractionInterpolator_;
+
+        mutable autoPtr<interpolation<vector> > Up1Interpolator_;
+
+        mutable autoPtr<interpolation<vector> > Up2Interpolator_;
+
+        mutable autoPtr<interpolation<scalar> > dSauterInterpolator_;
+
+        mutable autoPtr<interpolation<scalar> > phiP1Interpolator_;
+
+        mutable autoPtr<interpolation<scalar> > phiP2Interpolator_;
+
+        mutable autoPtr<interpolation<scalar> > alphaInterpolator_;
+
+        mutable autoPtr<interpolation<vector> > gradAlphaInterpolator_;
+
+        mutable autoPtr<interpolation<scalar> > TInterpolator_;
+
+        mutable autoPtr<interpolation<vector> > UsInterpolator_;
+
+        mutable autoPtr<interpolation<scalar> > fluidScalarFieldInterpolator_;
+
+        mutable autoPtr<interpolation<vector> > gradPsolidInterpolator_;
+
+        mutable autoPtr<interpolation<symmTensor> > shearRateInterpolator_;
+
+        mutable autoPtr<interpolation<vector> > DDtUInterpolator_;
+
+        mutable autoPtr<interpolation<vector> > divTauInterpolator_;
 public:
 
     //- Runtime type information
@@ -177,6 +221,10 @@ public:
         inline const bool& coupleForce() const { return coupleForce_;};
 
         virtual inline bool& requiresEx() { return requiresEx_;};
+
+        virtual inline bool& requiresQuaternion() { return requiresQuaternion_;};
+
+        virtual inline bool& requiresSuperquadric() { return requiresSuperquadric_;};
 
         virtual inline bool& requiresShape() { return requiresShape_;};
 

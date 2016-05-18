@@ -38,9 +38,6 @@ fix         zwalls1 all wall/gran model hertz tangential history primitive type 
 fix         zwalls2 all wall/gran model hertz tangential history primitive type 1  zplane 0.0553
 fix         cylwalls all wall/gran model hertz tangential history primitive type 1 zcylinder 0.01385 0. 0.
 
-# change the particles density
-set         group all density 2000
-
 # cfd coupling
 fix         cfd all couple/cfd couple_every 100 mpi
 fix         cfd2 all couple/cfd/force/implicit
@@ -66,4 +63,4 @@ compute_modify  thermo_temp dynamic yes
 dump            dmp all custom 5000 ../DEM/post/dump*.liggghts_run id type x y z vx vy vz fx fy fz f_dragforce[1] f_dragforce[2] f_dragforce[3] radius 
 #dump            dmp all custom/vtk 5000 ../DEM/post/dump_liggghts_run.*.vtk id type x y z vx vy vz fx fy fz f_dragforce[1] f_dragforce[2] f_dragforce[3] radius 
 
-run             1
+run             0

@@ -113,11 +113,13 @@ public:
 
         virtual void correctUo(volVectorField&) const {};
 
-        virtual volVectorField& f() const;
+        virtual tmp<volVectorField> f() const;
 
-        virtual volScalarField& body() const;
+        virtual tmp<volScalarField> body() const;
 
-        virtual volScalarField& inside() const;
+        virtual tmp<volScalarField> inside() const;
+
+        virtual void postProcessing(volScalarField&) const {};
 
     // Access
 

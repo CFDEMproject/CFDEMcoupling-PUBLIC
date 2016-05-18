@@ -21,11 +21,17 @@ ArchimedesIBProps
 {
     gravityFieldName "gravity";
     voidfractionFieldName "voidfraction";
+    twoDimensional;
+    treatForceExplicit  switch1;
 }; 
 </PRE>
 <UL><LI><I>gravity</I> = name of the finite volume gravity field 
 
 <LI><I>voidfraction</I> = name of the finite volume voidfraction field 
+
+<LI><I>twoDimensional</I> = optional keyword for conducting a two dimensional calculation 
+
+<LI><I>switch1</I> = (optional, default true) sub model switch, see <A HREF = "forceSubModel.html">forceSubModel</A> for details 
 
 
 </UL>

@@ -81,14 +81,6 @@ private:
 
   // private data
     dictionary propsDict_;
-
-    // variables
-    int me;
-
-    int nprocs;
-
-    int liggghts;
-
     MPI_Comm comm_liggghts;
 
   // private member functions

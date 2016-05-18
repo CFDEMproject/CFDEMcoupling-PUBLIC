@@ -91,7 +91,7 @@ private:
 
     mutable wordList itemsToSample_;
 
-    mutable List<OFstream*> sPtrList_;
+    mutable List<OFstream*> sPtrList_;                      //Must delete elements in destructor
 
     mutable int itemCounter_;
 
@@ -103,11 +103,13 @@ private:
 
     mutable std::vector< std::vector<double> > sProbes_;
     
-    mutable std::vector< std::vector<double*> > vProbes_;
+    mutable std::vector< std::vector<double*> > vProbes_;   //Must delete elements in destructor
     
     mutable  std::vector<std::string> probeName_;
     
     mutable int probeIndex_;
+    
+    mutable int printOnlyAt_;
   
     
 public:
@@ -123,8 +125,8 @@ public:
         (
             const dictionary& dict,
             cfdemCloud& sm,
-            word   typeName,
-            char*  logFileName
+            const word& typeName,
+            const char* logFileName
         );
 
     // Destructor
@@ -133,7 +135,7 @@ public:
 
     // Member Functions
     void updateProbes(int index, Field<scalar> sValues, Field<vector> vValues) const;
-    void initialize(word typeName, word logFileName) const;
+    void initialize(const word& modelName, const word& logFileName) const;
     void setOutputFile() const;
     void writeHeader() const;
     void writeProbe(int index, Field<scalar> sValues, Field<vector> vValues) const;

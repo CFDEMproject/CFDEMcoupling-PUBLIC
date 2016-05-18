@@ -61,7 +61,7 @@ noProbe::noProbe
     const dictionary& dict,
     cfdemCloud& sm,
     word   typeName,
-    char*  logFileName
+    const char*  logFileName
 )
 :
     probeModel(dict,sm,typeName,logFileName)

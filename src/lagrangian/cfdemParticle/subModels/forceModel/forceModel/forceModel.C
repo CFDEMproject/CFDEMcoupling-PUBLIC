@@ -88,11 +88,33 @@ forceModel::forceModel
     probeIt_(sm.probeM().active()),
     requiresEx_(false),
     requiresShape_(false),
+    requiresQuaternion_(false),
+    requiresSuperquadric_(false),
     pullPushRotation_(false),
     implicitAnisotropicDrag_(false),
     implicitRotation_(false),
-    forceSubModels_(wordList(0)),
-    forceSubModel_(new autoPtr<forceSubModel>[nrForceSubModels()])
+    forceSubModels_(0),
+    forceSubModel_(new autoPtr<forceSubModel>[nrForceSubModels()]),
+    voidfractionInterpolator_(NULL),
+    UInterpolator_(NULL),
+    vorticityInterpolator_(NULL),
+    gradPInterpolator_(NULL),
+    gradUInterpolator_(NULL),
+    gradVoidfractionInterpolator_(NULL),
+    Up1Interpolator_(NULL),
+    Up2Interpolator_(NULL),
+    dSauterInterpolator_(NULL),
+    phiP1Interpolator_(NULL),
+    phiP2Interpolator_(NULL),
+    alphaInterpolator_(NULL),
+    gradAlphaInterpolator_(NULL),
+    TInterpolator_(NULL),
+    UsInterpolator_(NULL),
+    fluidScalarFieldInterpolator_(NULL),
+    gradPsolidInterpolator_(NULL),
+    shearRateInterpolator_(NULL),
+    DDtUInterpolator_(NULL),
+    divTauInterpolator_(NULL)
 {}
 
 
@@ -200,10 +222,12 @@ void forceModel::treatVoidCells() const
 void forceModel::setForceSubModels(dictionary& dict)
 {
     if (dict.found("forceSubModels"))
+    {
         forceSubModels_ = wordList(dict.lookup("forceSubModels"));
-    else{
-        forceSubModels_ = wordList(1);
-        forceSubModels_[0] = "ImEx";
+    }
+    else
+    {
+        forceSubModels_.setSize(1, "ImEx");
     }
 
     delete[] forceSubModel_;

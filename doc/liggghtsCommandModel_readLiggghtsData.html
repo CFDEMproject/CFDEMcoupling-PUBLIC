@@ -20,13 +20,14 @@
 readLiggghtsDataProps0
 {
     startIndex "scalar1";
-    exactTiming "bool1";
+    verbose ;
+    exactTiming ;
     filePath 
     (
         "word"
     );
-    runFirst "bool2";
-    runEveryCouplingStep "bool3";
+    runFirst "bool1";
+    runEveryCouplingStep "bool2";
     startTime "scalar2";
     endTime "scalar3";
     timeInterval "scalar4";
@@ -34,13 +35,15 @@ readLiggghtsDataProps0
 </PRE>
 <UL><LI><I>scalar1</I> = start index of data file to be read 
 
-<LI><I>bool1</I> = true if start time should be kept even during a coupling interval 
+<LI><I>verbose</I> = (default off) flag for verbose run 
+
+<LI><I>exactTiming</I> = flag indicating that start time should be kept even during a coupling interval 
 
 <LI><I>filePath</I> = path to LIGGGHTS data file. Each word in a new line, numbers and symbols need special treatment (e.g. $couplingInterval will be replaced by correct coupling interval in the simulation)  
 
-<LI><I>bool2</I> = true if to be run at first timestep only (prio 1) 
+<LI><I>bool1</I> = true if to be run at first timestep only (prio 1) 
 
-<LI><I>bool3</I> = true if to be run at every coupling step (prio 2) 
+<LI><I>bool2</I> = true if to be run at every coupling step (prio 2) 
 
 <LI><I>scalar2</I> = if bool2 and bool3 false then starts at scalar2 (prio 3) run 
 

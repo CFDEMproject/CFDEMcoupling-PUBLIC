@@ -72,23 +72,22 @@ interface::interface
     deltaAlphaIn_(readScalar(propsDict_.lookup("deltaAlphaIn"))),
     deltaAlphaOut_(readScalar(propsDict_.lookup("deltaAlphaOut"))),
     C_(1.0),
-    interpolation_(false),
-    alphaInterpolator_(interpolation<scalar>::New("cellPoint", alpha_)),
-    gradAlphaInterpolator_(interpolation<vector>::New("cellPoint", gradAlpha_))
+    interpolation_(false)
 {
     if (propsDict_.found("C")) C_=readScalar(propsDict_.lookup("C"));
-    if (propsDict_.found("interpolation")) interpolation_=true;
 
     // init force sub model
     setForceSubModels(propsDict_);
 
     // define switches which can be read from dict
     forceSubM(0).setSwitchesList(0,true); // activate treatExplicit switch
+    forceSubM(0).setSwitchesList(4,true); // activate search for interpolate switch
 
     // read those switches defined above, if provided in dict
     forceSubM(0).readSwitches();
+    //for (int iFSub=0;iFSub<nrForceSubModels();iFSub++)
+    //    forceSubM(iFSub).readSwitches();
 
-    Info << "check if interpolation really works - use directly interpolationCellPoint<vector> ???" << endl;
     particleCloud_.checkCG(false);
 }
 
@@ -103,7 +102,9 @@ interface::~interface()
 
 void interface::setForce() const
 {
-Info << "interface::setForce" << endl;
+    #include "resetAlphaInterpolator.H"
+    #include "resetGradAlphaInterpolator.H"
+
     for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
     {
         //if(mask[index][0])
@@ -118,7 +119,7 @@ Info << "interface::setForce" << endl;
                 scalar alphap;
                 vector magGradAlphap;
 
-                if(interpolation_) // use intepolated values for alpha (normally off!!!)
+                if(forceSubM(0).interpolation()) // use intepolated values for alpha (normally off!!!)
                 {
                     // make interpolation object for alpha
                     alphap = alphaInterpolator_().interpolate(position,cellI);

@@ -47,8 +47,11 @@ Contributions
 #else
     #include "turbulenceModel.H"
 #endif
-
+#include "superquadric_flag.h"
 #include "cfdemCloudIB.H"
+#if defined(SUPERQUADRIC_ACTIVE_FLAG)
+#include "cfdemCloudIBSuperquadric.H"
+#endif
 #include "implicitCouple.H"
 
 #include "averagingModel.H"
@@ -89,7 +92,11 @@ int main(int argc, char *argv[])
 
     // create cfdemCloud
     #include "readGravitationalAcceleration.H"
-    cfdemCloudIB particleCloud(mesh);
+    #if defined(SUPERQUADRIC_ACTIVE_FLAG)
+        cfdemCloudIBSuperquadric particleCloud(mesh);
+    #else
+        cfdemCloudIB particleCloud(mesh);
+    #endif
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

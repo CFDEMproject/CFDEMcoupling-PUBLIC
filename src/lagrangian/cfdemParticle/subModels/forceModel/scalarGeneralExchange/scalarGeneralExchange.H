@@ -79,7 +79,7 @@ class scalarGeneralExchange
 {
 protected:
 
-    dictionary          propsDict_;
+    mutable dictionary  propsDict_;
 
     const IOdictionary  scalarTransportProperties_;
 
@@ -95,10 +95,11 @@ protected:
     word                partHeatTransCoeffName_;
     word                partHeatFluidName_;
 
-    mutable double      **partDat_;                   // Lagrangian array
-    mutable double      **partDatFlux_;               // Lagrangian array
-    mutable double      **partDatTransCoeff_;         // Lagrangian array
-    mutable double      **partDatFluid_;              // Lagrangian array
+    mutable double      **partDat_;                   // Lagrangian array ExtCode-->CFDEM
+
+    mutable double      **partDatFlux_;               // Lagrangian array CFDEM-->ExtCode (explicit contribution)
+    mutable double      **partDatTransCoeff_;         // Lagrangian array CFDEM-->ExtCode (implicit contribution)
+    mutable double      **partDatFluid_;              // Lagrangian array CFDEM-->ExtCode (implicit contribution)
 
     mutable double       **partTemp_;
 
@@ -108,22 +109,25 @@ protected:
     mutable double      **partDatSaturation_;                   // Lagrangian array
     mutable double      **partCoolingFlux_;
     
-    bool                validPartFlux_;               //indicator if found, based on heat, but also used for species
-    bool                validPartTransCoeff_;         //indicator if found, based on heat, but also used for species
-    bool                validPartFluid_;              //indicator if found, based on heat, but also used for species
+    mutable bool        validPartFlux_;               //indicator if found, based on heat, but also used for species 
+                                                      //also indicates EXplicit Coupling
+    mutable bool        validPartTransCoeff_;         //indicator if found, based on heat, but also used for species
+                                                      //also indicates IMplicit Coupling
+    mutable bool        validPartFluid_;              //indicator if found, based on heat, but also used for species
 
-    bool                haveTemperatureEqn_;          //indicator for temperature field or not
+    mutable bool        haveTemperatureEqn_;          //indicator for temperature field or not
 
-    bool                useLiMason_;                  //switch to activate calculation using Li-Mason
+    mutable bool        useLiMason_;                  //switch to activate calculation using Li-Mason
+    mutable bool        useGeneralCorrelation_;       //switch to activate calculation using a generalized correlation
+    mutable scalarList  generalCorrelationParameters_; //parameter for general correlation
 
     scalar              lambda_;                      // fluid thermal conductivity [W/(m*K)]
     scalar              Prandtl_;                     // Prandtl number
 
-
     //Species Word Lists
-    wordList            eulerianFieldNames_;           //List with Eulerian fields to exchange (handed over)
+    mutable wordList    eulerianFieldNames_;           //List with Eulerian fields to exchange (handed over)
 
-    scalarList          particleSpeciesValue_;         //list with scalar to indicate particle property is available
+    mutable scalarList  particleSpeciesValue_;         //list with scalar to indicate particle property is available
     const wordList      partSpeciesNames_;
     const wordList      partSpeciesFluxNames_;
     const wordList      partSpeciesTransCoeffNames_;
@@ -131,24 +135,30 @@ protected:
 
     scalarList          DMolecular_; 
 
-    //evaporation properties 
-    scalarList          parameterVap_;  // parameters for vapor pressure
-
-    scalar              Rvap_;  
-
-    dimensionedScalar   deltaHEvap_;    //units: K; deltaHEvap = deltaH_v / cp_g            
+    //information related to external register
+    mutable int                 partHeatFluxPositionInRegister_;
+    mutable std::vector<int>    partSpeciesFluxPositionInRegister_;
+    mutable int                 partHeatTransCoeffPositionInRegister_;
+    mutable std::vector<int>    partSpeciesTransCoeffPositionInRegister_;
+    mutable int                 partHeatFluidPositionInRegister_;
+    mutable std::vector<int>    partSpeciesFluidPositionInRegister_;
 
     //Scalar properties
-    scalar              maxSource_;                   // max (limited) value of src field
+    mutable scalar      maxSource_;                   // max (limited) value of src field
 
     mutable scalar      scaleDia_;
 
     void allocateMyArrays(scalar initialValue) const;
+    void setupModel() const;
+    void setPointersToExternalArrays(   word nameFlux,          int positionFlux,
+                                        word nameTransCoeff,    int positionTransCoeff,
+                                        word nameFluid,         int positionFluid
+                                    ) const;
 
+    mutable double (scalarGeneralExchange::*Nusselt)(double Re, double Pr, double voidfraction) const;
     double NusseltLiMason(double Re, double Pr, double voidfraction) const;
     double NusseltDeenEtAl(double Re, double Pr, double voidfraction)  const;
-
-    double (scalarGeneralExchange::*Nusselt)(double Re, double Pr, double voidfraction) const;
+    double NusseltGeneralCorrelation(double Re, double Pr, double voidfraction)  const;
 
 public:
 

@@ -46,4 +46,25 @@
 </P>
 <P><B>Default:</B> none.
 </P>
+<P><B>Swtiches:</B>
+</P>
+<UL><LI>Depending on the availability within the respective force model, a number of switches can be activated: 
+<LI>treatForceExplicit: switch for the purely explicit consideration of the force term in the equation of motion on the CFD side (if switched off, the force is considered semi-implicitly) 
+</UL>
+<UL><LI>treatForceDEM: switch for the consideration of the forces on the DEM side only 
+</UL>
+<UL><LI>implForceDEM: If true, the fluid velocity and drag coefficient are communicated to the DEM calculation at each coupling time step and the drag force is calculated at each DEM time step, using the current particle velocity. If false, a force term is communiated to the DEM calculation at each coupling time step, the term is not within a coupling interval. 
+</UL>
+<UL><LI>verbose: switch for debug output to screen 
+</UL>
+<UL><LI>interpolation: switch for the usage of interpolation models when getting data for the Lagrangian calculation from Eulerian fields; If false, the cell centre values are used. 
+</UL>
+<UL><LI>useFilteredDragModel: switch for using a coarse-grid version of the Beetstra drag model (takes grid-size effects into account; default = off) 
+</UL>
+<UL><LI>useParcelSizeDependentFilteredDrag: switch for using a coarse-grid version of the Beetstra drag model (takes parcel-size effects into account, will force the switch useFilteredDragModel to "on"; default = off) 
+</UL>
+<UL><LI>implForceDEMaccumulated: Can only be used in combination with implForceDEM switch, drag force values of each DEM time step are accumulated and passed on to the CFD-calculation. 
+</UL>
+<UL><LI>scalarViscosity: switch for the usage of a user-defined viscosity nu for the calculation of the drag force; The CFD calculation always uses the value of the transport model. 
+</UL>
 </HTML>

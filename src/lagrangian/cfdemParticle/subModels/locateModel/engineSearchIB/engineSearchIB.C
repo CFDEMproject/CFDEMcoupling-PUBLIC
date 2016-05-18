@@ -117,29 +117,36 @@ label engineSearchIB::findCell
             //cellIDs[index][0] = particleCloud_.mesh().findCell(position);
 
             //mod by alice upon from here
-            if(cellIDs[index][0]<0){
-            	bool foundPos=0;
-            	int countPoints=0;
-            	vector pos=position;
-            	label altStartPos=-1;
-            	label numberOfPoints = zSplit_*xySplit_-2*(zSplit_-1);
-            	label thetaLevel=0;
-            	scalar theta, phi, thetaSize=180/zSplit_,phiSize=360/xySplit_, factor=M_PI/180.;
-            	while(countPoints<numberOfPoints && !foundPos){
-            		pos=position;
-            		if(countPoints==0)
-            			pos[2]+=radius;
-            		else if(countPoints==1)
-            			pos[2]-=radius;
-            		else 
-            		{
-            			thetaLevel=(countPoints-2)/xySplit_;
-            			theta=factor*thetaSize*thetaLevel;
-            			phi=factor*phiSize*(countPoints-2-thetaLevel*xySplit_);
-            			pos[0]+=radius*sin(theta)*cos(phi);
-            		    pos[1]+=radius*sin(theta)*sin(phi);
-            		    pos[2]+=radius*cos(theta);
-            		}
+            if(cellIDs[index][0] < 0)
+            {
+                vector pos = position;
+                label altStartPos = -1;
+                label numberOfPoints = (zSplit_-1)*xySplit_ + 2; // 1 point at bottom, 1 point at top
+                label thetaLevel = 0;
+                scalar theta, phi;
+                const scalar thetaSize = 180./zSplit_, phiSize = 360./xySplit_;
+                const scalar deg2rad = M_PI/180.;
+
+                for(int countPoints = 0; countPoints < numberOfPoints; ++countPoints)
+                {
+                    pos = position;
+                    if(countPoints == 0)
+                    {
+                        pos[2] += radius;
+                    }
+                    else if(countPoints == 1)
+                    {
+                        pos[2] -= radius;
+                    }
+                    else
+                    {
+                        thetaLevel = (countPoints - 2) / xySplit_;
+                        theta = deg2rad * thetaSize * (thetaLevel+1);
+                        phi = deg2rad * phiSize * (countPoints - 2 - thetaLevel*xySplit_);
+                        pos[0] += radius * sin(theta) * cos(phi);
+                        pos[1] += radius * sin(theta) * sin(phi);
+                        pos[2] += radius * cos(theta);
+                    }
 
             		altStartPos=findSingleCell(pos,oldID); //particleCloud_.mesh().findCell(pos);//
                     //check for periodic domains
@@ -158,11 +165,14 @@ label engineSearchIB::findCell
                         }
                   		altStartPos=findSingleCell(pos,oldID); //particleCloud_.mesh().findCell(pos);//
                     }
-                    
-            		if(altStartPos>=0) foundPos=1;
-            		countPoints++;
+
+                    if(altStartPos >= 0) // found position, we're done
+                    {
+                        cellIDs[index][0] = altStartPos;
+                        break;
+                    }
             	}
-                if(foundPos) cellIDs[index][0]=altStartPos;
+
             }
         }
     }

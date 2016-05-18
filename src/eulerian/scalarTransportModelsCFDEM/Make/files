@@ -5,7 +5,7 @@ scalarTransportModel/newScalarTransportModel.C
 temperatureModel/temperatureModel.C
 generalManual/generalManual.C
 noTransport/noTransport.C
-/*generalPhaseChange/generalPhaseChange.C*/
+generalPhaseChange/generalPhaseChange.C
 
 /*Fields*/
 eulerianScalarField/eulerianScalarField.C

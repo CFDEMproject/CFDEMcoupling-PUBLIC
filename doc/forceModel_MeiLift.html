@@ -21,8 +21,13 @@ MeiLiftProps
 {
     velFieldName "U";
     useSecondOrderTerms;
-    interpolation "switch1";
-    verbose "switch2";
+    interpolation switch1;
+    vorticityInterpolationType "type1"
+    UInterpolationType "type2"
+    verbose switch2;
+    treatForceExplicit switch3;
+    scalarViscosity switch4;
+    nu scalar1;
 }; 
 </PRE>
 <UL><LI><I>U</I> = name of the finite volume fluid velocity field 
@@ -31,7 +36,17 @@ MeiLiftProps
 
 <LI><I>switch1</I> = switch to activate tri-linear interpolation of the flow quantities at the particle position 
 
+<LI><I>type1</I> = (optional, default cellPoint) interpolation type for vorticity field 
+
+<LI><I>type2</I> = (optional, default cellPointFace) interpolation type for velocity field 
+
 <LI><I>switch2</I> = switch to activate the report of per-particle quantities to the screen 
+
+<LI><I>switch3</I> = (optional, default true) sub model switch, see <A HREF = "forceSubModel.html">forceSubModel</A> for details 
+
+<LI><I>switch4</I> = (optional, default false) sub model switch, see <A HREF = "forceSubModel.html">forceSubModel</A> for details 
+
+<LI><I>scalar1</I> = optional, only if switch4 is true 
 
 
 </UL>

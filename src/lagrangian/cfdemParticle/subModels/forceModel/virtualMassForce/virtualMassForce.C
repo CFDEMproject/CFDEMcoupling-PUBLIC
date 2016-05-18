@@ -74,7 +74,7 @@ virtualMassForce::virtualMassForce
     Cadd_(0.5)
 {
 
-    if (particleCloud_.dataExchangeM().maxNumberOfParticles() > 0)
+    if (particleCloud_.dataExchangeM().maxNumberOfParticles() > 0 && !splitUrelCalculation_)
     {
         // get memory for 2d array
         particleCloud_.dataExchangeM().allocateArray(UrelOld_,NOTONCPU,3);
@@ -125,7 +125,8 @@ virtualMassForce::virtualMassForce
 
 virtualMassForce::~virtualMassForce()
 {
-    particleCloud_.dataExchangeM().destroy(UrelOld_,3);
+    if(!splitUrelCalculation_)
+        particleCloud_.dataExchangeM().destroy(UrelOld_,3);
 }
 
 
@@ -141,15 +142,16 @@ void virtualMassForce::setForce() const
     vector Ufluid(0,0,0);
     vector Ur(0,0,0);
     vector DDtU(0,0,0);
+    vector UrelOld(0,0,0);
+    vector ddtUrel(0,0,0);
 
     //Compute extra vfields in case it is needed
     volVectorField DDtU_(0.0*U_/U_.mesh().time().deltaT());
     if(splitUrelCalculation_)
         DDtU_ = fvc::ddt(U_) + fvc::div(phi_, U_); //Total Derivative of fluid velocity
 
-    interpolationCellPoint<vector> UInterpolator_(   U_);
-    interpolationCellPoint<vector> DDtUInterpolator_(DDtU_);
-
+    #include "resetUInterpolator.H"
+    #include "resetDDtUInterpolator.H"
     #include "setupProbeModel.H"
 
     bool haveUrelOld_(false); 
@@ -165,7 +167,7 @@ void virtualMassForce::setForce() const
                 if(forceSubM(0).interpolation()) 
                 {
 	                position     = particleCloud_.position(index);
-                    Ufluid       = UInterpolator_.interpolate(position,cellI);
+                    Ufluid       = UInterpolator_().interpolate(position,cellI);
                 }
                 else
                 {
@@ -174,13 +176,15 @@ void virtualMassForce::setForce() const
            
 
                 if(splitUrelCalculation_)  //if split, just use total derivative of fluid velocity
-                if(forceSubM(0).interpolation()) 
                 {
-                    DDtU = DDtUInterpolator_.interpolate(position,cellI);
-                }
-                else
-                {
-                    DDtU = DDtU_[cellI];
+                    if(forceSubM(0).interpolation()) 
+                    {
+                        DDtU = DDtUInterpolator_().interpolate(position,cellI);
+                    }
+                    else
+                    {
+                        DDtU = DDtU_[cellI];
+                    }
                 }
                 else
                 {
@@ -188,25 +192,27 @@ void virtualMassForce::setForce() const
                     Ur = Ufluid - Us;
                 }
 
-                
-                //Check of particle was on this CPU the last step
-                if(UrelOld_[index][0]==NOTONCPU) //use 1. element to indicate that particle was on this CPU the last time step
-                    haveUrelOld_ = false;
-                else
-                    haveUrelOld_ = true;
-
-                vector UrelOld(0.,0.,0.);
-                vector ddtUrel(0.,0.,0.);
-                for(int j=0;j<3;j++)
-                {
-                    UrelOld[j]         = UrelOld_[index][j];
-                    UrelOld_[index][j] = Ur[j];
-                }
-                if(haveUrelOld_ ) //only compute force if we have old (relative) velocity
-                    ddtUrel = (Ur-UrelOld)/dt;
-
                 if(splitUrelCalculation_) //we can always compute the total derivative in case we split
                     ddtUrel = DDtU;
+                else
+                {            
+                    //Check of particle was on this CPU the last step
+                    if(UrelOld_[index][0]==NOTONCPU) //use 1. element to indicate that particle was on this CPU the last time step
+                    {
+                        haveUrelOld_ = false;
+                        ddtUrel = vector(0,0,0);
+                    }
+                    else
+                        haveUrelOld_ = true;
+
+                    for(int j=0;j<3;j++)
+                    {
+                        UrelOld[j]         = UrelOld_[index][j];
+                        UrelOld_[index][j] = Ur[j];
+                    }
+                    if(haveUrelOld_ ) //only compute force if we have old (relative) velocity
+                        ddtUrel = (Ur-UrelOld)/dt;
+                }
 
                 scalar ds = 2*particleCloud_.radius(index);
                 scalar Vs = ds*ds*ds*M_PI/6;
@@ -244,12 +250,14 @@ void virtualMassForce::setForce() const
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 void Foam::virtualMassForce::reAllocArrays() const
 {
-    if(particleCloud_.numberOfParticlesChanged())
-        particleCloud_.dataExchangeM().allocateArray(UrelOld_,NOTONCPU,3);
+    if (!splitUrelCalculation_)
+    {
+        if(particleCloud_.numberOfParticlesChanged())
+            particleCloud_.dataExchangeM().allocateArray(UrelOld_,NOTONCPU,3);
 
-    // get DEM data
-    particleCloud_.dataExchangeM().getData("UrelOld", "vector-atom", UrelOld_);
-    
+        // get DEM data
+        particleCloud_.dataExchangeM().getData("UrelOld", "vector-atom", UrelOld_);
+    }
 }
 
 

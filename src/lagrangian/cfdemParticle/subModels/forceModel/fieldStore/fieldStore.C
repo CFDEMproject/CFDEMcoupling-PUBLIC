@@ -65,9 +65,7 @@ fieldStore::fieldStore
     propsDict_(dict.subDict(typeName + "Props")),
     mesh_(particleCloud_.mesh()),
     scalarFieldNames_(propsDict_.lookup("scalarFieldNames")),
-    vectorFieldNames_(propsDict_.lookup("vectorFieldNames")),
-    scalarFields_(NULL),
-    vectorFields_(NULL)
+    vectorFieldNames_(propsDict_.lookup("vectorFieldNames"))
 {
     // create time average scalar fields
     scalarFields_.setSize(scalarFieldNames_.size());
@@ -142,7 +140,7 @@ void fieldStore::setForce() const
         for (int i=0;i < scalarFieldNames_.size(); i++)
         {
             // get reference to actual field
-            volScalarField& field = (volScalarField&) mesh_.lookupObject<volScalarField>(scalarFieldNames_[i]);
+            const volScalarField& field = mesh_.lookupObject<volScalarField>(scalarFieldNames_[i]);
 
             // save field
             scalarFields_[i] = field;
@@ -151,7 +149,7 @@ void fieldStore::setForce() const
         for (int i=0;i < vectorFieldNames_.size(); i++)
         {
             // get reference to actual field
-            volVectorField& field = (volVectorField&) mesh_.lookupObject<volVectorField>(vectorFieldNames_[i]);
+            const volVectorField& field = mesh_.lookupObject<volVectorField>(vectorFieldNames_[i]);
 
             // save field
             vectorFields_[i] = field;

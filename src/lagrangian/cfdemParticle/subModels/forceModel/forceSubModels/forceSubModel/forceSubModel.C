@@ -59,7 +59,7 @@ forceSubModel::forceSubModel
     dict_(dict),
     particleCloud_(sm),
     forceModel_(fm),
-    nrDefaultSwitches_(9),                                          // !!!
+    nrDefaultSwitches_(10),                                          // !!!
     switchesNameList_(wordList(nrDefaultSwitches_)),
     switchesList_(List<Switch>(nrDefaultSwitches_)),
     switches_(List<Switch>(nrDefaultSwitches_)),
@@ -116,7 +116,9 @@ forceSubModel::forceSubModel
         dimensionedVector("IBDragPerV", dimensionSet(1, -2, -2, 0, 0), vector::zero)
     ),
     densityFieldName_(dict_.lookupOrDefault<word>("densityFieldName","rho")),
-    rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_))
+    rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_)),
+    verboseDiskIntervall_(1),
+    verboseDiskCounter_(0)
 {
     // init standard switch list
     int iCounter(0);
@@ -129,12 +131,14 @@ forceSubModel::forceSubModel
     switchesNameList_[iCounter]="useParcelSizeDependentFilteredDrag";iCounter++;  //6
 	switchesNameList_[iCounter]="implForceDEMaccumulated";iCounter++;             //7
 	switchesNameList_[iCounter]="scalarViscosity";iCounter++;                     //8
+	switchesNameList_[iCounter]="verboseToDisk";iCounter++;                       //9
 
-    for(int i=0;i<switchesList_.size();i++)
-    {
-        switchesList_[i]=false;
-        switches_[i]=false;
-    }
+    // should be done by default
+    //for(int i=0;i<switchesList_.size();i++)
+    //{
+    //    switchesList_[i]=false;
+    //    switches_[i]=false;
+    //}
 
     // sanity check of what is defined above
     if(switchesNameList_.size() != nrDefaultSwitches_)
@@ -150,8 +154,8 @@ forceSubModel::~forceSubModel()
 // * * * * * * * * * * * * * * * * Member Fct  * * * * * * * * * * * * * * * //
 void forceSubModel::partToArray
 (
-    label& index,
-    vector& dragTot,
+    const label& index,
+    const vector& dragTot,
     const vector& dragEx,
     const vector& Ufluid,
     scalar Cd
@@ -193,8 +197,8 @@ void forceSubModel::partToArray
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 void forceSubModel::partToArrayAnisotropic
 (
-    label& index,
-    vector& CdExtra,
+    const label& index,
+    const vector& CdExtra,
     const vector& dragEx //this is the remaining explictit drag
 ) const
 {
@@ -219,8 +223,8 @@ void forceSubModel::partToArrayAnisotropic
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 void forceSubModel::partToArrayAnisotropicTorque
 (
-    label&        index,
-    vector&       CdTorque,
+    const label&        index,
+    const vector&       CdTorque,
     const vector& torqueTotal  //this is the total torque
 ) const
 {
@@ -399,6 +403,9 @@ void forceSubModel::readSwitches() const
         }*/
     }
 
+    // read extra variables
+    dict_.readIfPresent("verboseDiskIntervall", verboseDiskIntervall_);
+
     // look for old nomenclature
     if (dict_.found("treatExplicit") || dict_.found("treatDEM") || dict_.found("implDEM"))
         FatalError<< "You are using an old nomenclature for force model settings, please have a look at the forceSubModel doc." << abort(FatalError);
@@ -471,7 +478,9 @@ const volVectorField& forceSubModel::IBDragPerV(const volVectorField& U,const vo
     #endif
     return IBDragPerV_;
 }
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
 
 } // End namespace Foam
 

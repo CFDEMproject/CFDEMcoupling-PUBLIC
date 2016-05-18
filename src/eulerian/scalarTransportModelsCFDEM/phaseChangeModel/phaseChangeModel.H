@@ -30,8 +30,12 @@ Description
 
 #include "cfdemCloud.H"
 #include "forceModel.H"
+#ifndef versionExt32
 #include "fvOptionList.H"
+#endif
 #include "eulerianScalarField.H"
+#include "generalManual.H"
+#include "OFstream.H"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -73,7 +77,27 @@ protected:
         dimensionedScalar       deltaHEvap_;    //units: K; deltaHEvap = deltaH_v / cp_g
         dimensionedScalar       tEvap_;         //units: s; tEvap_ = d_d^2 / (6*Sh*D_Vapor)
 
+        //Reporting
+        mutable int         verboseDiskIntervall_;
 
+        mutable int         verboseDiskCounter_;
+
+        mutable OFstream*   sPtr_; 
+
+
+        inline bool verboseToDisk() const
+        { 
+            if(verboseDiskIntervall_<=0) return false;
+
+            verboseDiskCounter_++;
+            if(verboseDiskCounter_>=verboseDiskIntervall_)
+            {
+                verboseDiskCounter_=0;
+                return true; 
+            }
+            else
+                return false;
+        };
 
         //Private/protected member functions
         inline double pVapor(double T) const
@@ -149,6 +173,8 @@ public:
     void setEnthalpySource(const eulerianScalarField&) const;
 
     void bound(autoPtr<phaseChangeModel>*) const {};
+    void initialzeSummation(word typeName, word  logFileName) const;
+    void computeIntegral (volScalarField& explicitEulerSource) const;
 
     // Access
     inline volScalarField& mSource() const {return mSource_;}; //returns the source

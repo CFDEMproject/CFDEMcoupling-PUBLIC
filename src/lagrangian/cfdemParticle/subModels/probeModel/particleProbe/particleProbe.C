@@ -60,8 +60,8 @@ particleProbe::particleProbe
 (
     const dictionary& dict,
     cfdemCloud& sm,
-    word   typeName,
-    char*  logFileName
+    const word& typeName,
+    const char* logFileName
 )
 :
     probeModel(dict,sm,typeName,logFileName),
@@ -79,17 +79,17 @@ particleProbe::particleProbe
     probeDebug_(false),
     includePosition_(false),
     particleIDsToSample_(propsDict_.lookup("particleIDsToSample")),
-    itemsToSample_(NULL),
-    sPtrList_(NULL),
     itemCounter_(0),
     currItemId_(0),
     printCounter_(0),
-    printNow_(false)
+    printNow_(false),
+    printOnlyAt_(-1)
 {
     if (propsDict_.found("verbose")) verbose_=true;
     if (propsDict_.found("verboseToFile")) verboseToFile_=true;
 
     if (propsDict_.found("printEvery")) printEvery_= readScalar(propsDict_.lookup("printEvery"));
+    if (propsDict_.found("printOnlyAtStep")) printOnlyAt_= readScalar(propsDict_.lookup("printOnlyAtStep"));
     if (propsDict_.found("sampleAll")) sampleAll_=true;
     if (propsDict_.found("probeDebug")) probeDebug_=true;
     if (propsDict_.found("includePosition")) includePosition_=true;
@@ -103,6 +103,8 @@ particleProbe::particleProbe
 particleProbe::~particleProbe()
 {
  clearProbes();
+ forAll(sPtrList_, i)
+     delete sPtrList_[i];
 }
 
 
@@ -123,7 +125,7 @@ void particleProbe::setOutputFile() const
 }
 
 
-void particleProbe::initialize(word typeName, word  logFileName) const
+void particleProbe::initialize(const word& modelName,const word& logFileName) const
 {
   //update the list of items to be sampled
   itemCounter_ += 1; 
@@ -132,31 +134,32 @@ void particleProbe::initialize(word typeName, word  logFileName) const
   itemsToSample_.setSize(itemsToSample_.size()+1, logFileName);
 
   // init environment
-  //propsDict_ = particleCloud_.couplingProperties().subDict(typeName + "Props");
-  name_ = typeName;
-  const char* fileNameOut_ = wordToChar(logFileName);
-  
+  name_ = modelName;
+  const char* fileNameOut_ = logFileName.c_str();
+
   if(verboseToFile_)
   {
 
+   if(printOnlyAt_==-1)
+   {
     Info << "Will sample these particle IDs: " << particleIDsToSample_ << " every " <<  printEvery_ <<  endl;
+   }
+   else if(printOnlyAt_>-1)
+   {
+     Info << "Will sample these particle IDs: " << particleIDsToSample_ << " at step " <<  printOnlyAt_ <<  endl;
+   }
+   else
+   {
+    FatalError <<  "particleProbe for model " <<  name_ << " : "<< "printOnlyAtStep cannot be negative or zero" << abort(FatalError);
+   }
 
     //initialize the output files
-    int myrank_(-1);
-    int numprocs_(-1);
-    MPI_Comm_rank(MPI_COMM_WORLD,&myrank_);
-    MPI_Comm_size(MPI_COMM_WORLD, &numprocs_);
-    rank_=myrank_;
+    MPI_Comm_rank(MPI_COMM_WORLD,&rank_);
 
     //open a separate file for each processor
-    char* filecurrent_;
-    filecurrent_= new char[strlen(fileNameOut_) + 4]; //reserve 4 chars for processor name
-    if (myrank_ < numprocs_)  
-             sprintf(filecurrent_,"%s%s%d", fileNameOut_, ".", myrank_);
-    else  //open one file for proc 0
-            sprintf(filecurrent_,"%s", fileNameOut_); 
-     word file_(filecurrent_);
-     Info << "particleProbe for model " <<  name_ << " will write to file " << file_ << endl;
+    char* filecurrent_ = new char[strlen(fileNameOut_) + 4]; //reserve 4 chars for processor name
+    sprintf(filecurrent_,"%s%s%d", fileNameOut_, ".", rank_);
+     Info << "particleProbe for model " <<  name_ << " will write to file " << filecurrent_ << endl;
 
       //generate the file streams
       fileName probeSubDir = dirName_;
@@ -180,15 +183,18 @@ void particleProbe::initialize(word typeName, word  logFileName) const
 
     //manage files and OFstreams
     mkDir(probeDir_);
-    sPtr = new OFstream(probeDir_/file_);
+    sPtr = new OFstream(probeDir_/filecurrent_);
     // Note: for other than ext one could use xx.append(x)
     // instead of setSize
     sPtrList_.setSize(sPtrList_.size()+1, sPtr);
 
+    delete [] filecurrent_;
     //Clear the containers for the fields to be probed
     scalarFields_.clear();
     vectorFields_.clear();
   }
+
+  Info << "particleProbe::initialize done!" << endl;
   return;
 
 }
@@ -226,9 +232,23 @@ void particleProbe::writeHeader() const
 
 void particleProbe::clearProbes() const
 {
-  for (unsigned int i=0; i<vProbes_.size(); i++)
-    vProbes_[i].clear();
-  
+
+ for(std::vector< std::vector<double*> >::iterator 
+       it  = vProbes_.begin(); 
+       it != vProbes_.end(); 
+     ++it) 
+ {
+    for(std::vector<double*>::iterator 
+           jt  = (*it).begin(); 
+           jt != (*it).end(); 
+         ++jt) 
+    {
+        delete[] (*jt);
+    }
+    (*it).clear();
+    
+ }
+
   for (unsigned int j=0; j<sProbes_.size(); j++)
     sProbes_[j].clear();
       
@@ -238,71 +258,50 @@ void particleProbe::clearProbes() const
 
 void particleProbe::updateProbes(int index, Field<scalar> sValues, Field<vector> vValues) const
 {
-  int vSize_=vProbes_.size();
-  int sSize_=sProbes_.size();
- 
- //check if the particle already has an allocated vector. If not, create it. It should be only called at the beginning. 
- while(index >= vSize_)
- {
-   std::vector<double*> particleVector_;
-   vProbes_.push_back(particleVector_);
-   vSize_=vProbes_.size();
- }
-  
-  while(index >= sSize_)
+  //check if the particle already has an allocated vector. If not, create it. It should be only called at the beginning. 
+  while(index >= static_cast<int>(vProbes_.size()))
   {
-   std::vector<double> particleScalar_;
-   sProbes_.push_back(particleScalar_);
-   sSize_=sProbes_.size();
+    std::vector<double*> particleVector_;
+    vProbes_.push_back(particleVector_);
   }
   
- //register vector probes on the corresponding vector
+  while(index >= static_cast<int>(sProbes_.size()))
+  {
+    std::vector<double> particleScalar_;
+    sProbes_.push_back(particleScalar_);
+  }
+  
+  //register vector probes on the corresponding vector
   forAll(vValues, iter)
   {
-   int ProbeSize_=vProbes_[index].size();
-   
-   if(probeIndex_<ProbeSize_) //The corresponding probe for this particle already exists, values are overwritten.
+   if(probeIndex_<static_cast<int>(vProbes_[index].size())) //The corresponding probe for this particle already exists, values are overwritten.
    {
     vProbes_[index][probeIndex_][0]=vValues[iter][0];
     vProbes_[index][probeIndex_][1]=vValues[iter][1];
     vProbes_[index][probeIndex_][2]=vValues[iter][2];
-    
    }
    else //The corresponding probe for this particle has to be created
    {
-    double * probe_= new double[3];
-   
-    probe_[0]=vValues[iter][0];
-    probe_[1]=vValues[iter][1];
-    probe_[2]=vValues[iter][2];
-              
-    vProbes_[index].push_back(probe_); 
+    vProbes_[index].push_back(new double[3]); //this pointer MUST be freed in the destructor
+    vProbes_[index].back()[0]=vValues[iter][0];
+    vProbes_[index].back()[1]=vValues[iter][1];
+    vProbes_[index].back()[2]=vValues[iter][2];
    }
   }
   
   //register scalar probes on the corresponding vector
   forAll(sValues, iter)
   {
-   int ProbeSize_=sProbes_[index].size();
-   
-   if(probeIndex_<ProbeSize_) //The corresponding probe for this particle already exists, values are overwritten.
-   {
+   if(probeIndex_<static_cast<int>(sProbes_[index].size())) //The corresponding probe for this particle already exists, values are overwritten.
     sProbes_[index][probeIndex_]=sValues[iter];
-   }
    else //The corresponding probe for this particle has to be created
-   {           
     sProbes_[index].push_back(sValues[iter]); 
-   } 
-  
   }
-  
-  
 }
 
 void particleProbe::writeProbe(int index, Field<scalar> sValues, Field<vector> vValues) const
 {
     updateProbes(index,sValues,vValues); //update probe vectors
-    
    
     if(printNow_ && checkIDForPrint(index) &&  verboseToFile_) 
     {
@@ -321,7 +320,6 @@ void particleProbe::writeProbe(int index, Field<scalar> sValues, Field<vector> v
              *sPtr << vValues[iter][0] << "   ";
              *sPtr << vValues[iter][1] << "   ";
              *sPtr << vValues[iter][2] << "   "; 
-   
           }
 
         //scalarFields
@@ -373,13 +371,24 @@ void particleProbe::setCounter() const
     if(currItemId_==1)
     {
         printCounter_++;
+       if(printOnlyAt_==-1)
+       {
         if(  printCounter_ >= printEvery_ )
         {
             printCounter_=0;
             printNow_ = true;
         }
         else printNow_ = false;
-
+       }
+       else if(printCounter_==printOnlyAt_)
+       {
+        printNow_ = true;
+       }
+       else 
+       {
+        printNow_ = false;
+       }
+    
     }
     return;    
 

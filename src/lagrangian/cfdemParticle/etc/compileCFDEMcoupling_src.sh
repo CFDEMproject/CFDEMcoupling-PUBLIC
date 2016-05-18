@@ -2,8 +2,10 @@
 
 #===================================================================#
 # compile routine for CFDEMcoupling source, part of CFDEMproject 
+# will create all lnInclude directories before compilation in order
+# to avoid missing headers in foreign libraries
 # Christoph Goniva - May. 2012, DCS Computing GmbH
-# update: Stefan Radl (TU Graz, Jan 2014)
+# update: Stefan Radl (TU Graz, April 2016)
 #===================================================================#
  
 #- include functions
@@ -16,27 +18,66 @@ logDir="log"
 cd $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc
 mkdir -p $logDir
 
+#================================================================================#
+# Must compile (but not clean) LIGGGHTS libraries, since it could have been 
+# compiled before with the compileLIGGGHTS command
+# Then, check successful compilation
+#================================================================================#
+bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/compileLIGGGHTS_lib.sh noClean
+echo "...now checking if LIGGGHTS libraries are compiled that are needed for CFDEM's src packages."
+bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/compileLIGGGHTS_lib.sh false
 
 #================================================================================#
 # compile src
 #================================================================================#
 whitelist="$CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/library-list.txt"
 echo ""
-echo "Please provide the libraries to be compiled in the $CWD/$whitelist file."
+echo "Please provide the libraries to be compiled in the $whitelist file."
 
-if [ ! -f "$CWD/$whitelist" ];then
+if [ ! -f "$whitelist" ];then
     echo "$whitelist does not exist in $CWD. Nothing will be done."
     NLINES=0
     COUNT=0
 else
-    NLINES=`wc -l < $CWD/$whitelist`
+    NLINES=`wc -l < $whitelist`
     COUNT=0
 fi
+
+#Generate lnIncludes, only for paths
+while [ $COUNT -lt $NLINES ]
+do
+        let COUNT++  
+        LINE=`head -n $COUNT $whitelist | tail -1`
+
+        # white lines
+        if [[ "$LINE" == "" ]]; then
+            echo "compile $LINE"
+            continue
+        # comments
+        elif [[ "$LINE" == \#* ]]; then
+            continue
+         # paths
+        elif [[ "$LINE" == */dir ]]; then
+            echo "will change path and create lnInclude..."
+            LINE=$(echo "${LINE%????}")
+            path="$CFDEM_SRC_DIR/$LINE"
+            cd $path
+            #continue
+        fi
+        wmakeLnInclude .
+done
+COUNT=0
+
+echo
+echo
+echo "\n Creation of lnInclude directories finished!"
+echo
+echo
 
 while [ $COUNT -lt $NLINES ]
 do
         let COUNT++  
-        LINE=`head -n $COUNT $CWD/$whitelist | tail -1`
+        LINE=`head -n $COUNT $whitelist | tail -1`
 
         # white lines
         if [[ "$LINE" == "" ]]; then

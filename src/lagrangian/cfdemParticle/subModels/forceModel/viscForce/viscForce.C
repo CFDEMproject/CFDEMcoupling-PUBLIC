@@ -33,7 +33,6 @@ Description
 
 #include "viscForce.H"
 #include "addToRunTimeSelectionTable.H"
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -137,7 +136,7 @@ viscForce::~viscForce()
 
 void viscForce::setForce() const
 {
-    const volVectorField& divTauField = forceSubM(0).divTauField(U_);
+    const volVectorField& divTau_ = forceSubM(0).divTauField(U_);
 
     vector divTau;
     scalar Vs;
@@ -145,8 +144,7 @@ void viscForce::setForce() const
     vector force;
     label cellI;
 
-    interpolationCellPoint<vector> divTauInterpolator_(divTauField);
-
+    #include "resetDivTauInterpolator.H"
     #include "setupProbeModel.H"
 
     for(int index = 0;index <  particleCloud_.numberOfParticles(); index++)
@@ -163,10 +161,10 @@ void viscForce::setForce() const
 
                 if(forceSubM(0).interpolation()) // use intepolated values for alpha (normally off!!!)
                 {
-                    divTau = divTauInterpolator_.interpolate(position,cellI);
+                    divTau = divTauInterpolator_().interpolate(position,cellI);
                 }else
                 {
-                    divTau = divTauField[cellI];
+                    divTau = divTau_[cellI];
                 }
 
                 Vs = particleCloud_.particleVolume(index);

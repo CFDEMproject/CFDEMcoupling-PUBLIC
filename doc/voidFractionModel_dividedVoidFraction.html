@@ -20,6 +20,8 @@ dividedProps
     interpolation;
     weight number2;
     porosity number3;
+    verbose;
+    cfdemUseOnly;
 } 
 </PRE>
 <UL><LI><I>number1</I> = minimum limit for voidfraction 
@@ -29,6 +31,10 @@ dividedProps
 <LI><I>number2</I> = (optional) scaling of the particle volume to account for porosity or agglomerations. 
 
 <LI><I>number3</I> = (optional) diameter of the particle's representation is artificially increased according to <I>number2</I> * Vparticle, volume remains unaltered! 
+
+<LI><I>verbose</I> = (optional, default false) flag for debugging output 
+
+<LI><I>cfdemUseOnly</I> = optional flag, default false 
 
 
 </UL>
@@ -55,6 +61,6 @@ The void fraction calculation is based on a three-step approach (reset, set and 
 </P>
 <P><B>Related commands:</B>
 </P>
-<P><A HREF = "voidfractionModel.html">voidfractionModel</A>
+<P><A HREF = "voidFractionModel.html">voidfractionModel</A>
 </P>
 </HTML>

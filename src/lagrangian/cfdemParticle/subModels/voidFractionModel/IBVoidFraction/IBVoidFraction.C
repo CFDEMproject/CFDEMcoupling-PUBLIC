@@ -238,7 +238,7 @@ void IBVoidFraction::setvoidFraction(double** const& mask,double**& voidfraction
                	    {
                	        particlePosList.setSize(particlePosList.size()+1, particlePosList[copyCounter]
                	                              + vector(
-               	                                               (double)doPeriodicImage[0]
+                                                               static_cast<double>(doPeriodicImage[0])
                	                                              *(globalBb.max()[0]-globalBb.min()[0]),
                	                                              0.0,
                	                                              0.0)
@@ -254,7 +254,7 @@ void IBVoidFraction::setvoidFraction(double** const& mask,double**& voidfraction
                	        particlePosList.setSize(particlePosList.size()+1, particlePosList[yDirCop]
                	                              + vector(
                	                                              0.0,
-               	                                               (double)doPeriodicImage[1]
+                                                               static_cast<double>(doPeriodicImage[1])
                	                                              *(globalBb.max()[1]-globalBb.min()[1]),
                	                                              0.0)
                	                               );
@@ -271,7 +271,7 @@ void IBVoidFraction::setvoidFraction(double** const& mask,double**& voidfraction
                	                              + vector(
                	                                              0.0,
                	                                              0.0,
-               	                                               (double)doPeriodicImage[2]
+                                                               static_cast<double>(doPeriodicImage[2])
                	                                              *(globalBb.max()[2]-globalBb.min()[2])
                	                                              )
                	                               );
@@ -422,17 +422,17 @@ double IBVoidFraction::minPeriodicDistance(vector    cellCentrePosition,
     for(int xDir=-1; xDir<=1; xDir++)
     {
         positionCenterPeriodic[0] =  positionCenter[0]
-                                  + (double)xDir
-                                  *(globalBb.max()[0]-globalBb.min()[0]);
+                                  + static_cast<double>(xDir)
+                                  * (globalBb.max()[0]-globalBb.min()[0]);
         for(int yDir=-1; yDir<=1; yDir++)
         {
             positionCenterPeriodic[1] =  positionCenter[1]
-                                      + (double)yDir
+                                      + static_cast<double>(yDir)
                                       * (globalBb.max()[1]-globalBb.min()[1]);                        
             for(int zDir=-1; zDir<=1; zDir++)
             {
                 positionCenterPeriodic[2] =  positionCenter[2]
-                                          + (double)zDir
+                                          + static_cast<double>(zDir)
                                           * (globalBb.max()[2]-globalBb.min()[2]);
                 if( mag(cellCentrePosition-positionCenterPeriodic)<centreDist)
                 {

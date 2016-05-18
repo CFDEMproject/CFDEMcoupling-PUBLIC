@@ -22,7 +22,7 @@ mkdir -p $logDir
     echo ""
     echo "Compiling sub-libraries of LIGGGHTS now..."
     echo "Please provide the libraries to be compiled in the $CWD/$whitelist file."
-    echo "Libraries must be in: $CFDEM_LAMMPS_LIB_DIR"
+    echo "Libraries must be in: $CFDEM_LAMMPS_LIB_DIR, or a path defined by the Line in the above file."
 
     if [ ! -f "$CWD/$whitelist" ];then
         echo "$whitelist does not exist in $CWD. Nothing will be done."
@@ -66,7 +66,8 @@ mkdir -p $logDir
             makeFileName="Makefile.${!libVarMakefileName}"
             libVarName="CFDEM_$LINE""LIB_PATH"
             libraryPath="${!libVarName}"
+            compilationModeSwitch="$1"
             #--------------------------------------------------------------------------------#
+            compileLMPlib $logpath $logfileName $headerText $makeFileName $libraryPath $compilationModeSwitch
 
-            compileLMPlib $logpath $logfileName $headerText $makeFileName $libraryPath
     done

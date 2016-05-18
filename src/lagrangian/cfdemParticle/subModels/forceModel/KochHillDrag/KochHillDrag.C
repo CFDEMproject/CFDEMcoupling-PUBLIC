@@ -34,8 +34,6 @@ Description
 #include "KochHillDrag.H"
 #include "addToRunTimeSelectionTable.H"
 #include "dataExchangeModel.H"
-
-//#include "mpi.h"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -161,9 +159,8 @@ void KochHillDrag::setForce() const
 
     int couplingInterval(particleCloud_.dataExchangeM().couplingInterval());
 
-    interpolationCellPoint<scalar> voidfractionInterpolator_(voidfraction_);
-    interpolationCellPoint<vector> UInterpolator_(U_);
-
+    #include "resetVoidfractionInterpolator.H"
+    #include "resetUInterpolator.H"
     #include "setupProbeModel.H"
 
     for(int index = 0;index <  particleCloud_.numberOfParticles(); index++)
@@ -182,8 +179,9 @@ void KochHillDrag::setForce() const
                 if(forceSubM(0).interpolation())
                 {
 	                position = particleCloud_.position(index);
-                    voidfraction = voidfractionInterpolator_.interpolate(position,cellI);
-                    Ufluid = UInterpolator_.interpolate(position,cellI);
+                    voidfraction = voidfractionInterpolator_().interpolate(position,cellI);
+                    Ufluid = UInterpolator_().interpolate(position,cellI);
+
                     //Ensure interpolated void fraction to be meaningful
                     // Info << " --> voidfraction: " << voidfraction << endl;
                     if(voidfraction>1.00) voidfraction = 1.00;
@@ -229,8 +227,8 @@ void KochHillDrag::setForce() const
                     scalar F0=0.;
                     if(volumefraction < 0.4)
                     {
-                        F0 = (1+3*sqrt((volumefraction)/2)+135/64*volumefraction*log(volumefraction)
-                              +16.14*volumefraction
+                        F0 = (1. + 3.*sqrt((volumefraction)/2.) + (135./64.)*volumefraction*log(volumefraction)
+                              + 16.14*volumefraction
                              )/
                              (1+0.681*volumefraction-8.48*sqr(volumefraction)
                               +8.16*volumefraction*volumefraction*volumefraction

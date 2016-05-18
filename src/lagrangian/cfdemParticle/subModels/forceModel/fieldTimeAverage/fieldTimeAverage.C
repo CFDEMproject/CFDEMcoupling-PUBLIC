@@ -63,14 +63,41 @@ fieldTimeAverage::fieldTimeAverage
 :
     forceModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
-    mesh_(particleCloud_.mesh()),
-    startTime_(0.),
-    scalarFieldNames_(propsDict_.lookup("scalarFieldNames")),
-    vectorFieldNames_(propsDict_.lookup("vectorFieldNames")),
-    scalarFields_(NULL),
-    vectorFields_(NULL),
-    nrAverages_(0.0)
+    mesh_(particleCloud_.mesh())
 {
+    init();
+}
+
+// Construct from components
+fieldTimeAverage::fieldTimeAverage
+(
+    const dictionary& dict,
+    const dictionary& mydict,
+    const word& fieldPrefix,
+    cfdemCloud& sm
+)
+:
+    forceModel(dict,sm),
+    propsDict_(mydict),
+    mesh_(particleCloud_.mesh())
+{
+    init(fieldPrefix);
+}
+
+// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
+
+fieldTimeAverage::~fieldTimeAverage()
+{}
+
+
+// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+void fieldTimeAverage::init(word fieldPrefix)
+{
+    startTime_=0.;
+    scalarFieldNames_=wordList(propsDict_.lookup("scalarFieldNames"));
+    vectorFieldNames_=wordList(propsDict_.lookup("vectorFieldNames"));
+    nrAverages_=0.0;
+
     // create time average scalar fields
     scalarFields_.setSize(scalarFieldNames_.size());
 
@@ -79,7 +106,7 @@ fieldTimeAverage::fieldTimeAverage
 
     for (int i=0;i < scalarFieldNames_.size(); i++)
     {
-        word fieldName = "timeAverage_" + scalarFieldNames_[i];
+        word fieldName = fieldPrefix + scalarFieldNames_[i];
 
         Info<< "Creating field " << fieldName << endl;
         scalarFields_.set
@@ -92,7 +119,7 @@ fieldTimeAverage::fieldTimeAverage
                     fieldName,
                     mesh_.time().timeName(),
                     mesh_,
-                    IOobject::NO_READ,
+                    IOobject::READ_IF_PRESENT,
                     IOobject::AUTO_WRITE
                 ),
                 mesh_,
@@ -106,7 +133,7 @@ fieldTimeAverage::fieldTimeAverage
 
     for (int i=0;i < vectorFieldNames_.size(); i++)
     {
-        word fieldName = "timeAverage_" + vectorFieldNames_[i];
+        word fieldName = fieldPrefix + vectorFieldNames_[i];
 
         Info<< "Creating field " << fieldName << endl;
         vectorFields_.set
@@ -119,7 +146,7 @@ fieldTimeAverage::fieldTimeAverage
                     fieldName,
                     mesh_.time().timeName(),
                     mesh_,
-                    IOobject::NO_READ,
+                    IOobject::READ_IF_PRESENT,
                     IOobject::AUTO_WRITE
                 ),
                 mesh_,
@@ -128,15 +155,6 @@ fieldTimeAverage::fieldTimeAverage
         );
     }
 }
-
-
-// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
-
-fieldTimeAverage::~fieldTimeAverage()
-{}
-
-
-// * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 void fieldTimeAverage::setForce() const
 {
@@ -147,38 +165,37 @@ void fieldTimeAverage::setForce() const
         for (int i=0;i < scalarFieldNames_.size(); i++)
         {
             // get reference to actual field
-            volScalarField& field = (volScalarField&) mesh_.lookupObject<volScalarField>(scalarFieldNames_[i]);
-
-            // first entry in this field
-            if(nrAverages_ == 0)
-            {
-                scalarFields_[i] = field;
-            }
-            else
-            {
-                scalarFields_[i] = (scalarFields_[i]*nrAverages_+field*1)/(nrAverages_+1);
-            }
+            const volScalarField& field = mesh_.lookupObject<volScalarField>(scalarFieldNames_[i]);
+            averaging(field,i,nrAverages_);
         }
 
         for (int i=0;i < vectorFieldNames_.size(); i++)
         {
             // get reference to actual field
-            volVectorField& field = (volVectorField&) mesh_.lookupObject<volVectorField>(vectorFieldNames_[i]);
-
-            // first entry in this field
-            if(nrAverages_ == 0)
-            {
-                vectorFields_[i] = field;
-            }
-            else
-            {
-                vectorFields_[i] = (vectorFields_[i]*nrAverages_+field*1)/(nrAverages_+1);
-            }
+            const volVectorField& field = mesh_.lookupObject<volVectorField>(vectorFieldNames_[i]);
+            averaging(field,i,nrAverages_);
         }
         nrAverages_++;
     }// end if time >= startTime_
 }
 
+void fieldTimeAverage::averaging(const volScalarField& field,int& i,double& nrAverages_) const
+{
+    // first entry in this field
+    if(nrAverages_ == 0)
+        scalarFields_[i] = field;
+    else
+        scalarFields_[i] = (scalarFields_[i]*nrAverages_+field*1)/(nrAverages_+1);
+}
+
+void fieldTimeAverage::averaging(const volVectorField& field,int& i,double& nrAverages_) const
+{
+    // first entry in this field
+    if(nrAverages_ == 0)
+        vectorFields_[i] = field;
+    else
+        vectorFields_[i] = (vectorFields_[i]*nrAverages_+field*1)/(nrAverages_+1);
+}
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

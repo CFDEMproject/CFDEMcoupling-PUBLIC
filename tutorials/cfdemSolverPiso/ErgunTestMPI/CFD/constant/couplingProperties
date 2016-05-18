@@ -65,6 +65,8 @@ forceModels
     //totalMomentumExchange
     //particleCellVolume
     //fieldTimeAverage
+    fieldStore
+    //fieldVolWeighted
 );
 
 momCoupleModels
@@ -72,7 +74,8 @@ momCoupleModels
     implicitCouple
 );
 
-turbulenceModelType "RASProperties";//"LESProperties";//
+//turbulenceModelType "RASProperties";//"LESProperties";//OFversion24x
+turbulenceModelType turbulenceProperties;//"LESProperties";//OFversion30x
 
 //===========================================================================//
 // sub-model properties
@@ -181,7 +184,7 @@ BeetstraDragProps
     gravityFieldName "g";
     rhoParticle     2000.;
     voidfractionFieldName "voidfraction";
-    interpolation ;
+    interpolation true;
     useFilteredDragModel ;
     useParcelSizeDependentFilteredDrag ;
     k       0.05;
@@ -224,6 +227,22 @@ fieldStoreProps
     );
 }
 
+fieldVolWeightedProps
+{
+    startTime 0;
+
+    scalarFieldNames
+    (
+    );
+
+    vectorFieldNames
+    (
+        "U"
+    );
+    useVolumeFraction true;
+    volumeFractionName "voidfraction";
+}
+
 oneWayVTKProps
 {
     couplingFilename "vtk_out%4.4d.vtk";
@@ -245,25 +264,13 @@ engineProps
     treeSearch true;
 }
 
-turboEngineM2MProps
-{
-    turboEngineProps
-    {
-        treeSearch true;
-    }
-}
-
 dividedProps
 {
-    alphaMin 0.01;
+    alphaMin 0.1;
     scaleUpVol 1.0;
 }
 
 twoWayMPIProps
-{
-    liggghtsPath "../DEM/in.liggghts_run";
-}
-twoWayM2MProps
 {
     liggghtsPath "../DEM/in.liggghts_run";
 }

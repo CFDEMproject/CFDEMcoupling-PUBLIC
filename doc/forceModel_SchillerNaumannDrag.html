@@ -20,10 +20,24 @@
 SchillerNaumannDragProps
 {
     velFieldName "U";
+    voidfractionFieldName "voidfraction";
+    interpolation "bool1";
+    voidfractionInterpolationType "type1"
+    UInterpolationType "type2"
+    implForceDEM "bool2";
 }; 
 </PRE>
 <UL><LI><I>U</I> = name of the finite volume fluid velocity field 
 
+<LI><I>voidfraction</I> = name of the finite volume voidfraction field 
+
+<LI><I>bool1</I> = (optional, normally off) flag to use interpolated voidfraction and fluid velocity values 
+
+<LI><I>type1</I> = (optional, default cellPoint) interpolation type for voidfraction field 
+
+<LI><I>type2</I> = (optional, default cellPointFace) interpolation type for velocity field 
+
+<I>bool2</I> = (optional, normally off) flag to use implicit formulation of drag on DEM side:l
 
 </UL>
 <P><B>Examples:</B>

@@ -1,12 +1,20 @@
+sinclude $(GENERAL_RULES)/mplib$(WM_MPLIB)
+sinclude $(RULES)/mplib$(WM_MPLIB)
+
+GIT_VERSION := $(shell git describe --dirty --always --tags)
+PFLAGS+= -DGITVERSION=\"$(GIT_VERSION)\"
+PFLAGS+= -DDEBUGFLAG=\"$(DEBUG)\"
+PFLAGS+= -DCFDEMWMPROJECTVERSION="$(CFDEM_WM_PROJECT_VERSION)"
+
 include $(CFDEM_ADD_LIBS_DIR)/$(CFDEM_ADD_LIBS_NAME)
 
 EXE_INC = \
+    $(PFLAGS) \
     $(CFDEM_ADD_INCOMPTURBMOD_PATHS) \
     -I$(LIB_SRC)/transportModels \
     -I$(LIB_SRC)/transportModels/incompressible/singlePhaseTransportModel \
     -I$(LIB_SRC)/finiteVolume/lnInclude \
     -I$(CFDEM_SRC_DIR)/lagrangian/cfdemParticle/lnInclude \
-    -I$(LIB_SRC)/fvOptions/lnInclude \
     -I$(LIB_SRC)/meshTools/lnInclude \
     -I$(LIB_SRC)/sampling/lnInclude \
 
@@ -15,7 +23,5 @@ LIB_LIBS = \
     $(CFDEM_ADD_INCOMPTURBMOD_LIBS) \
     -lincompressibleTransportModels \
     -lfiniteVolume \
-    -l$(CFDEM_LIB_NAME) \
-    -lfvOptions \
     -lmeshTools \
     -lsampling \

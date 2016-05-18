@@ -47,6 +47,10 @@ protected:
 
     dictionary                      propsDict_;
 
+    word                            phiFieldName_;
+
+    word                            voidfractionFieldName_;
+
     const wordList                  eulerianFieldList_;
 
     autoPtr<eulerianScalarField>*   eulerianFields_;
@@ -60,7 +64,8 @@ protected:
     //Extra fields to represent a mixture in the void space
     bool                            updateMixtureProperties_;   // switch to indicate whether phase properties will be updated or not
     volScalarField                  rhoMix_;                  //field (if needed) to hold mixture density
-    volScalarField                  cpRho_;                   //field (if needed) to hold volumetric cp-value
+    volScalarField                  cpRho_;                  //field (if needed) to hold volumetric cp-value
+             
 
 
 public:
@@ -98,6 +103,8 @@ public:
     void                 evolveFields();
 
     volScalarField&      sourceField(int i);
+
+
 
 };
 

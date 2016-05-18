@@ -13,18 +13,22 @@
 </P>
 <P>To be activated via couplingProperties dictionary.
 </P>
-<PRE>forceModels
+<P>forceModels
 (
     myForceModel1
     myForceModel2
     myForceModel3
 );
-particleProbeProps
+</P>
+<P>probeModel particleProbe; 
+</P>
+<PRE>particleProbeProps
 {
     particleIDsToSample (ID1 ID2 ID3 ...);  //list of particleIDs to sample
     verboseToFile;                          //main switch
     verbose;                                //currently not used
-    printEvery  xEvery;                     //print every this many CFD time steps
+    printEvery       xEvery;                //print every this many CFD time steps
+    printOnlyAtStep  xStep;                 //print only at this CFD time step (overrides "printEvery")
     sampleAll;                              //Activate sampling for all particles
     probeDebug;                             //probes additional fields
     includePosition;                        //will include particle position in the output file
@@ -40,6 +44,8 @@ particleProbeProps
 <LI><I>verbose</I> = main switch to activate output to Info (currently not implemented). 
 
 <LI><I>xEvery</I> = integer to specify the interval for sampling (default = 1, i.e., probing occurs every CFD time step). 
+
+<LI><I>xStep</I>  = integer to specify the step for sampling (default = deactivated, i.e., it will print accordingly to "printEvery"). 
 
 <LI><I>sampleAll</I> = switch to activate sampling of all particles. Otherwise (default) only particles specified via "particleIDsToSample" in the couplingProperties dictionary will be sampled. 
 

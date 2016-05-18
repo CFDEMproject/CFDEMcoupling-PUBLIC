@@ -39,7 +39,7 @@ generalManualProps
                        //must have dimensions [J/K/(m_voidspace)³]
                        //will only be used if cpVolumetricFieldName, or updateMixtureProperties = false
 
-    cpVolumetricFieldName   "cpRho"; 
+//    cpVolumetricFieldName   "cpRho"; 
     rhoMixFieldName         "rhoMix"; 
 
     eulerianFields

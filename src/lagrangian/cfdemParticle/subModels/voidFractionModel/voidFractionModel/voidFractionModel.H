@@ -75,6 +75,8 @@ protected:
 
         mutable scalar porosity_;
 
+        bool requiresSuperquadric_;
+
     // Protected member functions
 
 public:
@@ -157,6 +159,8 @@ public:
         virtual void setParticleType(label type) const {};
 
         virtual bool checkParticleType(label) const {return true;}; //consider all particles by default
+
+        bool requiresSuperquadric() const;
 };
 
 

@@ -66,13 +66,19 @@ private:
 
     const wordList vectorFieldNames_;
 
+    const word volumeFractionName_;
+
     mutable PtrList<volScalarField> scalarFields_;
 
     mutable PtrList<volVectorField> vectorFields_;
 
+    const volScalarField& volumeFraction_;
+
     mutable scalar upperThreshold_;
 
     mutable scalar lowerThreshold_;
+
+    Switch useVolumeFraction_;
 
     Switch verbose_;
 

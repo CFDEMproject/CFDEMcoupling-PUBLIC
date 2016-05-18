@@ -66,6 +66,8 @@ private:
 
     virtual inline vector arrayToField(label) const;
 
+    mutable volVectorField sourceField_; // N/m3
+
 public:
 
     //- Runtime type information
@@ -94,6 +96,7 @@ public:
 
         void resetMomSourceField() const;
 
+        void setSourceField(volVectorField &) const;
 };
 
 

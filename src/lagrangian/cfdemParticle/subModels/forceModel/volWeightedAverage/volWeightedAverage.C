@@ -64,30 +64,19 @@ volWeightedAverage::volWeightedAverage
     forceModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
     mesh_(particleCloud_.mesh()),
-    startTime_(0.),
+    startTime_(propsDict_.lookupOrDefault<scalar>("startTime",0.)),
+    volumeFractionName_(propsDict_.lookupOrDefault<word>("volumeFractionName","voidfraction")),
     scalarFieldNames_(propsDict_.lookup("scalarFieldNames")),
     vectorFieldNames_(propsDict_.lookup("vectorFieldNames")),
-    scalarFields_(NULL),
-    vectorFields_(NULL),
+    volumeFraction_(particleCloud_.mesh().lookupObject<volScalarField>(volumeFractionName_)),
     upperThreshold_(readScalar(propsDict_.lookup("upperThreshold"))),
     lowerThreshold_(readScalar(propsDict_.lookup("lowerThreshold"))),
-    verbose_(false),
+    useVolumeFraction_(propsDict_.lookupOrDefault<Switch>("useVolumeFraction",false)),
+    verbose_(propsDict_.lookupOrDefault<Switch>("verbose",false)),
     path_("postProcessing/volWeightedAverage"),
     sPtr_(NULL),
-    writeToFile_(false)
+    writeToFile_(propsDict_.lookupOrDefault<Switch>("writeToFile",false))
 {
-    if (propsDict_.found("startTime")){
-        startTime_=readScalar(propsDict_.lookup("startTime"));
-    }
-
-    if (propsDict_.found("verbose")){
-        verbose_ = true;
-    }
-
-    if (propsDict_.found("writeToFile")){
-        writeToFile_=Switch(propsDict_.lookup("writeToFile"));
-    }
-
     // create vol weighted average scalar fields
     scalarFields_.setSize(scalarFieldNames_.size());
 
@@ -172,14 +161,15 @@ void volWeightedAverage::setForce() const
         for (int i=0;i < scalarFieldNames_.size(); i++)
         {
             // get reference to actual field
-            volScalarField& field = (volScalarField&) mesh_.lookupObject<volScalarField>(scalarFieldNames_[i]);
+            const volScalarField& field = mesh_.lookupObject<volScalarField>(scalarFieldNames_[i]);
 
-            scalar fieldValue=-1;
-            scalar volWeightedAverage=-1;
-            scalar cellVol=-1;
-            scalar totVol=0;
-            scalar totVol_all=0;
-            scalar integralValue=0;
+            scalar fieldValue=-1.;
+            scalar volWeightedAverage=-1.;
+            scalar cellVol=-1.;
+            scalar totVol=0.;
+            scalar totVol_all=0.;
+            scalar integralValue=0.;
+            scalar volumeFraction(1.);
 
             forAll(field,cellI)
             {
@@ -187,7 +177,9 @@ void volWeightedAverage::setForce() const
                 if(fieldValue < upperThreshold_ && fieldValue > lowerThreshold_)
                 {
                     cellVol = mesh_.V()[cellI];
-                    scalarFields_[i][cellI] = fieldValue * cellVol;
+                    if(useVolumeFraction_)
+                        volumeFraction = volumeFraction_[cellI];
+                    scalarFields_[i][cellI] = fieldValue * cellVol * volumeFraction;
                     totVol += cellVol;
                 }
                 else
@@ -220,14 +212,15 @@ void volWeightedAverage::setForce() const
         for (int i=0;i < vectorFieldNames_.size(); i++)
         {
             // get reference to actual field
-            volVectorField& field = (volVectorField&) mesh_.lookupObject<volVectorField>(vectorFieldNames_[i]);
+            const volVectorField& field = mesh_.lookupObject<volVectorField>(vectorFieldNames_[i]);
 
-            vector fieldValue(-1,-1,-1);
-            vector volWeightedAverage(-1,-1,-1);
-            scalar magvolWeightedAverage=-1;
-            scalar cellVol=-1;
-            scalar totVol=0;
-            scalar totVol_all=0;
+            vector fieldValue(-1.,-1.,-1.);
+            vector volWeightedAverage(-1.,-1.,-1.);
+            scalar magvolWeightedAverage=-1.;
+            scalar cellVol=-1.;
+            scalar totVol=0.;
+            scalar totVol_all=0.;
+            scalar volumeFraction(1.);
 
             forAll(field,cellI)
             {
@@ -236,7 +229,9 @@ void volWeightedAverage::setForce() const
                 if(magvolWeightedAverage < upperThreshold_ && magvolWeightedAverage > lowerThreshold_)
                 {
                     cellVol = mesh_.V()[cellI];
-                    vectorFields_[i][cellI] = fieldValue * cellVol;
+                    if(useVolumeFraction_)
+                        volumeFraction = volumeFraction_[cellI];
+                    vectorFields_[i][cellI] = fieldValue * cellVol * volumeFraction;
                     totVol += cellVol;
                 }
                 else

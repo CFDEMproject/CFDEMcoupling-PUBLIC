@@ -18,6 +18,22 @@
     noDrag
 ); 
 </PRE>
+<P>noDragProps
+{
+    noDEMForce;
+    keepCFDForce;
+    treatForceExplicit switch1;
+}
+</P>
+<UL><LI>noDragProps are optional.
+<I>noDEMForce</I> = optional 
+
+<LI><I>keepCFDForce</I> = optional 
+
+<LI><I>switch1</I> = (optional, default false) sub model switch, see <A HREF = "forceSubModel.html">forceSubModel</A> for details 
+
+
+</UL>
 <P><B>Examples:</B>
 </P>
 <PRE>forceModels
@@ -27,12 +43,13 @@
 </PRE>
 <PRE>noDragProps (optional)
 {
-    noDEMForce; (optional)
+    noDEMForce; (optional, default false) do not apply the previously calculated forces in DEM integration
+    keepCFDForce; (optional, default false) do not delete the previously calculated forces and use them in CFD source terms
 }; 
 </PRE>
 <P><B>Description:</B>
 </P>
-<P>The force model performs the calculation of forces (e.g. fluid-particle interaction forces) acting on each DEM particle. The noDrag model sets the forces acting on the particle to zero. If several force models are selected and noDrag is the last model being executed, the fluid particle force will be set to zero. If the variable noDEMForce is set, then the forces communicated to the DEM solver are also set to zero.
+<P>The force model performs the calculation of forces (e.g. fluid-particle interaction forces) acting on each DEM particle. The noDrag model sets the forces acting on the particle (which were previously caclulated) to zero. If several force models are selected and noDrag is the last model being executed, the fluid particle force will be set to zero. If the variable noDEMForce is set, then the forces communicated to the DEM solver are also set to zero.
 </P>
 <P><B>Restrictions:</B>
 </P>

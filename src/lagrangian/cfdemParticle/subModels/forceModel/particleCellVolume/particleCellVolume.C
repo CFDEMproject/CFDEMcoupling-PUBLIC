@@ -144,7 +144,7 @@ void particleCellVolume::setForce() const
         scalarField_.internalField()=0.;
 
         // get reference to actual field
-        volScalarField& field = (volScalarField&) mesh_.lookupObject<volScalarField>(scalarFieldName_);
+        const volScalarField& field = mesh_.lookupObject<volScalarField>(scalarFieldName_);
 
         scalar fieldValue=-1;
         scalar cellVol=-1;

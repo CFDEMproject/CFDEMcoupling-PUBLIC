@@ -51,5 +51,27 @@ maxCo           1;
 
 maxDeltaT       1;
 
+functions
+(
+    probes
+    {
+        type        probes;
+        // Where to load it from
+        functionObjectLibs ( "libsampling.so" );  
+        // Name of the directory for probe data
+        name        probes;
+        probeLocations
+        (
+            (0.05001 0.05001 0.5)
+        );
+
+        // Fields to be probed
+        fields ( volAverage_ddtVoidfraction );
+
+        // Write at same frequency as fields
+        outputControl   timeStep;//outputTime;
+        outputInterval  1;
+    }
+);
 
 // ************************************************************************* //

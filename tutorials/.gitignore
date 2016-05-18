@@ -65,6 +65,9 @@ core
 # lnInclude (symlink) folders - anywhere
 lnInclude
 
+# CFD data
+processor*/
+
 # build folders - anywhere
 linux*Clang*/
 linux*Gcc*/

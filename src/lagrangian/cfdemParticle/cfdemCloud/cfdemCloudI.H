@@ -90,6 +90,12 @@ inline bool cfdemCloud::solveFlow() const
     return bool(solveFlow_);
 }
 
+inline bool cfdemCloud::solveScalarTransport() const
+{
+    return bool(solveScalarTransport_);
+}
+
+
 inline bool cfdemCloud::verbose() const
 {
     return verbose_;

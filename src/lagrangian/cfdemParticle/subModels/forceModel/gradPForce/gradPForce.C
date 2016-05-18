@@ -140,15 +140,15 @@ gradPForce::~gradPForce()
 
 void gradPForce::setForce() const
 {
-    volVectorField gradPField = fvc::grad(p_);
+    volVectorField gradP_ = fvc::grad(p_);
     /*if (useU_)
     {
         // const volScalarField& voidfraction_ = particleCloud_.mesh().lookupObject<volScalarField> ("voidfraction");
         volScalarField U2 = U_&U_;// *voidfraction_*voidfraction_;
         if (useRho_)
-            gradPField = fvc::grad(0.5*U2);
+            gradP_ = fvc::grad(0.5*U2);
         else
-            gradPField = fvc::grad(0.5*forceSubM(0).rhoField()*U2);
+            gradP_ = fvc::grad(0.5*forceSubM(0).rhoField()*U2);
     }*/
     vector gradP;
     scalar Vs;
@@ -157,8 +157,7 @@ void gradPForce::setForce() const
     vector force;
     label cellI;
 
-    interpolationCellPoint<vector> gradPInterpolator_(gradPField);
-
+    #include "resetGradPInterpolator.H"
     #include "setupProbeModel.H"
 
     for(int index = 0;index <  particleCloud_.numberOfParticles(); index++)
@@ -174,10 +173,10 @@ void gradPForce::setForce() const
 
                 if(forceSubM(0).interpolation()) // use intepolated values for alpha (normally off!!!)
                 {
-                    gradP = gradPInterpolator_.interpolate(position,cellI);
+                    gradP = gradPInterpolator_().interpolate(position,cellI);
                 }else
                 {
-                    gradP = gradPField[cellI];
+                    gradP = gradP_[cellI];
                 }
 
                 Vs = particleCloud_.particleVolume(index);

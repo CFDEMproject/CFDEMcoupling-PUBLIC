@@ -1,6 +1,9 @@
 include $(CFDEM_ADD_LIBS_DIR)/$(CFDEM_ADD_LIBS_NAME)
 
+PFLAGS+= -DCFDEMWMPROJECTVERSION="$(CFDEM_WM_PROJECT_VERSION)"
+
 EXE_INC = \
+     $(PFLAGS) \
     $(CFDEM_ADD_INCOMPTURBMOD_PATHS) \
     -I$(LIB_SRC)/transportModels \
     -I$(LIB_SRC)/transportModels/incompressible/singlePhaseTransportModel \
@@ -11,7 +14,8 @@ EXE_INC = \
     -I$(LIB_SRC)/dynamicFvMesh/lnInclude \
     -I$(LIB_SRC)/dynamicMesh/lnInclude \
     -I$(LIB_SRC)/dynamicMesh/dynamicFvMesh/lnInclude \
-    -I$(LIB_SRC)/dynamicMesh/dynamicMesh/lnInclude
+    -I$(LIB_SRC)/dynamicMesh/dynamicMesh/lnInclude \
+    -I$(CFDEM_LIGGGHTS_SRC_DIR)
 EXE_LIBS = \
     -L$(CFDEM_LIB_DIR)\
     $(CFDEM_ADD_INCOMPTURBMOD_LIBS) \

@@ -80,10 +80,6 @@ private:
 
     bool interpolation_; // use interpolated field values (does not work for fine grids???)
 
-    autoPtr<interpolation<scalar> > alphaInterpolator_;
-
-    autoPtr<interpolation<vector> > gradAlphaInterpolator_;
-
 public:
 
     //- Runtime type information

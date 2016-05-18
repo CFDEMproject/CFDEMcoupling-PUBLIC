@@ -28,9 +28,9 @@ headerText="$logfileName""-$NOW"
 #--------------------------------------------------------------------------------#
 
 #================================================================================#
-# compile LIGGGHTS libraries
+# compile LIGGGHTS libraries (forces clean, and then compile)
 #================================================================================#
-bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/compileLIGGGHTS_lib.sh
+bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/compileLIGGGHTS_lib.sh 
 
 #================================================================================#
 # compile LIGGGHTS src

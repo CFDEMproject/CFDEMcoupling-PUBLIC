@@ -20,6 +20,7 @@ constDiffSmoothingProps
     upperLimit number2;
     smoothingLength lengthScale;
     smoothingLengthReferenceField lengthScaleRefField;
+    verbose;
 } 
 </PRE>
 <UL><LI><I>number1</I> = scalar fields will be bound to this lower value 
@@ -29,6 +30,8 @@ constDiffSmoothingProps
 <LI><I>lengthScale</I> = length scale over which the exchange fields will be smoothed out 
 
 <LI><I>lengthScaleRefField</I> = length scale over which reference fields (e.g., the average particle velocity) will be smoothed out. Should be always larger than lengthScale. If not specified, will be equal to lengthScale. 
+
+<LI><I>verbose</I> = (optional, default false) flag for debugging output 
 
 
 </UL>

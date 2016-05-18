@@ -100,6 +100,8 @@ label engineSearch::findCell
 
             // find cell using tree search if switched on
             cellIDs[index][0] = searchEngine_.findCell(position,-1,treeSearch_);
+            //label cellIdOld = cellIDs[index][0];
+            //cellIDs[index][0] = searchEngine_.findCell(position,cellIdOld,treeSearch_);
         }
         else cellIDs[index][0] = -1;
     }

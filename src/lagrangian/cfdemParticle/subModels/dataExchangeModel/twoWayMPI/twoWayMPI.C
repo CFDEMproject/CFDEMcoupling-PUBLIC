@@ -63,45 +63,20 @@ twoWayMPI::twoWayMPI
 )
 :
     dataExchangeModel(dict,sm),
-    propsDict_(dict.subDict(typeName + "Props"))
+    propsDict_(dict.subDict(typeName + "Props")),
+    lmp(NULL)
 {
-    // set max nr of particles from dict
-    //Info << "twoWayMPI.C- this should no longer be needed" << endl;
-    //maxNumberOfParticles_ = readScalar(propsDict_.lookup("maxNumberOfParticles"));
-
-
     Info<<"Starting up LIGGGHTS for first time execution"<<endl;
 
-    MPI_Comm_rank(MPI_COMM_WORLD,&me);
-    MPI_Comm_size(MPI_COMM_WORLD,&nprocs);
+    MPI_Comm_dup(MPI_COMM_WORLD, &comm_liggghts);
 
-    if (me < nprocs) liggghts = 1;
-    else liggghts = MPI_UNDEFINED;
-
-    MPI_Comm_split(MPI_COMM_WORLD,liggghts,0,&comm_liggghts);
+    // read path from dictionary
+    const fileName liggghtsPath(propsDict_.lookup("liggghtsPath"));
 
     // open LIGGGHTS input script
-    char *liggghtsPathChar = new char[256];
-    int n = 0;
-    if (me == 0)
-    {
-      // read path from dictionary
-      const fileName liggghtsPath(propsDict_.lookup("liggghtsPath"));
-      strcpy(liggghtsPathChar, liggghtsPath.c_str());
-      n = strlen(liggghtsPathChar) + 1;
-
-      Info<<"Executing input script '"<< liggghtsPath.c_str() <<"'"<<endl;
-    }
-
-    if (liggghts == 1) lmp = new LAMMPS_NS::LAMMPS(0,NULL,comm_liggghts);
-
-    MPI_Bcast(&n,1,MPI_INT,0,MPI_COMM_WORLD);
-    if (n > 0) {
-        MPI_Bcast(liggghtsPathChar,n,MPI_CHAR,0,MPI_COMM_WORLD);
-        if (liggghts == 1) lmp->input->file(liggghtsPathChar);
-    }
-
-    delete [] liggghtsPathChar;
+    Info<<"Executing input script '"<< liggghtsPath.c_str() <<"'"<<endl;
+    lmp = new LAMMPS_NS::LAMMPS(0,NULL,comm_liggghts);
+    lmp->input->file(liggghtsPath.c_str());
 
     // get DEM time step size
     DEMts_ = lmp->update->dt;
@@ -113,7 +88,7 @@ twoWayMPI::twoWayMPI
 
 twoWayMPI::~twoWayMPI()
 {
-    if (liggghts == 1) delete lmp;
+    delete lmp;
 }
 
 // * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
@@ -246,7 +221,6 @@ bool Foam::twoWayMPI::couple(int i) const
         coupleNow = true;
 
         // start liggghts
-        if (liggghts == 1)
         {
             // run commands from liggghtsCommands dict
             Info<<"Starting up LIGGGHTS" << endl;

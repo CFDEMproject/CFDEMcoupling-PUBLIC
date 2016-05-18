@@ -15,7 +15,17 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-simulationType  RASModel;//LESModel; //
+//simulationType  RASModel;//OFversion24x
+simulationType  RAS;//OFversion30x
+
+RAS
+{
+    RASModel        kEpsilon;
+
+    turbulence      on;
+
+    printCoeffs     on;
+}
 
 
 // ************************************************************************* //

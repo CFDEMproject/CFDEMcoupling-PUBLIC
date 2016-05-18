@@ -81,7 +81,8 @@ if [ $postproc == "true" ]
 fi
 
 #- clean up case
-echo "deleting data at: $casePath :\n"
+echo "deleting data at: $casePath ?\n"
+read
 source $WM_PROJECT_DIR/bin/tools/CleanFunctions
 cd $casePath/CFD
 cleanCase

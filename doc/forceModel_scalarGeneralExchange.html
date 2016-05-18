@@ -20,6 +20,8 @@
 scalarGeneralExchangeProps
 {
     useLiMason "switch1"; //default: DeenEtAl
+    useGeneralCorrelation "switch3"; //default: DeenEtAl
+    generalCorrelationParameters (1 2 3 4 5 6 7 8);
     verbose "switch2";
     velFieldName "U";
     voidfractionFieldName "voidfraction";
@@ -53,11 +55,24 @@ scalarGeneralExchangeProps
     (
     value2
     );
+    interpolation "bool1";
+    voidfractionInterpolationType "type1"
+    UInterpolationType "type2"
+    fluidScalarFieldInterpolationType "type2"
+    scalarViscosity switch5;
+    nu scalar5;
+    suppressProbe switch6;
+    scale scalar6;
+    maxSource scalar7;
 } 
 </PRE>
 <UL><LI><I>switch1</I> = (optional) flag to use Nusselt correlations of Li and Mason (2000) 
 
 <LI><I>switch2</I> = (normally off) for verbose run 
+
+<LI><I>switch3</I> = (optional) flag to use a general Nusselt number correlation (must specify parameters of this correlation in a list called 'generalCorrelationParameters' ) 
+
+<LI>generalCorrelationParameters =  list with a predefined number of parameters (for length see src code, only read if useGeneralCorrelation is set to true) 
 
 <LI><I>U</I> = name of the finite volume fluid velocity field 
 
@@ -87,6 +102,24 @@ scalarGeneralExchangeProps
 
 <LI><I>value2</I> = molecular diffusion coefficient [m^2/s] 
 
+<LI><I>bool1</I> = (optional, normally off) flag to use interpolated voidfraction and fluid velocity values 
+
+<LI><I>type1</I> = (optional, default cellPoint) interpolation type for voidfraction field 
+
+<LI><I>type2</I> = (optional, default cellPointFace) interpolation type for velocity field 
+
+<LI><I>type3</I> = (optional, default cellPoint) interpolation type for fluidScalarField field 
+
+<LI><I>switch5</I> = (optional, default false) sub model switch, see <A HREF = "forceSubModel.html">forceSubModel</A> for details 
+
+<LI><I>scalar5</I> = (optional) optional, only if switch5 is true 
+
+<LI><I>switch6</I> = (optional, default false) can be used to suppress the output of the probe model 
+
+<LI><I>scalar7</I> = (optional) scaling of particle diameter 
+
+<LI><I>scalar7</I> = limit maximal turbulence 
+
 
 </UL>
 <P><B>Examples:</B>
@@ -98,6 +131,13 @@ scalarGeneralExchangeProps
 scalarGeneralExchangeProps
 {
     useLiMason false; //default: DeenEtAl
+    useGeneralCorrelation true; //default: DeenEtAl
+    generalCorrelationParameters
+    (
+     7.0 -10 5
+     1.0 0.17
+     1.33 -2.31 1.16
+    );
     verbose false;
     velFieldName "U";
     voidfractionFieldName "voidfraction";
@@ -148,6 +188,9 @@ Deen, N.G. et al., Review of direct numerical simulation of
 fluid-particle mass, momentum and heat transfer in dense gas-solid flows.
 Chemical Engineering Science 116 (2014) 710-724. 
 This correlation is based on that of Gunn (1978).
+</P>
+<P>The switch 'useGeneralCorrelation' allows one to specify the parameters 
+of the Gunn correlation as a list called 'generalCorrelationParameters'.
 </P>
 <P>Alternatively, the correclation of
 Li and Mason (2000), A computational investigation of transient heat

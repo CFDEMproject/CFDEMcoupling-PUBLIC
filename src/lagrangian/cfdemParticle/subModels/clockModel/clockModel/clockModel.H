@@ -121,9 +121,9 @@ public:
     // Member Functions
 
 	    virtual void start(int pos) const;	                //start measurement with custom string identifier
-	    virtual void start(int pos,std::string identifier) const;   //start measurement with custom string identifier
+	    virtual void start(int pos,const std::string& identifier) const;   //start measurement with custom string identifier
 	    virtual void stop() const;				            //stop last started measurement
-	    virtual void stop(std::string identifier) const;    //stop last started measurement with check if identifier is equal
+	    virtual void stop(const std::string& identifier) const;    //stop last started measurement with check if identifier is equal
 	    virtual std::string eval() const;
 	    virtual void evalFile() const;
 	    virtual void evalPar() const;
@@ -131,7 +131,7 @@ public:
 	    std::vector<int> calcShift() const;			        //detects empty indices in vector, when times are evaluated
 	    void Hist() const;					                //calc Histogram
 	    virtual void normHist() const;				        //calc normalized Histogram
-        void plotHist(double,std::string,int,int) const;    //plot histogramm to terminal
+	void plotHist(double,const std::string&,int,int) const;    //plot histogramm to terminal
     	void getRAMUsage() const;
 
 };

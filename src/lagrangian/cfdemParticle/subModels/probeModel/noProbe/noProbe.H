@@ -72,7 +72,7 @@ public:
             const dictionary& dict,
             cfdemCloud& sm,
             word   typeName,
-            char*  logFileName
+            const char*  logFileName
         );
 
     // Destructor

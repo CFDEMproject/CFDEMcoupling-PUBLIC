@@ -56,7 +56,7 @@ class fieldTimeAverage
 :
     public forceModel
 {
-private:
+protected:
 
     dictionary propsDict_;
 
@@ -64,16 +64,18 @@ private:
 
     scalar startTime_;
 
-    const wordList scalarFieldNames_;
+    wordList scalarFieldNames_;
 
-    const wordList vectorFieldNames_;
+    wordList vectorFieldNames_;
 
     mutable PtrList<volScalarField> scalarFields_;
 
     mutable PtrList<volVectorField> vectorFields_;
 
     mutable double nrAverages_;
-    
+
+    void init(word fieldPrefix = word("timeAverage_"));
+
 public:
 
     //- Runtime type information
@@ -89,6 +91,15 @@ public:
             cfdemCloud& sm
         );
 
+        //- Construct from components
+        fieldTimeAverage
+        (
+            const dictionary& dict,
+            const dictionary& mydict,
+            const word& fieldPrefix,
+            cfdemCloud& sm
+        );
+
     // Destructor
 
         ~fieldTimeAverage();
@@ -96,6 +107,10 @@ public:
 
     // Member Functions
         void setForce() const;
+
+        virtual inline void averaging(const volScalarField&,int&,double&) const;
+
+        virtual inline void averaging(const volVectorField&,int&,double&) const;
 };
 
 

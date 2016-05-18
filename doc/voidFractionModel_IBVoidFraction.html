@@ -19,6 +19,7 @@ IBProps
     maxCellsPerParticle number1;
     alphaMin number2;
     scaleUpVol number3;
+    checkPeriodicCells ;
 } 
 </PRE>
 <UL><LI><I>number1</I> = maximum number of cells covered by a particle (search will fail when more than <I>number1</I> cells are covered by the particle) 
@@ -26,6 +27,8 @@ IBProps
 <LI><I>number2</I> = minimum limit for voidfraction 
 
 <LI><I>number3</I> = diameter of the particle's representation is artificially increased according to <I>number3</I> * Vparticle, volume remains unaltered! 
+
+<LI><I>checkPeriodicCells</I> = (optional, default false) flag for considering the minimal distance to all periodic images of this particle 
 
 
 </UL>
@@ -51,6 +54,6 @@ IBProps
 </P>
 <P><B>Related commands:</B>
 </P>
-<P><A HREF = "voidfractionModel.html">voidfractionModel</A>
+<P><A HREF = "voidFractionModel.html">voidfractionModel</A>
 </P>
 </HTML>

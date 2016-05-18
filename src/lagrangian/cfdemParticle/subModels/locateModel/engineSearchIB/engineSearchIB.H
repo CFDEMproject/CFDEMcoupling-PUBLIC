@@ -55,9 +55,8 @@ class engineSearchIB
     public engineSearch
 {
 
-private:
-
-        dictionary propsDict_;
+protected:
+      dictionary propsDict_;
 
     	const label zSplit_;
 

@@ -45,8 +45,8 @@ autoPtr<probeModel> probeModel::New
 (
     const dictionary& dict,
     cfdemCloud& sm,
-    word   typeName,
-    char*  logFileName
+    const word& typeName,
+    const char* logFileName
 )
 {
     word probeModelType

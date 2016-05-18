@@ -22,6 +22,7 @@ engineIBProps
     }
     zSplit value1;
     xySplit value2;
+    checkPeriodicCells;
 }  
 </PRE>
 <UL><LI><I>switch1</I> = names of the finite volume scalar fields to be temporally averaged 
@@ -29,6 +30,8 @@ engineIBProps
 <LI><I>value1</I> = number of z-normal layers for satellite points 
 
 <LI><I>value2</I> = number of satellite points in each layer 
+
+<LI><I>checkPeriodicCells</I> = (optional, default false) flag for considering the minimal distance to all periodic images of this particle 
 
 
 </UL>

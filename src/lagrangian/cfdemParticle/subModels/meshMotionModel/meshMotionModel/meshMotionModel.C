@@ -68,70 +68,79 @@ meshMotionModel::~meshMotionModel()
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-volVectorField& meshMotionModel::f() const
+tmp<volVectorField> meshMotionModel::f() const
 {
-    volVectorField tmp
+    tmp<volVectorField> tmp
     (
-        IOobject
+        new volVectorField
         (
-            "xxx",
-            particleCloud_.mesh().time().timeName(),
+            IOobject
+            (
+                "xxx",
+                particleCloud_.mesh().time().timeName(),
+                particleCloud_.mesh(),
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            ),
             particleCloud_.mesh(),
-            IOobject::NO_READ,
-            IOobject::NO_WRITE
-        ),
-        particleCloud_.mesh(),
-        dimensionedVector
-        (
-            "zero",
-            dimensionSet(0, 1, -1, 0, 0),
-            vector::zero
+            dimensionedVector
+            (
+                "zero",
+                dimensionSet(0, 1, -1, 0, 0),
+                vector::zero
+            )
         )
     );
     return tmp;
 }
 
-volScalarField& meshMotionModel::body() const
+tmp<volScalarField> meshMotionModel::body() const
 {
-    volScalarField tmp
+    tmp<volScalarField> tmp
     (
-        IOobject
+        new volScalarField
         (
-            "xxx",
-            particleCloud_.mesh().time().timeName(),
+            IOobject
+            (
+                "xxx",
+                particleCloud_.mesh().time().timeName(),
+                particleCloud_.mesh(),
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            ),
             particleCloud_.mesh(),
-            IOobject::NO_READ,
-            IOobject::NO_WRITE
-        ),
-        particleCloud_.mesh(),
-        dimensionedScalar
-        (
-            "zero",
-            dimensionSet(0, 1, -1, 0, 0),
-            0.
+            dimensionedScalar
+            (
+                "zero",
+                dimensionSet(0, 1, -1, 0, 0),
+                0.
+            )
         )
     );
     return tmp;
 }
 
-volScalarField& meshMotionModel::inside() const
+tmp<volScalarField> meshMotionModel::inside() const
 {
-    volScalarField tmp
+    tmp<volScalarField> tmp
     (
-        IOobject
+        new volScalarField
         (
-            "xxx",
-            particleCloud_.mesh().time().timeName(),
+            IOobject
+            (
+                "xxx",
+                particleCloud_.mesh().time().timeName(),
+                particleCloud_.mesh(),
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            ),
             particleCloud_.mesh(),
-            IOobject::NO_READ,
-            IOobject::NO_WRITE
-        ),
-        particleCloud_.mesh(),
-        dimensionedScalar
-        (
-            "zero",
-            dimensionSet(0, 1, -1, 0, 0),
-            0.
+            dimensionedScalar
+            (
+                "zero",
+                dimensionSet(0, 1, -1, 0, 0),
+                0.
+            )
         )
     );
     return tmp;
