@@ -240,9 +240,9 @@ else
 fi
 
 # detect OF version
-if [ $WM_PROJECT_VERSION == "3.0.x" ]; then
+if [ $WM_PROJECT_VERSION == "3.0.x" ] || [ $WM_PROJECT_VERSION == "3.0.0" ] || [ $WM_PROJECT_VERSION == "3.0.1" ]; then
     export CFDEM_WM_PROJECT_VERSION=30
-elif [ $WM_PROJECT_VERSION == "2.4.x" ]; then
+elif [ $WM_PROJECT_VERSION == "2.4.x" ] || [ $WM_PROJECT_VERSION == "2.4.0" ]; then
     export CFDEM_WM_PROJECT_VERSION=24
 elif [[ $WM_PROJECT_VERSION == "3.2" && $WM_FORK == "extend" ]]; then
     export CFDEM_WM_PROJECT_VERSION=132
