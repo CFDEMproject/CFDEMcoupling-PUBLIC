@@ -55,7 +55,8 @@ export CFDEM_LIB_COMP_NAME=lagrangianCFDEMcomp-$CFDEM_VERSION-$WM_PROJECT_VERSIO
 
 #check if additional libraries should be compiled together with solvers
 if [[ $CFDEM_ADD_LIBS_NAME == "" ]]; then
-    export CFDEM_ADD_LIBS_NAME=additionalLibs_$WM_PROJECT_VERSION
+    export ADD_LIB_VERSION=$(echo $WM_PROJECT_VERSION | head -c 3)
+    export CFDEM_ADD_LIBS_NAME=additionalLibs_$ADD_LIB_VERSION
     echo "using CFDEM_ADD_LIBS_NAME=$CFDEM_ADD_LIBS_NAME ."
 else
     echo "using CFDEM_ADD_LIBS_NAME=$CFDEM_ADD_LIBS_NAME defined by user."
@@ -240,9 +241,9 @@ else
 fi
 
 # detect OF version
-if [ $WM_PROJECT_VERSION == "3.0.x" ]; then
+if [ $WM_PROJECT_VERSION == "3.0.x" ] || [ $WM_PROJECT_VERSION == "3.0.0" ] || [ $WM_PROJECT_VERSION == "3.0.1" ]; then
     export CFDEM_WM_PROJECT_VERSION=30
-elif [ $WM_PROJECT_VERSION == "2.4.x" ]; then
+elif [ $WM_PROJECT_VERSION == "2.4.x" ] || [ $WM_PROJECT_VERSION == "2.4.0" ]; then
     export CFDEM_WM_PROJECT_VERSION=24
 elif [[ $WM_PROJECT_VERSION == "3.2" && $WM_FORK == "extend" ]]; then
     export CFDEM_WM_PROJECT_VERSION=132
