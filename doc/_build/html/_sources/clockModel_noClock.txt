@@ -1,0 +1,39 @@
+.. index:: clockModel_noClock
+
+clockModel_noClock command
+==========================
+
+Syntax
+""""""
+
+Defined in couplingProperties dictionary.
+
+.. parsed-literal::
+
+   clockModel off;
+
+Examples
+""""""""
+
+.. parsed-literal::
+
+   clockModel off;
+
+Description
+"""""""""""
+
+The "noClock" model is a dummy clockModel model which does not measure/evaluate the run time.
+
+Restrictions
+""""""""""""
+ none.
+
+Related commands
+""""""""""""""""
+
+:doc:`clockModel <clockModel>`
+
+
+.. _liws: http://www.cfdem.com
+.. _ld: Manual.html
+.. _lc: Section_commands.html#comm

@@ -1,0 +1,64 @@
+"CFDEMproject WWW Site"_lws - "CFDEM Commands"_lc :c
+
+:link(lws,http://www.cfdem.com)
+:link(lc,CFDEMcoupling_Manual.html#comm)
+
+:line
+
+forceModel_checkCouplingInterval command :h3
+
+[Syntax:]
+
+Defined in couplingProperties dictionary.
+
+forceModels
+(
+    checkCouplingInterval
+);
+checkCouplingIntervalProps
+\{
+    warnOnly                    bool1;
+    velocityFieldName           word1;
+    rhoP                        scalar1;
+    maxCFL                      scalar2;
+    maxAccNr                    scalar3;
+    UmaxExpected                scalar4;
+    minAllowedVcellByVparcel    scalar5;
+    timeInterval                scalar6;
+\}; :pre
+
+{bool1} = (optional, default true) switch to warn or stop simulation if criterion is broken. :ulb,l
+{word1} = (optional, default U) name of velocity field. :l
+{scalar1} = particle density assumed for calculation of the particle relaxation time :l
+{scalar2} = (optional, default=50) maximum allowed CFL number. :l
+{scalar3} = (optional, default=0.1) maximum allowed ratio of coupling time to particle relaxation time. :l
+{scalar4} = maximum expected velocity fluid velocity (e.g. due to BCs) - used for CFL estimation. :l
+{scalar5} = (optional, default=3) min allowed volume ratio of cell / particle. :l
+{scalar6} = (optional, default=coupling time) interval of execution. :l
+:ule
+
+[Examples:]
+
+forceModels
+(
+    checkCouplingInterval
+);
+checkCouplingIntervalProps
+\{
+    rhoP 2500;
+    UmaxExpected 10;
+    timeInterval 0.002;
+\} :pre
+
+[Description:]
+
+This "forceModel" does not influence the particles or the simulation - it is a postprocessing tool! At the first coupling step and at every time interval several criteria are checked: (i) The acceleration number is defined as the ratio of DEMtime/particleRelaxationTime, where DEMtime is DEM time step size * coupling interval. The acceleration nr should be smaller than ~0.1. (ii) The Courant Number (CFL). If the CFL number exceeds a reasonable value the quality of the result becomes bad - therefore the simulation settings should be changed. (iii) The ratio of smallest cell biggest particle volume. Typically this should be larger than 3. (iiii) The minimum and maximum Stokes Number. For the criteria (i)-(iii) the user can define its own allowed bounds and with the flag "warnOnly" the user can choose if the simulation should be stopped or if just a warning is given if a criterion is broken.
+
+[Restrictions:]
+
+needs MPI based dataExchange model - e.g. oneWayVTK will not work.
+
+[Related commands:]
+
+"forceModel"_forceModel.html
+

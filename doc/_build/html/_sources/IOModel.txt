@@ -1,0 +1,45 @@
+.. index:: IOModel
+
+IOModel command
+===============
+
+Syntax
+""""""
+
+Defined in couplingProperties dictionary.
+
+.. parsed-literal::
+
+   IOModel "model";
+
+* model = name of IO-model to be applied
+
+Examples
+""""""""
+
+IOModel "off";
+
+Note: This examples list might not be complete - please look for other models (IOModel_XY) in this documentation.
+
+Description
+"""""""""""
+
+The IO-model is the base class to write data (e.g. particle properties) to files.
+
+Restrictions
+""""""""""""
+
+
+none.
+
+Related commands
+""""""""""""""""
+
+Note: This examples list may be incomplete - please look for other models (IOModel_XY) in this documentation.
+
+**Default:** none.
+
+
+.. _liws: http://www.cfdem.com
+.. _ld: Manual.html
+.. _lc: Section_commands.html#comm

@@ -1,0 +1,251 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>locateModel_engineSearchIB command &mdash; CFDEMcoupling v3.X documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="CFDEMcoupling v3.X documentation" href="index.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="CFDEMcoupling_Manual.html" class="icon icon-home"> CFDEMcoupling
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                v3.X
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <!-- Local TOC -->
+                <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">locateModel_engineSearchIB command</a><ul>
+<li><a class="reference internal" href="#syntax">Syntax</a></li>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+<li><a class="reference internal" href="#description">Description</a></li>
+<li><a class="reference internal" href="#restrictions">Restrictions</a></li>
+<li><a class="reference internal" href="#related-commands">Related commands</a></li>
+</ul>
+</li>
+</ul>
+</div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="CFDEMcoupling_Manual.html">CFDEMcoupling</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="CFDEMcoupling_Manual.html">Docs</a> &raquo;</li>
+      
+    <li>locateModel_engineSearchIB command</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        
+          <a href="http://www.cfdem.com"> Website</a>
+        
+      
+    </li>
+  </ul>
+  <hr/>
+  
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="locatemodel-enginesearchib-command">
+<span id="index-0"></span><h1>locateModel_engineSearchIB command<a class="headerlink" href="#locatemodel-enginesearchib-command" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="syntax">
+<h2>Syntax<a class="headerlink" href="#syntax" title="Permalink to this headline">¶</a></h2>
+<p>Defined in couplingProperties dictionary.</p>
+<div class="highlight-python"><div class="highlight"><pre>locateModel engineIB;
+engineIBProps
+{
+    treeSearch switch1;
+    zSplit value1;
+    xySplit value2;
+    checkPeriodicCells;
+}
+</pre></div>
+</div>
+<ul class="simple">
+<li><em>switch1</em> = names of the finite volume scalar fields to be temporally averaged</li>
+<li><em>value1</em> = number of z-normal layers for satellite points</li>
+<li><em>value2</em> = number of satellite points in each layer</li>
+<li><em>checkPeriodicCells</em> = (optional, default false) flag for considering the minimal distance to all periodic images of this particle</li>
+</ul>
+</div>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre>locateModel engineIB;
+engineIBProps
+{
+    treeSearch false;
+    zSplit 8;
+    xySplit 16;
+}
+</pre></div>
+</div>
+</div>
+<div class="section" id="description">
+<h2>Description<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h2>
+<p>The locateModel &#8220;engine&#8221; locates the CFD cell and cellID corresponding to a given position. This locate model is especially designed for parallel immersed boundary method. Each particle is represented by &#8220;satellite points&#8221; if it is distributed over several processors.</p>
+<p>The engineSearchIB locate Model can be used with different settings to use different algorithms:</p>
+<ul class="simple">
+<li>treeSearch false;     will execute some geometric (linear) search using the last known cellID (recommended)</li>
+<li>treeSearch true;      will use a recursive tree structure to find the cell.</li>
+</ul>
+<p>This model is a modification of the engine search model. Instead of using the centre-cell as starting point for the engine search, further satellite points located on the surface of the sphere are checked. This ensures that (parts of) spheres can be located even when their centre is on another processor. This is especially important for parallel computations, when a sphere is about to move from one processor to another.</p>
+</div>
+<div class="section" id="restrictions">
+<h2>Restrictions<a class="headerlink" href="#restrictions" title="Permalink to this headline">¶</a></h2>
+<p>Only for immersed boundary solvers!</p>
+</div>
+<div class="section" id="related-commands">
+<h2>Related commands<a class="headerlink" href="#related-commands" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="locateModel.html"><em>locateModel</em></a></p>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, DCS Computing GmbH, JKU Linz.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'v3.X',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

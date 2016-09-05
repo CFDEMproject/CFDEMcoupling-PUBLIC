@@ -58,11 +58,12 @@ addToRunTimeSelectionTable
 LaEuScalarTemp::LaEuScalarTemp
 (
     const dictionary& dict,
-    cfdemCloud& sm
+    cfdemCloud& sm,
+    word name
 )
 :
     forceModel(dict,sm),
-    propsDict_(dict.subDict(typeName + "Props")),
+    propsDict_(dict.subDict(name == "" ? typeName + "Props" : name + "Props")),
     tempFieldName_(propsDict_.lookup("tempFieldName")),
     T_(sm.mesh().lookupObject<volScalarField> (tempFieldName_)),
     voidfractionFieldName_(propsDict_.lookup("voidfractionFieldName")),
@@ -82,8 +83,7 @@ LaEuScalarTemp::LaEuScalarTemp
     partHeatFluid_(NULL),
     validPartHeatFluid_(false),
     lambda_(readScalar(propsDict_.lookup("lambda"))),
-    Cp_(readScalar(propsDict_.lookup("Cp"))),
-    scaleDia_(1.)
+    Cp_(readScalar(propsDict_.lookup("Cp")))
 {
     allocateMyArrays();
 
@@ -123,11 +123,7 @@ LaEuScalarTemp::LaEuScalarTemp
     //    forceSubM(iFSub).readSwitches();
 
     particleCloud_.checkCG(true);
-
-    if (propsDict_.found("scale"))
-        scaleDia_=scalar(readScalar(propsDict_.lookup("scale")));
 }
-
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
@@ -167,18 +163,11 @@ void LaEuScalarTemp::setForce() const
 
 void LaEuScalarTemp::manipulateScalarField(volScalarField& EuField) const
 {
-    if (scaleDia_ > 1)
-        Info << typeName << " using scale = " << scaleDia_ << endl;
-    else if (particleCloud_.cg() > 1){
-        scaleDia_=particleCloud_.cg();
-        Info << typeName << " using scale from liggghts cg = " << scaleDia_ << endl;
-    }
-
     // realloc the arrays
     allocateMyArrays();
 
     // reset Scalar field
-    EuField.internalField() = 0.0;
+    EuField == dimensionedScalar("zero", EuField.dimensions(), 0.);
 
     // get DEM data
     particleCloud_.dataExchangeM().getData(partTempName_,"scalar-atom",partTemp_);
@@ -193,15 +182,17 @@ void LaEuScalarTemp::manipulateScalarField(volScalarField& EuField) const
     scalar Tfluid(0);
     label cellI=0;
     vector Us(0,0,0);
-    scalar dscaled(0);
+    scalar ds(0);
     scalar nuf(0);
+    scalar rho(0);
     scalar magUr(0);
     scalar As(0);
     scalar Rep(0);
     scalar Pr(0);
     scalar Nup(0);
     scalar n = 3.5; // model parameter
-    scalar sDth(scaleDia_*scaleDia_*scaleDia_);
+    scalar scaleDia = forceSubM(0).scaleDia();
+    scalar sDth(scaleDia*scaleDia*scaleDia);
 
     #include "resetVoidfractionInterpolator.H"
     #include "resetUInterpolator.H"
@@ -229,12 +220,28 @@ void LaEuScalarTemp::manipulateScalarField(volScalarField& EuField) const
 
                 // calc relative velocity
                 Us = particleCloud_.velocity(index);
-                magUr = mag(Ufluid-Us);
-                dscaled = 2*particleCloud_.radius(index)/scaleDia_;
-                As = dscaled*dscaled*M_PI*sDth;
+                ds = 2*particleCloud_.radius(index);
+                forceSubM(0).scaleDia(ds); //caution: this fct will scale ds!
                 nuf = nufField[cellI];
-                Rep = dscaled*magUr/nuf;
-                Pr = max(SMALL,Cp_*nuf*rhoField[cellI]/lambda_);
+                rho = rhoField[cellI];
+
+                //Update any scalar or vector quantity
+                for (int iFSub=0;iFSub<nrForceSubModels();iFSub++)
+                      forceSubM(iFSub).update(  index, 
+                                                cellI,
+                                                ds,
+                                                Ufluid, 
+                                                Us, 
+                                                nuf,
+                                                rho,
+                                                forceSubM(0).verbose()
+                                             );
+
+                magUr = mag(Ufluid-Us);
+                As = ds*ds*M_PI*sDth;
+
+                Rep = ds*magUr/nuf;
+                Pr = max(SMALL,Cp_*nuf*rho/lambda_);
 
                 if (Rep < 200)
                 {
@@ -248,7 +255,7 @@ void LaEuScalarTemp::manipulateScalarField(volScalarField& EuField) const
                 {
                     Nup = 2+0.000045*pow(voidfraction,n)*pow(Rep,1.8);
                 }
-                scalar h = lambda_*Nup/(dscaled);
+                scalar h = lambda_*Nup/(ds);
 
                 // calc convective heat flux [W]
                 scalar partHeatFlux     = h * As * (Tfluid - partTemp_[index][0]);
@@ -267,7 +274,7 @@ void LaEuScalarTemp::manipulateScalarField(volScalarField& EuField) const
                     Pout << "magUr = " << magUr << endl;
                     Pout << "As = " << As << endl;
                     Pout << "r = " << particleCloud_.radius(index) << endl;
-                    Pout << "dscaled = " << dscaled << endl;
+                    Pout << "dprim = " << ds << endl;
                     Pout << "nuf = " << nuf << endl;
                     Pout << "Rep = " << Rep << endl;
                     Pout << "Pr = " << Pr << endl;
@@ -289,7 +296,8 @@ void LaEuScalarTemp::manipulateScalarField(volScalarField& EuField) const
     );
 
     // scale with -1./(Vcell*rho*Cp)
-    EuField.internalField() /= -rhoField.internalField()*Cp_*EuField.mesh().V();
+    forAll(EuField,cellI)
+        EuField[cellI] /= -rhoField[cellI]*Cp_*EuField.mesh().V()[cellI];
 
     // limit source term
     scalar EuFieldInCell;

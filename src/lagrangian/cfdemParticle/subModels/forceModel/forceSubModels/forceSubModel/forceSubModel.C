@@ -118,7 +118,9 @@ forceSubModel::forceSubModel
     densityFieldName_(dict_.lookupOrDefault<word>("densityFieldName","rho")),
     rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_)),
     verboseDiskIntervall_(1),
-    verboseDiskCounter_(0)
+    verboseDiskCounter_(0),
+    scaleDia_(dict_.lookupOrDefault<scalar>("scale",1.)),
+    scaleDrag_(dict_.lookupOrDefault<scalar>("scaleDrag",1.))
 {
     // init standard switch list
     int iCounter(0);
@@ -143,6 +145,15 @@ forceSubModel::forceSubModel
     // sanity check of what is defined above
     if(switchesNameList_.size() != nrDefaultSwitches_)
         FatalError<< "please check the nr of switches defined in forceSubModel class." << abort(FatalError);
+
+    // info about scaleDia being used
+    if (scaleDia_ != 1)
+        Info << "using scale = " << scaleDia_ << endl;
+    else if (particleCloud_.cg() != 1)
+    {
+        scaleDia_=particleCloud_.cg();
+        Info << "using scale from liggghts cg = " << scaleDia_ << endl;
+    }
 }
 
 
@@ -282,29 +293,54 @@ void forceSubModel::explicitCorrScalar(scalar& sourceKImplicit,
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-void forceSubModel::update(            scalar&  deltaT, 
-                                       label    particleI, 
-                                       label    cellI, 
-                                       scalar&  scalToUpdate1, 
-                                       scalar&  scalToUpdate2, 
-                                       bool     verbose
+void forceSubModel::update( label    particleI, 
+                            label    cellI,
+                            scalar&  d,
+                            scalar&  scalToUpdate1, 
+                            scalar&  scalToUpdate2, 
+                            bool     verbose
                           ) const
 {
     //no action
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-void forceSubModel::update(            scalar&  deltaT, 
-                                       label    particleI, 
-                                       label    cellI, 
-                                       vector&  vecToUpdate1, 
-                                       vector&  vecToUpdate2, 
-                                       scalar&  scalToUpdate1, 
-                                       scalar&  scalToUpdate2, 
-                                       bool     verbose
+void forceSubModel::update( label    particleI,
+                            label    cellI,
+                            scalar&  d,
+                            vector&  vecToUpdate1,
+                            vector&  vecToUpdate2,
+                            scalar&  scalToUpdate1,
+                            scalar&  scalToUpdate2,
+                            bool     verbose
                           ) const
 {
     //no action
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+void forceSubModel::scaleDia(scalar& d) const
+{
+    d /= scaleDia_;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+void forceSubModel::scaleForce(vector& force, scalar& d) const
+{
+    force *= scaleDia_*scaleDia_*scaleDia_*scaleDrag_;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+void forceSubModel::scaleForce(vector& force) const
+{
+    Warning << "Function not defined!" << endl;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+void forceSubModel::scaleCoeff(scalar& coeff,scalar& d) const
+{
+    coeff *= scaleDia_*scaleDia_*scaleDia_*scaleDrag_;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+void forceSubModel::scaleCoeff(scalar& coeff) const
+{
+    Warning << "Function not defined!" << endl;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 void forceSubModel::explicitLimit

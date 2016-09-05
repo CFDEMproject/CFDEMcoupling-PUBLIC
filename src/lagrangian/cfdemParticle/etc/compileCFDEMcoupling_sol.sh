@@ -9,6 +9,7 @@ whitelist="solver-list.txt"
 
 #- include functions
 source $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/functions.sh
+
 logDir="log"
 cd $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc
 mkdir -p $logDir
@@ -63,7 +64,7 @@ else
         echo "do compilation in serial"
     else    
         nsteps=$WM_NCOMPPROCS
-        nchunk=`echo $njobs/$nsteps+1 | bc`
+        let nchunk=$njobs/$nsteps+1
         echo "do compilation on $nsteps procs in $nchunk chunks" 
         let nchunk++ # +1, to wait for the last compilation too     
     fi
@@ -74,7 +75,8 @@ else
 
         #wait until prev. compilation is finished
         echo "waiting..."
-        until [ `ps -a | grep make | wc -l` -eq 0 ]; 
+        #until [ `ps -a | grep make | wc -l` -eq 0 ]; 
+        until [ `ls -a | $logpath/grep *.tempXYZ | wc -l` -eq 0 ];
         do 
             sleep 2
         done
@@ -127,7 +129,8 @@ fi
 
 #wait until prev. compilation is finished
 echo "waiting..."
-until [ `ps -a | grep make | wc -l` -eq 0 ]; 
+#until [ `ps -a | grep make | wc -l` -eq 0 ]; 
+until [ `ls -a | grep $logpath/*.tempXYZ | wc -l` -eq 0 ];
 do 
     sleep 2
 done

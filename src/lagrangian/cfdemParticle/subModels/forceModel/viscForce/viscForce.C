@@ -118,7 +118,7 @@ viscForce::viscForce
 
     if(probeIt_)
     {
-        particleCloud_.probeM().initialize(typeName, "visc.logDat");
+        particleCloud_.probeM().initialize(typeName, typeName+".logDat");
         particleCloud_.probeM().vectorFields_.append("viscForce"); //first entry must the be the force
         particleCloud_.probeM().scalarFields_.append("Vs");
         particleCloud_.probeM().writeHeader();

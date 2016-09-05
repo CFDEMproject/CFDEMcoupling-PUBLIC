@@ -1,0 +1,74 @@
+.. index:: forceModel_gradPForce
+
+forceModel_gradPForce command
+=============================
+
+Syntax
+""""""
+
+Defined in couplingProperties dictionary.
+
+.. parsed-literal::
+
+   forceModels
+   (
+       gradPForce;
+   );
+   gradPForceProps
+   {
+       pFieldName "pressure";
+       velocityFieldName "U";
+       interpolation       switch1;
+       gradPInterpolationType "type1"
+       useAddedMass        scalar1;
+       suppressProbe       switch2;
+       treatForceExplicit  switch3;
+       treatForceDEM       switch4;
+   };
+
+* *pressure* = name of the finite volume fluid pressure field
+* *U* = name of the finite volume fluid velocity field
+* *switch1* = flag to use interpolated pressure values (normally off)
+* *type1* = (optional, default cellPointFace) interpolation type for grad(p) field
+* *useAddedMass* = (optional) coefficient of added mass accounted for
+* *switch2* = (optional, default false) can be used to suppress the output of the probe model
+* *switch3* = (optional, default true) sub model switch, see :doc:`forceSubModel <forceSubModel>` for details
+* *switch4* = (optional, default false) sub model switch, see :doc:`forceSubModel <forceSubModel>` for details
+
+
+Examples
+""""""""
+
+.. parsed-literal::
+
+   forceModels
+   (
+       gradPForce;
+   );
+   gradPForceProps
+   {
+       pFieldName "p";
+       velocityFieldName "U";
+       interpolation true;
+   }
+
+Description
+"""""""""""
+
+The force model performs the calculation of forces (e.g. fluid-particle interaction forces) acting on each DEM particle. The gradPForce model is a model that calculates the particle based pressure gradient force -(grad(p)) * Vparticle (see Zhou et al. (2010): "Discrete particle simulation of particle-fluid flow: model formulations and their applicability" ,JFM).
+
+Restrictions
+""""""""""""
+
+
+none.
+
+Related commands
+""""""""""""""""
+
+:doc:`forceModel <forceModel>`
+
+
+.. _liws: http://www.cfdem.com
+.. _ld: Manual.html
+.. _lc: Section_commands.html#comm

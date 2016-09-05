@@ -97,6 +97,8 @@ protected:
 
     bool debug_;
 
+    bool allowCFDsubTimestep_;
+
     bool ignore_;
 
     const word modelType_;
@@ -166,6 +168,8 @@ protected:
     mutable word useDDTvoidfraction_;
 
     mutable volScalarField ddtVoidfraction_;
+
+    mutable Switch checkPeriodicCells_;
 
     #if defined(version24Dev)
         const turbulenceModel& turbulence_;
@@ -251,6 +255,10 @@ public:
        bool isLES() const {return isLES_; };
     
        bool debugMode(){ return debug_;};
+
+       bool allowCFDsubTimestep(){ return allowCFDsubTimestep_;};
+
+       void setAllowCFDsubTimestep(bool b){allowCFDsubTimestep_=b;};
 
        void checkCG(bool);
 
@@ -365,7 +373,10 @@ public:
          FatalError << "cfdemCloud::shapeArray(): you are attempting to get an access to shape array for spheroids/superquadrics. This is not allowed for spheres. Recompile the code with #define anisotropicRotation in OFversion.H or enable superquadrics in LIGGGHTS (SUPERQUADRIC_ACTIVE_FLAG)" << abort(FatalError);
          return NULL;
        };
-       virtual vector shape(int) const {return Foam::vector(0,0,0);};
+       virtual vector shape(int) const {
+         FatalError << "cfdemCloud::shapeArray(): you are attempting to get an access to shape array for spheroids/superquadrics. This is not allowed for spheres. Recompile the code with #define anisotropicRotation in OFversion.H or enable superquadrics in LIGGGHTS (SUPERQUADRIC_ACTIVE_FLAG)" << abort(FatalError);
+         return Foam::vector(0,0,0);
+       };
 
        // access to complex shape information
        virtual inline double ** vectorArray() const {return NULL;};
@@ -460,6 +471,14 @@ public:
            inline const incompressible::RASModel& turbulence() const;
        #endif
 
+        inline void makeSpecific(volScalarField&);
+
+        inline void makeSpecific(volVectorField&);
+
+        inline void scaleWithVcell(volScalarField&);
+
+        inline void scaleWithVcell(volVectorField&);
+
     // Write
 
       // write cfdemCloud internal data
@@ -511,6 +530,7 @@ public:
         void zeroizeParticleDatFieldsUserCFDEMToExt();
         void accessParticleDatFieldsUserCFDEMToExt(word fieldToAccess, double **& fieldData);
         //=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=
+        bool checkPeriodicCells() { return checkPeriodicCells_; }
 
 };
 

@@ -34,25 +34,25 @@ modelType B; // A or B
 
 couplingInterval 100;
 
-voidFractionModel trilinear;//centre;//divided;//bigParticle;//
+voidFractionModel trilinear;
 
-locateModel engine;//ijk;//standard;//
+locateModel engine;
 
 meshMotionModel noMeshMotion;
 
 regionModel allRegion;
 
-IOModel basicIO; //trackIO; // 
+IOModel basicIO;
 
 probeModel off;
 
-dataExchangeModel twoWayMPI;//twoWayFiles;//oneWayVTK;//
+dataExchangeModel twoWayMPI;
 
-averagingModel dense;//dilute;//
+averagingModel dense;
 
-clockModel off; //standardClock;//
+clockModel off;
 
-smoothingModel off;//constDiffSmoothing; // 
+smoothingModel off;
 
 //useDDTvoidfraction;
 
@@ -76,6 +76,9 @@ turbulenceModelType turbulenceProperties;//"LESProperties";//OFversion30x
 //===========================================================================//
 // sub-model properties
 
+noDragProps
+{
+}
 
 particleCellVolumeProps
 {

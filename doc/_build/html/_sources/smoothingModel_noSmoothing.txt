@@ -1,0 +1,39 @@
+.. index:: smoothingModel_noSmoothing
+
+smoothingModel_noSmoothing command
+==================================
+
+Syntax
+""""""
+
+Defined in couplingProperties dictionary.
+
+.. parsed-literal::
+
+   smoothingModel off;
+
+Examples
+""""""""
+
+.. parsed-literal::
+
+   smoothingModel off;
+
+Description
+"""""""""""
+
+The "noSmoothing" model is a dummy smoothingModel model which does no smoothing.
+
+Restrictions
+""""""""""""
+ none.
+
+Related commands
+""""""""""""""""
+
+:doc:`smoothingModel <smoothingModel>`
+
+
+.. _liws: http://www.cfdem.com
+.. _ld: Manual.html
+.. _lc: Section_commands.html#comm

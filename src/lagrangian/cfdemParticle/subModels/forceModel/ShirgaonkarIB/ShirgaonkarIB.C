@@ -71,7 +71,7 @@ ShirgaonkarIB::ShirgaonkarIB
     p_(sm.mesh().lookupObject<volScalarField> (pressureFieldName_))
 {
     //Append the field names to be probed
-    particleCloud_.probeM().initialize(typeName, "shirgaonkarIB.logDat");
+    particleCloud_.probeM().initialize(typeName, typeName+".logDat");
     particleCloud_.probeM().vectorFields_.append("dragForce"); //first entry must the be the force
     particleCloud_.probeM().writeHeader();
 

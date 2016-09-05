@@ -73,13 +73,6 @@ virtualMassForce::virtualMassForce
     splitUrelCalculation_(false),
     Cadd_(0.5)
 {
-
-    if (particleCloud_.dataExchangeM().maxNumberOfParticles() > 0 && !splitUrelCalculation_)
-    {
-        // get memory for 2d array
-        particleCloud_.dataExchangeM().allocateArray(UrelOld_,NOTONCPU,3);
-    }
-
     // init force sub model
     setForceSubModels(propsDict_);
     // define switches which can be read from dict
@@ -110,7 +103,7 @@ virtualMassForce::virtualMassForce
     particleCloud_.checkCG(true);
 
     //Append the field names to be probed
-    particleCloud_.probeM().initialize(typeName, "virtualMass.logDat");
+    particleCloud_.probeM().initialize(typeName, typeName+".logDat");
     particleCloud_.probeM().vectorFields_.append("virtualMassForce"); //first entry must the be the force
     particleCloud_.probeM().vectorFields_.append("Urel");
     particleCloud_.probeM().vectorFields_.append("UrelOld");
@@ -118,6 +111,17 @@ virtualMassForce::virtualMassForce
     particleCloud_.probeM().scalarFields_.append("Vs");
     particleCloud_.probeM().scalarFields_.append("rho");
     particleCloud_.probeM().writeHeader();
+
+    if(!splitUrelCalculation_)
+        FatalError << "Virtual mass model: you have set 'splitUrelCalculation' to false, but this is not implemented. use true!" << abort(FatalError);
+
+    if (particleCloud_.dataExchangeM().maxNumberOfParticles() > 0 && !splitUrelCalculation_)
+    {
+        // get memory for 2d array
+        particleCloud_.dataExchangeM().allocateArray(UrelOld_,NOTONCPU,3);
+        Info << "**Virtual mass model: allocating UrelOld " << endl;
+    }
+
 }
 
 
@@ -253,7 +257,10 @@ void Foam::virtualMassForce::reAllocArrays() const
     if (!splitUrelCalculation_)
     {
         if(particleCloud_.numberOfParticlesChanged())
+        {
             particleCloud_.dataExchangeM().allocateArray(UrelOld_,NOTONCPU,3);
+            Info << "**Virtual mass model: allocating UrelOld " << endl;
+        }
 
         // get DEM data
         particleCloud_.dataExchangeM().getData("UrelOld", "vector-atom", UrelOld_);

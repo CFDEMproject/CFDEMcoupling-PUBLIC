@@ -1,0 +1,48 @@
+.. index:: dataExchangeModel
+
+dataExchangeModel command
+=========================
+
+Syntax
+""""""
+
+Defined in couplingProperties dictionary.
+
+.. parsed-literal::
+
+   dataExchangeModel model;
+
+* model = name of data exchange model to be applied
+
+Examples
+""""""""
+
+.. parsed-literal::
+
+   dataExchangeModel twoWayFiles;
+   dataExchangeModel twoWayMPI;
+
+Note: This examples list might not be complete - please look for other models (dataExchangeModel_XY) in this documentation.
+
+Description
+"""""""""""
+
+The data exchange model performs the data exchange between the DEM code and the CFD code.
+
+Restrictions
+""""""""""""
+
+
+None.
+
+Related commands
+""""""""""""""""
+
+:doc:`noDataExchange <dataExchangeModel_noDataExchange>`, :doc:`oneWayVTK <dataExchangeModel_oneWayVTK>`, :doc:`twoWayFiles <dataExchangeModel_twoWayFiles>`, :doc:`twoWayMPI <dataExchangeModel_twoWayMPI>`
+
+**Default:** none
+
+
+.. _liws: http://www.cfdem.com
+.. _ld: Manual.html
+.. _lc: Section_commands.html#comm

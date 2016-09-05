@@ -131,28 +131,6 @@ void Foam::implicitCouple::applyDebugSettings(bool debug) const
 
 tmp<volScalarField> implicitCouple::impMomSource() const
 {
-    tmp<volScalarField> tsource
-    (
-        new volScalarField
-        (
-            IOobject
-            (
-                "Ksl_implicitCouple",
-                particleCloud_.mesh().time().timeName(),
-                particleCloud_.mesh(),
-                IOobject::NO_READ,
-                IOobject::NO_WRITE
-            ),
-            particleCloud_.mesh(),
-            dimensionedScalar
-            (
-                "zero",
-                dimensionSet(1, -3, -1, 0, 0), // N/m3 / m/s
-                0
-            )
-        )
-    );
-
     scalar tsf = particleCloud_.dataExchangeM().timeStepFraction();
 
     // calc Ksl
@@ -175,19 +153,23 @@ tmp<volScalarField> implicitCouple::impMomSource() const
             // limiter
             if (KslNext_[cellI] > KslLimit_) KslNext_[cellI] = KslLimit_;
         }
-        tsource() = KslPrev_;
+        return tmp<volScalarField>
+        (
+            new volScalarField("Ksl_implicitCouple", KslPrev_)
+        );
     }else
     {
-        tsource() = (1 - tsf) * KslPrev_ + tsf * KslNext_;
+        return tmp<volScalarField>
+        (
+            new volScalarField("Ksl_implicitCouple", (1 - tsf) * KslPrev_ + tsf * KslNext_)
+        );
     }
-
-    return tsource;
 }
 
 void Foam::implicitCouple::resetMomSourceField() const
 {
-    KslPrev_.internalField() = KslNext_.internalField();
-    KslNext_.internalField() = 0;
+    KslPrev_ == KslNext_;
+    KslNext_ == dimensionedScalar("zero", KslNext_.dimensions(), 0.0);
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

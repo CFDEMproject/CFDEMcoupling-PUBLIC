@@ -1,0 +1,91 @@
+.. index:: liggghtsCommandModel_readLiggghtsData
+
+liggghtsCommandModel_readLiggghtsData command
+=============================================
+
+Syntax
+""""""
+
+Defined in liggghtsCommmands dictionary.
+
+.. parsed-literal::
+
+   liggghtsCommandModels
+   (
+      readLiggghtsData
+   );
+   readLiggghtsDataProps0
+   {
+       startIndex "scalar1";
+       verbose ;
+       exactTiming ;
+       filePath 
+       (
+           "word"
+       );
+       runFirst "bool1";
+       runEveryCouplingStep "bool2";
+       startTime "scalar2";
+       endTime "scalar3";
+       timeInterval "scalar4";
+   }
+
+* *scalar1* = start index of data file to be read
+* *verbose* = (default off) flag for verbose run
+* *exactTiming* = flag indicating that start time should be kept even during a coupling interval
+* *filePath* = path to LIGGGHTS data file. Each word in a new line, numbers and symbols need special treatment (e.g. $couplingInterval will be replaced by correct coupling interval in the simulation)
+* *bool1* = true if to be run at first timestep only (prio 1)
+* *bool2* = true if to be run at every coupling step (prio 2)
+* *scalar2* = if bool2 and bool3 false then starts at scalar2 (prio 3) run
+* *scalar3* = if bool2 and bool3 false then it ends at scalar3 (prio 3) run
+* *scalar4* = if bool2 and bool3 false then it repeats at scalar3 increasing the data file index (prio 3) run
+
+
+Examples
+""""""""
+
+.. parsed-literal::
+
+   liggghtsCommandModels
+   (
+      readLiggghtsData
+   );
+   readLiggghtsDataProps0
+   {
+       startIndex 0;
+       exactTiming true;
+       filePath 
+       (
+           dotdot
+           slash
+           DEM
+           slash
+           packing.data
+       );
+       runFirst off;
+       runEveryCouplingStep off;
+       startTime 0.002;
+       endTime 0.012;
+       timeInterval 0.001;
+   }
+
+Description
+"""""""""""
+
+The readLiggghtsData liggghtsCommand Model can be used to read liggghts data files into liggghts during runtime of a coupled simulation.
+
+Restrictions
+""""""""""""
+
+
+Note: Model is not up to date.
+
+Related commands
+""""""""""""""""
+
+:doc:`liggghtsCommandModel <liggghtsCommandModel>`
+
+
+.. _liws: http://www.cfdem.com
+.. _ld: Manual.html
+.. _lc: Section_commands.html#comm

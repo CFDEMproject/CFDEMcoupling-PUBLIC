@@ -203,8 +203,11 @@ public:
                 Info << "particleCloud_.mesh().time().deltaT().value() = " << particleCloud_.mesh().time().deltaT().value() << endl;
                 Info << "couplingInterval_ = " << couplingInterval_ << endl;
                 Info << "DEMts_ = " << DEMts_ << endl;
-                FatalError<<"\nError - TS bigger than coupling interval!\n"<< abort(FatalError);
+                FatalError<<"\nError - CFD time-step bigger than coupling time (= DEM time step * coupling interval)!\n"<< abort(FatalError);
             }
+            if(!particleCloud_.allowCFDsubTimestep())
+                if(particleCloud_.mesh().time().deltaT().value() < couplingInterval_ * DEMts_ + SMALL)
+                    FatalError<<"\nYour models require: CFD time-step = coupling interval (= DEM time step * coupling interval)! \n"<< abort(FatalError);
         }
 
         /*inline bool checkExactTiming() const

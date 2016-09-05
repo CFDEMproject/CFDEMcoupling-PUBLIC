@@ -1,0 +1,276 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>liggghtsCommandModel_readLiggghtsData command &mdash; CFDEMcoupling v3.X documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="CFDEMcoupling v3.X documentation" href="index.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="CFDEMcoupling_Manual.html" class="icon icon-home"> CFDEMcoupling
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                v3.X
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <!-- Local TOC -->
+                <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">liggghtsCommandModel_readLiggghtsData command</a><ul>
+<li><a class="reference internal" href="#syntax">Syntax</a></li>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+<li><a class="reference internal" href="#description">Description</a></li>
+<li><a class="reference internal" href="#restrictions">Restrictions</a></li>
+<li><a class="reference internal" href="#related-commands">Related commands</a></li>
+</ul>
+</li>
+</ul>
+</div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="CFDEMcoupling_Manual.html">CFDEMcoupling</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="CFDEMcoupling_Manual.html">Docs</a> &raquo;</li>
+      
+    <li>liggghtsCommandModel_readLiggghtsData command</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        
+          <a href="http://www.cfdem.com"> Website</a>
+        
+      
+    </li>
+  </ul>
+  <hr/>
+  
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="liggghtscommandmodel-readliggghtsdata-command">
+<span id="index-0"></span><h1>liggghtsCommandModel_readLiggghtsData command<a class="headerlink" href="#liggghtscommandmodel-readliggghtsdata-command" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="syntax">
+<h2>Syntax<a class="headerlink" href="#syntax" title="Permalink to this headline">¶</a></h2>
+<p>Defined in liggghtsCommmands dictionary.</p>
+<div class="highlight-python"><div class="highlight"><pre>liggghtsCommandModels
+(
+   readLiggghtsData
+);
+readLiggghtsDataProps0
+{
+    startIndex &quot;scalar1&quot;;
+    verbose ;
+    exactTiming ;
+    filePath
+    (
+        &quot;word&quot;
+    );
+    runFirst &quot;bool1&quot;;
+    runEveryCouplingStep &quot;bool2&quot;;
+    startTime &quot;scalar2&quot;;
+    endTime &quot;scalar3&quot;;
+    timeInterval &quot;scalar4&quot;;
+}
+</pre></div>
+</div>
+<ul class="simple">
+<li><em>scalar1</em> = start index of data file to be read</li>
+<li><em>verbose</em> = (default off) flag for verbose run</li>
+<li><em>exactTiming</em> = flag indicating that start time should be kept even during a coupling interval</li>
+<li><em>filePath</em> = path to LIGGGHTS data file. Each word in a new line, numbers and symbols need special treatment (e.g. $couplingInterval will be replaced by correct coupling interval in the simulation)</li>
+<li><em>bool1</em> = true if to be run at first timestep only (prio 1)</li>
+<li><em>bool2</em> = true if to be run at every coupling step (prio 2)</li>
+<li><em>scalar2</em> = if bool2 and bool3 false then starts at scalar2 (prio 3) run</li>
+<li><em>scalar3</em> = if bool2 and bool3 false then it ends at scalar3 (prio 3) run</li>
+<li><em>scalar4</em> = if bool2 and bool3 false then it repeats at scalar3 increasing the data file index (prio 3) run</li>
+</ul>
+</div>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre>liggghtsCommandModels
+(
+   readLiggghtsData
+);
+readLiggghtsDataProps0
+{
+    startIndex 0;
+    exactTiming true;
+    filePath
+    (
+        dotdot
+        slash
+        DEM
+        slash
+        packing.data
+    );
+    runFirst off;
+    runEveryCouplingStep off;
+    startTime 0.002;
+    endTime 0.012;
+    timeInterval 0.001;
+}
+</pre></div>
+</div>
+</div>
+<div class="section" id="description">
+<h2>Description<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h2>
+<p>The readLiggghtsData liggghtsCommand Model can be used to read liggghts data files into liggghts during runtime of a coupled simulation.</p>
+</div>
+<div class="section" id="restrictions">
+<h2>Restrictions<a class="headerlink" href="#restrictions" title="Permalink to this headline">¶</a></h2>
+<p>Note: Model is not up to date.</p>
+</div>
+<div class="section" id="related-commands">
+<h2>Related commands<a class="headerlink" href="#related-commands" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="liggghtsCommandModel.html"><em>liggghtsCommandModel</em></a></p>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, DCS Computing GmbH, JKU Linz.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'v3.X',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

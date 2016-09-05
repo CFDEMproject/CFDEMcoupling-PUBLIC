@@ -59,7 +59,7 @@ void averagingModel::undoVectorAverage
 {
 // WARNING - not sure if this is valid for dilute model!!!
 
-    if(!single) fieldPrev.internalField() = fieldNext.internalField();
+    if(!single) fieldPrev == fieldNext;
 
     label cellI;
     vector valueVec;
@@ -294,13 +294,13 @@ void averagingModel::setDSauter
 
 void averagingModel::resetVectorAverage(volVectorField& prev,volVectorField& next,bool single) const
 {
-    if(!single) prev.internalField() = next.internalField();
-    next.internalField() = vector::zero;
+    if(!single) prev == next;
+    next == dimensionedVector("zero", next.dimensions(), vector::zero);
 }
 
 void averagingModel::resetWeightFields() const
 {
-    UsWeightField_.internalField() = 0;
+    UsWeightField_ == dimensionedScalar("zero", UsWeightField_.dimensions(), 0.0);
 }
 
 
@@ -319,39 +319,20 @@ void Foam::averagingModel::undoWeightFields(double**const& mask) const
 
 tmp<volVectorField> Foam::averagingModel::UsInterp() const
 {
-    tmp<volVectorField> tsource
-    (
-        new volVectorField
-        (
-            IOobject
-            (
-                "Us_averagingModel",
-                particleCloud_.mesh().time().timeName(),
-                particleCloud_.mesh(),
-                IOobject::NO_READ,
-                IOobject::NO_WRITE
-            ),
-            particleCloud_.mesh(),
-            dimensionedVector
-            (
-                "zero",
-                dimensionSet(0, 1, -1, 0, 0),
-                vector::zero
-            )
-        )
-    );
-
     if (particleCloud_.dataExchangeM().couplingStep() > 1)
     {
-        tsource() = (1 - particleCloud_.dataExchangeM().timeStepFraction()) * UsPrev_
-                    + particleCloud_.dataExchangeM().timeStepFraction() * UsNext_;
+        return tmp<volVectorField>
+        (
+            new volVectorField("Us_averagingModel", (1 - particleCloud_.dataExchangeM().timeStepFraction()) * UsPrev_ + particleCloud_.dataExchangeM().timeStepFraction() * UsNext_)
+        );
     }
     else
     {
-        tsource() = UsNext_;
+        return tmp<volVectorField>
+        (
+            new volVectorField("Us_averagingModel", UsNext_)
+        );
     }
-
-    return tsource;
 }
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //

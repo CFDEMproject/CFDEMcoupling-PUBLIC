@@ -1,0 +1,256 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>forceModel_ShirgaonkarIB command &mdash; CFDEMcoupling v3.X documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="CFDEMcoupling v3.X documentation" href="index.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="CFDEMcoupling_Manual.html" class="icon icon-home"> CFDEMcoupling
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                v3.X
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <!-- Local TOC -->
+                <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">forceModel_ShirgaonkarIB command</a><ul>
+<li><a class="reference internal" href="#syntax">Syntax</a></li>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+<li><a class="reference internal" href="#description">Description</a></li>
+<li><a class="reference internal" href="#restrictions">Restrictions</a></li>
+<li><a class="reference internal" href="#related-commands">Related commands</a></li>
+</ul>
+</li>
+</ul>
+</div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="CFDEMcoupling_Manual.html">CFDEMcoupling</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="CFDEMcoupling_Manual.html">Docs</a> &raquo;</li>
+      
+    <li>forceModel_ShirgaonkarIB command</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        
+          <a href="http://www.cfdem.com"> Website</a>
+        
+      
+    </li>
+  </ul>
+  <hr/>
+  
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="forcemodel-shirgaonkarib-command">
+<span id="index-0"></span><h1>forceModel_ShirgaonkarIB command<a class="headerlink" href="#forcemodel-shirgaonkarib-command" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="syntax">
+<h2>Syntax<a class="headerlink" href="#syntax" title="Permalink to this headline">¶</a></h2>
+<p>Defined in couplingProperties dictionary.</p>
+<div class="highlight-python"><div class="highlight"><pre>forceModels
+(
+    ShirgaonkarIB
+);
+ShirgaonkarIBProps
+{
+    velFieldName &quot;U&quot;;
+    pressureFieldName &quot;p&quot;;
+    twoDimensional;
+    depth scalar1;
+    verbose switch1;
+    treatForceExplicit switch2;
+};
+</pre></div>
+</div>
+<ul class="simple">
+<li><em>U</em> = name of the finite volume fluid velocity field</li>
+<li><em>p</em> = name of the finite volume pressure field</li>
+<li><em>twoDimensional</em> = optional keyword for conducting a two dimensional calculation</li>
+<li><em>scalar1</em> = optional, only necessary if twoDimensional is active</li>
+<li><em>switch1</em> = (optional, default false) sub model switch, see <a class="reference internal" href="forceSubModel.html"><em>forceSubModel</em></a> for details</li>
+<li><em>switch2</em> = (optional, default false) sub model switch, see <a class="reference internal" href="forceSubModel.html"><em>forceSubModel</em></a> for details</li>
+</ul>
+</div>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre>forceModels
+(
+    ShirgaonkarIB
+);
+ShirgaonkarIBProps
+{
+    velFieldName &quot;U&quot;;
+    pressureFieldName &quot;p&quot;;
+}
+</pre></div>
+</div>
+</div>
+<div class="section" id="description">
+<h2>Description<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h2>
+<p>The force model performs the calculation of forces (e.g. fluid-particle interaction forces) acting on each DEM particle. The ShirgaonkarIB model calculates the drag force (viscous and pressure force) acting on each particle in a resolved manner (see Shirgaonkar et al. (2009): &#8220;A new mathematical formulation and fast algorithm for fully resolved simulation of self-propulsion&#8221;, Journal of Comp. Physics). This model is only suited for resolved CFD-DEM simulations where the particle is represented by immersed boundary method.</p>
+<p><strong>References:</strong></p>
+<p>SHIRGAONKAR, A.A., MACIVER, M.A. and PATANKAR, N.A., (2009), “A new mathematical formulation and fast algorithm for fully resolved simulation of self-propulsion”, J. Comput. Phys., 228, 2366-2390.</p>
+</div>
+<div class="section" id="restrictions">
+<h2>Restrictions<a class="headerlink" href="#restrictions" title="Permalink to this headline">¶</a></h2>
+<p>Only for immersed boundary solvers.</p>
+</div>
+<div class="section" id="related-commands">
+<h2>Related commands<a class="headerlink" href="#related-commands" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="forceModel.html"><em>forceModel</em></a></p>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, DCS Computing GmbH, JKU Linz.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'v3.X',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

@@ -1,0 +1,69 @@
+.. index:: forceModel_particleCellVolume
+
+forceModel_particleCellVolume command
+=====================================
+
+Syntax
+""""""
+
+Defined in couplingProperties dictionary.
+
+.. parsed-literal::
+
+   forceModels
+   (
+       particleCellVolume
+   );
+   particleCellVolumeProps
+   {
+       verbose switch1;
+       writeToFile switch2;
+       startTime number1;
+       upperThreshold number2;
+       lowerThreshold number3;
+       verbose;
+   };
+
+* *switch1* = (optional, default true) switch for output to screen
+* *switch2* = (optional, default false) switch for output to file
+* *number1* = (optional, default 0) start time of volume calculation and output
+* *number2* = only cells with a field value (magnitude) lower than this upper threshold are considered
+* *number3* = only cells with a field value (magnitude) greater than this lower threshold are considered
+
+
+Examples
+""""""""
+
+.. parsed-literal::
+
+   forceModels
+   (
+       particleCellVolume
+   );
+   particleCellVolumeProps
+   {
+       upperThreshold 0.999;
+       lowerThreshold 0;
+   }
+
+Description
+"""""""""""
+
+This "forceModel" does not influence the particles or the simulation - it is a postprocessing tool! The total volume of the particles as they are represented on the CFD mesh is calculated. Further the total volume of the cells particles are in is calculated.
+At "writeTime" a field named particleCellVolume , where scalarField is the name of the original field, is written. This can then be probed using standard function object probes. Analogously a field named cellVolume is written. Using the verbose option a screen output is given.
+
+Restrictions
+""""""""""""
+
+
+None.
+
+Related commands
+""""""""""""""""
+
+:doc:`forceModel <forceModel>`
+
+
+.. _liws: http://www.cfdem.com
+.. _ld: Manual.html
+.. _lc: Section_commands.html#comm

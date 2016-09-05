@@ -332,5 +332,30 @@ inline autoPtr<liggghtsCommandModel>* cfdemCloud::liggghtsCommand() const
 {
     return turbulence_;
 }
+
+inline void cfdemCloud::makeSpecific(volScalarField& field)
+{
+    forAll(field,cellI)
+        field[cellI] /= mesh_.V()[cellI];
+}
+
+inline void cfdemCloud::makeSpecific(volVectorField& field)
+{
+    forAll(field,cellI)
+        field[cellI] /= mesh_.V()[cellI];
+}
+
+inline void cfdemCloud::scaleWithVcell(volScalarField& field)
+{
+    forAll(field,cellI)
+        field[cellI] *= mesh_.V()[cellI];
+}
+
+inline void cfdemCloud::scaleWithVcell(volVectorField& field)
+{
+    forAll(field,cellI)
+        field[cellI] *= mesh_.V()[cellI];
+}
+
 }
 // ************************************************************************* //

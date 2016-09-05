@@ -1,0 +1,68 @@
+.. index:: forceModel_SchillerNaumannDrag
+
+forceModel_SchillerNaumannDrag command
+======================================
+
+Syntax
+""""""
+
+Defined in couplingProperties dictionary.
+
+.. parsed-literal::
+
+   forceModels
+   (
+       SchillerNaumannDrag
+   );
+   SchillerNaumannDragProps
+   {
+       velFieldName "U";
+       voidfractionFieldName "voidfraction";
+       interpolation "bool1";
+       voidfractionInterpolationType "type1"
+       UInterpolationType "type2"
+       implForceDEM "bool2";
+   };
+
+* *U* = name of the finite volume fluid velocity field
+* *voidfraction* = name of the finite volume voidfraction field
+* *bool1* = (optional, normally off) flag to use interpolated voidfraction and fluid velocity values
+* *type1* = (optional, default cellPoint) interpolation type for voidfraction field
+* *type2* = (optional, default cellPointFace) interpolation type for velocity field
+*bool2* = (optional, normally off) flag to use implicit formulation of drag on DEM side:l
+
+
+Examples
+""""""""
+
+.. parsed-literal::
+
+   forceModels
+   (
+       SchillerNaumannDrag
+   );
+   SchillerNaumannDragProps
+   {
+       velFieldName "U";
+   }
+
+Description
+"""""""""""
+
+The force model performs the calculation of forces (e.g. fluid-particle interaction forces) acting on each DEM particle. The SchillerNaumannDrag model is a model that calculates the particle based drag force following the correlation of Schiller and Naumann.
+
+Restrictions
+""""""""""""
+
+
+none.
+
+Related commands
+""""""""""""""""
+
+:doc:`forceModel <forceModel>`
+
+
+.. _liws: http://www.cfdem.com
+.. _ld: Manual.html
+.. _lc: Section_commands.html#comm

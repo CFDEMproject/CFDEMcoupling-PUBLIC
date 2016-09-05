@@ -76,6 +76,12 @@ void Foam::noSmoothing::smoothen(volScalarField& field) const
 void Foam::noSmoothing::smoothen(volVectorField& field) const
 {}
 
+void Foam::noSmoothing::smoothenAbsolutField(volScalarField& field) const
+{}
+
+void Foam::noSmoothing::smoothenAbsolutField(volVectorField& field) const
+{}
+
 void Foam::noSmoothing::smoothenReferenceField(volVectorField& field) const
 {}
 

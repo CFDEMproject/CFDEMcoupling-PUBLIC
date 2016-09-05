@@ -1,0 +1,39 @@
+.. index:: IOModel_sophIO
+
+IOModel_sophIO command
+======================
+
+Syntax
+""""""
+
+Defined in couplingProperties dictionary.
+
+.. parsed-literal::
+
+   IOModel "sophIO";
+
+Examples
+""""""""
+
+.. parsed-literal::
+
+   IOModel "sophIO";
+
+Description
+"""""""""""
+
+The sophIO-model is based on basicIO model and additionally writes voidfraction, implicit forces, explicit forces. Data is written every write time of the CFD simulation.
+
+Restrictions
+""""""""""""
+ None.
+
+Related commands
+""""""""""""""""
+
+:doc:`IOModel <IOModel>`
+
+
+.. _liws: http://www.cfdem.com
+.. _ld: Manual.html
+.. _lc: Section_commands.html#comm

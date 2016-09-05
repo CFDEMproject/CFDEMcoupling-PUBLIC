@@ -1,0 +1,39 @@
+.. index:: IOModel_trackIO
+
+IOModel_trackIO command
+=======================
+
+Syntax
+""""""
+
+Defined in couplingProperties dictionary.
+
+.. parsed-literal::
+
+   IOModel "trackIO";
+
+Examples
+""""""""
+
+.. parsed-literal::
+
+   IOModel "trackIO";
+
+Description
+"""""""""""
+
+The trackIO-model is based on sophIO model and additionally writes fields necessary to use the particleTracks utility (which needs a particleTrackProperties file in the constant dir). The particleTracks utility generates tracks of the particles and writes them to a vtk file.
+
+Restrictions
+""""""""""""
+ None.
+
+Related commands
+""""""""""""""""
+
+:doc:`IOModel <IOModel>`
+
+
+.. _liws: http://www.cfdem.com
+.. _ld: Manual.html
+.. _lc: Section_commands.html#comm

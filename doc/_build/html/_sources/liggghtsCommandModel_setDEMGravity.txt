@@ -1,0 +1,70 @@
+.. index:: liggghtsCommandModel_setDEMGravity
+
+liggghtsCommandModel_setDEMGravity command
+==========================================
+
+Syntax
+""""""
+
+Defined in liggghtsCommmands dictionary.
+
+liggghtsCommandModels
+(
+   setDEMGravity
+);
+
+.. parsed-literal::
+
+   setDEMGravityProps0
+   {
+       runFirst switch1;
+       startTime scalar1;
+       endTime scalar2;
+       timeInterval scalar3;
+       verbose;
+   }
+
+* *switch1* = switch (must be on!!!) to select if executed only first step.
+* *scalar1* = start time of command (use simulation start time)
+* *scalar2* = end time of command (use simulation start time)
+* *scalar3* = time interval of command (use 1.)
+  *verbose* = (normally off) for verbose run
+
+
+Examples
+""""""""
+
+.. parsed-literal::
+
+   liggghtsCommandModels
+   (
+      runLiggghts
+      setDEMGravity
+   );
+   setDEMGravityProps1
+   {
+       runFirst on;
+       startTime 0;
+       endTime 0;
+       timeInterval 1;
+       verbose;
+   }
+
+Description
+"""""""""""
+
+The liggghtsCommand models can be used to set LIGGGHTS gravity during a CFD run.
+
+Restrictions
+""""""""""""
+ None.
+
+Related commands
+""""""""""""""""
+
+:doc:`liggghtsCommandModel <liggghtsCommandModel>`
+
+
+.. _liws: http://www.cfdem.com
+.. _ld: Manual.html
+.. _lc: Section_commands.html#comm

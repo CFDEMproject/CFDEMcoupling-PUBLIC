@@ -1,0 +1,77 @@
+.. index:: forceModel_MeiLift
+
+forceModel_MeiLift command
+==========================
+
+Syntax
+""""""
+
+Defined in couplingProperties dictionary.
+
+.. parsed-literal::
+
+   forceModels
+   (
+       MeiLift
+   );
+   MeiLiftProps
+   {
+       velFieldName "U";
+       useSecondOrderTerms;
+       interpolation switch1;
+       vorticityInterpolationType "type1"
+       UInterpolationType "type2"
+       verbose switch2;
+       treatForceExplicit switch3;
+       scalarViscosity switch4;
+       nu scalar1;
+   };
+
+* *U* = name of the finite volume fluid velocity field
+* *useSecondOrderTerms* = switch to activate second order terms in the lift force model
+* *switch1* = switch to activate tri-linear interpolation of the flow quantities at the particle position
+* *type1* = (optional, default cellPoint) interpolation type for vorticity field
+* *type2* = (optional, default cellPointFace) interpolation type for velocity field
+* *switch2* = switch to activate the report of per-particle quantities to the screen
+* *switch3* = (optional, default true) sub model switch, see :doc:`forceSubModel <forceSubModel>` for details
+* *switch4* = (optional, default false) sub model switch, see :doc:`forceSubModel <forceSubModel>` for details
+* *scalar1* = optional, only if switch4 is true
+
+
+Examples
+""""""""
+
+.. parsed-literal::
+
+   forceModels
+   (
+       MeiLift
+   );
+   MeiLiftProps
+   {
+       velFieldName "U";
+       useSecondOrderTerms;
+       interpolation true;
+       verbose true;
+   }
+
+Description
+"""""""""""
+
+The force model performs the calculation of forces (e.g. fluid-particle interaction forces) acting on each DEM particle. The MeiLift model calculates the lift force for each particle based on Loth and Dorgan (2009). In case the keyword "useSecondOrderTerms" is not specified, this lift force model uses the expression of McLaughlin (1991, Journal of Fluid Mechanics 224:261-274).
+
+Restrictions
+""""""""""""
+
+
+None.
+
+Related commands
+""""""""""""""""
+
+:doc:`forceModel <forceModel>`
+
+
+.. _liws: http://www.cfdem.com
+.. _ld: Manual.html
+.. _lc: Section_commands.html#comm

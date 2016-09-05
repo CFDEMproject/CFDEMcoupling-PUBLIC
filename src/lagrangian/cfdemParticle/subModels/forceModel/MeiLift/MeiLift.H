@@ -82,9 +82,6 @@ private:
 
     bool useSecondOrderTerms_;
 
-    mutable scalar scaleDia_;
-    mutable scalar numParticlesParcel_;
-
 public:
 
     //- Runtime type information

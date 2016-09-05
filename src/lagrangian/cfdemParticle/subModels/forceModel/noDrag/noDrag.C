@@ -61,26 +61,19 @@ noDrag::noDrag
 )
 :
     forceModel(dict,sm),
-    propsDict_(dict),
-    verbose_(false),
-    noDEMForce_(false),
-    keepCFDForce_(false)
+    propsDict_(dict.subDict(typeName + "Props")),
+    noDEMForce_(propsDict_.lookupOrDefault("noDEMForce",false)),
+    keepCFDForce_(propsDict_.lookupOrDefault("keepCFDForce",false))
 {
-    if(dict.found(word(typeName + "Props")))
-        propsDict_=dictionary(dict.subDict(typeName + "Props"));
-
     // init force sub model
     setForceSubModels(propsDict_);
 
     // define switches which can be read from dict
     forceSubM(0).setSwitchesList(0,true); // activate treatExplicit
+    forceSubM(0).setSwitchesList(3,true); // activate search for verbose switch
 
     // read those switches defined above, if provided in dict
     forceSubM(0).readSwitches();
-
-    if (propsDict_.found("noDEMForce")) noDEMForce_=true;
-
-    if (propsDict_.found("keepCFDForce")) keepCFDForce_=true;
 
     coupleForce_=false;
 }
@@ -96,7 +89,13 @@ noDrag::~noDrag()
 
 void noDrag::setForce() const
 {
-    Info << "noDrag::setForce" << endl;
+    if(forceSubM(0).verbose())
+    {
+        Info << "noDrag::setForce:" << endl;
+        Info << "noDEMForce=" << noDEMForce_ << endl;
+        Info << "keepCFDForce=" << keepCFDForce_ << endl;
+    }
+
     label cellI=0;
     bool treatExplicit=forceSubM(0).switches()[0];
     for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)

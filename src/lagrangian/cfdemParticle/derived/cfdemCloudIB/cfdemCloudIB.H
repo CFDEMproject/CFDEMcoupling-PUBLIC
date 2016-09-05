@@ -64,6 +64,11 @@ protected:
     
     mutable bool haveEvolvedOnce_;
     mutable bool skipLagrangeToEulerMapping_;
+    mutable bool skipAfter_;
+    mutable int  timeStepsToSkip_;
+    mutable bool calculateTortuosity_;
+
+    vector flowDir_;
 
 public:
 
@@ -85,7 +90,7 @@ public:
 
         bool reAllocArrays() const;
     
-        bool evolve(volScalarField&);
+        bool evolve(volScalarField&,volScalarField&);
 
         void calcVelocityCorrection(volScalarField&,volVectorField&,volScalarField&,volScalarField&);
 
@@ -98,6 +103,10 @@ public:
         {
             return angularVelocities_;
         };
+        void setInterFace(volScalarField& interFace);
+
+        double getTortuosity(vector dir);
+
 };
 
 

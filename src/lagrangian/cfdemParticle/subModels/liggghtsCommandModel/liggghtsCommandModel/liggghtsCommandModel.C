@@ -73,7 +73,8 @@ liggghtsCommandModel::liggghtsCommandModel
     couplingStepInterval_(0),
     exactTiming_(false),
     commandLines_(1),
-    verbose_(false)
+    verbose_(false),
+    timeStamp_(false)
 {}
 
 
@@ -255,7 +256,10 @@ bool liggghtsCommandModel::checkPath(fileName path)
 }
 
 
-void liggghtsCommandModel::parseCommandList(wordList& commandList,labelList& labelList,scalarList& scalarList,word& command, dictionary& propsDict, bool timeStamp)
+void liggghtsCommandModel::parseCommandList(wordList& commandList,labelList& labelList,
+                                            scalarList& scalarList,
+                                            word& command, dictionary& propsDict, 
+                                            bool& timeStamp)
 {
     bool addBlank = true;  // std no blanks after each word
     fileName add;

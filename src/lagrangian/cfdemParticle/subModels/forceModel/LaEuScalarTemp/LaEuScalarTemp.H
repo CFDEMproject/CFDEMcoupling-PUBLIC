@@ -64,7 +64,7 @@ class LaEuScalarTemp
 :
     public forceModel
 {
-private:
+protected:
 
     dictionary propsDict_;
 
@@ -108,8 +108,6 @@ private:
 
     scalar Cp_;                                  // specific heat capacity [W*s/(kg*K)]
 
-    mutable scalar scaleDia_;
-
     void allocateMyArrays() const;
 
 public:
@@ -123,7 +121,8 @@ public:
         LaEuScalarTemp
         (
             const dictionary& dict,
-            cfdemCloud& sm
+            cfdemCloud& sm,
+            word name = word("")
         );
 
     // Destructor

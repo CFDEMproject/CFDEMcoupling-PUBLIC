@@ -1,0 +1,39 @@
+.. index:: IOModel_basicIO
+
+IOModel_basicIO command
+=======================
+
+Syntax
+""""""
+
+Defined in couplingProperties dictionary.
+
+.. parsed-literal::
+
+   IOModel "basicIO";
+
+Examples
+""""""""
+
+.. parsed-literal::
+
+   IOModel "basicIO";
+
+Description
+"""""""""""
+
+The basic IO-model writes particle positions velocities and radii to files. The default output directory ($casePath/CFD/proc*/time/lagrangian). Using the keyword "serialOutput;" in couplingProperties the IO is serial to the directory ($casePath/CFD/lagrangian). In the latter case only the data on processor 0 is written! Data is written every write time of the CFD simulation.
+
+Restrictions
+""""""""""""
+ None.
+
+Related commands
+""""""""""""""""
+
+:doc:`IOModel <IOModel>`
+
+
+.. _liws: http://www.cfdem.com
+.. _ld: Manual.html
+.. _lc: Section_commands.html#comm

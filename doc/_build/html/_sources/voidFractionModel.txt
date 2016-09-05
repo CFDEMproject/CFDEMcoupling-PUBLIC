@@ -1,0 +1,40 @@
+.. index:: voidfractionModel
+
+voidfractionModel command
+=========================
+
+Syntax
+""""""
+
+Defined in couplingProperties dictionary.
+
+.. parsed-literal::
+
+   voidfractionModel model;
+
+* model = name of the voidfractionModel to be applied
+
+Examples
+""""""""
+
+.. parsed-literal::
+
+   voidfractionModel centre;
+
+Note: This examples list might not be complete - please look for other models (voidfractionModel_XY) in this documentation.
+
+Description
+"""""""""""
+
+The voidfractionModel is the base class for models to represent the DEM particle's volume in the CFD domain via a voidfraction field.
+
+Restrictions
+""""""""""""
+ none.
+
+**Default:** none.
+
+
+.. _liws: http://www.cfdem.com
+.. _ld: Manual.html
+.. _lc: Section_commands.html#comm

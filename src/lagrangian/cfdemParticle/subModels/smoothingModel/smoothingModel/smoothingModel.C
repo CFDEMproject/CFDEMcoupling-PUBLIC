@@ -129,6 +129,34 @@ void smoothingModel::dSmoothing() const
     //dSmooth *= 0.0;
 }
 
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+void smoothingModel::smoothenAbsolutField(volScalarField& scalField) const
+{
+
+    //1 - First make the field volume-specific
+    particleCloud_.makeSpecific(scalField);
+
+    //2 - smoothen now the volume-specific field (the volume integral of this field will be conserved!)
+    smoothen(scalField);
+
+    //3 - Finally, make field absolute again
+    particleCloud_.scaleWithVcell(scalField);
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+void smoothingModel::smoothenAbsolutField(volVectorField& vecField) const
+{
+
+    //1 - First make the field volume-specific
+    particleCloud_.makeSpecific(vecField);
+
+    //2 - smoothen now the volume-specific field (the volume integral of this field will be conserved!)
+    smoothen(vecField);
+
+    //3 - Finally, make field absolute again
+    particleCloud_.scaleWithVcell(vecField);
+}
 } // End namespace Foam
 
 // ************************************************************************* //

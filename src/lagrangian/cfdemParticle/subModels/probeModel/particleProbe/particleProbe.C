@@ -110,21 +110,28 @@ particleProbe::~particleProbe()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void particleProbe::setOutputFile() const
+void particleProbe::setOutputFile(const word& logFileName) const
 {
-    if(itemCounter_>0)
+    bool foundFile = false;
+    if(itemCounter_>0 && verboseToFile_ )
     {
-        //set the current item ID
-        if(currItemId_== itemCounter_)
-            currItemId_=1;
-        else
-            currItemId_+=1;
-        sPtr = sPtrList_[currItemId_-1]; //set the pointer to the output file from list
-        probeIndex_=currItemId_-1;
+        forAll(itemsToSample_, iterator)
+        {
+            if(itemsToSample_[iterator] == logFileName)
+            {
+                probeIndex_ = iterator ;
+                foundFile = true;
+            }
+        }
+
+        if(!foundFile)
+             FatalError <<  "particleProbe::setOutputFile for logFileName " <<  logFileName << " : "<< "File not found" << abort(FatalError);
+        currItemId_ = probeIndex_ + 1;
+        setCounter(); //set counter, will auto-check if first item
     }
 }
 
-
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 void particleProbe::initialize(const word& modelName,const word& logFileName) const
 {
   //update the list of items to be sampled
@@ -157,9 +164,10 @@ void particleProbe::initialize(const word& modelName,const word& logFileName) co
     MPI_Comm_rank(MPI_COMM_WORLD,&rank_);
 
     //open a separate file for each processor
-    char* filecurrent_ = new char[strlen(fileNameOut_) + 4]; //reserve 4 chars for processor name
+    char* filecurrent_ = new char[strlen(fileNameOut_) + 5]; //reserve 4 chars for processor name
     sprintf(filecurrent_,"%s%s%d", fileNameOut_, ".", rank_);
-     Info << "particleProbe for model " <<  name_ << " will write to file " << filecurrent_ << endl;
+    Info << "particleProbe for model " <<  name_ << " will write to file " << filecurrent_ 
+         << ". This is item " << itemCounter_ << " to probe." << endl;
 
       //generate the file streams
       fileName probeSubDir = dirName_;
@@ -196,8 +204,9 @@ void particleProbe::initialize(const word& modelName,const word& logFileName) co
 
   Info << "particleProbe::initialize done!" << endl;
   return;
-
 }
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 void particleProbe::writeHeader() const
 {
 
@@ -230,6 +239,7 @@ void particleProbe::writeHeader() const
 
 }
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 void particleProbe::clearProbes() const
 {
 
@@ -256,6 +266,7 @@ void particleProbe::clearProbes() const
   vProbes_.clear();
 }
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 void particleProbe::updateProbes(int index, Field<scalar> sValues, Field<vector> vValues) const
 {
   //check if the particle already has an allocated vector. If not, create it. It should be only called at the beginning. 
@@ -299,16 +310,18 @@ void particleProbe::updateProbes(int index, Field<scalar> sValues, Field<vector>
   }
 }
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 void particleProbe::writeProbe(int index, Field<scalar> sValues, Field<vector> vValues) const
 {
     updateProbes(index,sValues,vValues); //update probe vectors
    
     if(printNow_ && checkIDForPrint(index) &&  verboseToFile_) 
     {
+        sPtr = sPtrList_[probeIndex_]; //set the pointer to the output file from list
 
         //index and time
-       *sPtr <<    setprecision(IOstream::defaultPrecision()+7) ;
-       *sPtr << index  << tab 
+        *sPtr <<    setprecision(IOstream::defaultPrecision()+7) ;
+        *sPtr << index  << tab 
                 << particleCloud_.mesh().time().value()  << "   " ;
         *sPtr << "||   ";
         
@@ -341,13 +354,13 @@ void particleProbe::writeProbe(int index, Field<scalar> sValues, Field<vector> v
                       << endl;
         }
         else *sPtr << endl;
-
     }
     
     return;
     
 }
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 bool particleProbe::checkIDForPrint(int index) const
 {
   
@@ -363,6 +376,7 @@ bool particleProbe::checkIDForPrint(int index) const
       return sampleThisId_;
 }
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 void particleProbe::setCounter() const
 {
 
@@ -370,7 +384,7 @@ void particleProbe::setCounter() const
     //Do only if called by first item in the list of items!
     if(currItemId_==1)
     {
-        printCounter_++;
+       printCounter_++;
        if(printOnlyAt_==-1)
        {
         if(  printCounter_ >= printEvery_ )
@@ -393,7 +407,6 @@ void particleProbe::setCounter() const
     return;    
 
 }
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam

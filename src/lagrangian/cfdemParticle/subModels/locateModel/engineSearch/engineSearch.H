@@ -57,17 +57,13 @@ class engineSearch
     public locateModel
 {
 
-private:
+protected:
 
     dictionary propsDict_;
 
-    //Switch faceDecomp_;
-
     Switch treeSearch_;
 
-protected:
-
-    meshSearch searchEngine_;
+    mutable meshSearch searchEngine_;
 
 public:
 
@@ -81,7 +77,8 @@ public:
         engineSearch
         (
             const dictionary& dict,
-            cfdemCloud& sm
+            cfdemCloud& sm,
+            word name = word("")
         );
 
     // Destructor
@@ -90,7 +87,7 @@ public:
 
 
     // Member Functions
-        label findCell
+        virtual label findCell
         (
             double** const& mask,
             double**& positions,

@@ -59,13 +59,31 @@ cfdemCloudIB::cfdemCloudIB
     pRefCell_(readLabel(mesh.solutionDict().subDict("PISO").lookup("pRefCell"))),
     pRefValue_(readScalar(mesh.solutionDict().subDict("PISO").lookup("pRefValue"))),
     haveEvolvedOnce_(false),
-    skipLagrangeToEulerMapping_(false)
+    skipLagrangeToEulerMapping_(false),
+    skipAfter_(false),
+    timeStepsToSkip_(0),
+    calculateTortuosity_(false)
 {
-
     if(this->couplingProperties().found("skipLagrangeToEulerMapping"))
     {
         Info << "Will skip lagrange-to-Euler mapping..." << endl;
         skipLagrangeToEulerMapping_=true;
+    }
+    if(this->couplingProperties().found("timeStepsBeforeSkipping"))
+    {
+        skipAfter_=true;
+        timeStepsToSkip_ =  readScalar
+        (
+            this->couplingProperties().lookup("timeStepsBeforeSkipping")
+        );
+        Info << "Will skip LagrangeToEuler mapping after " << timeStepsToSkip_ << " time steps" <<  endl;
+    }
+    if(this->couplingProperties().found("tortuosity"))
+    {
+        calculateTortuosity_ = true;
+        flowDir_ = this->couplingProperties().subDict("tortuosity").lookup("flowDirection");
+        flowDir_ = flowDir_ / mag(flowDir_);
+        Info << "Will calculate tortuosity in the mean flow direction ("<<flowDir_[0]<<" "<<flowDir_[1]<<" "<<flowDir_[2]<<")"<< endl;
     }
 }
 
@@ -100,12 +118,18 @@ bool Foam::cfdemCloudIB::reAllocArrays() const
 
 bool Foam::cfdemCloudIB::evolve
 (
-    volScalarField& alpha
+    volScalarField& alpha,
+    volScalarField& interFace
 )
 {
     numberOfParticlesChanged_ = false;
     arraysReallocated_=false;
     bool doCouple=false;
+
+    if(skipAfter_) {
+      if(timeStepsToSkip_<1)
+        skipLagrangeToEulerMapping_=true;
+    }
 
     if (dataExchangeM().doCoupleNow())
     {
@@ -130,10 +154,14 @@ bool Foam::cfdemCloudIB::evolve
             if(verbose_) Info << "- setvoidFraction()" << endl;
             voidFractionM().setvoidFraction(NULL,voidfractions_,particleWeights_,particleVolumes_,particleV_);
             if(verbose_) Info << "setvoidFraction done." << endl;
+
+            Info <<"SetInterFace"<<endl;
+            setInterFace(interFace);
+            Info <<"SetInterFace done"<<endl;
         }
 
         // update voidFractionField
-        alpha.internalField() = voidFractionM().voidFractionNext().internalField(); // there might be a better approach, see cfdemCloud.C
+        alpha == voidFractionM().voidFractionNext(); // there might be a better approach, see cfdemCloud.C
         alpha.correctBoundaryConditions();
 
         // set particles forces
@@ -162,8 +190,45 @@ bool Foam::cfdemCloudIB::evolve
 
     // do particle IO
     IOM().dumpDEMdata();
+    if(skipAfter_)
+    {
+        timeStepsToSkip_--;
+        Info << "Will skip LagrangeToEuler mapping after " << timeStepsToSkip_ << " time steps" <<  endl;
+    }
 
     return doCouple;
+}
+
+void Foam::cfdemCloudIB::setInterFace
+(
+    volScalarField& interFace
+)
+{
+    interFace == dimensionedScalar("zero", interFace.dimensions(), 0.);
+    for(int par=0; par< numberOfParticles(); par++)
+    {
+        vector ParPos(positions()[par][0],positions()[par][1],positions()[par][2]);
+        const boundBox& globalBb = mesh().bounds();
+        double skin = 2.0;
+        forAll(mesh_.C(),cellI)
+        {
+            vector posC = mesh_.C()[cellI];
+            if(checkPeriodicCells_)
+            {
+                // Some cells may be located on the other side of a periodic boundary.
+                // In this case, the particle center has to be mirrored in order to correctly
+                // evaluate the interpolation points.
+                vector minPeriodicParticlePos=ParPos;
+                voidFractionM().minPeriodicDistance(par,posC, ParPos, globalBb, minPeriodicParticlePos);
+                ParPos = minPeriodicParticlePos;
+            }
+            double aaa2 = voidFractionM().pointInParticle(par, ParPos, posC, skin);
+            if(aaa2 <= 0.0)
+            {
+                interFace[cellI] = aaa2 + 1.0;
+            }
+        }
+    }
 }
 
 void Foam::cfdemCloudIB::calcVelocityCorrection
@@ -241,6 +306,31 @@ vector Foam::cfdemCloudIB::angularVelocity(int index)
     vector vel;
     for(int i=0;i<3;i++) vel[i] = angularVelocities_[index][i]; 
     return vel;
+}
+
+double Foam::cfdemCloudIB::getTortuosity(vector dir)
+{
+    volVectorField U = mesh_.lookupObject<volVectorField>("U");
+    volScalarField voidfraction = mesh_.lookupObject<volScalarField>("voidfraction");
+    double ux = 0.0;
+    double umag = 0.0;
+    forAll(mesh_.V(),cellI)
+    {
+        if(voidfraction[cellI] > 0.5)
+        {
+            double V = mesh_.V()[cellI];
+            ux += ((U[cellI] & dir))*V;
+            umag += mag(U[cellI])*V;
+        }
+    }
+    //double ux_reduced = 0.0;
+    //double umag_reduced = 0.0;
+    //MPI_Allreduce(&ux, &ux_reduced, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+    //MPI_Allreduce(&umag, &umag_reduced, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+    reduce(umag, sumOp<scalar>());
+    reduce(ux, sumOp<scalar>());
+    double tortuosity = ux == 0.0 ? 1.0 : umag / ux;
+    return tortuosity;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

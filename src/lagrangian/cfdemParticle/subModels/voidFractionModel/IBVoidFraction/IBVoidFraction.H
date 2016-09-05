@@ -64,12 +64,10 @@ private:
 
         const scalar alphaMin_;          //NP min value of voidFraction
 
-	mutable bool alphaLimited_;
+        mutable bool alphaLimited_;
 
         const scalar scaleUpVol_;        //NP scaling radius, keeping volume of particle
         
-    	mutable bool checkPeriodicCells_;
-
 public:
 
     //- Runtime type information
@@ -95,22 +93,15 @@ public:
 
         void buildLabelHashSet
         (
-            const scalar radius,
+            int index,
             const vector position,
             const label cellID,
             labelHashSet& hashSett,
             bool          initialInsert
         ) const;
         
-        double minPeriodicDistance
-        (
-            vector    cellCentrePosition, 
-            vector    positionCenter, 
-            boundBox  globalBb,
-            vector&   minPeriodicPos
-        ) const;
-        
-        
+
+        virtual double segmentParticleIntersection(int index, vector positionCenter, vector pointInside, vector pointOutside) const;
 };
 
 

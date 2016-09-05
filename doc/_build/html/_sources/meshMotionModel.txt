@@ -1,0 +1,40 @@
+.. index:: meshMotionModel
+
+meshMotionModel command
+=======================
+
+Syntax
+""""""
+
+Defined in couplingProperties dictionary.
+
+.. parsed-literal::
+
+   meshMotionModel model;
+
+* model = name of the meshMotionModel to be applied
+
+Examples
+""""""""
+
+.. parsed-literal::
+
+   meshMotionModel noMeshMotion;
+
+Note: This examples list might not be complete - please look for other models (meshMotionModel_XY) in this documentation.
+
+Description
+"""""""""""
+
+The meshMotionModel is the base class for models which manipulate the CFD mesh according to the DEM mesh motion.
+
+Restrictions
+""""""""""""
+ none.
+
+**Default:** none.
+
+
+.. _liws: http://www.cfdem.com
+.. _ld: Manual.html
+.. _lc: Section_commands.html#comm

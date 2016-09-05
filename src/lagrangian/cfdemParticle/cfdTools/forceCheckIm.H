@@ -1,4 +1,9 @@
 //calc. total implicit force
-vector fImpTotal = sum(mesh.V()*Ksl.internalField()*(Us.internalField()-U.internalField()));
-reduce(fImpTotal, sumOp<vector>());
-Info << "TotalForceImp: " << fImpTotal << endl;
+volVectorField fImp(Ksl*(Us-U));
+particleCloud.scaleWithVcell(fImp);
+dimensionedVector fImpTotal = gSum(fImp);
+//                                      mesh.V()
+//                                    * Ksl.internalField()
+//                                    * ( Us.internalField() - U.internalField() )
+//                                  );
+Info << "TotalForceImp:  " << fImpTotal.value() << endl;

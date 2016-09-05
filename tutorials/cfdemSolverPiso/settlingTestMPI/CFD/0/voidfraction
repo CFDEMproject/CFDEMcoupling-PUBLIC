@@ -20,7 +20,7 @@ internalField   uniform 1;
 
 boundaryField
 {
-    "(inlet|outlet|walls)"
+    ".*"
     {
         type            zeroGradient;
         value           uniform 1;

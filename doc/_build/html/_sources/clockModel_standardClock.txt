@@ -1,0 +1,41 @@
+.. index:: clockModel_standardClock
+
+clockModel_standardClock command
+================================
+
+Syntax
+""""""
+
+Defined in couplingProperties dictionary.
+
+.. parsed-literal::
+
+   clockModel standardClock;
+
+Examples
+""""""""
+
+.. parsed-literal::
+
+   clockModel standardClock;
+
+Description
+"""""""""""
+
+The "standardClock" model is a basic clockModel model which measures the run time between every ".start(int arrayPos,string name)" and ".stop(string name)" statement placed in the code. If a ".start(name)" is called more than once (e.g. in a loop) the accumulated times are calculated.  After the simulation has finished, the data is stored in $caseDir/CFD/clockData/$startTime/*.txt .
+Since the measurements are stored in an array, it is necessary to put a variable *arrayPos* (type integer) at the start command. Those do not need to be in ascending order and positions may be omitted. The standard size of this array is 30 and can be changed at the initialization of the standardClock class. If *arrayPos* is out of bounds, the array size will be doubled. The stop command does not need *arrayPos*, since the class remembers the positions. The string name is intended for easier evaluation afterwards an may be omitted like ".start(int arrayPos)" and ".stop()". The command ".stop(string name)" is a safety feature, because if the name is not equal to the started name, output will be produced for information.
+After the case ran you may use the matPlot.py script located in $CFDEM_UT_DIR/vizClock/ to produce a graphical output of your measurements. The usage is like 'python < matPlot.py' and you have to be in the directory of the desired time step, where there is a file called "timeEvalFull.txt", which contains averaged and maximum data with respect to the number of processes. There is an alias called "vizClock" to run this python routine for visualizing the data.
+
+Restrictions
+""""""""""""
+ none.
+
+Related commands
+""""""""""""""""
+
+:doc:`clockModel <clockModel>`
+
+
+.. _liws: http://www.cfdem.com
+.. _ld: Manual.html
+.. _lc: Section_commands.html#comm

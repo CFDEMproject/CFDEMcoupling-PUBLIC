@@ -1,0 +1,85 @@
+.. index:: forceModel_DiFeliceDrag
+
+forceModel_DiFeliceDrag command
+===============================
+
+Syntax
+""""""
+
+Defined in couplingProperties dictionary.
+
+.. parsed-literal::
+
+   forceModels
+   (
+       DiFeliceDrag
+   );
+   DiFeliceDragProps
+   {
+       velFieldName "U";
+       voidfractionFieldName "voidfraction";
+       granVelFieldName "Us";
+       interpolation switch1;
+       voidfractionInterpolationType "type1";
+       UInterpolationType "type2";
+       suppressProbe       switch2;
+       scale               scalar1;
+       scaleDrag           scalar2;
+       treatForceExplicit  switch3;
+       implForceDEM        switch4;
+       verbose             switch5;
+       scalarViscosity     switch6;
+       nu                  scalar3;
+   };
+
+* *U* = name of the finite volume fluid velocity field
+* *voidfraction* = name of the finite volume voidfraction field
+* *Us* = name of the finite volume granular velocity field
+* *switch1* = (optional, normally off) flag to use interpolated voidfraction and velocity values
+* *type1* = (optional, default cellPoint) interpolation type for voidfraction field
+* *type2* = (optional, default cellPointFace) interpolation type for velocity field
+* *switch2* = (optional, default false) can be used to suppress the output of the probe model
+* *scalar1* = (optional) scaling of particle diameter
+* *scalar2* = (optional) scaling of drag law
+* *switch3* = sub model switch, see :doc:`forceSubModel <forceSubModel>` for details
+* *switch4* = sub model switch, see :doc:`forceSubModel <forceSubModel>` for details
+* *switch5* = sub model switch, see :doc:`forceSubModel <forceSubModel>` for details
+* *switch6* = sub model switch, see :doc:`forceSubModel <forceSubModel>` for details
+* *scalar3* = optional, only if switch6 is true
+
+
+Examples
+""""""""
+
+.. parsed-literal::
+
+   forceModels
+   (
+       DiFeliceDrag
+   );
+   DiFeliceDragProps
+   {
+       velFieldName "U";
+       interpolation true;
+   }
+
+Description
+"""""""""""
+
+The force model performs the calculation of forces (e.g. fluid-particle interaction forces) acting on each DEM particle. The DiFeliceDrag model is a model that calculates the particle based drag force following the correlation of Di Felice (see Zhou et al. (2010), JFM).
+
+Restrictions
+""""""""""""
+
+
+none.
+
+Related commands
+""""""""""""""""
+
+:doc:`forceModel <forceModel>`
+
+
+.. _liws: http://www.cfdem.com
+.. _ld: Manual.html
+.. _lc: Section_commands.html#comm

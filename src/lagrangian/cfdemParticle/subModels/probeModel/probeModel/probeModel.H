@@ -134,7 +134,7 @@ public:
     // Member Functions
 
     virtual void initialize(const word& modelName, const word& logFileName) const {};
-    virtual void setOutputFile() const {};
+    virtual void setOutputFile(const word& logFileName) const {};
     virtual void writeHeader() const {};
     virtual void writeProbe(int index, Field<scalar> sValues, Field<vector> vValues) const {};
     virtual bool checkIDForPrint(int) const {return false;};

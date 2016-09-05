@@ -67,16 +67,14 @@ DiFeliceDrag::DiFeliceDrag
     voidfractionFieldName_(propsDict_.lookup("voidfractionFieldName")),
     voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
     UsFieldName_(propsDict_.lookup("granVelFieldName")),
-    UsField_(sm.mesh().lookupObject<volVectorField> (UsFieldName_)),
-    scaleDia_(1.),
-    scaleDrag_(1.)
+    UsField_(sm.mesh().lookupObject<volVectorField> (UsFieldName_))
 {
     // suppress particle probe
     if (probeIt_ && propsDict_.found("suppressProbe"))
         probeIt_=!Switch(propsDict_.lookup("suppressProbe"));
     if(probeIt_)
     {
-        particleCloud_.probeM().initialize(typeName, "diFeliceDrag.logDat");
+        particleCloud_.probeM().initialize(typeName, typeName+".logDat");
         particleCloud_.probeM().vectorFields_.append("dragForce"); //first entry must the be the force
         particleCloud_.probeM().vectorFields_.append("Urel");        //other are debug
         particleCloud_.probeM().scalarFields_.append("Rep");          //other are debug
@@ -86,10 +84,6 @@ DiFeliceDrag::DiFeliceDrag
     }
 
     particleCloud_.checkCG(true);
-    if (propsDict_.found("scale"))
-        scaleDia_=scalar(readScalar(propsDict_.lookup("scale")));
-    if (propsDict_.found("scaleDrag"))
-        scaleDrag_=scalar(readScalar(propsDict_.lookup("scaleDrag")));
 
     // init force sub model
     setForceSubModels(propsDict_);
@@ -117,13 +111,6 @@ DiFeliceDrag::~DiFeliceDrag()
 
 void DiFeliceDrag::setForce() const
 {
-    if (scaleDia_ > 1)
-        Info << typeName << " using scale = " << scaleDia_ << endl;
-    else if (particleCloud_.cg() > 1){
-        scaleDia_=particleCloud_.cg();
-        Info << typeName << " using scale from liggghts cg = " << scaleDia_ << endl;
-    }
-
     const volScalarField& nufField = forceSubM(0).nuField();
     const volScalarField& rhoField = forceSubM(0).rhoField();
 
@@ -141,6 +128,7 @@ void DiFeliceDrag::setForce() const
     vector Us(0,0,0);
     vector Ur(0,0,0);
     scalar ds(0);
+    scalar dParcel(0);
     scalar nuf(0);
     scalar rho(0);
     scalar magUr(0);
@@ -165,6 +153,11 @@ void DiFeliceDrag::setForce() const
                     position = particleCloud_.position(index);
                     voidfraction = voidfractionInterpolator_().interpolate(position,cellI);
                     Ufluid = UInterpolator_().interpolate(position,cellI);
+
+                    //Ensure interpolated void fraction to be meaningful
+                    // Info << " --> voidfraction: " << voidfraction << endl;
+                    if(voidfraction>1.00) voidfraction = 1.00;
+                    if(voidfraction<0.30) voidfraction = 0.30;
                 }else
                 {
                     voidfraction = voidfraction_[cellI];
@@ -172,12 +165,15 @@ void DiFeliceDrag::setForce() const
                 }
 
                 Us = particleCloud_.velocity(index);
+                ds = 2*particleCloud_.radius(index);
+                dParcel = ds;
+                forceSubM(0).scaleDia(ds); //caution: this fct will scale ds!
 
                 //Update any scalar or vector quantity
                 for (int iFSub=0;iFSub<nrForceSubModels();iFSub++)
-                      forceSubM(iFSub).update(  scaleDia_, 
-                                                index, 
-                                                cellI, 
+                      forceSubM(iFSub).update(  index, 
+                                                cellI,
+                                                ds,
                                                 Ufluid, 
                                                 Us, 
                                                 nuf,
@@ -186,7 +182,6 @@ void DiFeliceDrag::setForce() const
                                              );
 
                 Ur = Ufluid-Us;
-                ds = 2*particleCloud_.radius(index);
                 nuf = nufField[cellI];
                 rho = rhoField[cellI];
                 magUr = mag(Ur);
@@ -198,7 +193,7 @@ void DiFeliceDrag::setForce() const
                 {
 
                     // calc particle Re Nr
-                    Rep = ds/scaleDia_*voidfraction*magUr/(nuf+SMALL);
+                    Rep = ds*voidfraction*magUr/(nuf+SMALL);
 
                     // calc fluid drag Coeff
                     Cd = sqr(0.63 + 4.8/sqrt(Rep));
@@ -209,13 +204,13 @@ void DiFeliceDrag::setForce() const
                     // calc particle's drag
                     dragCoefficient = 0.125*Cd*rho
                                      *M_PI
-                                     *ds*ds     
-                                     *scaleDia_ 
-                                     *pow(voidfraction,(2-Xi))*magUr
-                                     *scaleDrag_;
+                                     *ds*ds      
+                                     *pow(voidfraction,(2-Xi))*magUr;
+
                     if (modelType_=="B")
                         dragCoefficient /= voidfraction;
 
+                    forceSubM(0).scaleCoeff(dragCoefficient,dParcel);
                     drag = dragCoefficient*Ur; //total drag force!
 
                     // explicitCorr
@@ -231,15 +226,16 @@ void DiFeliceDrag::setForce() const
                 if(forceSubM(0).verbose() && index >-1 && index <102)
                 {
                     Pout << "index = " << index << endl;
-                    Pout << "scaleDrag_ = " << scaleDrag_ << endl;
                     Pout << "Us = " << Us << endl;
                     Pout << "Ur = " << Ur << endl;
-                    Pout << "ds/scale = " << ds/scaleDia_ << endl;
+                    Pout << "dprim = " << ds << endl;
+                    Pout << "dParcel = " << dParcel << endl;
                     Pout << "rho = " << rho << endl;
                     Pout << "nuf = " << nuf << endl;
                     Pout << "voidfraction = " << voidfraction << endl;
                     Pout << "Rep = " << Rep << endl;
                     Pout << "Cd = " << Cd << endl;
+                    Pout << "dragCoefficient = " << dragCoefficient << endl;
                     Pout << "drag (total) = " << drag << endl;
                 }
 

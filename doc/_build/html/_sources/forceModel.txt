@@ -1,0 +1,57 @@
+.. index:: forceModel
+
+forceModel command
+==================
+
+Syntax
+""""""
+
+Defined in couplingProperties dictionary.
+
+.. parsed-literal::
+
+   forceModels
+   (
+       model_x
+       model_y
+   );
+
+* model = name of force model to be applied
+
+Examples
+""""""""
+
+.. parsed-literal::
+
+   forceModels
+   (
+       Archimedes
+       DiFeliceDrag
+   );
+
+Note: This examples list might not be complete - please look for other models (forceModel_XY) in this documentation.
+
+Description
+"""""""""""
+
+The force model performs the calculation of forces (e.g. fluid-particle interaction forces) acting on each DEM particle. All force models selected are executed sequentially and the forces on the particles are superposed. If the fluid density field is needed, by default a field named "rho" will be used. Via the forceSubModel an alternative field can be chosen.
+
+Restrictions
+""""""""""""
+
+
+Most force models are ready to be used with coarse graining. If any force model used in the simulation is not ready for coarse graining, but is used with coarse graining, a warning is written to the terminal (log file). Setting a flag "cgWarnOnly false;" in coupling properties, the simulation will be stopped if there is a violation.
+
+Related commands
+""""""""""""""""
+
+:doc:`Archimedes <forceModel_Archimedes>`, :doc:`DiFeliceDrag <forceModel_DiFeliceDrag>`, :doc:`gradPForce <forceModel_gradPForce>`, :doc:`viscForce <forceModel_viscForce>`
+
+Note: This examples list may be incomplete - please look for other models (forceModel_XY) in this documentation.
+
+**Default:** none.
+
+
+.. _liws: http://www.cfdem.com
+.. _ld: Manual.html
+.. _lc: Section_commands.html#comm

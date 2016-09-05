@@ -1,0 +1,65 @@
+.. index:: forceModel_ArchimedesIB
+
+forceModel_ArchimedesIB command
+===============================
+
+Syntax
+""""""
+
+Defined in couplingProperties dictionary.
+
+.. parsed-literal::
+
+   forceModels
+   (
+       ArchimedesIB
+   );
+   ArchimedesIBProps
+   {
+       gravityFieldName "gravity";
+       voidfractionFieldName "voidfraction";
+       twoDimensional;
+       treatForceExplicit  switch1;
+   };
+
+* *gravity* = name of the finite volume gravity field
+* *voidfraction* = name of the finite volume voidfraction field
+* *twoDimensional* = optional keyword for conducting a two dimensional calculation
+* *switch1* = (optional, default true) sub model switch, see :doc:`forceSubModel <forceSubModel>` for details
+
+
+Examples
+""""""""
+
+.. parsed-literal::
+
+   forceModels
+   (
+       ArchimedesIB
+   );
+   ArchimedesIBProps
+   {
+       gravityFieldName "g";
+       voidfractionFieldName "voidfractionNext";
+   }
+
+Description
+"""""""""""
+
+The force model performs the calculation of forces (e.g. fluid-particle interaction forces) acting on each DEM particle. The ArchimedesIB model is a model that calculates the ArchimedesIB' volumetric lift force stemming from density difference of fluid and particle. This model is especially suited for resolved CFD-DEM simulations where the particle is represented by immersed boundary method.
+
+Restrictions
+""""""""""""
+
+
+Only for immersed boundary solvers.
+
+Related commands
+""""""""""""""""
+
+:doc:`forceModel <forceModel>`
+
+
+.. _liws: http://www.cfdem.com
+.. _ld: Manual.html
+.. _lc: Section_commands.html#comm

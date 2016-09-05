@@ -44,6 +44,7 @@ Description
 #include "clockModel.H"
 #include "smoothingModel.H"
 #include "liggghtsCommandModel.H"
+#include "cyclicPolyPatch.H"
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 Foam::cfdemCloud::cfdemCloud
@@ -78,6 +79,7 @@ Foam::cfdemCloud::cfdemCloud
     solveScalarTransport_(true),
     verbose_(false),
     debug_(false),
+    allowCFDsubTimestep_(true),
     ignore_(false),
     modelType_(couplingProperties_.lookup("modelType")),
     positions_(NULL),
@@ -94,6 +96,7 @@ Foam::cfdemCloud::cfdemCloud
     particleWeights_(NULL),
     particleVolumes_(NULL),
     particleV_(NULL),
+    dragPrev_(NULL),
     numberOfParticles_(0),
     d32_(-1),
     numberOfParticlesChanged_(false),
@@ -110,7 +113,6 @@ Foam::cfdemCloud::cfdemCloud
     imExSplitFactor_(1.0),
     treatVoidCellsAsExplicitForce_(false),
     useDDTvoidfraction_("off"),
-    dragPrev_(NULL),
     ddtVoidfraction_
     (   
         IOobject
@@ -124,6 +126,7 @@ Foam::cfdemCloud::cfdemCloud
         mesh,
         dimensionedScalar("zero", dimensionSet(0,0,-1,0,0), 0)  // 1/s
     ),
+    checkPeriodicCells_(false),
     turbulence_
     (
         #if defined(version24Dev)
@@ -261,6 +264,8 @@ Foam::cfdemCloud::cfdemCloud
     averagingM().applyDebugSettings(debugMode());
     //--
 
+    dataExchangeM().setCG();
+
     Info << "If BC are important, please provide volScalarFields -imp/expParticleForces-" << endl;
     if (couplingProperties_.found("solveFlow"))
         solveFlow_=Switch(couplingProperties_.lookup("solveFlow"));
@@ -268,6 +273,14 @@ Foam::cfdemCloud::cfdemCloud
         solveScalarTransport_=Switch(couplingProperties_.lookup("solveScalarTransport"));
     if (couplingProperties_.found("imExSplitFactor"))
         imExSplitFactor_ = readScalar(couplingProperties_.lookup("imExSplitFactor"));
+
+    if(imExSplitFactor_>1.0)
+            FatalError  << "You have set imExSplitFactor > 1 in your couplingProperties. Must be <=1."
+                       << abort(FatalError);
+    if(imExSplitFactor_<0.0)
+            FatalError  << "You have set imExSplitFactor < 0 in your couplingProperties. Must be >=0"
+                       << abort(FatalError);
+
     if (couplingProperties_.found("treatVoidCellsAsExplicitForce"))
         treatVoidCellsAsExplicitForce_ = readBool(couplingProperties_.lookup("treatVoidCellsAsExplicitForce"));
     if (couplingProperties_.found("verbose")) verbose_=true;
@@ -332,8 +345,41 @@ Foam::cfdemCloud::cfdemCloud
         );
     }
 
-    dataExchangeM().setCG();
-    if (!cgOK_ && cg_ > 1) FatalError<< "at least one of your models is not fit for cg !!!"<< abort(FatalError); 
+    Switch cgWarnOnly_(couplingProperties_.lookupOrDefault<Switch>("cgWarnOnly", true));
+    if (!cgOK_ && cg_ > 1)
+    {
+        if(cgWarnOnly_)
+            Warning<< "at least one of your models is not fit for cg !!!"<< endl; 
+        else
+            FatalError<< "at least one of your models is not fit for cg !!!"<< abort(FatalError); 
+    }
+
+    // check if sim is fully peridic box
+    const polyBoundaryMesh& patches = mesh_.boundaryMesh();
+    int nPatchesCyclic(0);
+    int nPatchesNonCyclic(0);
+    forAll(patches, patchI)
+    {
+        const polyPatch& pp = patches[patchI];
+        #if defined(versionExt32)
+        if (isA<cyclicPolyPatch>(pp))
+            nPatchesCyclic++;
+        else if (!isA<processorPolyPatch>(pp))
+            nPatchesNonCyclic++;
+        #else
+        if (isA<cyclicPolyPatch>(pp) || isA<cyclicAMIPolyPatch>(pp))
+            nPatchesCyclic++;
+        else if (!isA<processorPolyPatch>(pp))
+            nPatchesNonCyclic++;
+        #endif
+    }
+    if(nPatchesNonCyclic==0)
+        checkPeriodicCells_=true;
+    if(nPatchesCyclic>0 && nPatchesNonCyclic>0)
+    {
+        if(verbose_) Info << "nPatchesNonCyclic=" << nPatchesNonCyclic << ", nPatchesCyclic=" << nPatchesCyclic << endl;
+        Warning << "Periodic handing is disabled because the domain is not fully periodic!\n" << endl;
+    }
 }
 
 // * * * * * * * * * * * * * * * * Destructors  * * * * * * * * * * * * * * //
@@ -809,8 +855,9 @@ tmp<volScalarField> cfdemCloud::ddtVoidfraction() const
 {
     if (useDDTvoidfraction_==word("off"))
     {
-        Info << "suppressing ddt(voidfraction)" << endl;
         return tmp<volScalarField> (ddtVoidfraction_ * 0.);
+        if(verbose_)
+            Info << "suppressing ddt(voidfraction)" << endl;
     }
     return tmp<volScalarField> (ddtVoidfraction_ * 1.) ;
 }

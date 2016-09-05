@@ -42,6 +42,21 @@
         mesh
     );
 
+    /*Info<< "\nCreating outside field\n" << endl;
+    volScalarField outside
+    (
+        IOobject
+        (
+            "outside",
+            runTime.timeName(),
+            mesh,
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh,
+        scalar(0)
+    );*/
+
 //========================
 // drag law modelling
 //========================

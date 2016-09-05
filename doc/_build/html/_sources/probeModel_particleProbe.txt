@@ -1,0 +1,90 @@
+.. index:: probeModel_particleProbe
+
+probeModel_particleProbe command
+================================
+
+Syntax
+""""""
+
+To be activated via couplingProperties dictionary.
+
+forceModels
+(
+    myForceModel1
+    myForceModel2
+    myForceModel3
+);
+
+probeModel particleProbe;
+
+.. parsed-literal::
+
+   particleProbeProps
+   {
+       particleIDsToSample (ID1 ID2 ID3 ...);  //list of particleIDs to sample
+       verboseToFile;                          //main switch
+       verbose;                                //currently not used
+       printEvery       xEvery;                //print every this many CFD time steps
+       printOnlyAtStep  xStep;                 //print only at this CFD time step (overrides "printEvery")
+       sampleAll;                              //Activate sampling for all particles
+       probeDebug;                             //probes additional fields
+       includePosition;                        //will include particle position in the output file
+       writePrecision xPrecision;              //number of significant digits to print
+   };
+
+* *particleIDsToSample* = list of particle IDs to be sampled.
+* *myForceModeli* = list of force models in the simulation, the particleProbe will be applied to all of these models!
+* *verboseToFile* = main switch to activate the particle probe (default = off).
+* *verbose* = main switch to activate output to Info (currently not implemented).
+* *xEvery* = integer to specify the interval for sampling (default = 1, i.e., probing occurs every CFD time step).
+* *xStep*  = integer to specify the step for sampling (default = deactivated, i.e., it will print accordingly to "printEvery").
+* *sampleAll* = switch to activate sampling of all particles. Otherwise (default) only particles specified via "particleIDsToSample" in the couplingProperties dictionary will be sampled.
+* *probeDebug* = switch to activate probing of debug properties of secondary importance (specific for each force model).
+* *includePosition* = switch to add the particle position in the log file (default = off).
+* *xPrecision*= number of significant digits of the text output (default = 3).
+
+
+Examples
+""""""""
+
+.. parsed-literal::
+
+   particleIDsToSample (0 1 2 3);
+   forceModels
+   (
+       gradPForce
+   );
+   particleProbeProps
+   {
+       verboseToFile;       //main switch
+       verbose;                //currently not used
+       printEvery  100;      //print every this many CFD time steps
+       sampleAll;            //Activate sampling for all particles
+       probeDebug;  //probes additional fields
+       includePosition;  //will include particle position in the output file
+       writePrecision 4;           //number of significant digits to print
+   };
+
+Note: This examples list might not be complete - please check below for the list of force models that can perform particle probing.
+
+Description
+"""""""""""
+
+The particleProbe feature keeps track of per-particle quantities (e.g., the fluid-particle interaction forces) acting on each DEM particle, and handles its storage during the simulation. Data is saved in the CFD/particleProbes/startTime directory, where startTime is the time at which the simulation is started (this avoids unwanted deletion of particleProbe data).
+
+Restrictions
+""""""""""""
+
+
+You can manually switch off the probe model for each force model by specifying the Switch "suppressProbe" in the corresponding force properties dictionary.
+
+**Related commands which are currently enabled for particle probing:**
+
+:doc:`gradPForce <forceModel_gradPForce>`, :doc:`viscForce <forceModel_viscForce>`, :doc:`BeetstraDrag <forceModel_Beetstra>`, :doc:`HollowayDrag <forceModel_Holloway>`, :doc:`MeiLift <forceModel_MeiLift>`, as well as most other forceModels (see src directory for details, i.e., use "grep -r 'probeM(' ./" in the terminal).
+
+**Default:** none.
+
+
+.. _liws: http://www.cfdem.com
+.. _ld: Manual.html
+.. _lc: Section_commands.html#comm

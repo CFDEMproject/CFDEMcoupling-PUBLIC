@@ -71,8 +71,6 @@ private:
 
     labelList labelList_;
 
-    bool timeStamp_;
-
 public:
 
     //- Runtime type information

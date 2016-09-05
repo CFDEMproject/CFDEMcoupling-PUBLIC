@@ -197,22 +197,22 @@ void eulerianScalarField::pullCloudFields() const
 }
 
 // ************************************************************
-void eulerianScalarField::update(surfaceScalarField phi, volScalarField voidfraction, volScalarField nuEff, scalar Sc) const 
+void eulerianScalarField::update(surfaceScalarField phi, volScalarField voidfraction, volScalarField nuEff, scalar Sc, bool limitDiffusion) const 
 {
-
+    scalar oneByCpVolumetric = 1./cpVolumetric_;
     //Normalize source in case we have a temperature field
     if(fieldType_=="temperature")
     {
         if(cpVolumetricFieldName_=="na" || !updateMixtureProperties_) //use also if mixture properties are not updated
         {
-            mSource_.internalField()      /= cpVolumetric_;
-            mSourceKImpl_.internalField() /= cpVolumetric_;
+            mSource_ *= oneByCpVolumetric;
+            mSourceKImpl_ *= oneByCpVolumetric;
         }
         else
         {
             const volScalarField& cpVolumetricField_(particleCloud_.mesh().lookupObject<volScalarField> (cpVolumetricFieldName_));
-            mSource_.internalField()      /= cpVolumetricField_.internalField();
-            mSourceKImpl_.internalField() /= cpVolumetricField_.internalField();
+            mSource_ /= cpVolumetricField_;
+            mSourceKImpl_ /= cpVolumetricField_;
         }
     }
 
@@ -226,6 +226,14 @@ void eulerianScalarField::update(surfaceScalarField phi, volScalarField voidfrac
         laplacianScheme = "laplacian((DT*voidfraction),T)";
     }
 
+    // calc diffusionCoeff field
+    volScalarField a=nuEff/Sc*voidfraction;
+    if(limitDiffusion)
+    {
+        forAll(a,cellI)
+            if(voidfraction[cellI] <2*SMALL)
+                a[cellI]=0.;
+    }
 
     // solve scalar transport equation
     fvScalarMatrix mEqn
@@ -238,7 +246,7 @@ void eulerianScalarField::update(surfaceScalarField phi, volScalarField voidfrac
 
      ==
 
-       fvm::laplacian(nuEff/Sc*voidfraction, m_, laplacianScheme) 
+       fvm::laplacian(a, m_, laplacianScheme) 
      + mSource_
      + fvm::Sp(mSourceKImpl_, m_)
      #ifndef versionExt32

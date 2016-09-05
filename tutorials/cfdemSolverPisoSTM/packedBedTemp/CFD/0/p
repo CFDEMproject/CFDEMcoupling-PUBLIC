@@ -23,14 +23,16 @@ boundaryField
 
     wall
     {
+//        type            fixedFluxPressure;
+//        phi             phi;
         type            zeroGradient;
     }
 
     inlet
     {
+//        type            fixedFluxPressure;
+//        phi             phi;
         type            zeroGradient;
-        //type            fixedValue;
-        //value           uniform 100000;
     }
     outlet
     {

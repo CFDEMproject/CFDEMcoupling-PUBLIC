@@ -121,7 +121,7 @@ int main(int argc, char *argv[])
 
         // do particle stuff
         Info << "- evolve()" << endl;
-        particleCloud.evolve(voidfraction);
+        particleCloud.evolve(voidfraction, interFace);
 
         // Pressure-velocity PISO corrector
         {

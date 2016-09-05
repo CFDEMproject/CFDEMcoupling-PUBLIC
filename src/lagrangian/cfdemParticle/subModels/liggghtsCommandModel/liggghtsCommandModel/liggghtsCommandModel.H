@@ -93,6 +93,8 @@ protected:
 
     bool verbose_;
 
+    bool timeStamp_;
+
 public:
 
     //- Runtime type information
@@ -174,7 +176,7 @@ public:
 
         label commandLines(){return commandLines_;};
 
-        void parseCommandList(wordList&, labelList&, scalarList&, word&, dictionary&, bool=false);
+        void parseCommandList(wordList&, labelList&, scalarList&, word&, dictionary&, bool& timeStamp);
 };
 
 

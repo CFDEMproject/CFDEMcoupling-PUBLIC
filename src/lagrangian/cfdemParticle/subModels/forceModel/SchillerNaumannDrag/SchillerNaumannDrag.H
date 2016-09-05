@@ -72,10 +72,6 @@ private:
 
     const volVectorField& UsField_;
 
-    mutable scalar scaleDia_;
-
-    mutable scalar scaleDrag_;
-
 public:
 
     //- Runtime type information

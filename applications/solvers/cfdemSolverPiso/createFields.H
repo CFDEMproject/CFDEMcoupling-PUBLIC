@@ -60,7 +60,7 @@
         mesh
     );
 
-    Info<< "\nCreating dummy density field rho\n" << endl;
+    Info<< "\nCreating density field rho\n" << endl;
     volScalarField rho
     (
         IOobject
@@ -109,7 +109,19 @@ surfaceScalarField phi
  );
 #endif
 
-
+Info<< "Generating interstitial face flux field phiByVoidfraction\n" << endl;
+surfaceScalarField phiByVoidfraction
+(
+ IOobject
+ (
+    "phiByVoidfraction",
+    runTime.timeName(),
+    mesh,
+    IOobject::NO_READ,
+    IOobject::NO_WRITE
+ ),
+ linearInterpolate(U) & mesh.Sf()
+);
 
     label pRefCell = 0;
     scalar pRefValue = 0.0;

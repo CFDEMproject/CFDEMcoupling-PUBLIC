@@ -225,6 +225,10 @@ void forceModel::setForceSubModels(dictionary& dict)
     {
         forceSubModels_ = wordList(dict.lookup("forceSubModels"));
     }
+    else if (dict.found("forceSubModel"))
+    {
+        FatalError << "Did you mean the forceSubModels keyword? " << abort(FatalError);
+    }
     else
     {
         forceSubModels_.setSize(1, "ImEx");

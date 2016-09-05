@@ -41,7 +41,7 @@ regionModel allRegion;
 
 IOModel basicIO;
 
-probeModel off;
+probeModel particleProbe;
 
 dataExchangeModel twoWayMPI;
 
@@ -54,7 +54,7 @@ smoothingModel off;
 forceModels
 (
     KochHillDrag
-    scalarGeneralExchange  // must be 2nd pos!
+    scalarGeneralExchange  
     Archimedes
 );
 
@@ -68,6 +68,16 @@ turbulenceModelType turbulenceProperties;//OFversion30x
 
 //===========================================================================//
 // sub-model properties
+particleProbeProps
+{
+    particleIDsToSample (0 0);
+    verboseToFile;      //main switch
+    printEvery 20;      //print every this many CFD time steps
+    sampleAll;          //Activate sampling for all particles
+    probeDebug;         //probes additional fields
+    includePosition;    //will include particle position in the output file
+    writePrecision 4;   //number of significant digits to print
+}
 
 scalarGeneralExchangeProps
 {

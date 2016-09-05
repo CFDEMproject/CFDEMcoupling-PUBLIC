@@ -1,0 +1,39 @@
+.. index:: IOModel_noIO
+
+IOModel_noIO command
+====================
+
+Syntax
+""""""
+
+Defined in couplingProperties dictionary.
+
+.. parsed-literal::
+
+   IOModel "off";
+
+Examples
+""""""""
+
+.. parsed-literal::
+
+   IOModel "off";
+
+Description
+"""""""""""
+
+The noIO-model is a dummy IO model.
+
+Restrictions
+""""""""""""
+ None.
+
+Related commands
+""""""""""""""""
+
+:doc:`IOModel <IOModel>`
+
+
+.. _liws: http://www.cfdem.com
+.. _ld: Manual.html
+.. _lc: Section_commands.html#comm

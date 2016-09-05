@@ -77,6 +77,66 @@ functions
         outputInterval  1;
     }
 
+    volFlow_inlet
+    {
+        type            faceSource;
+        functionObjectLibs ("libfieldFunctionObjects.so");
+        enabled         true;
+        outputControl   outputTime;//timeStep;
+        log             true;
+	    writeArea	    true; //write for OF 3.0 to be consistent
+        valueOutput     true;
+        source          patch;
+        sourceName      inlet;
+        operation       sum;
+
+        fields
+        (
+            phi
+        );
+        surfaceFormat null;
+    }
+
+    volFlow_outlet
+    {
+        type            faceSource;
+        functionObjectLibs ("libfieldFunctionObjects.so");
+        enabled         true;
+        outputControl   outputTime;//timeStep;
+        log             true;
+        writeArea       true; //write for OF 3.0 to be consistent
+        valueOutput     true;
+        source          patch;
+        sourceName      outlet;
+        operation       sum;
+
+        fields
+        (
+            phi
+        );
+        surfaceFormat null;
+    }
+
+    volFlow_wall
+    {
+        type            faceSource;
+        functionObjectLibs ("libfieldFunctionObjects.so");
+        enabled         true;
+        outputControl   outputTime;//timeStep;
+        log             true;
+        writeArea       true; //write for OF 3.0 to be consistent
+        valueOutput     true;
+        source          patch;
+        sourceName      wall;
+        operation       sum;
+
+        fields
+        (
+            phi
+        );
+        surfaceFormat null;
+    }
+
 /*
 // simpleFunctionObjects
    heatFlux

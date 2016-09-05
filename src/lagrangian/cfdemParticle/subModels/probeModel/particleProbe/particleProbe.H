@@ -136,7 +136,7 @@ public:
     // Member Functions
     void updateProbes(int index, Field<scalar> sValues, Field<vector> vValues) const;
     void initialize(const word& modelName, const word& logFileName) const;
-    void setOutputFile() const;
+    void setOutputFile(const word& logFileName) const;
     void writeHeader() const;
     void writeProbe(int index, Field<scalar> sValues, Field<vector> vValues) const;
     bool checkIDForPrint(int) const;

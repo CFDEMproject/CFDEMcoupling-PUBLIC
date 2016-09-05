@@ -35,7 +35,8 @@ cp $casePath/CFD/system/controlDict_run $casePath/CFD/system/controlDict
 #-------------------------------------------------------#
 
 #- run parallel CFD-DEM in new terminal
-gnome-terminal --title='cfdemSolverPiso ErgunTestMPI_restart CFD'  -e "bash $casePath/parCFDDEMrun.sh" 
+#gnome-terminal --title='cfdemSolverPiso ErgunTestMPI_restart CFD'  -e "bash $casePath/parCFDDEMrun.sh" 
+. $casePath/parCFDDEMrun.sh
 
 #- wait until sim has finished then run octave
 echo "simulation finished? ...press enter to proceed"
@@ -50,7 +51,7 @@ cp $casePath/CFD/system/controlDict_restart $casePath/CFD/system/controlDict
 
 #- run parallel CFD-DEM in new terminal
 #gnome-terminal --title='cfdemSolverPiso ErgunTestMPI_restart CFD'  -e "bash $casePath/parCFDDEMrun.sh" 
-bash $casePath/parCFDDEMrun.sh
+. $casePath/parCFDDEMrun.sh
 
 
 #- wait until sim has finished then run octave

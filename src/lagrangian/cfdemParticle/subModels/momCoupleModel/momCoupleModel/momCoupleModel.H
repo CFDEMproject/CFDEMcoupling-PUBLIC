@@ -121,6 +121,8 @@ public:
         virtual void resetMomSourceField() const=0;
 
         virtual void setSourceField(volVectorField &) const;
+
+        virtual dimensionedVector returnIntegralSourceField() const;
 };
 
 

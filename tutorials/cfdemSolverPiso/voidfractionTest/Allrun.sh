@@ -20,4 +20,4 @@ fi
 
 #- run parallel CFD-DEM in new terminal
 #gnome-terminal --title='cfdemSolverPiso voidfractionTest CFD'  -e "bash $casePath/parCFDDEMrun.sh"
-bash $casePath/parCFDDEMrun.sh
+. $casePath/parCFDDEMrun.sh

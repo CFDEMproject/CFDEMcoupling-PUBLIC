@@ -1,0 +1,40 @@
+.. index:: regionModel
+
+regionModel command
+===================
+
+Syntax
+""""""
+
+Note: In the current CFDEMcoupling version, this model is no longer used. Defined in couplingProperties dictionary.
+
+.. parsed-literal::
+
+   regionModel model;
+
+* model = name of the regionModel to be applied
+
+Examples
+""""""""
+
+.. parsed-literal::
+
+   regionModel allRegion;
+
+Note: This examples list might not be complete - please look for other models (regionModel_XY) in this documentation.
+
+Description
+"""""""""""
+
+The regionModel is the base class for region models to select a certain region for coupled simulation.
+
+Restrictions
+""""""""""""
+ none.
+
+**Default:** none.
+
+
+.. _liws: http://www.cfdem.com
+.. _ld: Manual.html
+.. _lc: Section_commands.html#comm

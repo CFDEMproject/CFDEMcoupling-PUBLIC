@@ -3,6 +3,15 @@
 {
     // locate subPoint
     vector subPosition = position + offset;
+    if(particleCloud_.checkPeriodicCells())
+    {
+      for(int iDir=0;iDir<3;iDir++) {
+        if( subPosition[iDir] > globalBb.max()[iDir] )
+          subPosition[iDir]-=globalBb.max()[iDir]-globalBb.min()[iDir];
+        else if( subPosition[iDir] < globalBb.min()[iDir] )
+          subPosition[iDir]+=globalBb.max()[iDir]-globalBb.min()[iDir];
+      }
+    }
     label partCellId = particleCloud_.locateM().findSingleCell(subPosition,cellID);
                
     //NP fprintf(lmp->screen,"cellID=%d, partCellId=%d\n",static_cast<int>(cellID),static_cast<int>(partCellId));

@@ -60,6 +60,8 @@ private:
 
         bool verbose_;
 
+        Switch procBoundaryCorrection_;
+
         const scalar alphaMin_;          // min value of voidFraction
 
 	    mutable bool alphaLimited_;

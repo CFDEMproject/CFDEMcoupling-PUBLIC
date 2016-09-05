@@ -65,7 +65,7 @@ public:
 
     void update();
 
-    volScalarField& sourceField();
+    const volScalarField& sourceField();
 
 };
 

@@ -77,7 +77,7 @@ Archimedes::Archimedes
         probeIt_=!Switch(propsDict_.lookup("suppressProbe"));
     if(probeIt_)
     {
-        particleCloud_.probeM().initialize(typeName, "archimedesF.logDat");
+        particleCloud_.probeM().initialize(typeName, typeName+".logDat");
         particleCloud_.probeM().vectorFields_.append("archimedesForce");  //first entry must the be the force
         particleCloud_.probeM().scalarFields_.append("Vp");
         particleCloud_.probeM().writeHeader(); 
@@ -94,6 +94,7 @@ Archimedes::Archimedes
 
     // define switches which can be read from dict (default = false)
     forceSubM(0).setSwitchesList(1,true); // activate treatForceDEM switch (DEM side only treatment)
+    forceSubM(0).setSwitchesList(3,true); // activate search for verbose switch
 
     //set default switches (hard-coded default = false)
     forceSubM(0).setSwitches(1,true);  // will treat forces on DEM side only - IMPORTANT!
@@ -129,51 +130,56 @@ Archimedes::~Archimedes()
 void Archimedes::setForce() const
 {
     vector force(0,0,0);
+    scalar piBySix(M_PI/6.);
+    scalar Vs(0.);
+    scalar ds(0.);
 
     #include "setupProbeModel.H"
 
     for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
     {
-        //if(mask[index][0])
-        //{
-            label cellI = particleCloud_.cellIDs()[index][0];
-            force=vector::zero;
+        label cellI = particleCloud_.cellIDs()[index][0];
+        force=vector::zero;
 
-            if (cellI > -1) // particle Found
+        if (cellI > -1) // particle Found
+        {
+            if(twoDimensional_)
             {
-                if(twoDimensional_)
-                {
-                    scalar r = particleCloud_.radius(index);
-                    force = -g_.value()*forceSubM(0).rhoField()[cellI]*r*r*M_PI; // circle area
-                    Warning << "Archimedes::setForce() : this functionality is not tested!" << endl;
-                }else{
-                    force = -g_.value()*forceSubM(0).rhoField()[cellI]*particleCloud_.particleVolume(index);
-                }
-
-                //if(index >=0 && index <100)
-                //{
-                //    Pout << "cellI = " << cellI << endl;
-                //    Pout << "index = " << index << endl;
-                //    Pout << "forceSubM(0).rhoField()[cellI] = " << forceSubM(0).rhoField()[cellI] << endl;
-                //    Pout << "particleCloud_.particleVolume(index) = " << particleCloud_.particleVolume(index) << endl;
-                //    Pout << "force = " << force << endl;
-                //}
-
-                //Set value fields and write the probe
-                if(probeIt_)
-                {
-                    #include "setupProbeModelfields.H"
-                    // Note: for other than ext one could use vValues.append(x)
-                    // instead of setSize
-                    vValues.setSize(vValues.size()+1, force);           //first entry must the be the force
-                    sValues.setSize(sValues.size()+1, particleCloud_.particleVolume(index)); 
-                    particleCloud_.probeM().writeProbe(index, sValues, vValues);
-                }
+                scalar r = particleCloud_.radius(index);
+                force = -g_.value()*forceSubM(0).rhoField()[cellI]*r*r*M_PI; // circle area
+                Warning << "Archimedes::setForce() : this functionality is not tested!" << endl;
+            }else{
+                ds = particleCloud_.d(index);
+                scalar dParcel = ds;
+                forceSubM(0).scaleDia(dParcel); //caution: this fct will scale ds!
+                Vs = dParcel*dParcel*dParcel*piBySix;
+                force = -g_.value()*forceSubM(0).rhoField()[cellI]*Vs;
+                forceSubM(0).scaleForce(force,ds);
             }
 
-            // write particle based data to global array
-            forceSubM(0).partToArray(index,force,vector::zero);
-        //}
+            if(forceSubM(0).verbose() && index >=0 && index <2)
+            {
+                Pout << "cellI = " << cellI << endl;
+                Pout << "index = " << index << endl;
+                Pout << "forceSubM(0).rhoField()[cellI] = " << forceSubM(0).rhoField()[cellI] << endl;
+                Pout << "particleCloud_.particleVolume(index) = " << particleCloud_.particleVolume(index) << endl;
+                Pout << "force = " << force << endl;
+            }
+
+            //Set value fields and write the probe
+            if(probeIt_)
+            {
+                #include "setupProbeModelfields.H"
+                // Note: for other than ext one could use vValues.append(x)
+                // instead of setSize
+                vValues.setSize(vValues.size()+1, force);           //first entry must the be the force
+                sValues.setSize(sValues.size()+1, particleCloud_.particleVolume(index)); 
+                particleCloud_.probeM().writeProbe(index, sValues, vValues);
+            }
+        }
+
+        // write particle based data to global array
+        forceSubM(0).partToArray(index,force,vector::zero);
     }
 }
 

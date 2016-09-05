@@ -68,8 +68,7 @@ IBVoidFraction::IBVoidFraction
     propsDict_(dict.subDict(typeName + "Props")),
     alphaMin_(readScalar(propsDict_.lookup("alphaMin"))),
     alphaLimited_(0),
-    scaleUpVol_(readScalar(propsDict_.lookup("scaleUpVol"))),
-    checkPeriodicCells_(false)
+    scaleUpVol_(readScalar(propsDict_.lookup("scaleUpVol")))
 {
     Info << "\n\n W A R N I N G - do not use in combination with differentialRegion model! \n\n" << endl;
     //Info << "\n\n W A R N I N G - this model does not yet work properly! \n\n" << endl;
@@ -79,7 +78,6 @@ IBVoidFraction::IBVoidFraction
     if(scaleUpVol_ < 1){ FatalError<< "scaleUpVol shloud be > 1."<< abort(FatalError); }
     if(alphaMin_ > 1 || alphaMin_ < 0.01){ FatalError<< "alphaMin shloud be > 1 and < 0.01." << abort(FatalError); }
     
-    if(propsDict_.found("checkPeriodicCells")) checkPeriodicCells_=true;
 }
 
 
@@ -101,7 +99,7 @@ void IBVoidFraction::setvoidFraction(double** const& mask,double**& voidfraction
 
     reAllocArrays();
 
-    voidfractionNext_.internalField()=1;
+    voidfractionNext_ == dimensionedScalar("one", voidfractionNext_.dimensions(), 1.);
 
     for(int index=0; index< particleCloud_.numberOfParticles(); index++)
     {
@@ -127,87 +125,55 @@ void IBVoidFraction::setvoidFraction(double** const& mask,double**& voidfraction
 
                 //compute the voidfraction for the cell "particleCentreCellID
                 vector cellCentrePosition = particleCloud_.mesh().C()[particleCenterCellID];
-                scalar centreDist=mag(cellCentrePosition-positionCenter);
+                scalar fc = pointInParticle(index, positionCenter, cellCentrePosition);
 
                 vector minPeriodicParticlePos=positionCenter;
-                if(checkPeriodicCells_) //consider minimal distance to all periodic images of this particle
+                if(particleCloud_.checkPeriodicCells()) //consider minimal distance to all periodic images of this particle
                 {
-                    centreDist = minPeriodicDistance(cellCentrePosition, positionCenter, globalBb,          
+                    fc = minPeriodicDistance(index,cellCentrePosition, positionCenter, globalBb,
                                                      minPeriodicParticlePos);
                 }
+                scalar centreDist=mag(cellCentrePosition-minPeriodicParticlePos);
+                scalar corona = 0.5*sqrt(3.0)*pow(particleCloud_.mesh().V()[particleCenterCellID],0.33333);
+                vector coronaPoint = cellCentrePosition + (cellCentrePosition - minPeriodicParticlePos) * (corona / centreDist);
 
-                if(centreDist + 0.5*sqrt(3.0)*pow(particleCloud_.mesh().V()[particleCenterCellID],0.33333) < radius)
+                if(pointInParticle(index, minPeriodicParticlePos, coronaPoint) < 0.0)
                 {
                     voidfractionNext_[particleCenterCellID] = 0;
                 }
                 else
                 {
-                	const labelList& vertices = particleCloud_.mesh().cellPoints()[particleCenterCellID];
-                	forAll(vertices, i)
+                    const labelList& vertices = particleCloud_.mesh().cellPoints()[particleCenterCellID];
+                    int nn = 0.0;
+                    forAll(vertices, i) nn ++;
+
+                    double ratio = 0.125; //1.0 / static_cast<double>(nn);
+                    forAll(vertices, i)
                     {
-                		vector vertexPosition = particleCloud_.mesh().points()[vertices[i]];
-                		scalar centreVertexDist = mag(vertexPosition-positionCenter);
-                        if(checkPeriodicCells_) //consider minimal distance to all periodic images of this particle
-                        {                		
-                		    centreVertexDist = minPeriodicDistance(vertexPosition, positionCenter, globalBb,
-                		                                           minPeriodicParticlePos);
-                		}
-                		
-                		if(centreDist<radius &&  centreVertexDist<radius)
-                		{
-                			voidfractionNext_[particleCenterCellID]-=0.125;
-                		}
-                		else if(centreDist<radius && centreVertexDist>radius)
-                		{
-                			//compute lambda
-                			scalar a = (vertexPosition - cellCentrePosition)
-                			         & (vertexPosition - cellCentrePosition);
-                			scalar b = 2. * (vertexPosition - cellCentrePosition)
-                			              & (cellCentrePosition-minPeriodicParticlePos);
-                			scalar c = ((cellCentrePosition-minPeriodicParticlePos)
-                			         &  (cellCentrePosition-minPeriodicParticlePos)
-                			           )
-                			         - radius*radius;
-
-                			scalar lambda = 0.;
-
-                			if (b*b-4*a*c>=0)  lambda =  (-b+sqrt(b*b-4*a*c))/(2*a);
-                			if (lambda > 0 && lambda <=1) voidfractionNext_[particleCenterCellID]-=lambda*.125;
-                			else 
-                			{
-                			    lambda =  (-b-sqrt(b*b-4*a*c))/(2*a);
-                			    if (lambda > 0 && lambda <=1) voidfractionNext_[particleCenterCellID]-=lambda*.125;
-                			}
-                		}
-                		else if(centreDist>radius && centreVertexDist<radius)
-                		{
-                		    //compute another lambda too
-                            scalar a = (vertexPosition - cellCentrePosition)
-                                     & (vertexPosition - cellCentrePosition);
-                            scalar b = 2.* (vertexPosition - cellCentrePosition)
-                                     &     (cellCentrePosition-minPeriodicParticlePos);
-                            scalar c = ( (cellCentrePosition-minPeriodicParticlePos)
-                                        &(cellCentrePosition-minPeriodicParticlePos)
-                                       )
-                                     - radius*radius;
-                            scalar lambda = 0.;
-
-                            if(b*b-4*a*c>=0)  lambda =  (-b+sqrt(b*b-4*a*c))/(2*a);
-                            if(lambda > 0 && lambda <=1) voidfractionNext_[particleCenterCellID]-=(1-lambda)*0.125;
-                            else 
-                            {
-                                lambda =  (-b-sqrt(b*b-4*a*c))/(2*a);
-                                if (lambda > 0 && lambda <=1) voidfractionNext_[particleCenterCellID]-=(1-lambda)*0.125;
-                            }
-                		}
-                	}
+                        vector vertexPosition = particleCloud_.mesh().points()[vertices[i]];
+                        scalar fv = pointInParticle(index, positionCenter, vertexPosition);
+                        if(particleCloud_.checkPeriodicCells()) { //consider minimal distance to all periodic images of this particle
+                            fv = minPeriodicDistance(index,vertexPosition, positionCenter, globalBb, minPeriodicParticlePos);
+                        }
+                        if(fc < 0.0 &&  fv < 0.0)
+                            voidfractionNext_[particleCenterCellID]-=ratio;
+                        else if(fc < 0.0 && fv > 0.0) {
+                            //compute lambda
+                            scalar lambda = segmentParticleIntersection(index, minPeriodicParticlePos, cellCentrePosition, vertexPosition);
+                            voidfractionNext_[particleCenterCellID] -= ratio*lambda;
+                        } else if(fc > 0.0 && fv < 0.0) {
+                            //compute lambda
+                            scalar lambda = segmentParticleIntersection(index, minPeriodicParticlePos, vertexPosition, cellCentrePosition);
+                            voidfractionNext_[particleCenterCellID] -= ratio*lambda;
+                        }
+                    }
                 } //end particle partially overlapping with cell
 
                 //generating list with cell and subcells
-                buildLabelHashSet(radius, minPeriodicParticlePos, particleCenterCellID, hashSett, true);
+                buildLabelHashSet(index,minPeriodicParticlePos, particleCenterCellID, hashSett, true);
 
                 //Add cells of periodic particle images on same processor
-      			if(checkPeriodicCells_) 
+      			if(particleCloud_.checkPeriodicCells()) 
                	{
                	    int doPeriodicImage[3];
                	    for(int iDir=0;iDir<3;iDir++)
@@ -227,117 +193,100 @@ void IBVoidFraction::setvoidFraction(double** const& mask,double**& voidfraction
                	    List<vector> particlePosList;         //List of particle center position
               	    List<label>  particleLabelList;
 
-              	    vector       nearestPosInMesh=vector(0.0,0.0,0.0);
-               	    int copyCounter=0;
-                    // Note: for other than ext one could use xx.append(x)
-                    // instead of setSize
-                    particlePosList.setSize(particlePosList.size()+1, minPeriodicParticlePos);
-               	    
-               	    //x-direction
-               	    if(doPeriodicImage[0]!=0) 
-               	    {
-               	        particlePosList.setSize(particlePosList.size()+1, particlePosList[copyCounter]
-               	                              + vector(
-                                                               static_cast<double>(doPeriodicImage[0])
-               	                                              *(globalBb.max()[0]-globalBb.min()[0]),
-               	                                              0.0,
-               	                                              0.0)
-               	                               );
-               	        copyCounter++;
-               	    }
-               	    //y-direction
-               	    int currCopyCounter=copyCounter;
-               	    if(doPeriodicImage[1]!=0) 
-               	    {
-               	       for(int yDirCop=0; yDirCop<=currCopyCounter; yDirCop++)
-               	       {
-               	        particlePosList.setSize(particlePosList.size()+1, particlePosList[yDirCop]
-               	                              + vector(
-               	                                              0.0,
-                                                               static_cast<double>(doPeriodicImage[1])
-               	                                              *(globalBb.max()[1]-globalBb.min()[1]),
-               	                                              0.0)
-               	                               );
-               	        copyCounter++;
-               	       }
-               	    }
-               	    //z-direction
-               	    currCopyCounter=copyCounter;
-               	    if(doPeriodicImage[2]!=0) 
-               	    {
-               	       for(int zDirCop=0; zDirCop<=currCopyCounter; zDirCop++)
-               	       {
-               	        particlePosList.setSize(particlePosList.size()+1, particlePosList[zDirCop]
-               	                              + vector(
-               	                                              0.0,
-               	                                              0.0,
-                                                               static_cast<double>(doPeriodicImage[2])
-               	                                              *(globalBb.max()[2]-globalBb.min()[2])
-               	                                              )
-               	                               );
-               	        copyCounter++;
-               	       }
-               	    }               	    
+                  int copyCounter=0;
+                  // Note: for other than ext one could use xx.append(x)
+                  // instead of setSize
+                  particlePosList.setSize(particlePosList.size()+1, minPeriodicParticlePos);
 
-                    //add the nearest cell labels
-                    particleLabelList.setSize(particleLabelList.size()+1,particleCenterCellID);
-                    for(int iPeriodicImage=1;iPeriodicImage<=copyCounter; iPeriodicImage++)
-                    {
-                        label copyCellID=-1;                                        
-                        label partCellId = 
+                  //x-direction
+                  if(doPeriodicImage[0]!=0) {
+                    particlePosList.setSize(particlePosList.size()+1, particlePosList[copyCounter]
+                                              + vector(
+                                                               static_cast<double>(doPeriodicImage[0])
+                                                              *(globalBb.max()[0]-globalBb.min()[0]),
+                                                              0.0,
+                                                              0.0)
+                                               );
+                    copyCounter++;
+                  }
+                  //y-direction
+                  int currCopyCounter=copyCounter;
+                  if(doPeriodicImage[1]!=0) {
+                    for(int yDirCop=0; yDirCop<=currCopyCounter; yDirCop++) {
+                      particlePosList.setSize(particlePosList.size()+1, particlePosList[yDirCop]
+                          + vector(
+                                                              0.0,
+                                                               static_cast<double>(doPeriodicImage[1])
+                                                              *(globalBb.max()[1]-globalBb.min()[1]),
+                                                              0.0)
+                                               );
+                      copyCounter++;
+                     }
+                  }
+                  //z-direction
+                  currCopyCounter=copyCounter;
+                  if(doPeriodicImage[2]!=0) {
+                    for(int zDirCop=0; zDirCop<=currCopyCounter; zDirCop++) {
+                      particlePosList.setSize(particlePosList.size()+1, particlePosList[zDirCop]
+                          + vector(
+                                                              0.0,
+                                                              0.0,
+                                                               static_cast<double>(doPeriodicImage[2])
+                                                              *(globalBb.max()[2]-globalBb.min()[2])
+                                                              )
+                                               );
+                       copyCounter++;
+                     }
+                 }
+
+                  //add the nearest cell labels
+                  particleLabelList.setSize(particleLabelList.size()+1,particleCenterCellID);
+                  for(int iPeriodicImage=1;iPeriodicImage<=copyCounter; iPeriodicImage++)
+                  {
+                    label partCellId =
 
                         particleCloud_.mesh().findNearestCell(particlePosList[iPeriodicImage]);
-                        particleLabelList.setSize(particleLabelList.size()+1,partCellId);
+                    particleLabelList.setSize(particleLabelList.size()+1,partCellId);
 
-                        buildLabelHashSet(radius, particlePosList[iPeriodicImage], particleLabelList[iPeriodicImage], hashSett, false);
-                        
-                    }
-
-               	} //end checkPeriodicCells_
-
+                    buildLabelHashSet(index,particlePosList[iPeriodicImage], particleLabelList[iPeriodicImage], hashSett, false);
+                  }
+                } //end particleCloud_.checkPeriodicCells()
 
                 scalar hashSetLength = hashSett.size();
-                if (hashSetLength > maxCellsPerParticle_)
-                {
+                if (hashSetLength > maxCellsPerParticle_) {
                     FatalError<< "big particle algo found more cells ("<< hashSetLength 
                               <<") than storage is prepared ("<<maxCellsPerParticle_<<")" << abort(FatalError);
-                }
-                else if (hashSetLength > 0)
-                {
-                    cellsPerParticle_[index][0]=hashSetLength;
-                    hashSett.erase(particleCenterCellID);
+                } else if (hashSetLength > 0) {
+                  cellsPerParticle_[index][0]=hashSetLength;
+                  hashSett.erase(particleCenterCellID);
 
-                    for(label i=0;i<hashSetLength-1;i++)
-                    {
-                        label cellI=hashSett.toc()[i];
-                        particleCloud_.cellIDs()[index][i+1]=cellI; //adding subcell represenation
-                    }
+                  for(label i=0;i<hashSetLength-1;i++) {
+                    label cellI=hashSett.toc()[i];
+                    particleCloud_.cellIDs()[index][i+1]=cellI; //adding subcell represenation
+                  }
                 }//end cells found on this proc
             }// end found cells
         //}// end if masked
     }// end loop all particles
 
-    for(label index=0; index< particleCloud_.numberOfParticles(); index++)
-    {
-        for(label subcell=0;subcell<cellsPerParticle_[index][0];subcell++)
-        {
-            label cellID = particleCloud_.cellIDs()[index][subcell];
+    for(label index=0; index< particleCloud_.numberOfParticles(); index++) {
+      for(label subcell=0;subcell<cellsPerParticle_[index][0];subcell++) {
+        label cellID = particleCloud_.cellIDs()[index][subcell];
 
-            if(cellID >= 0)
-            {
-                 voidfractions[index][subcell] = voidfractionNext_[cellID];
-            }
-            else
-            {
-                voidfractions[index][subcell] = -1.;
-            }
+        if(cellID >= 0) {
+          if(voidfractionNext_[cellID] < 0.0)
+            voidfractionNext_[cellID] = 0.0;
+          voidfractions[index][subcell] = voidfractionNext_[cellID];
+        } else {
+          voidfractions[index][subcell] = -1.;
         }
+      }
     }
 }
 
 void IBVoidFraction::buildLabelHashSet
 (
-    const scalar radius,
+    int index,
     const vector position,
     const label cellID,
     labelHashSet& hashSett, 
@@ -349,101 +298,87 @@ void IBVoidFraction::buildLabelHashSet
     MPI_Comm_rank(MPI_COMM_WORLD, &me);
 
     if(initialInsert)  hashSett.insert(cellID);
-    
+
     const labelList& nc = particleCloud_.mesh().cellCells()[cellID];
     forAll(nc,i){
         label neighbor=nc[i];
         vector cellCentrePosition = particleCloud_.mesh().C()[neighbor];
         scalar centreDist = mag(cellCentrePosition-position);
+        scalar fc = pointInParticle(index, position, cellCentrePosition);
+        scalar corona = 0.5*sqrt(3.0)*pow(particleCloud_.mesh().V()[neighbor],0.33333);
+        vector coronaPoint = cellCentrePosition + (cellCentrePosition - position) * (corona / centreDist);
         
-        if(!hashSett.found(neighbor) && centreDist + 0.5*sqrt(3.0)*pow(particleCloud_.mesh().V()[neighbor],0.33333) < radius){
+        if(!hashSett.found(neighbor) && pointInParticle(index, position, coronaPoint) < 0.0){
             voidfractionNext_[neighbor] = 0;
-            buildLabelHashSet(radius,position,neighbor,hashSett,true);
+            buildLabelHashSet(index,position,neighbor,hashSett,true);
         }
-        else if(!hashSett.found(neighbor) && centreDist < radius + sqrt(3.0)*pow(particleCloud_.mesh().V()[neighbor],0.33333)){
+        else if(!hashSett.found(neighbor)) {
             scalar scale = 1;
+            int nn = 0.0;
             const labelList& vertexPoints = particleCloud_.mesh().cellPoints()[neighbor];
+            forAll(vertexPoints, i) {
+              nn ++;
+            }
+            double ratio = 0.125; //1.0 / static_cast<double>(nn);
 
             forAll(vertexPoints, j){
                 vector vertexPosition = particleCloud_.mesh().points()[vertexPoints[j]];
-                scalar vertexDist = mag(vertexPosition - position);
+                scalar fv = pointInParticle(index, position, vertexPosition);
 
-                if (centreDist < radius){
-                    if (vertexDist < radius) scale -= 0.125;
+                if (fc < 0.0){
+                    if (fv < 0.0) scale -= ratio;
                     else {
-                        scalar a = (vertexPosition - cellCentrePosition)&(vertexPosition - cellCentrePosition);
-                        scalar b = 2.* (vertexPosition - cellCentrePosition)&(cellCentrePosition-position);
-                        scalar c = ((cellCentrePosition-position)&(cellCentrePosition-position))-radius*radius;
-                        scalar lambda = 0.;
-
-                        if(b*b-4*a*c>=0)  lambda =  (-b+sqrt(b*b-4*a*c))/(2*a);
-                        if (lambda > 0 && lambda <=1) scale -=lambda * 0.125;
-                        else {
-                            lambda =  (-b-sqrt(b*b-4*a*c))/(2*a);
-                            if (lambda > 0 && lambda <=1) scale -=lambda * 0.125;
-                        }
+                      //compute lambda
+                      scalar lambda = segmentParticleIntersection(index, position, cellCentrePosition, vertexPosition);
+                      scale -=lambda * ratio;
                     }
                 }
-                else if (vertexDist < radius){
-                    scalar a = (vertexPosition - cellCentrePosition)&(vertexPosition - cellCentrePosition);
-                    scalar b = 2.* (vertexPosition - cellCentrePosition)&(cellCentrePosition-position);
-                    scalar c = ((cellCentrePosition-position)&(cellCentrePosition-position))-radius*radius;
-                    scalar lambda = 0.;
-
-                    if(b*b-4*a*c>=0)  lambda =  (-b+sqrt(b*b-4*a*c))/(2*a);
-                    if (lambda > 0 && lambda <=1) scale -=(1-lambda) * 0.125;
-                    else {
-                        lambda =  (-b-sqrt(b*b-4*a*c))/(2*a);
-                        if (lambda > 0 && lambda <=1) scale -=(1-lambda) * 0.125;
-                    }
+                else if (fv < 0.0) {
+                  //compute lambda
+                  scalar lambda = segmentParticleIntersection(index, position, vertexPosition, cellCentrePosition);
+                  scale -= lambda * ratio;
                 }
             }
+            if(scale < 0.0)
+              scale = 0.0;
 
             if(voidfractionNext_[neighbor]==1) voidfractionNext_[neighbor] = scale;
             else {
-            	voidfractionNext_[neighbor] -= (1-scale);
-            	if(voidfractionNext_[neighbor]<0) voidfractionNext_[neighbor] = 0;
+              voidfractionNext_[neighbor] -= (1.0 - scale);
+              if(voidfractionNext_[neighbor]<0) voidfractionNext_[neighbor] = 0;
             }
-            if(!(scale == 1))  buildLabelHashSet(radius,position,neighbor,hashSett, true);
+            if(!(scale == 1))  buildLabelHashSet(index,position,neighbor,hashSett, true);
         }
     }
 }
 
-//Function to determine minimal distance of point
-//to one of the periodic images of a particle
-double IBVoidFraction::minPeriodicDistance(vector    cellCentrePosition, 
-                                           vector    positionCenter, 
-                                           boundBox  globalBb,
-                                           vector&   minPeriodicPos)const
+double IBVoidFraction::segmentParticleIntersection(int index, vector positionCenter, vector pointInside, vector pointOutside) const
 {
-    double centreDist=999e32;
-    vector positionCenterPeriodic;
-    
-    for(int xDir=-1; xDir<=1; xDir++)
-    {
-        positionCenterPeriodic[0] =  positionCenter[0]
-                                  + static_cast<double>(xDir)
-                                  * (globalBb.max()[0]-globalBb.min()[0]);
-        for(int yDir=-1; yDir<=1; yDir++)
-        {
-            positionCenterPeriodic[1] =  positionCenter[1]
-                                      + static_cast<double>(yDir)
-                                      * (globalBb.max()[1]-globalBb.min()[1]);                        
-            for(int zDir=-1; zDir<=1; zDir++)
-            {
-                positionCenterPeriodic[2] =  positionCenter[2]
-                                          + static_cast<double>(zDir)
-                                          * (globalBb.max()[2]-globalBb.min()[2]);
-                if( mag(cellCentrePosition-positionCenterPeriodic)<centreDist)
-                {
-                    centreDist     = mag(cellCentrePosition-positionCenterPeriodic);
-                    minPeriodicPos = positionCenterPeriodic;
-                }
-            }
-        }
+  scalar radius =  particleCloud_.radius(index);
+  scalar a = (pointOutside - pointInside)&(pointOutside - pointInside);
+  scalar b = 2.*(pointOutside - pointInside)&(pointInside - positionCenter);
+  scalar c = ((pointInside - positionCenter)&(pointInside - positionCenter)) - radius*radius;
+  scalar lambda_ = 0.0;
+  scalar lambda = 0.0;
+  scalar D = b*b - 4.0*a*c;
+  double eps = 1e-12;
+  if(D >= 0.0) {
+    double sqrtD = sqrt(D);
+    lambda_ = (-b + sqrtD)/(2.0*a);
+    if(lambda_ >= -eps && lambda_ <= 1.0+eps)
+      lambda = lambda_;
+    else {
+      lambda_ = (-b - sqrtD)/(2.0*a);
+      if(lambda_ >= -eps && lambda_ <= 1.0+eps)
+        lambda = lambda_;
     }
+  }
 
-    return centreDist;
+  if(lambda < 0.0)
+    lambda = 0.0;
+  if(lambda > 1.0)
+    lambda = 1.0;
+  return lambda;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

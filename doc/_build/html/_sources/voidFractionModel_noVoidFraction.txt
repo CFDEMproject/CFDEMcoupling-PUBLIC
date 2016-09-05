@@ -1,0 +1,35 @@
+.. index:: voidfractionModel_noVoidFractionVoidFraction
+
+voidfractionModel_noVoidFractionVoidFraction command
+====================================================
+
+Syntax
+""""""
+
+Defined in couplingProperties dictionary.
+
+voidfractionModel noVoidFraction;
+
+Examples
+""""""""
+
+voidfractionModel noVoidFraction;
+
+Description
+"""""""""""
+
+The noVoidFraction voidFraction model is a dummy model and has no physical meaning.
+
+Restrictions
+""""""""""""
+ none.
+
+Related commands
+""""""""""""""""
+
+:doc:`voidfractionModel <voidFractionModel>`
+
+
+.. _liws: http://www.cfdem.com
+.. _ld: Manual.html
+.. _lc: Section_commands.html#comm

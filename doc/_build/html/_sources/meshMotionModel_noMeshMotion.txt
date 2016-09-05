@@ -1,0 +1,39 @@
+.. index:: meshMotionModel_noMeshMotion
+
+meshMotionModel_noMeshMotion command
+====================================
+
+Syntax
+""""""
+
+Defined in couplingProperties dictionary.
+
+.. parsed-literal::
+
+   meshMotionModel noMeshMotion;
+
+Examples
+""""""""
+
+.. parsed-literal::
+
+   meshMotionModel noMeshMotion;
+
+Description
+"""""""""""
+
+The noMeshMotion-model is a dummy meshMotion model.
+
+Restrictions
+""""""""""""
+ None.
+
+Related commands
+""""""""""""""""
+
+:doc:`meshMotionModel <meshMotionModel>`
+
+
+.. _liws: http://www.cfdem.com
+.. _ld: Manual.html
+.. _lc: Section_commands.html#comm

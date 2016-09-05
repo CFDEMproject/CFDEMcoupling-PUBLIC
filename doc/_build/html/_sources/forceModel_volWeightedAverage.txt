@@ -1,0 +1,91 @@
+.. index:: forceModel_volWeightedAverage
+
+forceModel_volWeightedAverage command
+=====================================
+
+Syntax
+""""""
+
+Defined in couplingProperties dictionary.
+
+.. parsed-literal::
+
+   forceModels
+   (
+       volWeightedAverage
+   );
+   volWeightedAverageProps
+   {
+       startTime time;
+       scalarFieldNames
+       (
+           scalarField
+       );
+       vectorFieldNames
+       (
+           vectorField
+       );
+       upperThreshold scalar1;
+       lowerThreshold scalar2;
+       useVolumeFraction switch0;
+       volumeFractionName word1;
+       verbose ;
+       writeToFile switch1;
+   };
+
+* *time* = (optional, default 0.) time to start the averaging
+* *scalarField* = names of the finite volume scalar fields to be temporally averaged
+* *vectorField* = names of the finite volume vector fields to be temporally averaged
+* *scalar1* = only cells with a field value (magnitude) lower than this upper threshold are considered
+* *scalar2* = only cells with a field value (magnitude) greater than this lower threshold are considered
+* *switch0* = (optional, default false) consider a volume fraction for the calculation
+* *word1* = (optional, default "voidfraction") name of the volume fraction, only used if useVolumeFraction is true
+* *verbose* = (optional, default false) keyword only (mostly used for debugging)
+* *switch1* = (optional, default false) switch for the output.
+
+
+Examples
+""""""""
+
+.. parsed-literal::
+
+   forceModels
+   (
+       volWeightedAverage
+   );
+   volWeightedAverageProps
+   {
+       startTime 0.1;
+       scalarFieldNames
+       (
+           voidfraction
+       );
+       vectorFieldNames
+       (
+       );
+       upperThreshold 0.999;
+       lowerThreshold 0;
+   }
+
+Description
+"""""""""""
+
+This "forceModel" does not influence the particles or the simulation - it is a postprocessing tool! Starting at start time 
+the volume weighted averages of those cells of the fields within the threshold are calculated.
+At "writeTime" a field named volAverage_field , where scalarField is the name of the original field, is written. This can then be probed using standard function object probes.
+
+Restrictions
+""""""""""""
+
+
+Currently all fields have the same threshold value!
+
+Related commands
+""""""""""""""""
+
+:doc:`forceModel <forceModel>`
+
+
+.. _liws: http://www.cfdem.com
+.. _ld: Manual.html
+.. _lc: Section_commands.html#comm

@@ -113,44 +113,27 @@ void Foam::voidFractionModel::applyDebugSettings(bool debug) const
 
 tmp<volScalarField> Foam::voidFractionModel::voidFractionInterp() const
 {
-    tmp<volScalarField> tsource
-    (
-        new volScalarField
-        (
-            IOobject
-            (
-                "alpha_voidFractionModel",
-                particleCloud_.mesh().time().timeName(),
-                particleCloud_.mesh(),
-                IOobject::NO_READ,
-                IOobject::NO_WRITE
-            ),
-            particleCloud_.mesh(),
-            dimensionedScalar
-            (
-                "zero",
-                dimensionSet(0, 0, 0, 0, 0),
-                0
-            )
-        )
-    );
-
     scalar tsf = particleCloud_.dataExchangeM().timeStepFraction();
     if(1-tsf < 1e-4 && particleCloud_.dataExchangeM().couplingStep() > 1) //tsf==1
     {
-        tsource() = voidfractionPrev_;
+        return tmp<volScalarField>
+        (
+            new volScalarField("alpha_voidFractionModel", voidfractionPrev_)
+        );
     }
     else
     {
-        tsource() = (1 - tsf) * voidfractionPrev_ + tsf * voidfractionNext_;
+        return tmp<volScalarField>
+        (
+            new volScalarField("alpha_voidFractionModel", (1 - tsf) * voidfractionPrev_ + tsf * voidfractionNext_)
+        );
     }
-    return tsource;
 }
 
 void Foam::voidFractionModel::resetVoidFractions() const
 {
-    voidfractionPrev_.internalField() = voidfractionNext_.internalField();
-    voidfractionNext_.internalField() = 1;
+    voidfractionPrev_ == voidfractionNext_;
+    voidfractionNext_ == dimensionedScalar("one", voidfractionNext_.dimensions(), 1.);
 }
 
 /*void Foam::voidFractionModel::undoVoidFractions(double**const& mask) const
@@ -200,6 +183,56 @@ void Foam::voidFractionModel::reAllocArrays(int nP) const
 bool Foam::voidFractionModel::requiresSuperquadric() const
 {
   return requiresSuperquadric_;
+}
+
+double Foam::voidFractionModel::pointInParticle(int index, vector positionCenter, vector point, double scale) const
+{
+  scalar radius =  particleCloud_.radius(index);
+  scalar pointDistSq = magSqr(point - positionCenter);
+  return pointDistSq / (scale*scale*radius*radius) - 1.0;
+}
+
+double Foam::voidFractionModel::pointInParticle(int index, vector positionCenter, vector point) const {
+  return pointInParticle(index, positionCenter, point, 1.0);
+}
+
+//Function to determine minimal distance of point
+//to one of the periodic images of a particle
+double Foam::voidFractionModel::minPeriodicDistance(int index,
+                                           vector    cellCentrePosition,
+                                           vector    positionCenter,
+                                           boundBox  globalBb,
+                                           vector&   minPeriodicPos)const
+{
+    double f=999e32;
+    vector positionCenterPeriodic;
+
+    for(int xDir=-1; xDir<=1; xDir++)
+    {
+        positionCenterPeriodic[0] =  positionCenter[0]
+                                  + static_cast<double>(xDir)
+                                  * (globalBb.max()[0]-globalBb.min()[0]);
+        for(int yDir=-1; yDir<=1; yDir++)
+        {
+            positionCenterPeriodic[1] =  positionCenter[1]
+                                      + static_cast<double>(yDir)
+                                      * (globalBb.max()[1]-globalBb.min()[1]);
+            for(int zDir=-1; zDir<=1; zDir++)
+            {
+                positionCenterPeriodic[2] =  positionCenter[2]
+                                          + static_cast<double>(zDir)
+                                          * (globalBb.max()[2]-globalBb.min()[2]);
+                //if( mag(cellCentrePosition-positionCenterPeriodic)<f)
+                if(pointInParticle(index, positionCenterPeriodic, cellCentrePosition) < f)
+                {
+                    f = pointInParticle(index, positionCenterPeriodic, cellCentrePosition);
+                    minPeriodicPos = positionCenterPeriodic;
+                }
+            }
+        }
+    }
+
+    return f;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

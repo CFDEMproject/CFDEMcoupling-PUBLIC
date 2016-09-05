@@ -135,25 +135,25 @@ void generalManual::evolveFields()
             FatalError <<"generalManual: first eulerianField is temperature, but we need a species. Please re-order your eulerianFields in the input dict. \n" 
                        << abort(FatalError);  
 
-        forAll(rhoMix_.internalField(), iter)
+        forAll(rhoMix_, iter)
         {
             double denominator              = 1./eulerianScalarF(0).rhoCarrier();
-            rhoMix_.internalField()[iter]   = 1.0;
-            cpRho_.internalField()[iter]    = eulerianScalarF(0).cpCarrier();
+            rhoMix_[iter]   = 1.0;
+            cpRho_[iter]    = eulerianScalarF(0).cpCarrier();
             for (int i=0;i<eulerianFieldList_.size();i++)
             {
               if(eulerianScalarF(i).fieldType()!="temperature")
               {
-                denominator += eulerianScalarF(i).m().internalField()[iter]
+                denominator += eulerianScalarF(i).m()[iter]
                              / eulerianScalarF(i).rho();
 
-                rhoMix_.internalField()[iter] += eulerianScalarF(i).m().internalField()[iter];
-                cpRho_.internalField()[iter]  += eulerianScalarF(i).m().internalField()[iter]
+                rhoMix_[iter] += eulerianScalarF(i).m()[iter];
+                cpRho_[iter]  += eulerianScalarF(i).m()[iter]
                                                 *eulerianScalarF(i).cp();
               }
             }
-            rhoMix_.internalField()[iter]  /= denominator;
-            cpRho_.internalField()[iter]   /= denominator;
+            rhoMix_[iter]  /= denominator;
+            cpRho_[iter]   /= denominator;
         }
 
     }

@@ -116,7 +116,7 @@ public:
 
         virtual void update();
 
-        virtual volScalarField& sourceField();
+        virtual const volScalarField& sourceField();
 
 };
 

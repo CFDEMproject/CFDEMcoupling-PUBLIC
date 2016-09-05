@@ -1,0 +1,73 @@
+.. index:: forceModel_ShirgaonkarIB
+
+forceModel_ShirgaonkarIB command
+================================
+
+Syntax
+""""""
+
+Defined in couplingProperties dictionary.
+
+.. parsed-literal::
+
+   forceModels
+   (
+       ShirgaonkarIB
+   );
+   ShirgaonkarIBProps
+   {
+       velFieldName "U";
+       pressureFieldName "p";
+       twoDimensional;
+       depth scalar1;
+       verbose switch1;
+       treatForceExplicit switch2;
+   };
+
+* *U* = name of the finite volume fluid velocity field
+* *p* = name of the finite volume pressure field
+* *twoDimensional* = optional keyword for conducting a two dimensional calculation
+* *scalar1* = optional, only necessary if twoDimensional is active
+* *switch1* = (optional, default false) sub model switch, see :doc:`forceSubModel <forceSubModel>` for details
+* *switch2* = (optional, default false) sub model switch, see :doc:`forceSubModel <forceSubModel>` for details
+
+
+Examples
+""""""""
+
+.. parsed-literal::
+
+   forceModels
+   (
+       ShirgaonkarIB
+   );
+   ShirgaonkarIBProps
+   {
+       velFieldName "U";
+       pressureFieldName "p";
+   }
+
+Description
+"""""""""""
+
+The force model performs the calculation of forces (e.g. fluid-particle interaction forces) acting on each DEM particle. The ShirgaonkarIB model calculates the drag force (viscous and pressure force) acting on each particle in a resolved manner (see Shirgaonkar et al. (2009): "A new mathematical formulation and fast algorithm for fully resolved simulation of self-propulsion", Journal of Comp. Physics). This model is only suited for resolved CFD-DEM simulations where the particle is represented by immersed boundary method.
+
+**References:**
+
+SHIRGAONKAR, A.A., MACIVER, M.A. and PATANKAR, N.A., (2009), “A new mathematical formulation and fast algorithm for fully resolved simulation of self-propulsion”, J. Comput. Phys., 228, 2366-2390.
+
+Restrictions
+""""""""""""
+
+
+Only for immersed boundary solvers.
+
+Related commands
+""""""""""""""""
+
+:doc:`forceModel <forceModel>`
+
+
+.. _liws: http://www.cfdem.com
+.. _ld: Manual.html
+.. _lc: Section_commands.html#comm

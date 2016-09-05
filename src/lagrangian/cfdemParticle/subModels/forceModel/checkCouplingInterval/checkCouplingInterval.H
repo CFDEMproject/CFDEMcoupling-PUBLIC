@@ -62,11 +62,29 @@ class checkCouplingInterval
 private:
     dictionary propsDict_;
 
+    Switch warnOnly_;
+
+    word velocityFieldName_;
+
     const volVectorField& U_;
 
     const scalar rhoP_;
 
     scalar maxCFL_;
+
+    scalar maxAccNr_;
+
+    scalar UmaxExpected_;
+
+    scalar minAllowedVcellByVparcel_;
+
+    mutable int nextRun_;
+
+    scalar timeInterval_;
+
+    int couplingStepInterval_;
+
+    inline bool doCheck() const;
 
 public:
 

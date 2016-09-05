@@ -1,0 +1,58 @@
+.. index:: momCoupleModel_explicitCouple
+
+momCoupleModel_explicitCouple command
+=====================================
+
+Syntax
+""""""
+
+Defined in couplingProperties dictionary.
+
+.. parsed-literal::
+
+   momCoupleModels
+   (
+       explicitCouple
+   );
+   explicitCoupleProps
+   {
+       fLimit vector;
+   }
+
+* *vector* = limiter vector for explicit force term (default (1e10,1e10,1e10) )
+
+
+Examples
+""""""""
+
+.. parsed-literal::
+
+   momCoupleModels
+   (
+       explicitCouple
+   );
+   explicitCoupleProps
+   {
+       fLimit (1e3 1e2 1e4);
+   }
+
+Description
+"""""""""""
+
+The explicitCouple-model is a momCoupleModel model providing an explicit momentum source term for the CFD solver and additionally it superposes an additional source field which can be set via the function setSourceField.
+
+Restrictions
+""""""""""""
+
+
+Only for solvers that include explicit momentum exchange.
+
+Related commands
+""""""""""""""""
+
+:doc:`momCoupleModel <momCoupleModel>`
+
+
+.. _liws: http://www.cfdem.com
+.. _ld: Manual.html
+.. _lc: Section_commands.html#comm

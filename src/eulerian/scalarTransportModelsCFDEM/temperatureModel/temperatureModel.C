@@ -95,7 +95,7 @@ void temperatureModel::update()
 }
 
 // ************************************************************
-volScalarField& temperatureModel::sourceField()
+const volScalarField& temperatureModel::sourceField()
 {
     return temperatureField_->mSource();
 }

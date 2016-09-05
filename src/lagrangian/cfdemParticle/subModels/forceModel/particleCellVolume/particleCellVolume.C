@@ -141,7 +141,7 @@ void particleCellVolume::setForce() const
     {
         if(forceSubM(0).verbose()) Info << "particleCellVolume.C - setForce()" << endl;
 
-        scalarField_.internalField()=0.;
+        scalarField_ == dimensionedScalar("zero", scalarField_.dimensions(), 0.);
 
         // get reference to actual field
         const volScalarField& field = mesh_.lookupObject<volScalarField>(scalarFieldName_);
@@ -168,8 +168,8 @@ void particleCellVolume::setForce() const
                 scalarField2_[cellI] = 0.;
             }
         }
-        scalarField_.internalField() = gSum(scalarField_);
-        scalarField2_.internalField() = gSum(scalarField2_);
+        scalarField_ == dimensionedScalar("zero", scalarField_.dimensions(), gSum(scalarField_));
+        scalarField2_ == dimensionedScalar("zero", scalarField_.dimensions(), gSum(scalarField2_));
         reduce(minFieldVal, minOp<scalar>());
         reduce(maxFieldVal, maxOp<scalar>());
 

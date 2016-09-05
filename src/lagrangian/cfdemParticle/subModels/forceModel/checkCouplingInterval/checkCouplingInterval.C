@@ -34,8 +34,6 @@ Description
 #include "checkCouplingInterval.H"
 #include "addToRunTimeSelectionTable.H"
 
-//#include "mpi.h"
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -64,31 +62,40 @@ checkCouplingInterval::checkCouplingInterval
 :
     forceModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
-    U_(sm.mesh().lookupObject<volVectorField> ("U")),
+    warnOnly_(propsDict_.lookupOrDefault<Switch>("warnOnly", true)),
+    velocityFieldName_(propsDict_.lookupOrDefault<word>("velocityFieldName", "U")),
+    U_(sm.mesh().lookupObject<volVectorField> (velocityFieldName_)),
     rhoP_(readScalar(propsDict_.lookup("rhoP"))),
-    maxCFL_(50)
+    maxCFL_(propsDict_.lookupOrDefault<scalar>("maxCFL", 50.)),
+    maxAccNr_(propsDict_.lookupOrDefault<scalar>("maxAccNr", 0.1)),
+    UmaxExpected_(readScalar(propsDict_.lookup("UmaxExpected"))),
+    minAllowedVcellByVparcel_(propsDict_.lookupOrDefault<scalar>("minAllowedVcellByVparcel", 3.)),
+    nextRun_(0),
+    timeInterval_(propsDict_.lookupOrDefault<scalar>("timeInterval", sm.dataExchangeM().couplingTime())),
+    couplingStepInterval_(floor(timeInterval_/sm.dataExchangeM().couplingTime()))
 {
-    if (propsDict_.found("maxCFL"))
-        maxCFL_=readScalar(propsDict_.lookup("maxCFL"));
-
     // init force sub model
     setForceSubModels(propsDict_);
 
     // read those switches defined above, if provided in dict
     forceSubM(0).readSwitches();
 
-    if (probeIt_ && propsDict_.found("suppressProbe"))
+    /*if (probeIt_ && propsDict_.found("suppressProbe"))
         probeIt_=!Switch(propsDict_.lookup("suppressProbe"));
     if(probeIt_)
     {
-        particleCloud_.probeM().initialize(typeName, "checkCouplingInterval.logDat");
+        particleCloud_.probeM().initialize(typeName, typeName+".logDat");
+        particleCloud_.probeM().scalarFields_.append("maxCFL");
+        particleCloud_.probeM().scalarFields_.append("maxCFLexpected");
         particleCloud_.probeM().scalarFields_.append("minTauP");
         particleCloud_.probeM().scalarFields_.append("minVcellByVparcel");
         particleCloud_.probeM().scalarFields_.append("minStokes");
         particleCloud_.probeM().scalarFields_.append("maxStokes");
         particleCloud_.probeM().writeHeader();
-    }
+    }*/
 
+    Info << "running checkCouplingInterval every " << couplingStepInterval_ << " coupling steps,"
+         << "which is every " << timeInterval_ << " seconds." << endl;
 }
 
 
@@ -99,29 +106,77 @@ checkCouplingInterval::~checkCouplingInterval()
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+inline bool checkCouplingInterval::doCheck() const
+{
+    label couplingStep = particleCloud_.dataExchangeM().couplingStep();
+    if(couplingStep >= nextRun_)
+    {
+        nextRun_ += couplingStepInterval_;
+        return true;
+    }
+    return false;
+}
 
 void checkCouplingInterval::setForce() const
 {
     #include "setupProbeModel.H"
 
-    if(particleCloud_.mesh().time().write())
+    if(doCheck())
     {
+        Info << "========================================================================" << endl;
+        Info << "Check Coupling Interval" << endl;
+        Info << "========================================================================" << endl;
 
+        //==============================================================================================
         // calc the maximum CFL number
         scalar CFL = 0.0;
+        scalar CFLexpected = 0.0;
+        scalar ts = particleCloud_.mesh().time().deltaT().value();
 
         if (particleCloud_.mesh().nInternalFaces())
         {
             surfaceScalarField phi(particleCloud_.mesh().lookupObject<surfaceScalarField> ("phi"));
             scalarField sumPhi(fvc::surfaceSum(mag(phi))().internalField());
 
-            CFL = 0.5*gMax(sumPhi/particleCloud_.mesh().V().field())*particleCloud_.mesh().time().deltaT().value();
-        }
-        if (CFL > maxCFL_)
-            FatalError << "CFL exceeds maximum allowed value:" << maxCFL_
-                       << ", and reached the value:" << CFL
-                       << "\nThe simulation is stopped, check your settings." << abort(FatalError);
+            CFL = 0.5*gMax(sumPhi/particleCloud_.mesh().V().field())*ts;
 
+            scalar minVol = gMin(particleCloud_.mesh().V());
+            scalar minLen = pow(minVol,1./3.);
+            CFLexpected = UmaxExpected_ * ts / minLen;
+        }
+
+        if (CFL > maxCFL_)
+        {
+            if(warnOnly_)
+                Warning << "CFL exceeds maximum allowed value:" << maxCFL_
+                           << ", and reached the value:" << CFL
+                           << "\ncheck your settings!" << endl;
+            else
+                FatalError << "CFL exceeds maximum allowed value:" << maxCFL_
+                           << ", and reached the value:" << CFL
+                           << "\nThe simulation is stopped, check your settings." << abort(FatalError);
+        }
+        else if (CFLexpected > maxCFL_)
+            if(warnOnly_)
+                Warning << "Expected CFL (based on UmaxExpected) exceeds maximum allowed value:" << maxCFL_
+                           << ", and reached the value:" << CFLexpected
+                           << "\ncheck your settings." << endl;
+            else
+                FatalError << "Expected CFL (based on UmaxExpected) exceeds maximum allowed value:" << maxCFL_
+                           << ", and reached the value:" << CFLexpected
+                           << "\nThe simulation is stopped, check your settings." << abort(FatalError);
+        else
+        {
+            Info << "max. CFL = " << CFL << endl;
+            Info << "max. expected CFL (based on UmaxExpected) = " << CFLexpected << endl;
+        }
+        //==============================================================================================
+
+
+        //==============================================================================================
+        // particle relaxation time tau,
+        // Stokes nr,
+        // cell/particle volume ratio
 
         const volScalarField& nufField = forceSubM(0).nuField();
         const volScalarField& rhoField = forceSubM(0).rhoField();
@@ -189,30 +244,56 @@ void checkCouplingInterval::setForce() const
         scalar maxVparcelAll = maxDparcelAll*maxDparcelAll*maxDparcelAll*3.1416/6.0;
         scalar minVcellByVparcel = minVcellAll/maxVparcelAll;
 
+        if(accNr > maxAccNr_)
+        {
+            if(warnOnly_)
+                Warning << "The max. acceleration nr (coupling time / particle relaxation time) exceeds the maximum allowed value " << maxAccNr_
+                           << ", and reached the value:" << accNr
+                           << "\ncheck your settings." << endl;
+            else
+                FatalError << "The max. acceleration nr (coupling time / particle relaxation time) exceeds the maximum allowed value " << maxAccNr_
+                           << ", and reached the value:" << accNr
+                           << "\nThe simulation is stopped, check your settings." << abort(FatalError);
+        }
+        else
+        {
+            Info << "min. occurring particle relaxation time [s]: " << minTauPAll << endl;
+            Info << "coupling interval [s]: " << DEMtime << endl;
+            Info << "max. occurring acceleration nr: " << accNr << endl;
+        }
 
-        Info << "min. occurring particle relaxation time [s]: " << minTauPAll << endl;
-        Info << "coupling interval [s]: " << DEMtime << endl;
-        Info << "max. occurring acceleration nr: " << accNr << endl;
-        if(accNr > 0.1) Warning << "you should use a smaller coupling interval!" << endl;
+        if(minVcellByVparcel < minAllowedVcellByVparcel_)
+        {
+            if(warnOnly_)
+                Warning << "The min. ratio of Vcell / Vparcel is below the minimum allowed value " << minAllowedVcellByVparcel_
+                           << ", and reached the value:" << minVcellByVparcel
+                           << "\ncheck your settings." << endl;
+            else
+                FatalError << "The min. ratio of Vcell / Vparcel is below the minimum allowed value " << minAllowedVcellByVparcel_
+                           << ", and reached the value:" << minVcellByVparcel
+                           << "\nThe simulation is stopped, check your settings." << abort(FatalError);
+        }
+        else
+            Info << "min. ratio of Vcell / Vparcel is " << minVcellByVparcel << endl;
 
-        Info << "min. occurring cell/parcel volume ratio: " << minVcellByVparcel << endl;
-        if(minVcellByVparcel < 3) Warning << "you should use bigger cells!" << endl;
+        Info << "min./max. Stokes Nr: " << minStAll << " / " << maxStAll << endl;
 
-        Info << "min. Stokes Nr: " << minStAll << endl;
-        Info << "max. Stokes Nr: " << maxStAll << endl;
+        Info << "========================================================================" << endl;
 
-        //Set value fields and write the probe
+        /*//Set value fields and write the probe
         if(probeIt_)
         {
             #include "setupProbeModelfields.H"
             // Note: for other than ext one could use vValues.append(x)
             // instead of setSize
+            sValues.setSize(sValues.size()+1, CFL);
+            sValues.setSize(sValues.size()+1, CFLexpected);
             sValues.setSize(sValues.size()+1, minTauPAll);
             sValues.setSize(sValues.size()+1, minVcellByVparcel);
             sValues.setSize(sValues.size()+1, minStAll);
             sValues.setSize(sValues.size()+1, maxStAll);
             particleCloud_.probeM().writeProbe(0, sValues, vValues);
-        }
+        }*/
     }
 }
 

@@ -19,9 +19,9 @@ mkdir -p $logDir
 #================================================================================#
 # compile LIGGGHTS src + libraries
 #================================================================================#
-bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/compileLIGGGHTS.sh
+. $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/compileLIGGGHTS.sh
 
 #================================================================================#
 # compile CFDEMcoupling
 #================================================================================#
-bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/compileCFDEMcoupling.sh
+. $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/compileCFDEMcoupling.sh

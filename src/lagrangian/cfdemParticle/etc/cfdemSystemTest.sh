@@ -25,6 +25,7 @@ echo "CFDEM_VERSION=$CFDEM_VERSION"
 echo "couple to OF_VERSION=$WM_PROJECT_VERSION"
 echo "compile option=$WM_COMPILE_OPTION"
 
+
 echo
 echo "check if paths are set correctly"
 checkDirComment "$CFDEM_PROJECT_DIR" '$CFDEM_PROJECT_DIR' "yes"
@@ -45,6 +46,10 @@ echo '$CFDEM_LIGGGHTS_LIB_NAME = '"$CFDEM_LIGGGHTS_LIB_NAME"
 echo '$CFDEM_LIB_NAME = '"$CFDEM_LIB_NAME"
 echo '$LD_LIBRARY_PATH  = '"$LD_LIBRARY_PATH"
 echo '$WM_NCOMPPROCS  = '"$WM_NCOMPPROCS"
+echo '$WM_LABEL_SIZE = '"$WM_LABEL_SIZE"
+if [ $WM_LABEL_SIZE != 32 ]; then 
+    echo "!!!! Warning: WM_LABEL_SIZE must be 32!!!!! (Please correct in $FOAM_ETC/bashrc.)"
+fi
 
 echo "*******************"
 

@@ -128,30 +128,21 @@ void Foam::explicitCouple::applyDebugSettings(bool debug) const
     }
 }
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+dimensionedVector explicitCouple::returnIntegralSourceField() const
+{
+    //Sum is over cells of PROCESOR ONLY!!
+    dimensionedVector intSource = dimensionedVector("0", dimensionSet(1, 1, -2, 0, 0), vector::zero);
+    forAll(sourceField_,cellI)
+        intSource.value() += sourceField_.internalField()[cellI] * particleCloud_.mesh().V()[cellI];
+
+    return intSource;  // in Newton
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 tmp<volVectorField> explicitCouple::expMomSource() const
 {
-    tmp<volVectorField> tsource
-    (
-        new volVectorField
-        (
-            IOobject
-            (
-                "f_explicitCouple",
-                particleCloud_.mesh().time().timeName(),
-                particleCloud_.mesh(),
-                IOobject::NO_READ,
-                IOobject::NO_WRITE
-            ),
-            particleCloud_.mesh(),
-            dimensionedVector
-            (
-                "zero",
-                dimensionSet(1, -2, -2, 0, 0), // N/m3
-                vector::zero
-            )
-        )
-    );
-
+    //This INCLUDES the source field that is set separately!
     scalar tsf = particleCloud_.dataExchangeM().timeStepFraction();
 
     if(1-tsf < 1e-4) //tsf==1
@@ -167,23 +158,32 @@ tmp<volVectorField> explicitCouple::expMomSource() const
                 if (mag(fNext_[cellI][i]) > fLimit_[i]) fNext_[cellI][i] = fLimit_[i];
             }
         }
-        tsource() = fPrev_;
+        return tmp<volVectorField>
+        (
+            new volVectorField("f_explicitCouple", fPrev_)
+        );
     }else
     {
-        tsource() = (1 - tsf) * fPrev_ + tsf * fNext_;
+        return tmp<volVectorField>
+        (
+            new volVectorField("f_explicitCouple", (1 - tsf) * fPrev_ + tsf * fNext_)
+        );
     }
-    return tsource;
 }
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Foam::explicitCouple::resetMomSourceField() const
 {
-    fPrev_.internalField() = fNext_.internalField();
-    fNext_.internalField() = vector::zero;
+    fPrev_ == fNext_;
+    fNext_ == dimensionedVector("zero", fNext_.dimensions(), vector::zero);
 }
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 inline vector Foam::explicitCouple::arrayToField(label cellI) const
 {
-    return particleCloud_.forceM(0).expParticleForces()[cellI] / particleCloud_.mesh().V()[cellI] + sourceField_[cellI];
+    //This INCLUDES the source field that is set separately!
+    return particleCloud_.forceM(0).expParticleForces()[cellI] / particleCloud_.mesh().V()[cellI] 
+         + sourceField_[cellI];
 }
 
 void Foam::explicitCouple::setSourceField(volVectorField & field) const

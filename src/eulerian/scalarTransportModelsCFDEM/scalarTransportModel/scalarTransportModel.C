@@ -49,7 +49,7 @@ void scalarTransportModel::createFields()
 void scalarTransportModel::update()
 {}
 
-volScalarField& scalarTransportModel::sourceField()
+const volScalarField& scalarTransportModel::sourceField()
 {
     // dummy source field
     tmp<volScalarField> tsource

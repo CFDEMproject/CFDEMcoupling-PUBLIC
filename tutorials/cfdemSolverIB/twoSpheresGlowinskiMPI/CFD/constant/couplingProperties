@@ -118,10 +118,7 @@ dividedProps
 
 engineIBProps
 {
-    engineProps
-    {
-        treeSearch false;
-    }
+    treeSearch false;
     zSplit 8;
     xySplit 16;
 }

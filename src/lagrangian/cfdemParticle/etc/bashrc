@@ -240,10 +240,26 @@ else
 fi
 
 # detect OF version
-if [ $WM_PROJECT_VERSION == "3.0.x" ]; then
+if [[ $WM_PROJECT_VERSION == 4.* ]]; then
+    export CFDEM_WM_PROJECT_VERSION=40
+    echo "************************************"
+    echo "WARNING from your CFDEM code!"
+    echo "WARNING: Coupling with your OpenFOAM(R) version is currently under development!"
+    echo "In doubt switch to another version."
+    echo "************************************"
+    sleep 1.5
+elif [[ $WM_PROJECT_VERSION == 3.0.* ]]; then
     export CFDEM_WM_PROJECT_VERSION=30
-elif [ $WM_PROJECT_VERSION == "2.4.x" ]; then
+elif [[ $WM_PROJECT_VERSION == 2.4.* ]]; then
     export CFDEM_WM_PROJECT_VERSION=24
 elif [[ $WM_PROJECT_VERSION == "3.2" && $WM_FORK == "extend" ]]; then
     export CFDEM_WM_PROJECT_VERSION=132
+else
+    clear
+    echo "************************************"
+    echo "ERROR from your CFDEM code!"
+    echo "ERROR: your OpenFOAM(R) version is not supported!"
+    echo "Please use a version that is supported, i.e., see the bashrc file in the source directory!"
+    echo "************************************"
+    sleep 1.5
 fi

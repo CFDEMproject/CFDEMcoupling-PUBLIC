@@ -1,0 +1,74 @@
+.. index:: forceModel_viscForce
+
+forceModel_viscForce command
+============================
+
+Syntax
+""""""
+
+Defined in couplingProperties dictionary.
+
+.. parsed-literal::
+
+   forceModels
+   (
+       viscForce;
+   );
+   viscForceProps
+   {
+       velocityFieldName "U";
+       useAddedMass scalar1;
+       suppressProbe switch1;
+       treatForceExplicit switch2;
+       treatForceDEM switch3;
+       interpolation switch4;
+       divTauInterpolationType "type1";
+       scalarViscosity switch5;
+       nu scalar2;
+   };
+
+* *U* = name of the finite volume fluid velocity field
+* *scalar1* = (optional) coefficient of added mass accounted for
+* *switch1* = (optional, default false) can be used to suppress the output of the probe model
+* *switch2* = (optional, default true) sub model switch, see :doc:`forceSubModel <forceSubModel>` for details
+* *switch3* = (optional, default false) sub model switch, see :doc:`forceSubModel <forceSubModel>` for details
+* *switch4* = (optional, default false) sub model switch, see :doc:`forceSubModel <forceSubModel>` for details
+* *type1* = (optional, default cellPointFace) interpolation type for div(Tau) field
+* *switch5* =  (optional, default false) sub model switch, see :doc:`forceSubModel <forceSubModel>` for details
+* *scalar2* = optional, only if switch5 is true
+
+
+Examples
+""""""""
+
+.. parsed-literal::
+
+   forceModels
+   (
+       viscForce;
+   );
+   viscForceProps
+   {
+       velocityFieldName "U";
+   }
+
+Description
+"""""""""""
+
+The force model performs the calculation of forces (e.g. fluid-particle interaction forces) acting on each DEM particle. The viscForce model calculates the particle based viscous force, -(grad(tau)) * Vparticle (see Zhou et al. (2010): "Discrete particle simulation of particle-fluid flow: model formulations and their applicability", JFM).
+
+Restrictions
+""""""""""""
+
+
+none.
+
+Related commands
+""""""""""""""""
+
+:doc:`forceModel <forceModel>`
+
+
+.. _liws: http://www.cfdem.com
+.. _ld: Manual.html
+.. _lc: Section_commands.html#comm

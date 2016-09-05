@@ -1,0 +1,48 @@
+.. index:: forceSubModel_ImEx
+
+forceSubModel_ImEx command
+==========================
+
+Syntax
+""""""
+
+Defined in couplingProperties sub-dictionary of the force model in use.
+
+forceSubModels
+(
+    ImEx;
+);
+
+treatExplicit true;  // optional for some force models.
+treatDEM true;       // optional for some force models.
+implDEM true;        // optional for some force models.
+
+Examples
+""""""""
+
+forceSubModels
+(
+    ImEx;
+);
+treatExplicit true;  // optional for some force models.
+
+Description
+"""""""""""
+
+If no force sub-model is applied ImEx is used as default. If the keyword "forceSubModels" is provided, a choice of sub model is demanded. Depending on the force model different keywords are read and can therefrore be set (see the log file). If the keyword is provided, its value is used.
+
+Restrictions
+""""""""""""
+
+
+none.
+
+Related commands
+""""""""""""""""
+
+:doc:`forceSubModel <forceSubModel>`
+
+
+.. _liws: http://www.cfdem.com
+.. _ld: Manual.html
+.. _lc: Section_commands.html#comm

@@ -23,12 +23,16 @@ boundaryField
 
     wall
     {
+//        type            fixedFluxPressure;
+//        phi             phi;
         type            zeroGradient;
         value           $internalField;
     }
 
     inlet
     {
+//        type            fixedFluxPressure;
+//        phi             phi;
         type            zeroGradient;
         value           $internalField;
     }

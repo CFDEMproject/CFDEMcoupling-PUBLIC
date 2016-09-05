@@ -55,6 +55,7 @@ tmp<volScalarField> momCoupleModel::impMomSource() const
     return tsource;
 }
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 tmp<volVectorField> momCoupleModel::expMomSource() const
 {
     FatalError<<"the solver calls for expMomSource()\n"
@@ -64,9 +65,20 @@ tmp<volVectorField> momCoupleModel::expMomSource() const
     return tsource;
 }
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void momCoupleModel::setSourceField(volVectorField & a) const
 {
     //do nothing;
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+dimensionedVector momCoupleModel::returnIntegralSourceField() const
+{
+    FatalError<<"the solver calls for returnIntegralSourceField()\n"
+              <<", please set 'momCoupleModel' to type 'explicitCouple' to access this data.\n"
+              << abort(FatalError);
+
+    return dimensionedVector("0", dimensionSet(1, 1, -2, 0, 0), vector::zero); // Newton
 }
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //

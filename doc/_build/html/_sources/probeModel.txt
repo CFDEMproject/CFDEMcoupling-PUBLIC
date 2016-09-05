@@ -1,0 +1,52 @@
+.. index:: probeModel
+
+probeModel command
+==================
+
+Syntax
+""""""
+
+To be activated via couplingProperties dictionary.
+
+.. parsed-literal::
+
+   probeModel myProbeModel;
+
+Use probe model "off" to disable this feature.
+
+.. parsed-literal::
+
+   myProbeModelProps
+
+.. parsed-literal::
+
+   {
+
+.. parsed-literal::
+
+   };
+
+Examples
+""""""""
+
+See :doc:`particleProbe <probeModel_particleProbe>`
+
+Note: This examples list might not be complete - please check below for the list of force models that can perform particle probing.
+
+Description
+"""""""""""
+
+The probeModel feature allows to implement various probing features in CFDEM. Currently, only the :doc:`particleProbe <probeModel_particleProbe>` model is implemented, that performs probing of particle forces.
+
+Restrictions
+""""""""""""
+
+
+None.
+
+**Default:** none.
+
+
+.. _liws: http://www.cfdem.com
+.. _ld: Manual.html
+.. _lc: Section_commands.html#comm

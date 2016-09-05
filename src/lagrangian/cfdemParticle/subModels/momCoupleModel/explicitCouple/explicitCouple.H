@@ -97,6 +97,8 @@ public:
         void resetMomSourceField() const;
 
         void setSourceField(volVectorField &) const;
+
+        dimensionedVector returnIntegralSourceField() const;
 };
 
 

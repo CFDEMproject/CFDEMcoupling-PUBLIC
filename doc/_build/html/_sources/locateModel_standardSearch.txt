@@ -1,0 +1,39 @@
+.. index:: locateModel_standardSearch
+
+locateModel_standardSearch command
+==================================
+
+Syntax
+""""""
+
+Defined in couplingProperties dictionary.
+
+.. parsed-literal::
+
+   locateModel standard;
+
+Examples
+""""""""
+
+.. parsed-literal::
+
+   locateModel standard;
+
+Description
+"""""""""""
+
+The locateModel "standard" locates the CFD cell and cellID corresponding to a given position. A very straight-forward (robust!) locate algorithm is used.
+
+Restrictions
+""""""""""""
+ none.
+
+Related commands
+""""""""""""""""
+
+:doc:`locateModel <locateModel>`
+
+
+.. _liws: http://www.cfdem.com
+.. _ld: Manual.html
+.. _lc: Section_commands.html#comm

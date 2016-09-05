@@ -1,0 +1,74 @@
+.. index:: forceModel_virtualMassForce
+
+forceModel_virtualMassForce command
+===================================
+
+Syntax
+""""""
+
+Defined in couplingProperties dictionary.
+
+.. parsed-literal::
+
+   forceModels
+   (
+       virtualMassForce
+   );
+   virtualMassForceProps
+   {
+       velFieldName "U";
+       phiFieldName "phi";
+       splitUrelCalculation switch1;
+       Cadd scalar1;
+       treatForceExplicit switch2;
+       treatForceDEM switch3;
+       interpolation switch4;
+       UInterpolationType "type1"
+       DDtUInterpolationType "type2"
+   };
+
+* *U* = name of the finite volume fluid velocity field
+* *phi* = name of the finite volume flux field
+* *switch1* = indicator to split calculation of Urel between CFDEM and LIGGGHTS
+* *scalar1* = scalar value
+* *switch2* = (optional, default true) sub model switch, see :doc:`forceSubModel <forceSubModel>` for details
+* *switch3* = (optional, default false) sub model switch, see :doc:`forceSubModel <forceSubModel>` for details
+* *switch4* = (optional, default false) sub model switch, see :doc:`forceSubModel <forceSubModel>` for details
+* *type1* = (optional, default cellPointFace) interpolation type for U field
+* *type2* = (optional, default cellPointFace) interpolation type for ddt(U) field
+
+
+Examples
+""""""""
+
+.. parsed-literal::
+
+   forceModels
+   (
+       virtualMassForce
+   );
+   virtualMassForceProps
+   {
+       velFieldName "U";
+   }
+
+Description
+"""""""""""
+
+The force model performs the calculation of forces (e.g. fluid-particle interaction forces) acting on each DEM particle. The virtualMassForce model calculates the virtual mass force for each particle.
+
+Restrictions
+""""""""""""
+
+
+Model not validated!
+
+Related commands
+""""""""""""""""
+
+:doc:`forceModel <forceModel>`
+
+
+.. _liws: http://www.cfdem.com
+.. _ld: Manual.html
+.. _lc: Section_commands.html#comm

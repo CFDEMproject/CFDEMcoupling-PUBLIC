@@ -72,10 +72,6 @@ private:
 
     const volVectorField& UsField_;  // the average particle velocity field (for implicit/expliti force split)
 
-    mutable scalar scaleDia_;
-
-    mutable scalar scaleDrag_;
-
 public:
 
     //- Runtime type information

@@ -1,0 +1,51 @@
+.. index:: probeModel_noProbe
+
+probeModel_noProbe command
+==========================
+
+Syntax
+""""""
+
+To be activated via couplingProperties dictionary.
+
+.. parsed-literal::
+
+   forceModels
+   {
+       myForceModel1
+       myForceModel2
+       myForceModel3
+   };
+
+probeModel off;
+
+Examples
+""""""""
+
+.. parsed-literal::
+
+   probeModel off;
+
+Note: This examples list might not be complete - please check below for the list of force models that can perform particle probing.
+
+Description
+"""""""""""
+
+Does not perform any probing.
+
+Restrictions
+""""""""""""
+
+
+None.
+
+**Related commands which are currently enabled for particle probing:**
+
+:doc:`particleProbe <probeModel_particleProbe>`
+
+**Default:** none.
+
+
+.. _liws: http://www.cfdem.com
+.. _ld: Manual.html
+.. _lc: Section_commands.html#comm

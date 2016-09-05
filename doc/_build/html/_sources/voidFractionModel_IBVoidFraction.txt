@@ -1,0 +1,62 @@
+.. index:: voidfractionModel_IBVoidFraction
+
+voidfractionModel_IBVoidFraction command
+========================================
+
+Syntax
+""""""
+
+Defined in couplingProperties dictionary.
+
+.. parsed-literal::
+
+   voidfractionModel IB;
+   IBProps
+   {
+       maxCellsPerParticle number1;
+       alphaMin number2;
+       scaleUpVol number3;
+       checkPeriodicCells ;
+   }
+
+* *number1* = maximum number of cells covered by a particle (search will fail when more than *number1* cells are covered by the particle)
+* *number2* = minimum limit for voidfraction
+* *number3* = diameter of the particle's representation is artificially increased according to *number3* * Vparticle, volume remains unaltered!
+* *checkPeriodicCells* = (optional, default false) flag for considering the minimal distance to all periodic images of this particle
+
+
+Examples
+""""""""
+
+.. parsed-literal::
+
+   voidfractionModel IB;
+   IBProps
+   {
+       maxCellsPerParticle 1000;
+       alphaMin 0.10;
+       scaleUpVol 5.0;
+   }
+
+Description
+"""""""""""
+
+The IB voidFraction model is supposed to be used when a particle (or its representation) is bigger than a CFD cell. The voidfraction field is set in those cell whose centres are inside the particle. The model is specially designed for cfdemSolverIB and creates a smooth transition of the voidfraction at the particle surface. Cells which are only partially covered by solid are marked by voidfraction values between 0 and 1 respectively.
+
+The region of influence of a particle can be increased artificially by "scaleUpVol", which blows up the particles, but keeps their volume (for voidfraction calculation) constant.
+
+Code of this sub-model contributed by Alice Hager, JKU.
+
+Restrictions
+""""""""""""
+ none.
+
+Related commands
+""""""""""""""""
+
+:doc:`voidfractionModel <voidFractionModel>`
+
+
+.. _liws: http://www.cfdem.com
+.. _ld: Manual.html
+.. _lc: Section_commands.html#comm

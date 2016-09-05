@@ -3,6 +3,7 @@ scalarTransportModel/newScalarTransportModel.C
 
 /*Sub-Level*/
 temperatureModel/temperatureModel.C
+solidTemperatureModel/solidTemperatureModel.C
 generalManual/generalManual.C
 noTransport/noTransport.C
 generalPhaseChange/generalPhaseChange.C

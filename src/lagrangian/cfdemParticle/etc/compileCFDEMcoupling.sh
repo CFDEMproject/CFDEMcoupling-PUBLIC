@@ -18,14 +18,14 @@ mkdir -p $logDir
 #================================================================================#
 # compile src
 #================================================================================#
-bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/compileCFDEMcoupling_src.sh
+. $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/compileCFDEMcoupling_src.sh
 
 #================================================================================#
 # compile solvers
 #================================================================================#
-bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/compileCFDEMcoupling_sol.sh
+. $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/compileCFDEMcoupling_sol.sh
 
 #================================================================================#
 # compile utilities
 #================================================================================#
-bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/compileCFDEMcoupling_uti.sh
+. $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/compileCFDEMcoupling_uti.sh

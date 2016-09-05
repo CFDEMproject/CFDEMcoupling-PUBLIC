@@ -70,8 +70,6 @@ GidaspowDrag::GidaspowDrag
     phi_(readScalar(propsDict_.lookup("phi"))),
     UsFieldName_(propsDict_.lookup("granVelFieldName")),
     UsField_(sm.mesh().lookupObject<volVectorField> (UsFieldName_)),
-    scaleDia_(1.),
-    scaleDrag_(1.),
     switchingVoidfraction_(0.8)
 {
     //Append the field names to be probed
@@ -80,7 +78,7 @@ GidaspowDrag::GidaspowDrag
         probeIt_=!Switch(propsDict_.lookup("suppressProbe"));
     if(probeIt_)
     {
-        particleCloud_.probeM().initialize(typeName, "gidaspowDrag.logDat");
+        particleCloud_.probeM().initialize(typeName, typeName+".logDat");
         particleCloud_.probeM().vectorFields_.append("dragForce"); //first entry must  be the force
         particleCloud_.probeM().vectorFields_.append("Urel");
         particleCloud_.probeM().scalarFields_.append("Rep");
@@ -103,10 +101,6 @@ GidaspowDrag::GidaspowDrag
         forceSubM(iFSub).readSwitches();
 
     particleCloud_.checkCG(true);
-    if (propsDict_.found("scale"))
-        scaleDia_=scalar(readScalar(propsDict_.lookup("scale")));
-    if (propsDict_.found("scaleDrag"))
-        scaleDrag_=scalar(readScalar(propsDict_.lookup("scaleDrag")));
 
     if (propsDict_.found("switchingVoidfraction"))
         switchingVoidfraction_ = readScalar(propsDict_.lookup("switchingVoidfraction"));
@@ -123,15 +117,16 @@ GidaspowDrag::~GidaspowDrag()
 
 void GidaspowDrag::setForce() const
 {
-    if (scaleDia_ > 1)
-        Info << typeName << " using scale = " << scaleDia_ << endl;
-    else if (particleCloud_.cg() > 1){
-        scaleDia_=particleCloud_.cg();
-        Info << typeName << " using scale from liggghts cg = " << scaleDia_ << endl;
-    }
 
-    const volScalarField& nufField = forceSubM(0).nuField();
     const volScalarField& rhoField = forceSubM(0).rhoField();
+    #if defined(version24Dev)
+       // there seems to have been a change in the return value of 
+       // particleCloud_.turbulence().nu() used by forceSubM(0).nuField();
+       const volScalarField& nufField = particleCloud_.turbulence().nu();
+    #else
+        const volScalarField& nufField = forceSubM(0).nuField();
+    #endif
+
 
     //update force submodels to prepare for loop
     for (int iFSub=0;iFSub<nrForceSubModels();iFSub++)
@@ -146,6 +141,7 @@ void GidaspowDrag::setForce() const
     vector Us(0,0,0);
     vector Ur(0,0,0);
     scalar ds(0);
+    scalar dParcel(0);
     scalar nuf(0);
     scalar rho(0);
     scalar magUr(0);
@@ -196,50 +192,58 @@ void GidaspowDrag::setForce() const
                 }
 
                 Us = particleCloud_.velocity(index);
+                ds = 2*particleCloud_.radius(index);
+                dParcel = ds;
+                forceSubM(0).scaleDia(ds); //caution: this fct will scale ds!
+                rho = rhoField[cellI];
+                nuf = nufField[cellI];
+
+                //Update any scalar or vector quantity
+                for (int iFSub=0;iFSub<nrForceSubModels();iFSub++)
+                      forceSubM(iFSub).update(  index, 
+                                                cellI,
+                                                ds,
+                                                Ufluid, 
+                                                Us, 
+                                                nuf,
+                                                rho,
+                                                forceSubM(0).verbose()
+                                             );
+
+                Vs = ds*ds*ds*M_PI/6;
                 Ur = Ufluid-Us;
                 magUr = mag(Ur);
-                ds = 2*particleCloud_.radius(index);
-                rho = rhoField[cellI];
-
-                #if defined(version24Dev)
-                    // there seems to have been a change in the return value of 
-                    // particleCloud_.turbulence().nu() used by forceSubM(0).nuField();
-                    nuf = particleCloud_.turbulence().nu()()[cellI];
-                #else
-                    nuf = nufField[cellI];
-                #endif
-
                 Rep=0.0;
                 localPhiP = 1.0f-voidfraction+SMALL;
-                Vs = ds*ds*ds*M_PI/6;
 
                 // calc particle's drag coefficient (i.e., Force per unit slip velocity and per m³ PARTICLE)
                 if(voidfraction > switchingVoidfraction_) //dilute
                 {
-                    Rep=ds/scaleDia_*voidfraction*magUr/(nuf+SMALL);
-                    CdMagUrLag = (24.0*nuf/(ds/scaleDia_*voidfraction)) //1/magUr missing here, but compensated in expression for betaP!
+                    Rep=ds*voidfraction*magUr/(nuf+SMALL);
+                    CdMagUrLag = (24.0*nuf/(ds*voidfraction)) //1/magUr missing here, but compensated in expression for betaP!
                                  *(scalar(1.0)+0.15*Foam::pow(Rep, 0.687));
 
                     betaP = 0.75*(                                  //this is betaP = beta / localPhiP!
                                             rho*voidfraction*CdMagUrLag
                                           /
-                                            (ds/scaleDia_*Foam::pow(voidfraction,2.65))
+                                            (ds*Foam::pow(voidfraction,2.65))
                                           );
                 }
                 else  //dense
                 {
                     betaP = (150 * localPhiP*nuf*rho)          //this is betaP = beta / localPhiP!
-                             /  (voidfraction*ds/scaleDia_*phi_*ds/scaleDia_*phi_)
+                             /  (voidfraction*ds*phi_*ds*phi_)
                             +
                               (1.75 * magUr * rho)
-                             /((ds/scaleDia_*phi_));
+                             /((ds*phi_));
                 }
 
                 // calc particle's drag
-                dragCoefficient = Vs*betaP*scaleDrag_;
+                dragCoefficient = Vs*betaP;
                 if (modelType_=="B")
                     dragCoefficient /= voidfraction;
 
+                forceSubM(0).scaleCoeff(dragCoefficient,dParcel);
                 drag = dragCoefficient * Ur;
 
                 // explicitCorr
@@ -256,8 +260,7 @@ void GidaspowDrag::setForce() const
                     Pout << "index = " << index << endl;
                     Pout << "Us = " << Us << endl;
                     Pout << "Ur = " << Ur << endl;
-                    Pout << "ds = " << ds << endl;
-                    Pout << "ds/scale = " << ds/scaleDia_ << endl;
+                    Pout << "dprim = " << ds << endl;
                     Pout << "phi = " << phi_ << endl;
                     Pout << "rho = " << rho << endl;
                     Pout << "nuf = " << nuf << endl;

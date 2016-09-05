@@ -63,8 +63,12 @@ void noTransport::update()
 {}
 
 // ************************************************************
-volScalarField& noTransport::sourceField()
-{}
+const volScalarField& noTransport::sourceField()
+{
+    FatalErrorIn("const volScalarField& noTransport::sourceField() ")
+        << "this source field is NOT implemented, and hence MUST NOT be called!" << abort(FatalError);
+    return volScalarField::null();
+}
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam

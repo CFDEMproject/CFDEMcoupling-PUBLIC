@@ -29,7 +29,7 @@ gradSchemes
 
 divSchemes
 {
-    default          Gauss linear;
+    default         Gauss linear;
     div(phi,U)      Gauss limitedLinearV 1;
     div(phi,k)      Gauss limitedLinear 1;
     div(phi,epsilon) Gauss limitedLinear 1;
@@ -59,12 +59,6 @@ laplacianSchemes
 interpolationSchemes
 {
     default         linear;
-    //interpolate(U)  linear;
-    //interpolate((1|A(U))) linear;
-    //interpolate((U*voidfraction)) linear;
-    //interpolate((Us*voidfraction)) linear;
-    //interpolate((Ksl|rho)) linear;
-    
 }
 
 snGradSchemes

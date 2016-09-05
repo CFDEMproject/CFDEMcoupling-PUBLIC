@@ -1,0 +1,55 @@
+.. index:: locateModel_engineSearch
+
+locateModel_engineSearch command
+================================
+
+Syntax
+""""""
+
+Defined in couplingProperties dictionary.
+
+.. parsed-literal::
+
+   locateModel engine;
+   engineProps
+   {
+       treeSearch switch1;
+   }
+
+* *switch1* = (optional, default true) switch to use tree search algorithm
+
+
+Examples
+""""""""
+
+.. parsed-literal::
+
+   locateModel engine;
+   engineProps
+   {
+       treeSearch true;
+   }
+
+Description
+"""""""""""
+
+The locateModel "engine" locates the CFD cell and cellID corresponding to a given position.
+The engineSearch locate model can be used with different settings to use different algorithms:
+
+* treeSearch false;     will execute some geometric (linear) search using the last known cellID
+* treeSearch true;      will use a recursive tree structure to find the cell (recommended).
+
+
+Restrictions
+""""""""""""
+ none.
+
+Related commands
+""""""""""""""""
+
+:doc:`locateModel <locateModel>`
+
+
+.. _liws: http://www.cfdem.com
+.. _ld: Manual.html
+.. _lc: Section_commands.html#comm

@@ -1,0 +1,50 @@
+.. index:: voidfractionModel_trilinearVoidFraction
+
+voidfractionModel_trilinearVoidFraction command
+===============================================
+
+Syntax
+""""""
+
+Defined in couplingProperties dictionary.
+
+.. parsed-literal::
+
+   voidfractionModel trilinear;
+   trilinearProps
+   {
+       alphaMin number1;
+   }
+
+* *number1* = minimum limit for voidfraction
+
+
+Examples
+""""""""
+
+.. parsed-literal::
+
+   voidfractionModel trilinear;
+   trilinearProps
+   {
+       alphaMin 0.3;
+   }
+
+Description
+"""""""""""
+
+The trilinear voidFraction model is supposed to be used when a particle (or its representation) is in the size range of a CFD cell. The particle's volume is distributed over 8 neighbouring cell centres usind trilinear interpolation. This allows for a very smooth transition of particle volume when a particle travels from one cell to another cell.
+
+Restrictions
+""""""""""""
+ The model works only for a structured mesh with equal cubic cells and a clean x/y/z parallel distribution of the cells. WARNING: the alphaMin parameter is not yet considered in the model!!!
+
+Related commands
+""""""""""""""""
+
+:doc:`voidfractionModel <voidFractionModel>`
+
+
+.. _liws: http://www.cfdem.com
+.. _ld: Manual.html
+.. _lc: Section_commands.html#comm

@@ -88,6 +88,10 @@ protected:
 
         mutable int     verboseDiskCounter_;
 
+        scalar scaleDia_;
+
+        scalar scaleDrag_;
+
 public:
 
     //- Runtime type information
@@ -156,13 +160,23 @@ public:
         virtual void explicitCorrScalar(scalar&, scalar&, scalar&,
                                         scalar&, const scalar&, scalar&, bool, label index=100) const;
 
-        virtual void update(scalar& deltaT,         label particleI,        label cellI,
+        virtual void update(label particleI,        label cellI,            scalar& d,
                             scalar& scalToUpdate1,  scalar&  scalToUpdate2, bool  verbose) const;
 
-        virtual void update(scalar& deltaT,         label particleI,        label cellI,
+        virtual void update(label particleI,        label cellI,            scalar& d,
                             vector& vecToUpdate1,   vector&  vecToUpdate2,
                             scalar& scalToUpdate1,  scalar&  scalToUpdate2,
                             bool  verbose) const;
+
+        virtual void scaleDia(scalar& d) const;
+
+        virtual void scaleForce(vector& force) const;
+
+        virtual void scaleForce(vector& force, scalar& d) const;
+
+        virtual void scaleCoeff(scalar& coeff) const;
+
+        virtual void scaleCoeff(scalar& coeff, scalar& d) const;
 
         virtual void explicitLimit(vector&, vector&, scalar&) const;
         
@@ -217,6 +231,10 @@ public:
         const volVectorField& divTauField(const volVectorField&) const;
 
         const volVectorField& IBDragPerV(const volVectorField&,const volScalarField&) const;
+
+        const scalar& scaleDia() const {return scaleDia_;};
+
+        const scalar& scaleDrag() const {return scaleDia_;};
 };
 
 

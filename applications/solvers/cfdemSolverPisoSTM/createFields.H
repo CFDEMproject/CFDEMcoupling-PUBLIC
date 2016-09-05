@@ -105,7 +105,7 @@
         ),
         mesh//,
         //dimensionedScalar("0", dimensionSet(0, 0, -1, 1, 0), 273.15)
-    );
+    );*/
 
     Info<< "\nCreating fluid-particle heat flux field\n" << endl;
     volScalarField Tsource
@@ -115,14 +115,14 @@
             "Tsource",
             runTime.timeName(),
             mesh,
-            IOobject::MUST_READ,
-            IOobject::AUTO_WRITE
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
         ),
-        mesh//,
-        //dimensionedScalar("0", dimensionSet(0, 0, -1, 1, 0), 0.0)
+        mesh,
+        dimensionedScalar("0", dimensionSet(0, 0, -1, 1, 0), 0.0)
     );
 
-    IOdictionary transportProperties
+    /*IOdictionary transportProperties
     (
         IOobject
         (
@@ -159,7 +159,19 @@ surfaceScalarField phi
  );
 #endif
 
-
+Info<< "Generating interstitial face flux field phiByVoidfraction\n" << endl;
+surfaceScalarField phiByVoidfraction
+(
+ IOobject
+ (
+    "phiByVoidfraction",
+    runTime.timeName(),
+    mesh,
+    IOobject::NO_READ,
+    IOobject::NO_WRITE
+ ),
+ linearInterpolate(U) & mesh.Sf()
+);
 
     label pRefCell = 0;
     scalar pRefValue = 0.0;

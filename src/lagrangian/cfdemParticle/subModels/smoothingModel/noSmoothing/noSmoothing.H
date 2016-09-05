@@ -80,6 +80,10 @@ public:
 
         void smoothen(volVectorField&) const;
 
+        void smoothenAbsolutField(volScalarField&) const;
+
+        void smoothenAbsolutField(volVectorField&) const;
+
         void smoothenReferenceField(volVectorField&) const;
 };
 

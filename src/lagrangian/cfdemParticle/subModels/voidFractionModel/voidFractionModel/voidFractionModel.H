@@ -161,6 +161,17 @@ public:
         virtual bool checkParticleType(label) const {return true;}; //consider all particles by default
 
         bool requiresSuperquadric() const;
+
+        virtual double minPeriodicDistance
+        (
+            int index,
+            vector    cellCentrePosition,
+            vector    positionCenter,
+            boundBox  globalBb,
+            vector&   minPeriodicPos
+        ) const;
+        virtual double pointInParticle(int index, vector positionCenter, vector point, double scale) const;
+        virtual double pointInParticle(int index, vector positionCenter, vector point) const;
 };
 
 

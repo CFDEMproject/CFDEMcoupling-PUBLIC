@@ -64,16 +64,10 @@ engineSearchIB::engineSearchIB
     cfdemCloud& sm
 )
 :
-    engineSearch(dict.subDict(typeName + "Props"),sm),
-    propsDict_(dict.subDict(typeName + "Props")),
+    engineSearch(dict,sm,typeName),
     zSplit_(readLabel(propsDict_.lookup("zSplit"))),
-    xySplit_(readLabel(propsDict_.lookup("xySplit"))),
-    checkPeriodicCells_(false)
-{
-
-    if(propsDict_.found("checkPeriodicCells")) checkPeriodicCells_=true;
-
-}
+    xySplit_(readLabel(propsDict_.lookup("xySplit")))
+{}
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
@@ -93,12 +87,11 @@ label engineSearchIB::findCell
     int size
 ) const
 {
-
+    bool checkPeriodicCells(particleCloud_.checkPeriodicCells());
     int numprocs, me;
     MPI_Comm_size(MPI_COMM_WORLD, &numprocs);
     MPI_Comm_rank(MPI_COMM_WORLD, &me);
     const boundBox& globalBb = particleCloud_.mesh().bounds();
-
 
     vector position;
     for(int index = 0;index < size; ++index)
@@ -122,35 +115,14 @@ label engineSearchIB::findCell
                 vector pos = position;
                 label altStartPos = -1;
                 label numberOfPoints = (zSplit_-1)*xySplit_ + 2; // 1 point at bottom, 1 point at top
-                label thetaLevel = 0;
-                scalar theta, phi;
-                const scalar thetaSize = 180./zSplit_, phiSize = 360./xySplit_;
-                const scalar deg2rad = M_PI/180.;
 
                 for(int countPoints = 0; countPoints < numberOfPoints; ++countPoints)
                 {
-                    pos = position;
-                    if(countPoints == 0)
-                    {
-                        pos[2] += radius;
-                    }
-                    else if(countPoints == 1)
-                    {
-                        pos[2] -= radius;
-                    }
-                    else
-                    {
-                        thetaLevel = (countPoints - 2) / xySplit_;
-                        theta = deg2rad * thetaSize * (thetaLevel+1);
-                        phi = deg2rad * phiSize * (countPoints - 2 - thetaLevel*xySplit_);
-                        pos[0] += radius * sin(theta) * cos(phi);
-                        pos[1] += radius * sin(theta) * sin(phi);
-                        pos[2] += radius * cos(theta);
-                    }
+                    pos = generateSatellitePoint(index, countPoints);
 
-            		altStartPos=findSingleCell(pos,oldID); //particleCloud_.mesh().findCell(pos);//
+                    altStartPos=findSingleCell(pos,oldID); //particleCloud_.mesh().findCell(pos);//
                     //check for periodic domains
-                    if(checkPeriodicCells_)
+                    if(checkPeriodicCells)
                     {
                         for(int iDir=0;iDir<3;iDir++)
                         {
@@ -163,7 +135,7 @@ label engineSearchIB::findCell
                                 pos[iDir]+=globalBb.max()[iDir]-globalBb.min()[iDir];
                             }
                         }
-                  		altStartPos=findSingleCell(pos,oldID); //particleCloud_.mesh().findCell(pos);//
+                        altStartPos=findSingleCell(pos,oldID); //particleCloud_.mesh().findCell(pos);//
                     }
 
                     if(altStartPos >= 0) // found position, we're done
@@ -177,6 +149,29 @@ label engineSearchIB::findCell
         }
     }
     return 1;
+}
+
+vector engineSearchIB::generateSatellitePoint(int index, int countPoints) const
+{
+  vector position = particleCloud_.position(index);
+  scalar theta, phi;
+  const scalar thetaSize = 180./zSplit_, phiSize = 360./xySplit_;
+  const scalar deg2rad = M_PI/180.;
+  vector pos = position;
+  double radius=particleCloud_.radius(index);
+  if(countPoints == 0) {
+    pos[2] += radius;
+  } else if(countPoints == 1) {
+    pos[2] -= radius;
+  } else {
+    scalar thetaLevel = (countPoints - 2) / xySplit_;
+    theta = deg2rad * thetaSize * (thetaLevel+1);
+    phi = deg2rad * phiSize * (countPoints - 2 - thetaLevel*xySplit_);
+    pos[0] += radius * sin(theta) * cos(phi);
+    pos[1] += radius * sin(theta) * sin(phi);
+    pos[2] += radius * cos(theta);
+  }
+  return pos;
 }
 
 

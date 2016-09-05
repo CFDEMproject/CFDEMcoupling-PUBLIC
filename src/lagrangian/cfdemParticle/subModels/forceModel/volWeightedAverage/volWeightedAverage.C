@@ -65,9 +65,9 @@ volWeightedAverage::volWeightedAverage
     propsDict_(dict.subDict(typeName + "Props")),
     mesh_(particleCloud_.mesh()),
     startTime_(propsDict_.lookupOrDefault<scalar>("startTime",0.)),
-    volumeFractionName_(propsDict_.lookupOrDefault<word>("volumeFractionName","voidfraction")),
     scalarFieldNames_(propsDict_.lookup("scalarFieldNames")),
     vectorFieldNames_(propsDict_.lookup("vectorFieldNames")),
+    volumeFractionName_(propsDict_.lookupOrDefault<word>("volumeFractionName","voidfraction")),
     volumeFraction_(particleCloud_.mesh().lookupObject<volScalarField>(volumeFractionName_)),
     upperThreshold_(readScalar(propsDict_.lookup("upperThreshold"))),
     lowerThreshold_(readScalar(propsDict_.lookup("lowerThreshold"))),
@@ -191,7 +191,7 @@ void volWeightedAverage::setForce() const
             MPI_Allreduce(&totVol, &totVol_all, 3, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
             integralValue = gSum(scalarFields_[i]);
             volWeightedAverage = integralValue / (totVol_all+SMALL);
-            scalarFields_[i].internalField() = volWeightedAverage;
+            scalarFields_[i] == dimensionedScalar("value", scalarFields_[i].dimensions(), volWeightedAverage);
 
             if(verbose_)
             {
@@ -242,7 +242,7 @@ void volWeightedAverage::setForce() const
 
             MPI_Allreduce(&totVol, &totVol_all, 3, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
             volWeightedAverage = gSum(vectorFields_[i]) / (totVol_all+SMALL);
-            vectorFields_[i].internalField() = volWeightedAverage;
+            vectorFields_[i] == volWeightedAverage;
 
             if(verbose_)
             {

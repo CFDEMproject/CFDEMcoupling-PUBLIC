@@ -1,0 +1,55 @@
+.. index:: voidfractionModel_centreVoidFraction
+
+voidfractionModel_centreVoidFraction command
+============================================
+
+Syntax
+""""""
+
+Defined in couplingProperties dictionary.
+
+.. parsed-literal::
+
+   voidfractionModel centre;
+   centreProps
+   {
+       alphaMin number1;
+       weight number2;
+   }
+
+* *number1* = minimum limit for voidfraction
+* *number2* = (optional) scaling of the particle volume to account for porosity or agglomerations.
+
+
+Examples
+""""""""
+
+.. parsed-literal::
+
+   voidfractionModel centre;
+   centreProps
+   {
+       alphaMin 0.1;
+       weight 1.;
+   }
+
+Description
+"""""""""""
+
+The centre voidFraction model calculates the voidfraction in a CFD cell accounting for the volume of the particles whose centres are inside the cell.
+
+The particle volume occupied in the CFD domain can be adjusted by the parameter "weight", using Vparticle=dsphere^3*pi/6*weight.
+
+Restrictions
+""""""""""""
+ none.
+
+Related commands
+""""""""""""""""
+
+:doc:`voidfractionModel <voidFractionModel>`
+
+
+.. _liws: http://www.cfdem.com
+.. _ld: Manual.html
+.. _lc: Section_commands.html#comm

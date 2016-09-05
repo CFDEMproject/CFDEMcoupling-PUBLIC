@@ -68,8 +68,7 @@ execute::execute
     commandList_(0),
     command_(""),
     scalarList_(0),
-    labelList_(0),
-    timeStamp_(false)
+    labelList_(0)
 {
     // define dictionary
     char h[80];

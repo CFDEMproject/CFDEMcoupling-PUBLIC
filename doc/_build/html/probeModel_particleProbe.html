@@ -1,0 +1,270 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>probeModel_particleProbe command &mdash; CFDEMcoupling v3.X documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="CFDEMcoupling v3.X documentation" href="index.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="CFDEMcoupling_Manual.html" class="icon icon-home"> CFDEMcoupling
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                v3.X
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <!-- Local TOC -->
+                <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">probeModel_particleProbe command</a><ul>
+<li><a class="reference internal" href="#syntax">Syntax</a></li>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+<li><a class="reference internal" href="#description">Description</a></li>
+<li><a class="reference internal" href="#restrictions">Restrictions</a></li>
+</ul>
+</li>
+</ul>
+</div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="CFDEMcoupling_Manual.html">CFDEMcoupling</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="CFDEMcoupling_Manual.html">Docs</a> &raquo;</li>
+      
+    <li>probeModel_particleProbe command</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        
+          <a href="http://www.cfdem.com"> Website</a>
+        
+      
+    </li>
+  </ul>
+  <hr/>
+  
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="probemodel-particleprobe-command">
+<span id="index-0"></span><h1>probeModel_particleProbe command<a class="headerlink" href="#probemodel-particleprobe-command" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="syntax">
+<h2>Syntax<a class="headerlink" href="#syntax" title="Permalink to this headline">¶</a></h2>
+<p>To be activated via couplingProperties dictionary.</p>
+<p>forceModels
+(</p>
+<blockquote>
+<div>myForceModel1
+myForceModel2
+myForceModel3</div></blockquote>
+<p>);</p>
+<p>probeModel particleProbe;</p>
+<div class="highlight-python"><div class="highlight"><pre>particleProbeProps
+{
+    particleIDsToSample (ID1 ID2 ID3 ...);  //list of particleIDs to sample
+    verboseToFile;                          //main switch
+    verbose;                                //currently not used
+    printEvery       xEvery;                //print every this many CFD time steps
+    printOnlyAtStep  xStep;                 //print only at this CFD time step (overrides &quot;printEvery&quot;)
+    sampleAll;                              //Activate sampling for all particles
+    probeDebug;                             //probes additional fields
+    includePosition;                        //will include particle position in the output file
+    writePrecision xPrecision;              //number of significant digits to print
+};
+</pre></div>
+</div>
+<ul class="simple">
+<li><em>particleIDsToSample</em> = list of particle IDs to be sampled.</li>
+<li><em>myForceModeli</em> = list of force models in the simulation, the particleProbe will be applied to all of these models!</li>
+<li><em>verboseToFile</em> = main switch to activate the particle probe (default = off).</li>
+<li><em>verbose</em> = main switch to activate output to Info (currently not implemented).</li>
+<li><em>xEvery</em> = integer to specify the interval for sampling (default = 1, i.e., probing occurs every CFD time step).</li>
+<li><em>xStep</em>  = integer to specify the step for sampling (default = deactivated, i.e., it will print accordingly to &#8220;printEvery&#8221;).</li>
+<li><em>sampleAll</em> = switch to activate sampling of all particles. Otherwise (default) only particles specified via &#8220;particleIDsToSample&#8221; in the couplingProperties dictionary will be sampled.</li>
+<li><em>probeDebug</em> = switch to activate probing of debug properties of secondary importance (specific for each force model).</li>
+<li><em>includePosition</em> = switch to add the particle position in the log file (default = off).</li>
+<li><a href="#id1"><span class="problematic" id="id2">*</span></a>xPrecision*= number of significant digits of the text output (default = 3).</li>
+</ul>
+</div>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre>particleIDsToSample (0 1 2 3);
+forceModels
+(
+    gradPForce
+);
+particleProbeProps
+{
+    verboseToFile;       //main switch
+    verbose;                //currently not used
+    printEvery  100;      //print every this many CFD time steps
+    sampleAll;            //Activate sampling for all particles
+    probeDebug;  //probes additional fields
+    includePosition;  //will include particle position in the output file
+    writePrecision 4;           //number of significant digits to print
+};
+</pre></div>
+</div>
+<p>Note: This examples list might not be complete - please check below for the list of force models that can perform particle probing.</p>
+</div>
+<div class="section" id="description">
+<h2>Description<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h2>
+<p>The particleProbe feature keeps track of per-particle quantities (e.g., the fluid-particle interaction forces) acting on each DEM particle, and handles its storage during the simulation. Data is saved in the CFD/particleProbes/startTime directory, where startTime is the time at which the simulation is started (this avoids unwanted deletion of particleProbe data).</p>
+</div>
+<div class="section" id="restrictions">
+<h2>Restrictions<a class="headerlink" href="#restrictions" title="Permalink to this headline">¶</a></h2>
+<p>You can manually switch off the probe model for each force model by specifying the Switch &#8220;suppressProbe&#8221; in the corresponding force properties dictionary.</p>
+<p><strong>Related commands which are currently enabled for particle probing:</strong></p>
+<p><a class="reference internal" href="forceModel_gradPForce.html"><em>gradPForce</em></a>, <a class="reference internal" href="forceModel_viscForce.html"><em>viscForce</em></a>, <tt class="xref doc docutils literal"><span class="pre">BeetstraDrag</span></tt>, <tt class="xref doc docutils literal"><span class="pre">HollowayDrag</span></tt>, <a class="reference internal" href="forceModel_MeiLift.html"><em>MeiLift</em></a>, as well as most other forceModels (see src directory for details, i.e., use &#8220;grep -r &#8216;probeM(&#8216; ./&#8221; in the terminal).</p>
+<p><strong>Default:</strong> none.</p>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, DCS Computing GmbH, JKU Linz.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'v3.X',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

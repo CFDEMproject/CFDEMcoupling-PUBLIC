@@ -1,0 +1,41 @@
+.. index:: dataExchangeModel_noDataExchange
+
+dataExchangeModel_noDataExchange command
+========================================
+
+Syntax
+""""""
+
+Defined in couplingProperties dictionary.
+
+.. parsed-literal::
+
+   dataExchangeModel noDataExchange;
+
+Examples
+""""""""
+
+.. parsed-literal::
+
+   dataExchangeModel noDataExchange;
+
+Description
+"""""""""""
+
+The data exchange model performs the data exchange between the DEM code and the CFD code. The noDataExchange model is a dummy model where no data is exchanged.
+
+Restrictions
+""""""""""""
+
+
+None.
+
+Related commands
+""""""""""""""""
+
+:doc:`dataExchangeModel <dataExchangeModel>`
+
+
+.. _liws: http://www.cfdem.com
+.. _ld: Manual.html
+.. _lc: Section_commands.html#comm

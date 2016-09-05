@@ -122,8 +122,8 @@ void phaseChangeModel::update(const volScalarField&      voidfraction,   //this 
     cpFromField_ = fromField.cpCarrier();
     cpToField_   = toField.cpCarrier();
 
-    forAll(mSaturation_.internalField(), iter)
-        mSaturation_.internalField()[iter] = pVapor( temp.internalField()[iter] )  / temp[iter] / Rvap_; 
+    forAll(mSaturation_, iter)
+        mSaturation_[iter] = pVapor( temp[iter] )  / temp[iter] / Rvap_; 
 
     //update the reference quantities
     volScalarField tempF =      voidfraction 
@@ -136,19 +136,19 @@ void phaseChangeModel::update(const volScalarField&      voidfraction,   //this 
 
 
     //leaving mass rate - implicit/explicit term (divided by fromFiel.m())
-    fromField.mSource().internalField()    -= (1-alphaImExSplit_) * tempF.internalField() * fromField.m().internalField()
+    fromField.mSource()    -= (1-alphaImExSplit_) * tempF * fromField.m()
                                               / tEvap_.value()  //characteristic evaporation time
                                             * (   
-                                                 mSaturation_.internalField() 
-                                               - toField.m().internalField()
+                                                 mSaturation_ 
+                                               - toField.m()
                                                 *fromField.rhoCarrier()
                                               );
 
-    fromField.mSourceKImpl().internalField() -= alphaImExSplit_ * tempF.internalField() 
+    fromField.mSourceKImpl() -= alphaImExSplit_ * tempF
                                               / tEvap_.value()  //characteristic evaporation time
                                             * (   
-                                                 mSaturation_.internalField() 
-                                               - toField.m().internalField()
+                                                 mSaturation_ 
+                                               - toField.m()
                                                 *fromField.rhoCarrier()
                                               );
 
@@ -157,14 +157,14 @@ void phaseChangeModel::update(const volScalarField&      voidfraction,   //this 
 
 
     //entering mass rate - explicit & implicit term
-    toField.mSource().internalField()     += tempF * mSaturation_.internalField();
-    toField.mSourceKImpl().internalField()-= tempF * toField.rhoCarrier();
+    toField.mSource()     += tempF * mSaturation_;
+    toField.mSourceKImpl()-= tempF * toField.rhoCarrier();
 
     //set the rate
-    mSource_.internalField()  = tempF 
+    mSource_  = tempF 
                               * (   
-                                    mSaturation_.internalField() 
-                                  - toField.m().internalField()
+                                    mSaturation_
+                                  - toField.m()
                                   * toField.rhoCarrier() 
                                 );
     if(verboseToDisk())
@@ -175,9 +175,9 @@ void phaseChangeModel::update(const volScalarField&      voidfraction,   //this 
 void phaseChangeModel::setEnthalpySource(const eulerianScalarField& Temperature) const
 {
     //update the heat source
-    Temperature.mSource().internalField() -= mSource_.internalField()
+    Temperature.mSource() -= mSource_
                                            * (   deltaHEvap_.value() 
-                                               - Temperature.m().internalField() * (cpFromField_ - cpToField_)
+                                               - Temperature.m() * (cpFromField_ - cpToField_)
                                              );
 }
 
@@ -224,9 +224,9 @@ void phaseChangeModel::initialzeSummation(word typeName, word  logFileName) cons
 //*******************************************************************
 void phaseChangeModel::computeIntegral(volScalarField& explicitEulerSource) const
 {
-    scalar integralValue = gSum( explicitEulerSource.internalField() 
-                                *explicitEulerSource.mesh().V()
-                               );
+    volScalarField expEulerSrc=explicitEulerSource;
+    particleCloud_.scaleWithVcell(expEulerSrc);
+    scalar integralValue = gSum(expEulerSrc);
 
     if (Pstream::master() )
     {

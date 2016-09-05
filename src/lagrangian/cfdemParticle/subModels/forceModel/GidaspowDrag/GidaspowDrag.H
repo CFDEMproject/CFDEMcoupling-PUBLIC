@@ -78,10 +78,6 @@ private:
 
     const volVectorField& UsField_;  // the average particle velocity field
 
-    mutable scalar scaleDia_;
-
-    mutable scalar scaleDrag_;
-
     mutable scalar switchingVoidfraction_; //voidfraction above which dilute formulation will be used
 
 public:

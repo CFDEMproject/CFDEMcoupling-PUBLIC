@@ -1,0 +1,451 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>CFDEMcoupling Documentation &mdash; CFDEMcoupling v3.X documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="CFDEMcoupling v3.X documentation" href="index.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="#" class="icon icon-home"> CFDEMcoupling
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                v3.X
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <!-- Local TOC -->
+                <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">CFDEMcoupling Documentation</a><ul>
+<li><a class="reference internal" href="#contents">Contents</a><ul>
+<li><a class="reference internal" href="#about-cfdemcoupling">About CFDEMcoupling</a></li>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#tutorials">Tutorials</a></li>
+<li><a class="reference internal" href="#couplingproperties-dictionary">&#8220;couplingProperties&#8221; dictionary</a></li>
+<li><a class="reference internal" href="#liggghtscommands-dictionary">&#8220;liggghtsCommands&#8221; dictionary</a></li>
+<li><a class="reference internal" href="#models-solvers">Models/Solvers</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="#">CFDEMcoupling</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="#">Docs</a> &raquo;</li>
+      
+    <li>CFDEMcoupling Documentation</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        
+          <a href="http://www.cfdem.com"> Website</a>
+        
+      
+    </li>
+  </ul>
+  <hr/>
+  
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="cfdemcoupling-documentation">
+<h1>CFDEMcoupling Documentation<a class="headerlink" href="#cfdemcoupling-documentation" title="Permalink to this headline">¶</a></h1>
+<hr class="docutils" />
+<img alt="_images/Portfolio_CFDEMcoupling.png" class="align-center" src="_images/Portfolio_CFDEMcoupling.png" />
+<hr class="docutils" />
+<div class="section" id="contents">
+<h2>Contents<a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h2>
+<p>The CFDEMcoupling documentation is organized into the following sections. If you find any errors or omissions in this manual or have suggestions for useful information to add, please send an email to the developers so the CFDEMcoupling documentation can be improved.</p>
+<div class="line-block">
+<div class="line">1.1 <a class="reference internal" href="#id1"><em>About CFDEMcoupling</em></a></div>
+<div class="line">1.2 <a class="reference internal" href="#id2"><em>Installation</em></a></div>
+<div class="line">1.3 <a class="reference internal" href="#id3"><em>Tutorials</em></a></div>
+<div class="line">1.4 <a class="reference internal" href="#id4"><em>couplingProperties dictionary</em></a></div>
+<div class="line">1.5 <a class="reference internal" href="#id5"><em>liggghtsCommands dictionary</em></a></div>
+<div class="line">1.6 <a class="reference internal" href="#cmd-5"><em>Models and solvers</em></a></div>
+<div class="line"><br /></div>
+</div>
+<hr class="docutils" />
+<div class="section" id="about-cfdemcoupling">
+<span id="id1"></span><h3>About CFDEMcoupling<a class="headerlink" href="#about-cfdemcoupling" title="Permalink to this headline">¶</a></h3>
+<p>CFDEM coupling provides an open source parallel coupled CFD-DEM framework combining the strengths of <a class="reference external" href="http://www.cfdem.com">LIGGGHTS</a> DEM code and the Open Source CFD package <a class="reference external" href="http://www.openfoam.com">OpenFOAM(R)(*)</a>. The CFDEMcoupling toolbox allows to expand standard CFD solvers of <a class="reference external" href="http://www.openfoam.com">OpenFOAM(R)(*)</a> to include a coupling to the DEM code <a class="reference external" href="http://www.cfdem.com">LIGGGHTS</a>. In this toolbox the particle representation within the CFD solver is organized by &#8220;cloud&#8221; classes. Key functionalities are organised in sub-models (e.g. force models, data exchange models, etc.) which can easily be selected and combined by dictionary settings.</p>
+<p>The coupled solvers run fully parallel on distributed-memory clusters. Features are:</p>
+<ul class="simple">
+<li>its modular approach allows users to easily implement new models</li>
+<li>its MPI parallelization enables to use it for large scale problems</li>
+<li>the <a class="reference external" href="http://www.cfdem.com">forum</a> on CFD-DEM gives the possibility to exchange with other users / developers</li>
+<li>the use of GIT allows to easily update to the latest version</li>
+<li>basic documentation is provided</li>
+</ul>
+<p>The file structure:</p>
+<ul class="simple">
+<li><em>src</em> directory including the source files of the coupling toolbox and models</li>
+<li><em>applications</em> directory including the solver files for coupled CFD-DEM simulations</li>
+<li><em>doc</em> directory including the documentation of CFDEMcoupling</li>
+<li><em>tutorials</em> directory including basic tutorial cases showing the functionality</li>
+</ul>
+<p>Details on installation are given on the <a class="reference external" href="http://www.cfdem.com">CFDEMproject WWW Site</a> .
+The functionality of this CFD-DEM framework is described via <em class="xref std std-ref">tutorial cases</em> showing how to use different solvers and models.</p>
+<p>CFDEMcoupling stands for Computational Fluid Dynamics (CFD) -Discrete Element Method (DEM) coupling.</p>
+<p>CFDEMcoupling is an open-source code, distributed freely under the terms of the GNU Public License (GPL).</p>
+<p>Core development of CFDEMcoupling is done by Christoph Goniva and Christoph Kloss, both at DCS Computing GmbH, 2012</p>
+<p>This documentation was written by Christoph Goniva, DCS Computing GmbH, 2012</p>
+<hr class="docutils" />
+<p>(*) This offering is not approved or endorsed by OpenCFD Limited, the producer of the OpenFOAM software and owner of the OPENFOAM®  and OpenCFD®  trade marks.</p>
+<hr class="docutils" />
+</div>
+<div class="section" id="installation">
+<span id="id2"></span><h3>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h3>
+<p>Please follow the installation routine provided at www.cfdem.com.
+In order to get the latest code version, please use the git repository at <a class="reference external" href="http://github.com">http://github.com</a> (<a class="reference internal" href="githubAccess_public.html"><em>githubAccess</em></a>).</p>
+<hr class="docutils" />
+</div>
+<div class="section" id="tutorials">
+<span id="id3"></span><h3>Tutorials<a class="headerlink" href="#tutorials" title="Permalink to this headline">¶</a></h3>
+<p><strong>General:</strong></p>
+<p>Each solver of the CFDEMcoupling comes with at least one tutorial example, showing its functionality and correct usage. Provided that the installation is correct, the tutorials can be run via &#8220;Allrun.sh&#8221; shell scripts. These scripts perform all necessary steps (preprocessing, run, postprocessing, visualization).</p>
+<p><strong>Location:</strong></p>
+<p>The tutorials can be found in the directory $CFDEM_PROJECT_DIR/tutorials, which can be reached by typing &#8220;cfdemTut&#8221;</p>
+<p><strong>Structure:</strong></p>
+<p>Each case is structured in a directory called &#8220;CFD&#8221; covering the CFD relevant settings and data, and a dirctory called &#8220;DEM&#8221; covering the DEM relevant settings and data. This allows to easily expand a pure CFD or DEM simulation case to a coupled case.</p>
+<p><strong>Usage:</strong></p>
+<p>Provided that the installation is correct, the tutorials can be run via &#8220;Allrun.sh&#8221; shell script, executed by typing &#8221;./Allrun.sh&#8221;. The successful run of the script might need some third party software (e.g. octave, evince, etc.).</p>
+<p><strong>Settings:</strong></p>
+<p>The main settings of a simulation are done via dictionaries:</p>
+<p>The DEM setup of each case is defined by a <a class="reference external" href="http://www.cfdem.com">LIGGGHTS</a> input file located in $caseDir/DEM (e.g. in.liggghts_init). For details on the <a class="reference external" href="http://www.cfdem.com">LIGGGHTS</a> setup, please have a look at the <a class="reference external" href="http://www.cfdem.com">LIGGGHTS</a> manual.</p>
+<p>Standard CFD settings are defined in $caseDir/CFD/constant (e.g. transportProperties, RASproperties, etc.) and $caseDir/CFD/system (e.g. fvSchemes, controlDict). You can find more information on that in <a class="reference external" href="http://www.openfoam.com">OpenFOAM(R)(*)</a> documentations (www.openFoam.com)(*).</p>
+<p>Settings of the coupling routines are defined in $caseDir/CFD/constant/<a class="reference internal" href="#id3"><em>couplingProperies</em></a> (e.g. force models, data exchange model, etc.) and $caseDir/CFD/constant/<a class="reference internal" href="#id3"><em>liggghtsCommands</em></a> (allows to execute a LIGGGHTS command during a coupled simulation).</p>
+<hr class="docutils" />
+</div>
+<div class="section" id="couplingproperties-dictionary">
+<span id="id4"></span><h3>&#8220;couplingProperties&#8221; dictionary<a class="headerlink" href="#couplingproperties-dictionary" title="Permalink to this headline">¶</a></h3>
+<p><strong>General:</strong></p>
+<p>In the &#8220;couplingProperties&#8221; dictionary the setup of the coupling routines of the CFD-DEM simulation are defined.</p>
+<p><strong>Location:</strong> $caseDir/CFD/constant</p>
+<p><strong>Structure:</strong></p>
+<p>The dictionary is divided into two parts, &#8220;sub-models &amp; settings&#8221; and &#8220;sub-model properties&#8221;.</p>
+<p>In &#8220;sub-models &amp; settings&#8221; the following routines must be specified:</p>
+<ul class="simple">
+<li>modelType</li>
+<li>couplingInterval</li>
+<li>voidFractionModel</li>
+<li>locateModel</li>
+<li>meshMotionModel</li>
+<li>regionModel</li>
+<li>IOModel</li>
+<li>dataExchangeModel</li>
+<li>averagingModel</li>
+<li>forceModels</li>
+<li>momCoupleModels</li>
+<li>turbulenceModelType</li>
+</ul>
+<p>In &#8220;sub-model properties&#8221; sub-dictionaries might be defined to specify model specific parameters.</p>
+<p><strong>Settings:</strong></p>
+<p>Reasonable example settings for the &#8220;couplingProperties&#8221; dictionary are given in the tutorial cases.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">modelType</span>
+</pre></div>
+</div>
+<p>&#8220;modelType&#8221; refers to the formulation of the equations to be solved. Choose &#8220;A&#8221;, &#8220;B&#8221; or &#8220;Bfull&#8221;, according to Zhou et al. (2010): &#8220;Discrete particle simulation of particle-fluid flow: model formulations and their applicability&#8221;, JFM. &#8220;A&#8221; requires the use of the force models gradPForce and viscForce, whereas &#8220;B&#8221; requires the force model &#8220;Archimedes&#8221;. &#8220;Bfull&#8221; refers to model type I.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">couplingInterval</span>
+</pre></div>
+</div>
+<p>The coupling interval determines the time passing between two CFD-DEM data exchanges.</p>
+<p>A useful procedure would be:
+1) Set the DEM timestep in the in.xxx file according to the needs of the pure DEM problem.
+2) Set the &#8220;couplingInterval&#8221;, which refers to the DEM timesteps. Depending on the problem you will need to have a close (small couplingInterval) or loose coupling.
+3) Choose the CFD timestep in the controlDict. It must be equal to or smaller than the coupling time, otherwise you will get the error: &#8220;Error - TS bigger than coupling interval!&#8221;.</p>
+<p>Example: DEMts=0.00001s, couplingInterval=10 exchange data (=couple) will happen every 0.0001s.</p>
+<hr class="docutils" />
+</div>
+<div class="section" id="liggghtscommands-dictionary">
+<span id="id5"></span><h3>&#8220;liggghtsCommands&#8221; dictionary<a class="headerlink" href="#liggghtscommands-dictionary" title="Permalink to this headline">¶</a></h3>
+<p><strong>General:</strong></p>
+<p>In the &#8220;liggghtsCommands&#8221; dictionary liggghts commands being executed during a coupled CFD-DEM simulation are specified.</p>
+<p><strong>Location:</strong> $caseDir/CFD/constant</p>
+<p><strong>Structure:</strong></p>
+<p>The dictionary is divided into two parts, first a list of &#8220;liggghtsCommandModels&#8221; is defined, then the settings for each model must be specified.</p>
+<p><strong>Settings:</strong></p>
+<p>Reasonable example settings for the &#8220;liggghtsCommands&#8221; dictionary are given in the tutorial cases.</p>
+<hr class="docutils" />
+</div>
+<div class="section" id="models-solvers">
+<span id="comm"></span><span id="cmd-5"></span><h3>Models/Solvers<a class="headerlink" href="#models-solvers" title="Permalink to this headline">¶</a></h3>
+<p>This section lists all CFDEMcoupling sub-models and solvers alphabetically, with a separate
+listing below of styles within certain commands.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="52%" />
+<col width="48%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="IOModel.html"><em>IOModel</em></a></td>
+<td><a class="reference internal" href="IOModel_basicIO.html"><em>IOModel_basicIO</em></a></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="IOModel_noIO.html"><em>IOModel_noIO</em></a></td>
+<td><a class="reference internal" href="IOModel_sophIO.html"><em>IOModel_sophIO</em></a></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="IOModel_trackIO.html"><em>IOModel_trackIO</em></a></td>
+<td><a class="reference internal" href="averagingModel.html"><em>averagingModel</em></a></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="averagingModel_dense.html"><em>averagingModel_dense</em></a></td>
+<td><a class="reference internal" href="averagingModel_dilute.html"><em>averagingModel_dilute</em></a></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="cfdemSolverIB.html"><em>cfdemSolverIB</em></a></td>
+<td><a class="reference internal" href="cfdemSolverPiso.html"><em>cfdemSolverPiso</em></a></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="cfdemSolverPisoScalar.html"><em>cfdemSolverPisoScalar</em></a></td>
+<td><a class="reference internal" href="clockModel.html"><em>clockModel</em></a></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="clockModel_noClock.html"><em>clockModel_noClock</em></a></td>
+<td><a class="reference internal" href="clockModel_standardClock.html"><em>clockModel_standardClock</em></a></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="dataExchangeModel.html"><em>dataExchangeModel</em></a></td>
+<td><a class="reference internal" href="dataExchangeModel_noDataExchange.html"><em>dataExchangeModel_noDataExchange</em></a></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="dataExchangeModel_oneWayVTK.html"><em>dataExchangeModel_oneWayVTK</em></a></td>
+<td><a class="reference internal" href="dataExchangeModel_twoWayFiles.html"><em>dataExchangeModel_twoWayFiles</em></a></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="dataExchangeModel_twoWayMPI.html"><em>dataExchangeModel_twoWayMPI</em></a></td>
+<td><a class="reference internal" href="forceModel.html"><em>forceModel</em></a></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="forceModel_Archimedes.html"><em>forceModel_Archimedes</em></a></td>
+<td><a class="reference internal" href="forceModel_ArchimedesIB.html"><em>forceModel_ArchimedesIB</em></a></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="forceModel_DiFeliceDrag.html"><em>forceModel_DiFeliceDrag</em></a></td>
+<td><a class="reference internal" href="forceModel_GidaspowDrag.html"><em>forceModel_GidaspowDrag</em></a></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="forceModel_KochHillDrag.html"><em>forceModel_KochHillDrag</em></a></td>
+<td><a class="reference internal" href="forceModel_LaEuScalarTemp.html"><em>forceModel_LaEuScalarTemp</em></a></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="forceModel_MeiLift.html"><em>forceModel_MeiLift</em></a></td>
+<td><a class="reference internal" href="forceModel_SchillerNaumannDrag.html"><em>forceModel_SchillerNaumannDrag</em></a></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="forceModel_ShirgaonkarIB.html"><em>forceModel_ShirgaonkarIB</em></a></td>
+<td><a class="reference internal" href="forceModel_checkCouplingInterval.html"><em>forceModel_checkCouplingInterval</em></a></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="forceModel_fieldStore.html"><em>forceModel_fieldStore</em></a></td>
+<td><a class="reference internal" href="forceModel_fieldTimeAverage.html"><em>forceModel_fieldTimeAverage</em></a></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="forceModel_gradPForce.html"><em>forceModel_gradPForce</em></a></td>
+<td><a class="reference internal" href="forceModel_noDrag.html"><em>forceModel_noDrag</em></a></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="forceModel_particleCellVolume.html"><em>forceModel_particleCellVolume</em></a></td>
+<td><a class="reference internal" href="forceModel_particleVolume.html"><em>forceModel_particleVolume</em></a></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="forceModel_scalarGeneralExchange.html"><em>forceModel_scalarGeneralExchange</em></a></td>
+<td><a class="reference internal" href="forceModel_virtualMassForce.html"><em>forceModel_virtualMassForce</em></a></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="forceModel_viscForce.html"><em>forceModel_viscForce</em></a></td>
+<td><a class="reference internal" href="forceModel_volWeightedAverage.html"><em>forceModel_volWeightedAverage</em></a></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="forceSubModel.html"><em>forceSubModel</em></a></td>
+<td><a class="reference internal" href="forceSubModel_ImEx.html"><em>forceSubModel_ImEx</em></a></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="liggghtsCommandModel.html"><em>liggghtsCommandModel</em></a></td>
+<td><a class="reference internal" href="liggghtsCommandModel_execute.html"><em>liggghtsCommandModel_execute</em></a></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="liggghtsCommandModel_readLiggghtsData.html"><em>liggghtsCommandModel_readLiggghtsData</em></a></td>
+<td><a class="reference internal" href="liggghtsCommandModel_runLiggghts.html"><em>liggghtsCommandModel_runLiggghts</em></a></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="liggghtsCommandModel_setDEMGravity.html"><em>liggghtsCommandModel_setDEMGravity</em></a></td>
+<td><a class="reference internal" href="liggghtsCommandModel_writeLiggghts.html"><em>liggghtsCommandModel_writeLiggghts</em></a></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="locateModel.html"><em>locateModel</em></a></td>
+<td><a class="reference internal" href="locateModel_engineSearch.html"><em>locateModel_engineSearch</em></a></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="locateModel_engineSearchIB.html"><em>locateModel_engineSearchIB</em></a></td>
+<td><a class="reference internal" href="locateModel_standardSearch.html"><em>locateModel_standardSearch</em></a></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="meshMotionModel.html"><em>meshMotionModel</em></a></td>
+<td><a class="reference internal" href="meshMotionModel_noMeshMotion.html"><em>meshMotionModel_noMeshMotion</em></a></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="momCoupleModel.html"><em>momCoupleModel</em></a></td>
+<td><a class="reference internal" href="momCoupleModel_explicitCouple.html"><em>momCoupleModel_explicitCouple</em></a></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="momCoupleModel_implicitCouple.html"><em>momCoupleModel_implicitCouple</em></a></td>
+<td><a class="reference internal" href="momCoupleModel_noCouple.html"><em>momCoupleModel_noCouple</em></a></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="probeModel.html"><em>probeModel</em></a></td>
+<td><a class="reference internal" href="probeModel_noProbe.html"><em>probeModel_noProbe</em></a></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="probeModel_particleProbe.html"><em>probeModel_particleProbe</em></a></td>
+<td><a class="reference internal" href="regionModel.html"><em>regionModel</em></a></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="regionModel_allRegion.html"><em>regionModel_allRegion</em></a></td>
+<td><a class="reference internal" href="scalarTransportModel.html"><em>scalarTransportModel</em></a></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="smoothingModel.html"><em>smoothingModel</em></a></td>
+<td><a class="reference internal" href="smoothingModel_constDiffSmoothing.html"><em>smoothingModel_constDiffSmoothing</em></a></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="smoothingModel_noSmoothing.html"><em>smoothingModel_noSmoothing</em></a></td>
+<td><a class="reference internal" href="voidFractionModel.html"><em>voidfractionModel</em></a></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="voidFractionModel_GaussVoidFraction.html"><em>voidfractionModel_GaussVoidFraction</em></a></td>
+<td><a class="reference internal" href="voidFractionModel_IBVoidFraction.html"><em>voidfractionModel_IBVoidFraction</em></a></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="voidFractionModel_bigParticleVoidFraction.html"><em>voidfractionModel_bigParticleVoidFraction</em></a></td>
+<td><a class="reference internal" href="voidFractionModel_centreVoidFraction.html"><em>voidfractionModel_centreVoidFraction</em></a></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="voidFractionModel_dividedVoidFraction.html"><em>voidfractionModel_dividedVoidFraction</em></a></td>
+<td><a class="reference internal" href="voidFractionModel_noVoidFraction.html"><em>voidfractionModel_noVoidFractionVoidFraction</em></a></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="voidFractionModel_trilinearVoidFraction.html"><em>voidfractionModel_trilinearVoidFraction</em></a></td>
+<td>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, DCS Computing GmbH, JKU Linz.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'v3.X',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

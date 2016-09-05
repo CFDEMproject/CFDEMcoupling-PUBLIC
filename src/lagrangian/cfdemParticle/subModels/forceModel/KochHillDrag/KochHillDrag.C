@@ -67,16 +67,14 @@ KochHillDrag::KochHillDrag
     voidfractionFieldName_(propsDict_.lookup("voidfractionFieldName")),
     voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
     UsFieldName_(propsDict_.lookupOrDefault("granVelFieldName",word("Us"))),
-    UsField_(sm.mesh().lookupObject<volVectorField> (UsFieldName_)),
-    scaleDia_(1.),
-    scaleDrag_(1.)
+    UsField_(sm.mesh().lookupObject<volVectorField> (UsFieldName_))
 {
     // suppress particle probe
     if (probeIt_ && propsDict_.found("suppressProbe"))
         probeIt_=!Switch(propsDict_.lookup("suppressProbe"));
     if(probeIt_)
     {
-        particleCloud_.probeM().initialize(typeName, "kochHillDrag.logDat");
+        particleCloud_.probeM().initialize(typeName, typeName+".logDat");
         particleCloud_.probeM().vectorFields_.append("dragForce"); //first entry must the be the force
         particleCloud_.probeM().vectorFields_.append("Urel");        //other are debug
         particleCloud_.probeM().scalarFields_.append("Rep");          //other are debug
@@ -101,11 +99,6 @@ KochHillDrag::KochHillDrag
         forceSubM(iFSub).readSwitches();
 
     particleCloud_.checkCG(true);
-
-    if (propsDict_.found("scale"))
-        scaleDia_=scalar(readScalar(propsDict_.lookup("scale")));
-    if (propsDict_.found("scaleDrag"))
-        scaleDrag_=scalar(readScalar(propsDict_.lookup("scaleDrag")));
 }
 
 
@@ -119,13 +112,6 @@ KochHillDrag::~KochHillDrag()
 
 void KochHillDrag::setForce() const
 {
-    if (scaleDia_ > 1)
-        Info << typeName << " using scale = " << scaleDia_ << endl;
-    else if (particleCloud_.cg() > 1){
-        scaleDia_=particleCloud_.cg();
-        Info << typeName << " using scale from liggghts cg = " << scaleDia_ << endl;
-    }
-
     const volScalarField& nufField = forceSubM(0).nuField();
     const volScalarField& rhoField = forceSubM(0).rhoField();
 
@@ -146,6 +132,7 @@ void KochHillDrag::setForce() const
     vector Us(0,0,0);
     vector Ur(0,0,0);
     scalar ds(0);
+    scalar dParcel(0);
     scalar nuf(0);
     scalar rho(0);
     scalar magUr(0);
@@ -193,6 +180,8 @@ void KochHillDrag::setForce() const
                 }
 
                 ds = particleCloud_.d(index);
+                dParcel = ds;
+                forceSubM(0).scaleDia(ds); //caution: this fct will scale ds!
                 nuf = nufField[cellI];
                 rho = rhoField[cellI];
 
@@ -200,9 +189,9 @@ void KochHillDrag::setForce() const
 
                 //Update any scalar or vector quantity
                 for (int iFSub=0;iFSub<nrForceSubModels();iFSub++)
-                      forceSubM(iFSub).update(  scaleDia_, 
-                                                index, 
-                                                cellI, 
+                      forceSubM(iFSub).update(  index,
+                                                cellI,
+                                                ds,
                                                 Ufluid, 
                                                 Us, 
                                                 nuf,
@@ -221,7 +210,7 @@ void KochHillDrag::setForce() const
                 if (magUr > 0)
                 {
                     // calc particle Re Nr
-                    Rep = ds/scaleDia_*voidfraction*magUr/(nuf+SMALL);
+                    Rep = ds*voidfraction*magUr/(nuf+SMALL);
 
                     // calc model coefficient F0
                     scalar F0=0.;
@@ -245,12 +234,14 @@ void KochHillDrag::setForce() const
                     scalar F = voidfraction * (F0 + 0.5*F3*Rep);
 
                     // calc drag model coefficient betaP
-                    betaP = 18.*nuf*rho/(ds/scaleDia_*ds/scaleDia_)*voidfraction*F;
+                    betaP = 18.*nuf*rho/(ds*ds)*voidfraction*F;
 
                     // calc particle's drag
-                    dragCoefficient = Vs*betaP*scaleDrag_;
+                    dragCoefficient = Vs*betaP;
                     if (modelType_=="B")
                         dragCoefficient /= voidfraction;
+
+                    forceSubM(0).scaleCoeff(dragCoefficient,dParcel);
 
                     if(forceSubM(0).switches()[7]) // implForceDEMaccumulated=true
                     {
@@ -277,8 +268,7 @@ void KochHillDrag::setForce() const
                     Pout << "index = " << index << endl;
                     Pout << "Us = " << Us << endl;
                     Pout << "Ur = " << Ur << endl;
-                    Pout << "ds = " << ds << endl;
-                    Pout << "ds/scale = " << ds/scaleDia_ << endl;
+                    Pout << "dprim = " << ds << endl;
                     Pout << "rho = " << rho << endl;
                     Pout << "nuf = " << nuf << endl;
                     Pout << "voidfraction = " << voidfraction << endl;

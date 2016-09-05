@@ -56,13 +56,9 @@ class engineSearchIB
 {
 
 protected:
-      dictionary propsDict_;
-
     	const label zSplit_;
 
     	const label xySplit_;
-    	
-    	bool checkPeriodicCells_;
 
 public:
 
@@ -91,6 +87,12 @@ public:
             double**& positions,
             double**& cellIDs,
             int size
+        ) const;
+
+        virtual vector generateSatellitePoint
+        (
+            int index,
+            int countPoints
         ) const;
 
 };

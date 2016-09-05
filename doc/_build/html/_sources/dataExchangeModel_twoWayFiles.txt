@@ -1,0 +1,57 @@
+.. index:: dataExchangeModel_twoWayFiles
+
+dataExchangeModel_twoWayFiles command
+=====================================
+
+Syntax
+""""""
+
+Defined in couplingProperties dictionary.
+
+.. parsed-literal::
+
+   dataExchangeModel twoWayFiles;
+   twoWayFilesProps
+   {
+       couplingFilename "filename";
+       maxNumberOfParticles scalar1;
+       DEMts scalar2;
+   };
+
+* *filename* = filename of the VTK file series
+* *scalar1* = maximum number of particles in DEM simulation
+* *scalar2* = DEM time step width
+
+
+Examples
+""""""""
+
+.. parsed-literal::
+
+   dataExchangeModel twoWayFiles;
+   twoWayFilesProps
+   {
+       couplingFilename "vtk_out%4.4d.vtk";
+       maxNumberOfParticles 30000;
+   }
+
+Description
+"""""""""""
+
+The data exchange model performs the data exchange between the DEM code and the CFD code. The twoWayFiles model is a model that can exchange particle properties from DEM to CFD and from CFD to DEM. Data is exchanged via files that are sequentially written/read by the codes.
+
+Restrictions
+""""""""""""
+
+
+Developed only for two processors, one for DEM and one for CFD run.
+
+Related commands
+""""""""""""""""
+
+:doc:`dataExchangeModel <dataExchangeModel>`
+
+
+.. _liws: http://www.cfdem.com
+.. _ld: Manual.html
+.. _lc: Section_commands.html#comm

@@ -112,17 +112,26 @@ scalarGeneralExchange::scalarGeneralExchange
         probeIt_=!Switch(propsDict_.lookup("suppressProbe"));
     if(probeIt_)
     {
-        particleCloud_.probeM().initialize(typeName, typeName+".logDat");
+      forAll(eulerianFieldNames_, fieldIt)
+      {
+        particleCloud_.probeM().initialize(typeName, typeName + "_" + eulerianFieldNames_[fieldIt] + ".logDat");
         particleCloud_.probeM().vectorFields_.append("Urel");               //first entry must the be the vector to probe
-        particleCloud_.probeM().scalarFields_.append("Nu");                 //other are debug
-        particleCloud_.probeM().scalarFields_.append("Rep");                //other are debug
+        if(eulerianFieldNames_[fieldIt]==tempFieldName_) //this is the temperature
+        {
+            particleCloud_.probeM().scalarFields_.append("Rep");            
+            particleCloud_.probeM().scalarFields_.append("Nu"); 
+        }
+        else                
+            particleCloud_.probeM().scalarFields_.append("Sh"); 
         particleCloud_.probeM().scalarFields_.append("exchangeRate");
         particleCloud_.probeM().writeHeader();
+      }
     }
 
     for (int iFSub=0;iFSub<nrForceSubModels();iFSub++)
         forceSubM(iFSub).constructorCalls(typeName);
 
+    particleCloud_.setAllowCFDsubTimestep(false);
 }
 
 // ***********************************************************
@@ -188,12 +197,20 @@ scalarGeneralExchange::scalarGeneralExchange
         probeIt_=!Switch(propsDict_.lookup("suppressProbe"));
     if(probeIt_)
     {
-        particleCloud_.probeM().initialize(dictName, dictName+".logDat");
+      forAll(eulerianFieldNames_, fieldIt)
+      {
+        particleCloud_.probeM().initialize(dictName, dictName + "_" + eulerianFieldNames_[fieldIt] + ".logDat");
         particleCloud_.probeM().vectorFields_.append("Urel");               //first entry must the be the vector to probe
-        particleCloud_.probeM().scalarFields_.append("Nu");                 //other are debug
-        particleCloud_.probeM().scalarFields_.append("Rep");                //other are debug
-        particleCloud_.probeM().scalarFields_.append("exchangeRate"+dictName);
+        if(eulerianFieldNames_[fieldIt]==tempFieldName_) //this is the temperature
+        {
+            particleCloud_.probeM().scalarFields_.append("Rep");            
+            particleCloud_.probeM().scalarFields_.append("Nu");                 //other are debug
+        }
+        else                
+            particleCloud_.probeM().scalarFields_.append("Sh"); 
+        particleCloud_.probeM().scalarFields_.append("exchangeRate");
         particleCloud_.probeM().writeHeader();
+      }
     }
 
     for (int iFSub=0;iFSub<nrForceSubModels();iFSub++)
@@ -240,8 +257,8 @@ void scalarGeneralExchange::manipulateScalarField(volScalarField& explicitEulerS
 {
 
     // reset Scalar field
-    explicitEulerSource.internalField() = 0.0;
-    implicitEulerSource.internalField() = 0.0;
+    explicitEulerSource == dimensionedScalar("zero", explicitEulerSource.dimensions(), 0.);
+    implicitEulerSource == dimensionedScalar("zero", implicitEulerSource.dimensions(), 0.);
 
     if(speciesID>=0 && particleSpeciesValue_[speciesID]<0.0)    //skip if species is not active
         return;
@@ -261,6 +278,8 @@ void scalarGeneralExchange::manipulateScalarField(volScalarField& explicitEulerS
                                      partHeatTransCoeffName_, partHeatTransCoeffPositionInRegister_,
                                      partHeatFluidName_,      partHeatFluidPositionInRegister_
                                    );
+        if(probeIt_)
+            particleCloud_.probeM().setOutputFile(typeName+"_"+tempFieldName_+".logDat");
     }
     else
     {
@@ -272,7 +291,10 @@ void scalarGeneralExchange::manipulateScalarField(volScalarField& explicitEulerS
                                      partSpeciesTransCoeffNames_[speciesID], partSpeciesTransCoeffPositionInRegister_[speciesID],
                                      partSpeciesFluidNames_[speciesID],      partSpeciesFluidPositionInRegister_[speciesID]
                                    );
+        if(probeIt_)
+            particleCloud_.probeM().setOutputFile(typeName + "_" + fieldName + ".logDat");
     }
+
 
     //==============================
     // get references
@@ -318,7 +340,6 @@ void scalarGeneralExchange::manipulateScalarField(volScalarField& explicitEulerS
     #include "resetVoidfractionInterpolator.H"
     #include "resetUInterpolator.H"
     #include "resetFluidScalarFieldInterpolator.H"
-    #include "setupProbeModel.H"
 
     for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
     {
@@ -406,8 +427,9 @@ void scalarGeneralExchange::manipulateScalarField(volScalarField& explicitEulerS
                     // Note: for other than ext one could use vValues.append(x)
                     // instead of setSize
                     vValues.setSize(vValues.size()+1, Ur);
+                    if(speciesID<0) //this is the temperature, then also report Rep 
+                        sValues.setSize(sValues.size()+1, Rep);
                     sValues.setSize(sValues.size()+1, (this->*Nusselt)(Rep,Pr,voidfraction));
-                    sValues.setSize(sValues.size()+1, Rep);
                     sValues.setSize(sValues.size()+1, tmpPartFlux);
                     particleCloud_.probeM().writeProbe(index, sValues, vValues);
                 }
@@ -432,9 +454,11 @@ void scalarGeneralExchange::manipulateScalarField(volScalarField& explicitEulerS
         NULL
     );
 
-    // scale with the cell volume to get (total) volume-specific source 
-    explicitEulerSource.internalField() /= -explicitEulerSource.mesh().V();
-    implicitEulerSource.internalField() /= -implicitEulerSource.mesh().V();
+    // scale with the cell volume to get (total) volume-specific source
+    particleCloud_.makeSpecific(explicitEulerSource);
+    explicitEulerSource*=-1;
+    particleCloud_.makeSpecific(implicitEulerSource);
+    implicitEulerSource*=-1;
 
     // limit explicit source term
     scalar explicitEulerSourceInCell;
@@ -452,6 +476,7 @@ void scalarGeneralExchange::manipulateScalarField(volScalarField& explicitEulerS
     //Reporting of integral quantities
     //TODO: write to different file for speciesId>0
     Field<scalar> writeValues; bool writeDiskNow=forceSubM(0).verboseToDisk(); //must call 'verboseToDisk()' only once since this function is incremeting a counter!
+    writeValues.clear();
     if( forceSubM(0).verbose() || writeDiskNow)
     {
 	    scalar exchangeRate = gSum(-(explicitEulerSource
@@ -734,6 +759,15 @@ void scalarGeneralExchange::setPointersToExternalArrays(    word nameFlux,      
                                                             word nameFluid,         int positionFluid
                                                        ) const
 {
+    if(particleCloud_.particleDatFieldsUserCFDEMToExt.size() !=
+               particleCloud_.namesFieldsUserCFDEMToExt.size()
+      )
+      FatalError <<  "\n\n****CATASTROPHIC ERROR MOST LIKELY CAUSED BY USER!!! \n" 
+                 <<  "particleCloud_.particleDatFieldsUserCFDEMToExt.size() is NOT EQUAL to particleCloud_.namesFieldsUserCFDEMToExt.size()." 
+                 <<  "This may be caused by an incorrect time step, or coupling interval, resulting in the fact that an array inside particleCloud_ was not allocated. "
+                 <<  "Please check your time step and coupling interval settings, such that fluid-particle coupling is done EVERY fluid time step. \n\n" 
+                 << abort(FatalError);
+	
     if(validPartFlux_)  //EXPLICIT coupling strategy for Lagrangian part
     {
             partDatFlux_           = particleCloud_.particleDatFieldsUserCFDEMToExt[positionFlux];

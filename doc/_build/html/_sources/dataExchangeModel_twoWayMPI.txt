@@ -1,0 +1,52 @@
+.. index:: dataExchangeModel_twoWayMPI
+
+dataExchangeModel_twoWayMPI command
+===================================
+
+Syntax
+""""""
+
+Defined in couplingProperties dictionary.
+
+.. parsed-literal::
+
+   dataExchangeModel twoWayMPI;
+   twoWayMPIProps
+   {
+       liggghtsPath "path";
+   };
+
+* *path* = path to the DEM simulation input file
+
+
+Examples
+""""""""
+
+.. parsed-literal::
+
+   dataExchangeModel twoWayMPI;
+   twoWayMPIProps
+   {
+       liggghtsPath "../DEM/in.liggghts_init";
+   }
+
+Description
+"""""""""""
+
+The data exchange model performs the data exchange between the DEM code and the CFD code. The twoWayMPI model is a model that can exchange particle properties from DEM to CFD and from CFD to DEM. Data is exchanged via MPI technique. The DEM run is executed by the coupling model, via a liggghtsCommandModel object.
+
+Restrictions
+""""""""""""
+
+
+none.
+
+Related commands
+""""""""""""""""
+
+:doc:`dataExchangeModel <dataExchangeModel>`
+
+
+.. _liws: http://www.cfdem.com
+.. _ld: Manual.html
+.. _lc: Section_commands.html#comm

@@ -49,7 +49,12 @@ adjustTimeStep  no;
 
 maxCo 0.1;
 
-//libs ( "libgroovyBC.so" "libfiniteVolumeCFDEM.so");
+/*libs (
+    "libsimpleSwakFunctionObjects.so"
+    "libswakFunctionObjects.so"
+  "libgroovyBC.so"
+  "libfiniteVolumeCFDEM.so"
+);*/
 
 functions
 (
@@ -121,6 +126,7 @@ functions
         enabled         true;
         outputControl   outputTime;//timeStep;
         log             true;
+	    writeArea	    true; //write for OF 3.0 to be consistent
         valueOutput     true;
         source          patch;
         sourceName      inlet;
@@ -140,6 +146,7 @@ functions
         enabled         true;
         outputControl   outputTime;//timeStep;
         log             true;
+        writeArea       true; //write for OF 3.0 to be consistent
         valueOutput     true;
         source          patch;
         sourceName      outlet;
@@ -159,6 +166,7 @@ functions
         enabled         true;
         outputControl   outputTime;//timeStep;
         log             true;
+        writeArea       true; //write for OF 3.0 to be consistent
         valueOutput     true;
         source          patch;
         sourceName      wall;

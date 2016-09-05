@@ -74,11 +74,7 @@ private:
 
     word UsFieldName_;   
 
-    const volVectorField& UsField_; 
-
-    mutable scalar scaleDia_;
-
-    mutable scalar scaleDrag_;
+    const volVectorField& UsField_;
 
 public:
 

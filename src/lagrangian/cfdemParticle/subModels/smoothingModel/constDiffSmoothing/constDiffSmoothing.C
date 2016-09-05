@@ -93,14 +93,14 @@ bool constDiffSmoothing::doSmoothing() const
     return true;
 }
 
-
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 void Foam::constDiffSmoothing::smoothen(volScalarField& fieldSrc) const
 {
     // Create scalar smooth field from virgin scalar smooth field template
     volScalarField sSmoothField = sSmoothField_;
 
     sSmoothField.dimensions().reset(fieldSrc.dimensions());
-    sSmoothField.internalField()=fieldSrc.internalField();
+    sSmoothField ==fieldSrc;
     sSmoothField.correctBoundaryConditions();
     sSmoothField.oldTime().dimensions().reset(fieldSrc.dimensions());
     sSmoothField.oldTime()=fieldSrc;
@@ -141,7 +141,7 @@ void Foam::constDiffSmoothing::smoothen(volVectorField& fieldSrc) const
     volVectorField vSmoothField = vSmoothField_;
 
     vSmoothField.dimensions().reset(fieldSrc.dimensions());
-    vSmoothField.internalField()=fieldSrc.internalField();
+    vSmoothField=fieldSrc;
     vSmoothField.correctBoundaryConditions();
     vSmoothField.oldTime().dimensions().reset(fieldSrc.dimensions());
     vSmoothField.oldTime()=fieldSrc;
@@ -176,7 +176,7 @@ void Foam::constDiffSmoothing::smoothenReferenceField(volVectorField& fieldSrc) 
     volVectorField vSmoothField = vSmoothField_;
 
     vSmoothField.dimensions().reset(fieldSrc.dimensions());
-    vSmoothField.internalField()=fieldSrc.internalField();
+    vSmoothField=fieldSrc;
     vSmoothField.correctBoundaryConditions();
     vSmoothField.oldTime().dimensions().reset(fieldSrc.dimensions());
     vSmoothField.oldTime()=fieldSrc;
@@ -188,21 +188,18 @@ void Foam::constDiffSmoothing::smoothenReferenceField(volVectorField& fieldSrc) 
     DT_.value() = smoothingLengthReferenceField_.value() 
                          * smoothingLengthReferenceField_.value() / deltaT.value();
 
-    tmp<volScalarField> NLarge
+    volScalarField NLarge
     (
-        new volScalarField
+        IOobject
         (
-            IOobject
-            (
-                "xxx",
-                particleCloud_.mesh().time().timeName(),
-                particleCloud_.mesh(),
-                IOobject::NO_READ,
-                IOobject::NO_WRITE
-            ),
+            "NLarge",
+            particleCloud_.mesh().time().timeName(),
             particleCloud_.mesh(),
-            0.0
-        )
+            IOobject::NO_READ,
+            IOobject::NO_WRITE
+        ),
+        particleCloud_.mesh(),
+        0.0
     );
 
 
@@ -210,7 +207,7 @@ void Foam::constDiffSmoothing::smoothenReferenceField(volVectorField& fieldSrc) 
     forAll(vSmoothField,cellI)
     {
         if ( mag(vSmoothField.oldTime().internalField()[cellI]) > 0.0f)  // have a vector in the OLD vSmoothField, so keep it!
-            NLarge()[cellI] = sourceStrength;
+            NLarge[cellI] = sourceStrength;
     }
 
     // do the smoothing
@@ -219,8 +216,8 @@ void Foam::constDiffSmoothing::smoothenReferenceField(volVectorField& fieldSrc) 
         fvm::ddt(vSmoothField)
        -fvm::laplacian( DT_, vSmoothField)
        == 
-        NLarge() / deltaT * vSmoothField.oldTime()  //add source to keep cell values constant
-       -fvm::Sp( NLarge() / deltaT, vSmoothField)   //add sink to keep cell values constant
+        NLarge / deltaT * vSmoothField.oldTime()  //add source to keep cell values constant
+       -fvm::Sp( NLarge / deltaT, vSmoothField)   //add sink to keep cell values constant
     );
 
     // get data from working vSmoothField

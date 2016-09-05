@@ -1,0 +1,66 @@
+.. index:: forceModel_Archimedes
+
+forceModel_Archimedes command
+=============================
+
+Syntax
+""""""
+
+Defined in couplingProperties dictionary.
+
+.. parsed-literal::
+
+   forceModels
+   (
+       Archimedes
+   );
+   ArchimedesProps
+   {
+       gravityFieldName "gravity";
+       twoDimensional;
+       suppressProbe   switch1;
+       treatForceDEM   switch2;
+       verbose         switch3;
+   };
+
+* *gravity* = name of the finite volume gravity field
+* *twoDimensional* = optional keyword for conducting a two dimensional calculation
+* *switch1* = (optional, default false) can be used to suppress the output of the probe model
+* *switch2* = (optional, default true) sub model switch, see :doc:`forceSubModel <forceSubModel>` for details
+* *switch3* = (optional, default false) sub model switch, see :doc:`forceSubModel <forceSubModel>` for details
+
+
+Examples
+""""""""
+
+.. parsed-literal::
+
+   forceModels
+   (
+       Archimedes
+   );
+   ArchimedesProps
+   {
+       gravityFieldName "g";
+   }
+
+Description
+"""""""""""
+
+The force model performs the calculation of forces (e.g. fluid-particle interaction forces) acting on each DEM particle. The Archimedes model is a model that calculates the Archimedes' volumetric lift force stemming from density difference of fluid and particle.
+
+Restrictions
+""""""""""""
+
+
+none.
+
+Related commands
+""""""""""""""""
+
+:doc:`forceModel <forceModel>`
+
+
+.. _liws: http://www.cfdem.com
+.. _ld: Manual.html
+.. _lc: Section_commands.html#comm
