@@ -1,0 +1,41 @@
+# paths for additional libraries
+CFDEM_ADD_LIB_PATHS = \
+
+# additional libraries to be linked to solvers
+CFDEM_ADD_LIBS = \
+
+# additional static libraries to be linked to lagrangian library
+CFDEM_ADD_STATICLIBS = \
+-lmpi_cxx \
+
+#################################################################
+## SETTINGS FOR 2.4.x                                          ##
+#################################################################
+#----------------------------------------------------------------
+# incompressible turbulence model settings
+#----------------------------------------------------------------
+# paths for incompressible turbulence models to use
+CFDEM_ADD_INCOMPTURBMOD_PATHS = \
+-I$(LIB_SRC)/turbulenceModels/incompressible/turbulenceModel \
+-I$(LIB_SRC)/fvOptions/lnInclude \
+
+# libs for turbulence models to use
+CFDEM_ADD_INCOMPTURBMOD_LIBS = \
+-lincompressibleRASModels \
+-lincompressibleLESModels \
+-lfvOptions \
+
+#----------------------------------------------------------------
+# compressible turbulence model settings
+#----------------------------------------------------------------
+# paths for compressible turbulence models to use
+CFDEM_ADD_COMPTURBMOD_PATHS = \
+-I$(LIB_SRC)/turbulenceModels/compressible/turbulenceModel \
+-I$(LIB_SRC)/thermophysicalModels/basic/lnInclude \
+-I$(LIB_SRC)/thermophysicalModels/radiationModels/lnInclude \
+
+# libs for turbulence models to use
+CFDEM_ADD_COMPTURBMOD_LIBS = \
+-lcompressibleRASModels \
+-lcompressibleLESModels \
+-lfluidThermophysicalModels \
