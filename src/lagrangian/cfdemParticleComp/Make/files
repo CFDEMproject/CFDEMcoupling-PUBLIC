@@ -1,0 +1,128 @@
+path = ../cfdemParticle
+cfdemCloud = $(path)/cfdemCloud
+derived = $(path)/derived
+cfdTools = $(path)/cfdTools
+forceModels = $(path)/subModels/forceModel
+forceSubModels = $(path)/subModels/forceModel/forceSubModels
+IOModels = $(path)/subModels/IOModel
+voidFractionModels = $(path)/subModels/voidFractionModel
+locateModels = $(path)/subModels/locateModel
+meshMotionModels = $(path)/subModels/meshMotionModel
+momCoupleModels = $(path)/subModels/momCoupleModel
+regionModels = $(path)/subModels/regionModel
+dataExchangeModels = $(path)/subModels/dataExchangeModel
+averagingModels = $(path)/subModels/averagingModel
+clockModels = $(path)/subModels/clockModel
+liggghtsCommandModels = $(path)/subModels/liggghtsCommandModel
+smoothingModels = $(path)/subModels/smoothingModel
+probeModels = $(path)/subModels/probeModel
+
+$(cfdemCloud)/cfdemCloud.C
+$(derived)/cfdemCloudIB/cfdemCloudIB.C
+
+$(cfdTools)/IOtools/json/json.C
+$(cfdTools)/global.C
+$(cfdTools)/newGlobal.C
+
+$(forceModels)/forceModel/forceModel.C
+$(forceModels)/forceModel/newForceModel.C
+$(forceModels)/noDrag/noDrag.C
+$(forceModels)/checkCouplingInterval/checkCouplingInterval.C
+$(forceModels)/DiFeliceDrag/DiFeliceDrag.C
+$(forceModels)/fieldStore/fieldStore.C
+$(forceModels)/GidaspowDrag/GidaspowDrag.C
+$(forceModels)/SchillerNaumannDrag/SchillerNaumannDrag.C
+$(forceModels)/Archimedes/Archimedes.C
+$(forceModels)/ArchimedesIB/ArchimedesIB.C
+$(forceModels)/interface/interface.C
+$(forceModels)/ShirgaonkarIB/ShirgaonkarIB.C
+$(forceModels)/KochHillDrag/KochHillDrag.C
+$(forceModels)/LaEuScalarTemp/LaEuScalarTemp.C
+$(forceModels)/virtualMassForce/virtualMassForce.C
+$(forceModels)/gradPForce/gradPForce.C
+$(forceModels)/viscForce/viscForce.C
+$(forceModels)/MeiLift/MeiLift.C
+$(forceModels)/particleCellVolume/particleCellVolume.C
+$(forceModels)/particleVolume/particleVolume.C
+$(forceModels)/scalarGeneralExchange/scalarGeneralExchange.C
+$(forceModels)/fieldTimeAverage/fieldTimeAverage.C
+$(forceModels)/volWeightedAverage/volWeightedAverage.C
+
+$(forceSubModels)/forceSubModel/newForceSubModel.C
+$(forceSubModels)/forceSubModel/forceSubModel.C
+$(forceSubModels)/ImEx/ImEx.C
+
+$(probeModels)/probeModel/probeModel.C
+$(probeModels)/probeModel/newProbeModel.C
+$(probeModels)/noProbe/noProbe.C
+$(probeModels)/particleProbe/particleProbe.C
+
+$(IOModels)/IOModel/IOModel.C
+$(IOModels)/IOModel/newIOModel.C
+$(IOModels)/noIO/noIO.C
+$(IOModels)/basicIO/basicIO.C
+$(IOModels)/trackIO/trackIO.C
+$(IOModels)/sophIO/sophIO.C
+
+$(voidFractionModels)/voidFractionModel/voidFractionModel.C
+$(voidFractionModels)/voidFractionModel/newVoidFractionModel.C
+$(voidFractionModels)/centreVoidFraction/centreVoidFraction.C
+$(voidFractionModels)/dividedVoidFraction/dividedVoidFraction.C
+$(voidFractionModels)/bigParticleVoidFraction/bigParticleVoidFraction.C
+$(voidFractionModels)/GaussVoidFraction/GaussVoidFraction.C
+$(voidFractionModels)/IBVoidFraction/IBVoidFraction.C
+$(voidFractionModels)/trilinearVoidFraction/trilinearVoidFraction.C
+$(voidFractionModels)/noVoidFraction/noVoidFraction.C
+
+$(locateModels)/locateModel/locateModel.C
+$(locateModels)/locateModel/newLocateModel.C
+$(locateModels)/standardSearch/standardSearch.C
+$(locateModels)/engineSearch/engineSearch.C
+$(locateModels)/engineSearchIB/engineSearchIB.C
+
+
+$(meshMotionModels)/meshMotionModel/meshMotionModel.C
+$(meshMotionModels)/meshMotionModel/newMeshMotionModel.C
+$(meshMotionModels)/noMeshMotion/noMeshMotion.C
+
+$(momCoupleModels)/momCoupleModel/momCoupleModel.C
+$(momCoupleModels)/momCoupleModel/newMomCoupleModel.C
+$(momCoupleModels)/explicitCouple/explicitCouple.C
+$(momCoupleModels)/implicitCouple/implicitCouple.C
+$(momCoupleModels)/noCouple/noCouple.C
+
+$(regionModels)/regionModel/regionModel.C
+$(regionModels)/regionModel/newRegionModel.C
+$(regionModels)/allRegion/allRegion.C
+
+$(dataExchangeModels)/dataExchangeModel/dataExchangeModel.C
+$(dataExchangeModels)/dataExchangeModel/newDataExchangeModel.C
+$(dataExchangeModels)/oneWayVTK/oneWayVTK.C
+$(dataExchangeModels)/twoWayFiles/twoWayFiles.C
+$(dataExchangeModels)/noDataExchange/noDataExchange.C
+$(dataExchangeModels)/twoWayMPI/twoWayMPI.C
+
+$(averagingModels)/averagingModel/averagingModel.C
+$(averagingModels)/averagingModel/newAveragingModel.C
+$(averagingModels)/dilute/dilute.C
+$(averagingModels)/dense/dense.C
+
+$(clockModels)/clockModel/clockModel.C
+$(clockModels)/clockModel/newClockModel.C
+$(clockModels)/standardClock/standardClock.C
+$(clockModels)/noClock/noClock.C
+
+$(liggghtsCommandModels)/liggghtsCommandModel/liggghtsCommandModel.C
+$(liggghtsCommandModels)/liggghtsCommandModel/newLiggghtsCommandModel.C
+$(liggghtsCommandModels)/execute/execute.C
+$(liggghtsCommandModels)/runLiggghts/runLiggghts.C
+$(liggghtsCommandModels)/setDEMGravity/setDEMGravity.C
+$(liggghtsCommandModels)/writeLiggghts/writeLiggghts.C
+$(liggghtsCommandModels)/readLiggghtsData/readLiggghtsData.C
+
+$(smoothingModels)/smoothingModel/smoothingModel.C
+$(smoothingModels)/smoothingModel/newSmoothingModel.C
+$(smoothingModels)/noSmoothing/noSmoothing.C
+$(smoothingModels)/constDiffSmoothing/constDiffSmoothing.C
+
+LIB = $(CFDEM_LIB_DIR)/lib$(CFDEM_LIB_COMP_NAME)
