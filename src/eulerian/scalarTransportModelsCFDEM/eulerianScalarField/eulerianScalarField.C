@@ -20,6 +20,7 @@ License
 
 #include "error.H"
 #include "eulerianScalarField.H"
+#include "OFversion.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -199,7 +200,7 @@ void eulerianScalarField::pullCloudFields() const
 // ************************************************************
 void eulerianScalarField::update(surfaceScalarField phi, volScalarField voidfraction, volScalarField nuEff, scalar Sc, bool limitDiffusion) const 
 {
-    scalar oneByCpVolumetric = 1./cpVolumetric_;
+    scalar oneByCpVolumetric = 1./(cpVolumetric_+SMALL);
     //Normalize source in case we have a temperature field
     if(fieldType_=="temperature")
     {
@@ -211,8 +212,14 @@ void eulerianScalarField::update(surfaceScalarField phi, volScalarField voidfrac
         else
         {
             const volScalarField& cpVolumetricField_(particleCloud_.mesh().lookupObject<volScalarField> (cpVolumetricFieldName_));
-            mSource_ /= cpVolumetricField_;
-            mSourceKImpl_ /= cpVolumetricField_;
+
+            #if defined(version40) || defined(versionv1612plus)
+            mSource_ /= cpVolumetricField_+SMALL;
+            mSourceKImpl_ /= cpVolumetricField_+SMALL;
+            #else
+            mSource_.internalField() /= cpVolumetricField_.internalField()+SMALL;
+            mSourceKImpl_.internalField() /= cpVolumetricField_.internalField()+SMALL;
+            #endif
         }
     }
 

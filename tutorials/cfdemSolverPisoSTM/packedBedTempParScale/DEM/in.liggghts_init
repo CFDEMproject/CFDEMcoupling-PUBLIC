@@ -1,0 +1,69 @@
+echo            both
+log             ../DEM/log.liggghts
+
+atom_style      granular
+atom_modify     map array
+boundary        m m m
+newton          off
+
+communicate     single vel yes
+
+units           si
+processors      1 1 2
+
+region          reg block 0. 0.1 0. 0.1 0. 1.1 units box
+create_box      1 reg
+
+neighbor        0.002 bin
+neigh_modify    delay 0
+
+
+# Material properties required for granular pair styles
+
+fix         m1 all property/global youngsModulus peratomtype 5.e6
+fix         m2 all property/global poissonsRatio peratomtype 0.45
+fix         m3 all property/global coefficientRestitution peratomtypepair 1 0.3
+fix         m4 all property/global coefficientFriction peratomtypepair 1 0.5
+
+# pair style
+pair_style  gran model hertz tangential history #Hertzian without cohesion
+pair_coeff  * *
+
+timestep    0.00001
+
+# walls
+fix     xwalls1 all wall/gran model hertz tangential history primitive type 1 xplane 0.0
+fix     xwalls2 all wall/gran model hertz tangential history primitive type 1 xplane 0.1
+fix     ywalls1 all wall/gran model hertz tangential history primitive type 1 yplane 0.0
+fix     ywalls2 all wall/gran model hertz tangential history primitive type 1 yplane 0.1
+fix     zwalls1 all wall/gran model hertz tangential history primitive type 1 zplane 0.0
+fix     zwalls2 all wall/gran model hertz tangential history primitive type 1 zplane 1.1
+
+fix         gravi all gravity 9.81 vector 0.0 0.0 -1.0
+
+
+# particle distributions and insertion
+region      bc block 0. 0.1 0. 0.1 0. 1.1 units box
+fix         pts1 all particletemplate/sphere 15485863 atom_type 1 density constant 2500 radius constant 0.011
+fix         pdd1 all particledistribution/discrete 15485867 1 pts1 1.0
+
+fix         ins all insert/pack seed 32452843 distributiontemplate pdd1 vel constant 0. 0. -3. insert_every 10000 overlapcheck yes all_in yes particles_in_region 1005 region bc
+
+# apply nve integration to all particles that are inserted as single particles
+fix         integr all nve/sphere
+
+# output settings, include total thermal energy
+compute         rke all erotate/sphere
+thermo_style    custom step atoms ke c_rke vol #f_heattransfer
+thermo          1000
+thermo_modify   lost ignore norm no
+compute_modify  thermo_temp dynamic yes
+
+#insert the first particles
+run             1
+dump            dmp all custom 1000 post/dump.liggghts_init id type x y z ix iy iz vx vy vz fx fy fz omegax omegay omegaz radius #f_heattransfer[0] f_heatFlux[0]
+
+run             150000
+
+write_restart   post/restart/liggghts.restart
+

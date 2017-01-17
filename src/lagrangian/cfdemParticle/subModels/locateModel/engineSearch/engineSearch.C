@@ -113,7 +113,36 @@ label engineSearch::findSingleCell
     return searchEngine_.findCell(position,oldCellID,treeSearch_);
 }
 
+label engineSearch::intersection
+(
+    const point& pStart,
+    const point& pEnd
+) const
+{
+    // find intersection with boundary
+    label face = searchEngine_.findNearestBoundaryFace(pEnd);
 
+    // try alternative
+    if (face==-1)
+    {
+        face = searchEngine_.intersection(pStart,pEnd).index();
+
+        if (face==-1 && mag(pStart-point(0,0,0))<SMALL)
+        {
+            point pStart2 = pEnd+0.0001*(pStart-pEnd)/mag(pStart-pEnd);
+            face = searchEngine_.intersection(pStart2,pEnd).index();
+        }
+    }
+    return face;
+}
+
+label engineSearch::findNearestCell
+(
+    const point& pStart
+) const
+{
+    return searchEngine_.findNearestCell(pStart,-1,true);
+}
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam

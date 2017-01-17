@@ -1,8 +1,6 @@
 echo            both
 log             ../DEM/log.liggghts
 
-# Particle packing by insertion and successive growing of particles
-
 atom_style      granular
 atom_modify     map array
 boundary        m m m
@@ -44,8 +42,8 @@ fix     zwalls2 all wall/gran model hertz tangential history primitive type 1 zp
 fix         gravi all gravity 9.81 vector 0.0 0.0 -1.0
 
 # heat transfer
-fix         ftco all property/global thermalConductivity peratomtype 5.
-fix         ftca all property/global thermalCapacity peratomtype 10.
+fix         ftco all property/global thermalConductivity peratomtype 5. # lambda in [W/(K*m)]
+fix         ftca all property/global thermalCapacity peratomtype 10.    # cp in [J/(kg*K)]
 fix         heattransfer all heat/gran initial_temperature 263.
 
 # particle distributions and insertion

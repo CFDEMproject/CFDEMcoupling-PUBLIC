@@ -166,7 +166,7 @@ void LaEuScalarTemp::manipulateScalarField(volScalarField& EuField) const
     // realloc the arrays
     allocateMyArrays();
 
-    // reset Scalar field
+    // reset Scalar field (== means hard reset)
     EuField == dimensionedScalar("zero", EuField.dimensions(), 0.);
 
     // get DEM data
@@ -183,6 +183,8 @@ void LaEuScalarTemp::manipulateScalarField(volScalarField& EuField) const
     label cellI=0;
     vector Us(0,0,0);
     scalar ds(0);
+    scalar dparcel(0);
+    scalar numberParticlesInParcel(1);
     scalar nuf(0);
     scalar rho(0);
     scalar magUr(0);
@@ -191,8 +193,6 @@ void LaEuScalarTemp::manipulateScalarField(volScalarField& EuField) const
     scalar Pr(0);
     scalar Nup(0);
     scalar n = 3.5; // model parameter
-    scalar scaleDia = forceSubM(0).scaleDia();
-    scalar sDth(scaleDia*scaleDia*scaleDia);
 
     #include "resetVoidfractionInterpolator.H"
     #include "resetUInterpolator.H"
@@ -221,7 +221,10 @@ void LaEuScalarTemp::manipulateScalarField(volScalarField& EuField) const
                 // calc relative velocity
                 Us = particleCloud_.velocity(index);
                 ds = 2*particleCloud_.radius(index);
-                forceSubM(0).scaleDia(ds); //caution: this fct will scale ds!
+                dparcel = ds;
+                forceSubM(0).scaleDia(ds,index); //caution: this fct will scale ds!
+                numberParticlesInParcel    = dparcel/ds;
+                numberParticlesInParcel   *= numberParticlesInParcel*numberParticlesInParcel;
                 nuf = nufField[cellI];
                 rho = rhoField[cellI];
 
@@ -238,7 +241,7 @@ void LaEuScalarTemp::manipulateScalarField(volScalarField& EuField) const
                                              );
 
                 magUr = mag(Ufluid-Us);
-                As = ds*ds*M_PI*sDth;
+                As = ds*ds*M_PI*numberParticlesInParcel;
 
                 Rep = ds*magUr/nuf;
                 Pr = max(SMALL,Cp_*nuf*rho/lambda_);
@@ -314,7 +317,10 @@ void LaEuScalarTemp::manipulateScalarField(volScalarField& EuField) const
     Info << "total convective particle-fluid heat flux [W] (Eulerian) = " 
          << gSum(EuField*rhoField*Cp_*EuField.mesh().V()) 
          << endl;
+}
 
+void LaEuScalarTemp::commToDEM() const
+{
     // give DEM data
     if(validPartHeatFlux_)
         particleCloud_.dataExchangeM().giveData(partHeatFluxName_,
@@ -331,7 +337,6 @@ void LaEuScalarTemp::manipulateScalarField(volScalarField& EuField) const
                                                 "scalar-atom", 
                                                 partHeatFluid_);
 }
-
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

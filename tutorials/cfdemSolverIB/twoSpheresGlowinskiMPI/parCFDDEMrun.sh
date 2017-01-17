@@ -64,14 +64,6 @@ fi
 cp ../../$logfileName $testHarnessPath
 
 #- clean up case
-echo "deleting data at: $casePath"
-source $WM_PROJECT_DIR/bin/tools/CleanFunctions
-cd $casePath/CFD
-cleanCase
-rm -r $casePath/CFD/clockData
-rm $casePath/DEM/post/*.*
-#rm -r $casePath/DEM/post/restart/*.*
-#- preserve post directory
-touch $casePath/DEM/post/.gitignore
-echo "done"
+keepDEMrestart="false"
+cleanCFDEMcase $casePath/CFD $keepDEMrestart
 

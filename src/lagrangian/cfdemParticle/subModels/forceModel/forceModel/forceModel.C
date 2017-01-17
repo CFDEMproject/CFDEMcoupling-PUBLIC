@@ -185,6 +185,11 @@ void forceModel::manipulateScalarField(volScalarField& field, volScalarField& fi
     fieldImpl *= 0.0;
 }
 
+//Function for return particle based data to DEM
+void forceModel::commToDEM() const
+{
+    // do noting.
+}
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 void forceModel::repartitionImExForces() const

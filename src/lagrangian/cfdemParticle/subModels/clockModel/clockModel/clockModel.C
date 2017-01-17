@@ -416,7 +416,7 @@ Foam::clockModel::clockModel
     dict_(dict),
     particleCloud_(sm),
     path_("clockData"),
-    startTime_(sm.mesh().time().startTime().value()+sm.mesh().time().deltaT().value()+SMALL),  // delay start of measurement by deltaT
+    startTime_(sm.mesh().time().startTime().value()+2.*sm.dataExchangeM().couplingTime()), // delay start of measurement by 2*tCouple
     //startTime_(0),                                //no delay
     n_(30),
     deltaT_(n_),

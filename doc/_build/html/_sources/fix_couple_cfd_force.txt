@@ -1,0 +1,44 @@
+.. index:: couple/cfd/force
+
+couple/cfd/force command
+========================
+
+Syntax
+""""""
+
+.. parsed-literal::
+
+   fix ID group-ID couple/cfd/force
+
+* ID, group-ID are documented in :doc:`fix <fix>` command
+* couple/cfd = style name of this fix command
+
+
+Examples
+""""""""
+fix	cfd  all couple/cfd couple_every 100 mpi
+fix cfd2 all couple/cfd/force
+
+Description
+"""""""""""
+
+The command couple/cfd/force can only be used in combination with :doc:`fix_couple_cfd <fix_couple_cfd>`. This model transfers the force that the fluid exceeds on each particle to the DEM calculation. At every coupling time step the force term, which contains contributions from all force models active in the CFD calculation, is passed on to LIGGGHTS(R). This (constant) term is then used in the particle calculations at every DEM time step until the next coupling takes place.
+
+Restrictions
+""""""""""""
+
+
+None
+
+**Related Commands:**
+:doc:`fix couple/cfd <fix_couple_cfd>`
+
+Default
+"""""""
+
+None
+
+
+.. _liws: http://www.cfdem.com
+.. _ld: Manual.html
+.. _lc: Section_commands.html#comm

@@ -18,7 +18,7 @@
 ##- source cfdem env vars
 #setenv CFDEM_VERSION PUBLIC
 #setenv CFDEM_PROJECT_DIR $HOME/CFDEM/CFDEMcoupling-$CFDEM_VERSION-$WM_PROJECT_VERSION
-#setenv CFDEM_SRC_DIR $CFDEM_PROJECT_DIR/src/lagrangian/cfdemParticle
+#setenv CFDEM_SRC_DIR $CFDEM_PROJECT_DIR/src
 #setenv CFDEM_SOLVER_DIR $CFDEM_PROJECT_DIR/applications/solvers
 #setenv CFDEM_DOC_DIR $CFDEM_PROJECT_DIR/doc
 #setenv CFDEM_UT_DIR $CFDEM_PROJECT_DIR/applications/utilities
@@ -36,13 +36,24 @@
 #------------------------------------------------------------------------------
 #- export environment variables (adapt to your paths)
 #------------------------------------------------------------------------------
+echo "************************************"
 
 #check if default lammps lib path should be used
 if ( ! ($?CFDEM_LAMMPS_LIB_DIR) ) then
-    setenv CFDEM_LAMMPS_LIB_DIR $CFDEM_LIGGGHTS_SRC_DIR"/../lib/"
+    setenv CFDEM_LAMMPS_LIB_DIR $CFDEM_LIGGGHTS_SRC_DIR"/../lib"
 else
     echo "using CFDEM_LAMMPS_LIB_DIR=$CFDEM_LAMMPS_LIB_DIR defined by user."
 endif
+
+#test CFDEM_LAMMPS_LIB_DIR
+if ( -f "$CFDEM_LAMMPS_LIB_DIR/poems/Makefile.lammps" ) then
+    :
+else
+    echo ""
+    echo "   !!! WARNING CFDEM_LAMMPS_LIB_DIR = $CFDEM_LAMMPS_LIB_DIR seems to be wrong !!!"
+    echo ""
+endif
+
 
 #- LIGGGHTS lib name
 setenv CFDEM_LIGGGHTS_LIB_NAME lmp_$CFDEM_LIGGGHTS_MAKEFILE_NAME
@@ -54,20 +65,23 @@ setenv CFDEM_LIB_NAME lagrangianCFDEM-$CFDEM_VERSION-$WM_PROJECT_VERSION
 setenv CFDEM_LIB_COMP_NAME lagrangianCFDEMcomp-$CFDEM_VERSION-$WM_PROJECT_VERSION
 
 #check if additional libraries should be compiled together with solvers
-if ( ! ($?CFDEM_ADD_LIBS_NAME) ) then
-    setenv CFDEM_ADD_LIBS_NAME additionalLibs_$WM_PROJECT_VERSION
-    echo "using CFDEM_ADD_LIBS_NAME=$CFDEM_ADD_LIBS_NAME ."
-else
-    echo "using CFDEM_ADD_LIBS_NAME=$CFDEM_ADD_LIBS_NAME defined by user."
-endif
 if ( ! ($?CFDEM_ADD_LIBS_DIR) ) then
-    setenv CFDEM_ADD_LIBS_DIR $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc
+    setenv CFDEM_ADD_LIBS_DIR $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/addLibs_universal
+    echo "using default CFDEM_ADD_LIBS_DIR=$CFDEM_ADD_LIBS_DIR"
 else
     echo "using CFDEM_ADD_LIBS_DIR=$CFDEM_ADD_LIBS_DIR defined by user."
 endif
 
+if ( ! ($?CFDEM_ADD_LIBS_NAME) ) then
+    setenv CFDEM_ADD_LIBS_NAME additionalLibs_$WM_PROJECT_VERSION
+    echo "using default CFDEM_ADD_LIBS_NAME=$CFDEM_ADD_LIBS_NAME"
+else
+    echo "using CFDEM_ADD_LIBS_NAME=$CFDEM_ADD_LIBS_NAME defined by user."
+endif
+
 # check addLibs path and file name
-if ( ! -f $CFDEM_ADD_LIBS_DIR/$CFDEM_ADD_LIBS_NAME ) then
+setenv h $CFDEM_ADD_LIBS_DIR/$CFDEM_ADD_LIBS_NAME
+if ( ! ($?h) ) then
     echo "!!! ERROR !!!: CFDEM_ADD_LIBS_DIR/CFDEM_ADD_LIBS_NAME=$CFDEM_ADD_LIBS_DIR/$CFDEM_ADD_LIBS_NAME does not exist."
 endif
 
@@ -79,12 +93,12 @@ setenv CFDEM_Many2ManyLIB_PATH $CFDEM_SRC_DIR/lagrangian/cfdemParticle/subModels
 setenv CFDEM_Many2ManyLIB_MAKEFILENAME $CFDEM_LIGGGHTS_MAKEFILE_NAME
 
 #- LMP M2M lib path
-setenv CFDEM_M2MLIB_PATH $CFDEM_SRC_DIR/lagrangian/cfdemParticle/subModels/dataExchangeModel/twoWayM2M/library
+setenv CFDEM_M2MLIB_PATH $CFDEM_SRC_DIR/lagrangian/cfdemParticle/subModels/dataExchangeModel/M2M/library
 setenv CFDEM_M2MLIB_MAKEFILENAME $CFDEM_LIGGGHTS_MAKEFILE_NAME
 
-#- LMP POEMS lib path
-setenv CFDEM_POEMSLIB_PATH $CFDEM_LIGGGHTS_SRC_DIR/../lib/poems
-setenv CFDEM_POEMSLIB_MAKEFILENAME g++
+#- LMP POEMS lib default path
+setenv CFDEM_POEMSLIB_PATH $CFDEM_LAMMPS_LIB_DIR/poems
+#-----------------------------------------------------
 
 #- path to test harness
 setenv CFDEM_TEST_HARNESS_PATH $CFDEM_PROJECT_USER_DIR/log/logFilesCFDEM-$CFDEM_VERSION-$WM_PROJECT_VERSION
@@ -95,12 +109,14 @@ setenv CFDEM_LIB_DIR $FOAM_USER_LIBBIN
 #- path to apps
 setenv CFDEM_APP_DIR $FOAM_USER_APPBIN
 
+#- path to OF version flag file
+setenv CFDEM_OFVERSION_DIR $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/OFversion
 #------------------------------------------------------------------------------
 #- settings for lpp postproc tool
 #------------------------------------------------------------------------------
 
 #- nr of procs for lpp tool
-setenv CFDEM_LPP_NPROCS 4
+setenv CFDEM_LPP_NPROCS 1
 
 #- nr of procs for lpp tool
 setenv CFDEM_LPP_CHUNKSIZE 1
@@ -233,6 +249,22 @@ if ( $WM_PROJECT_VERSION =~ "4.*" ) then
     sleep 1.5
 else if ( $WM_PROJECT_VERSION =~ "3.0.*" ) then
     setenv CFDEM_WM_PROJECT_VERSION 30
+else if ( $WM_PROJECT_VERSION =~ "v1606+" ) then
+    setenv CFDEM_WM_PROJECT_VERSION v1606
+    echo "************************************"
+    echo "WARNING from your CFDEM code!"
+    echo "WARNING: Coupling with your OpenFOAM(R) version is currently under development!"
+    echo "In doubt switch to another version."
+    echo "************************************"
+    sleep 1.5
+else if ( $WM_PROJECT_VERSION =~ "v1612+" ) then
+    setenv CFDEM_WM_PROJECT_VERSION v1606
+    echo "************************************"
+    echo "WARNING from your CFDEM code!"
+    echo "WARNING: Coupling with your OpenFOAM(R) version is currently under development!"
+    echo "In doubt switch to another version."
+    echo "************************************"
+    sleep 1.5
 else if ( $WM_PROJECT_VERSION =~ "2.4.*" ) then
     setenv CFDEM_WM_PROJECT_VERSION 24
 else if ( $WM_PROJECT_VERSION == "3.2" ) then
@@ -243,8 +275,11 @@ else
     clear
     echo "************************************"
     echo "ERROR from your CFDEM code!"
-    echo "ERROR: your openFOAM(R)s version is not supported!"
+    echo "ERROR: your OpenFOAM(R) version is not supported!"
     echo "Please use a version that is supported, i.e., see the bashrc file in the source directory!"
     echo "************************************"
     sleep 1.5
 endif
+
+echo "************************************"
+

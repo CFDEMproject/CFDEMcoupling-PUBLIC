@@ -1,5 +1,5 @@
-CFDEMcoupling Documentation
-***************************
+CFDEM(R)coupling Documentation
+******************************
 
 
 ----------
@@ -31,9 +31,9 @@ CFDEMcoupling Documentation
 Contents
 ========
 
-The CFDEMcoupling documentation is organized into the following sections. If you find any errors or omissions in this manual or have suggestions for useful information to add, please send an email to the developers so the CFDEMcoupling documentation can be improved.
+The CFDEM(R)coupling documentation is organized into the following sections. If you find any errors or omissions in this manual or have suggestions for useful information to add, please send an email to the developers so the CFDEM(R)coupling documentation can be improved.
 
-| 1.1 :ref:`About CFDEMcoupling <1_1>`
+| 1.1 :ref:`About CFDEM(R)coupling <1_1>`
 | 1.2 :ref:`Installation <1_2>`
 | 1.3 :ref:`Tutorials <1_3>`
 | 1.4 :ref:`couplingProperties dictionary <1_4>`
@@ -47,10 +47,10 @@ The CFDEMcoupling documentation is organized into the following sections. If you
 
 .. _1_1:
 
-About CFDEMcoupling
--------------------
+About CFDEM(R)coupling
+----------------------
 
-CFDEM coupling provides an open source parallel coupled CFD-DEM framework combining the strengths of `LIGGGHTS <lig_>`_ DEM code and the Open Source CFD package `OpenFOAM(R)(*) <of_>`_. The CFDEMcoupling toolbox allows to expand standard CFD solvers of `OpenFOAM(R)(*) <of_>`_ to include a coupling to the DEM code `LIGGGHTS <lig_>`_. In this toolbox the particle representation within the CFD solver is organized by "cloud" classes. Key functionalities are organised in sub-models (e.g. force models, data exchange models, etc.) which can easily be selected and combined by dictionary settings.
+CFDEM(R)coupling provides an open source parallel coupled CFD-DEM framework combining the strengths of `LIGGGHTS(R) <lig_>`_ DEM code and the Open Source CFD package `OpenFOAM(R)(*) <of_>`_. The CFDEM(R)coupling toolbox allows to expand standard CFD solvers of `OpenFOAM(R)(*) <of_>`_ to include a coupling to the DEM code `LIGGGHTS(R) <lig_>`_. In this toolbox the particle representation within the CFD solver is organized by "cloud" classes. Key functionalities are organised in sub-models (e.g. force models, data exchange models, etc.) which can easily be selected and combined by dictionary settings.
 
 The coupled solvers run fully parallel on distributed-memory clusters. Features are:
 
@@ -65,18 +65,18 @@ The file structure:
 
 * *src* directory including the source files of the coupling toolbox and models
 * *applications* directory including the solver files for coupled CFD-DEM simulations
-* *doc* directory including the documentation of CFDEMcoupling
+* *doc* directory including the documentation of CFDEM(R)coupling
 * *tutorials* directory including basic tutorial cases showing the functionality
 
 
-Details on installation are given on the `CFDEMproject WWW Site <lws_>`_ .
+Details on installation are given on the `CFDEM(R)project WWW Site <lws_>`_ .
 The functionality of this CFD-DEM framework is described via :ref:`tutorial cases <_1_2>` showing how to use different solvers and models.
 
-CFDEMcoupling stands for Computational Fluid Dynamics (CFD) -Discrete Element Method (DEM) coupling.
+CFDEM(R)coupling stands for Computational Fluid Dynamics (CFD) -Discrete Element Method (DEM) coupling.
 
-CFDEMcoupling is an open-source code, distributed freely under the terms of the GNU Public License (GPL).
+CFDEM(R)coupling is an open-source code, distributed freely under the terms of the GNU Public License (GPL).
 
-Core development of CFDEMcoupling is done by Christoph Goniva and Christoph Kloss, both at DCS Computing GmbH, 2012
+Core development of CFDEM(R)coupling is done by Christoph Goniva and Christoph Kloss, both at DCS Computing GmbH, 2012
 
 This documentation was written by Christoph Goniva, DCS Computing GmbH, 2012
 
@@ -109,7 +109,7 @@ Tutorials
 
 **General:**
 
-Each solver of the CFDEMcoupling comes with at least one tutorial example, showing its functionality and correct usage. Provided that the installation is correct, the tutorials can be run via "Allrun.sh" shell scripts. These scripts perform all necessary steps (preprocessing, run, postprocessing, visualization).
+Each solver of the CFDEM(R)coupling comes with at least one tutorial example, showing its functionality and correct usage. Provided that the installation is correct, the tutorials can be run via "Allrun.sh" shell scripts. These scripts perform all necessary steps (preprocessing, run, postprocessing, visualization).
 
 **Location:**
 
@@ -127,11 +127,11 @@ Provided that the installation is correct, the tutorials can be run via "Allrun.
 
 The main settings of a simulation are done via dictionaries:
 
-The DEM setup of each case is defined by a `LIGGGHTS <lig_>`_ input file located in $caseDir/DEM (e.g. in.liggghts_init). For details on the `LIGGGHTS <lig_>`_ setup, please have a look at the `LIGGGHTS <lig_>`_ manual.
+The DEM setup of each case is defined by a `LIGGGHTS(R) <lig_>`_ input file located in $caseDir/DEM (e.g. in.liggghts_init). For details on the `LIGGGHTS(R) <lig_>`_ setup, please have a look at the `LIGGGHTS(R) <lig_>`_ manual.
 
 Standard CFD settings are defined in $caseDir/CFD/constant (e.g. transportProperties, RASproperties, etc.) and $caseDir/CFD/system (e.g. fvSchemes, controlDict). You can find more information on that in `OpenFOAM(R)(*) <of_>`_ documentations (www.openFoam.com)(*).
 
-Settings of the coupling routines are defined in $caseDir/CFD/constant/:ref:`couplingProperies <1_3>` (e.g. force models, data exchange model, etc.) and $caseDir/CFD/constant/:ref:`liggghtsCommands <1_3>` (allows to execute a LIGGGHTS command during a coupled simulation).
+Settings of the coupling routines are defined in $caseDir/CFD/constant/:ref:`couplingProperies <1_3>` (e.g. force models, data exchange model, etc.) and $caseDir/CFD/constant/:ref:`liggghtsCommands <1_3>` (allows to execute a LIGGGHTS(R) command during a coupled simulation).
 
 
 ----------
@@ -178,7 +178,7 @@ Reasonable example settings for the "couplingProperties" dictionary are given in
 
    modelType
 
-"modelType" refers to the formulation of the equations to be solved. Choose "A", "B" or "Bfull", according to Zhou et al. (2010): "Discrete particle simulation of particle-fluid flow: model formulations and their applicability", JFM. "A" requires the use of the force models gradPForce and viscForce, whereas "B" requires the force model "Archimedes". "Bfull" refers to model type I.
+"modelType" refers to the formulation of the equations to be solved. Choose "A", "B" or "Bfull", according to Zhou et al. (2010): "Discrete particle simulation of particle-fluid flow: model formulations and their applicability", JFM. "A" requires the use of the force models gradPForce and viscForce, whereas "B" requires the force model "Archimedes". "Bfull" refers to model type I, "A" refers to model type II and "B" refers to type III in the nomenclature used by Zhou et al.
 
 .. parsed-literal::
 
@@ -204,7 +204,7 @@ Example: DEMts=0.00001s, couplingInterval=10 exchange data (=couple) will happen
 
 **General:**
 
-In the "liggghtsCommands" dictionary liggghts commands being executed during a coupled CFD-DEM simulation are specified.
+In the "liggghtsCommands" dictionary LIGGGHTS(R) commands being executed during a coupled CFD-DEM simulation are specified.
 
 **Location:** $caseDir/CFD/constant
 
@@ -230,83 +230,87 @@ Models/Solvers
 This section lists all CFDEMcoupling sub-models and solvers alphabetically, with a separate
 listing below of styles within certain commands.
 
-+----------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------+
-| :doc:`IOModel <IOModel>`                                                                     | :doc:`IOModel_basicIO <IOModel_basicIO>`                                               |
-+----------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------+
-| :doc:`IOModel_noIO <IOModel_noIO>`                                                           | :doc:`IOModel_sophIO <IOModel_sophIO>`                                                 |
-+----------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------+
-| :doc:`IOModel_trackIO <IOModel_trackIO>`                                                     | :doc:`averagingModel <averagingModel>`                                                 |
-+----------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------+
-| :doc:`averagingModel_dense <averagingModel_dense>`                                           | :doc:`averagingModel_dilute <averagingModel_dilute>`                                   |
-+----------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------+
-| :doc:`cfdemSolverIB <cfdemSolverIB>`                                                         | :doc:`cfdemSolverPiso <cfdemSolverPiso>`                                               |
-+----------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------+
-| :doc:`cfdemSolverPisoScalar <cfdemSolverPisoScalar>`                                         | :doc:`clockModel <clockModel>`                                                         |
-+----------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------+
-| :doc:`clockModel_noClock <clockModel_noClock>`                                               | :doc:`clockModel_standardClock <clockModel_standardClock>`                             |
-+----------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------+
-| :doc:`dataExchangeModel <dataExchangeModel>`                                                 | :doc:`dataExchangeModel_noDataExchange <dataExchangeModel_noDataExchange>`             |
-+----------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------+
-| :doc:`dataExchangeModel_oneWayVTK <dataExchangeModel_oneWayVTK>`                             | :doc:`dataExchangeModel_twoWayFiles <dataExchangeModel_twoWayFiles>`                   |
-+----------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------+
-| :doc:`dataExchangeModel_twoWayMPI <dataExchangeModel_twoWayMPI>`                             | :doc:`forceModel <forceModel>`                                                         |
-+----------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------+
-| :doc:`forceModel_Archimedes <forceModel_Archimedes>`                                         | :doc:`forceModel_ArchimedesIB <forceModel_ArchimedesIB>`                               |
-+----------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------+
-| :doc:`forceModel_DiFeliceDrag <forceModel_DiFeliceDrag>`                                     | :doc:`forceModel_GidaspowDrag <forceModel_GidaspowDrag>`                               |
-+----------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------+
-| :doc:`forceModel_KochHillDrag <forceModel_KochHillDrag>`                                     | :doc:`forceModel_LaEuScalarTemp <forceModel_LaEuScalarTemp>`                           |
-+----------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------+
-| :doc:`forceModel_MeiLift <forceModel_MeiLift>`                                               | :doc:`forceModel_SchillerNaumannDrag <forceModel_SchillerNaumannDrag>`                 |
-+----------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------+
-| :doc:`forceModel_ShirgaonkarIB <forceModel_ShirgaonkarIB>`                                   | :doc:`forceModel_checkCouplingInterval <forceModel_checkCouplingInterval>`             |
-+----------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------+
-| :doc:`forceModel_fieldStore <forceModel_fieldStore>`                                         | :doc:`forceModel_fieldTimeAverage <forceModel_fieldTimeAverage>`                       |
-+----------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------+
-| :doc:`forceModel_gradPForce <forceModel_gradPForce>`                                         | :doc:`forceModel_noDrag <forceModel_noDrag>`                                           |
-+----------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------+
-| :doc:`forceModel_particleCellVolume <forceModel_particleCellVolume>`                         | :doc:`forceModel_particleVolume <forceModel_particleVolume>`                           |
-+----------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------+
-| :doc:`forceModel_scalarGeneralExchange <forceModel_scalarGeneralExchange>`                   | :doc:`forceModel_virtualMassForce <forceModel_virtualMassForce>`                       |
-+----------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------+
-| :doc:`forceModel_viscForce <forceModel_viscForce>`                                           | :doc:`forceModel_volWeightedAverage <forceModel_volWeightedAverage>`                   |
-+----------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------+
-| :doc:`forceSubModel <forceSubModel>`                                                         | :doc:`forceSubModel_ImEx <forceSubModel_ImEx>`                                         |
-+----------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------+
-| :doc:`liggghtsCommandModel <liggghtsCommandModel>`                                           | :doc:`liggghtsCommandModel_execute <liggghtsCommandModel_execute>`                     |
-+----------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------+
-| :doc:`liggghtsCommandModel_readLiggghtsData <liggghtsCommandModel_readLiggghtsData>`         | :doc:`liggghtsCommandModel_runLiggghts <liggghtsCommandModel_runLiggghts>`             |
-+----------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------+
-| :doc:`liggghtsCommandModel_setDEMGravity <liggghtsCommandModel_setDEMGravity>`               | :doc:`liggghtsCommandModel_writeLiggghts <liggghtsCommandModel_writeLiggghts>`         |
-+----------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------+
-| :doc:`locateModel <locateModel>`                                                             | :doc:`locateModel_engineSearch <locateModel_engineSearch>`                             |
-+----------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------+
-| :doc:`locateModel_engineSearchIB <locateModel_engineSearchIB>`                               | :doc:`locateModel_standardSearch <locateModel_standardSearch>`                         |
-+----------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------+
-| :doc:`meshMotionModel <meshMotionModel>`                                                     | :doc:`meshMotionModel_noMeshMotion <meshMotionModel_noMeshMotion>`                     |
-+----------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------+
-| :doc:`momCoupleModel <momCoupleModel>`                                                       | :doc:`momCoupleModel_explicitCouple <momCoupleModel_explicitCouple>`                   |
-+----------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------+
-| :doc:`momCoupleModel_implicitCouple <momCoupleModel_implicitCouple>`                         | :doc:`momCoupleModel_noCouple <momCoupleModel_noCouple>`                               |
-+----------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------+
-| :doc:`probeModel <probeModel>`                                                               | :doc:`probeModel_noProbe <probeModel_noProbe>`                                         |
-+----------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------+
-| :doc:`probeModel_particleProbe <probeModel_particleProbe>`                                   | :doc:`regionModel <regionModel>`                                                       |
-+----------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------+
-| :doc:`regionModel_allRegion <regionModel_allRegion>`                                         | :doc:`scalarTransportModel <scalarTransportModel>`                                     |
-+----------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------+
-| :doc:`smoothingModel <smoothingModel>`                                                       | :doc:`smoothingModel_constDiffSmoothing <smoothingModel_constDiffSmoothing>`           |
-+----------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------+
-| :doc:`smoothingModel_noSmoothing <smoothingModel_noSmoothing>`                               | :doc:`voidfractionModel <voidFractionModel>`                                           |
-+----------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------+
-| :doc:`voidfractionModel_GaussVoidFraction <voidFractionModel_GaussVoidFraction>`             | :doc:`voidfractionModel_IBVoidFraction <voidFractionModel_IBVoidFraction>`             |
-+----------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------+
-| :doc:`voidfractionModel_bigParticleVoidFraction <voidFractionModel_bigParticleVoidFraction>` | :doc:`voidfractionModel_centreVoidFraction <voidFractionModel_centreVoidFraction>`     |
-+----------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------+
-| :doc:`voidfractionModel_dividedVoidFraction <voidFractionModel_dividedVoidFraction>`         | :doc:`voidfractionModel_noVoidFractionVoidFraction <voidFractionModel_noVoidFraction>` |
-+----------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------+
-| :doc:`voidfractionModel_trilinearVoidFraction <voidFractionModel_trilinearVoidFraction>`     |                                                                                        |
-+----------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------+
++----------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| :doc:`IOModel <IOModel>`                                                               | :doc:`IOModel_basicIO <IOModel_basicIO>`                                                     |
++----------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| :doc:`IOModel_noIO <IOModel_noIO>`                                                     | :doc:`IOModel_sophIO <IOModel_sophIO>`                                                       |
++----------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| :doc:`IOModel_trackIO <IOModel_trackIO>`                                               | :doc:`averagingModel <averagingModel>`                                                       |
++----------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| :doc:`averagingModel_dense <averagingModel_dense>`                                     | :doc:`averagingModel_dilute <averagingModel_dilute>`                                         |
++----------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| :doc:`cfdemSolverIB <cfdemSolverIB>`                                                   | :doc:`cfdemSolverPiso <cfdemSolverPiso>`                                                     |
++----------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| :doc:`cfdemSolverPisoSTM <cfdemSolverPisoSTM>`                                         | :doc:`cfdemSolverPisoScalar <cfdemSolverPisoScalar>`                                         |
++----------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| :doc:`clockModel <clockModel>`                                                         | :doc:`clockModel_noClock <clockModel_noClock>`                                               |
++----------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| :doc:`clockModel_standardClock <clockModel_standardClock>`                             | :doc:`couple/cfd <fix_couple_cfd>`                                                           |
++----------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| :doc:`couple/cfd/force <fix_couple_cfd_force>`                                         | :doc:`couple/cfd/force/implicit <fix_couple_cfd_force_implicit>`                             |
++----------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| :doc:`dataExchangeModel <dataExchangeModel>`                                           | :doc:`dataExchangeModel_noDataExchange <dataExchangeModel_noDataExchange>`                   |
++----------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| :doc:`dataExchangeModel_oneWayVTK <dataExchangeModel_oneWayVTK>`                       | :doc:`dataExchangeModel_twoWayFiles <dataExchangeModel_twoWayFiles>`                         |
++----------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| :doc:`dataExchangeModel_twoWayMPI <dataExchangeModel_twoWayMPI>`                       | :doc:`forceModel <forceModel>`                                                               |
++----------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| :doc:`forceModel_Archimedes <forceModel_Archimedes>`                                   | :doc:`forceModel_ArchimedesIB <forceModel_ArchimedesIB>`                                     |
++----------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| :doc:`forceModel_DiFeliceDrag <forceModel_DiFeliceDrag>`                               | :doc:`forceModel_GidaspowDrag <forceModel_GidaspowDrag>`                                     |
++----------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| :doc:`forceModel_KochHillDrag <forceModel_KochHillDrag>`                               | :doc:`forceModel_LaEuScalarTemp <forceModel_LaEuScalarTemp>`                                 |
++----------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| :doc:`forceModel_MeiLift <forceModel_MeiLift>`                                         | :doc:`forceModel_SchillerNaumannDrag <forceModel_SchillerNaumannDrag>`                       |
++----------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| :doc:`forceModel_ShirgaonkarIB <forceModel_ShirgaonkarIB>`                             | :doc:`forceModel_checkCouplingInterval <forceModel_checkCouplingInterval>`                   |
++----------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| :doc:`forceModel_fieldStore <forceModel_fieldStore>`                                   | :doc:`forceModel_fieldTimeAverage <forceModel_fieldTimeAverage>`                             |
++----------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| :doc:`forceModel_gradPForce <forceModel_gradPForce>`                                   | :doc:`forceModel_noDrag <forceModel_noDrag>`                                                 |
++----------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| :doc:`forceModel_particleCellVolume <forceModel_particleCellVolume>`                   | :doc:`forceModel_particleVolume <forceModel_particleVolume>`                                 |
++----------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| :doc:`forceModel_scalarGeneralExchange <forceModel_scalarGeneralExchange>`             | :doc:`forceModel_virtualMassForce <forceModel_virtualMassForce>`                             |
++----------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| :doc:`forceModel_viscForce <forceModel_viscForce>`                                     | :doc:`forceModel_volWeightedAverage <forceModel_volWeightedAverage>`                         |
++----------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| :doc:`forceSubModel <forceSubModel>`                                                   | :doc:`forceSubModel_ImEx <forceSubModel_ImEx>`                                               |
++----------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| :doc:`liggghtsCommandModel <liggghtsCommandModel>`                                     | :doc:`liggghtsCommandModel_execute <liggghtsCommandModel_execute>`                           |
++----------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| :doc:`liggghtsCommandModel_readLiggghtsData <liggghtsCommandModel_readLiggghtsData>`   | :doc:`liggghtsCommandModel_runLiggghts <liggghtsCommandModel_runLiggghts>`                   |
++----------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| :doc:`liggghtsCommandModel_setDEMGravity <liggghtsCommandModel_setDEMGravity>`         | :doc:`liggghtsCommandModel_writeLiggghts <liggghtsCommandModel_writeLiggghts>`               |
++----------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| :doc:`locateModel <locateModel>`                                                       | :doc:`locateModel_engineSearch <locateModel_engineSearch>`                                   |
++----------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| :doc:`locateModel_engineSearchIB <locateModel_engineSearchIB>`                         | :doc:`locateModel_standardSearch <locateModel_standardSearch>`                               |
++----------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| :doc:`meshMotionModel <meshMotionModel>`                                               | :doc:`meshMotionModel_noMeshMotion <meshMotionModel_noMeshMotion>`                           |
++----------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| :doc:`momCoupleModel <momCoupleModel>`                                                 | :doc:`momCoupleModel_explicitCouple <momCoupleModel_explicitCouple>`                         |
++----------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| :doc:`momCoupleModel_implicitCouple <momCoupleModel_implicitCouple>`                   | :doc:`momCoupleModel_noCouple <momCoupleModel_noCouple>`                                     |
++----------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| :doc:`probeModel <probeModel>`                                                         | :doc:`probeModel_noProbe <probeModel_noProbe>`                                               |
++----------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| :doc:`probeModel_particleProbe <probeModel_particleProbe>`                             | :doc:`regionModel <regionModel>`                                                             |
++----------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| :doc:`regionModel_allRegion <regionModel_allRegion>`                                   | :doc:`scalarTransportModel <scalarTransportModel>`                                           |
++----------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| :doc:`scalarTransportModel_generalManual <scalarTransportModel_generalManual>`         | :doc:`smoothingModel <smoothingModel>`                                                       |
++----------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| :doc:`smoothingModel_constDiffSmoothing <smoothingModel_constDiffSmoothing>`           | :doc:`smoothingModel_noSmoothing <smoothingModel_noSmoothing>`                               |
++----------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| :doc:`voidfractionModel <voidFractionModel>`                                           | :doc:`voidfractionModel_GaussVoidFraction <voidFractionModel_GaussVoidFraction>`             |
++----------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| :doc:`voidfractionModel_IBVoidFraction <voidFractionModel_IBVoidFraction>`             | :doc:`voidfractionModel_bigParticleVoidFraction <voidFractionModel_bigParticleVoidFraction>` |
++----------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| :doc:`voidfractionModel_centreVoidFraction <voidFractionModel_centreVoidFraction>`     | :doc:`voidfractionModel_dividedVoidFraction <voidFractionModel_dividedVoidFraction>`         |
++----------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| :doc:`voidfractionModel_noVoidFractionVoidFraction <voidFractionModel_noVoidFraction>` | :doc:`voidfractionModel_trilinearVoidFraction <voidFractionModel_trilinearVoidFraction>`     |
++----------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
 
 
 .. _liws: http://www.cfdem.com

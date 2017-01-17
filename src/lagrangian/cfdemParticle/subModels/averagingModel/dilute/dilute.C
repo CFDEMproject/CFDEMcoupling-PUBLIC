@@ -129,35 +129,39 @@ void dilute::setVectorAverage
     scalar weightP;
 
     if(weightWithWeight2) //use weight2, e.g., mass-averaged - has no effect, just weight is DIFFERENT!
-    for(int index=0; index< particleCloud_.numberOfParticles(); index++)
     {
-        for(int subCell=0;subCell<particleCloud_.cellsPerParticle()[index][0];subCell++)
+        for(int index=0; index< particleCloud_.numberOfParticles(); index++)
         {
-            cellI = particleCloud_.cellIDs()[index][subCell];
-            if (cellI >= 0)
+            for(int subCell=0;subCell<particleCloud_.cellsPerParticle()[index][0];subCell++)
             {
-                for(int i=0;i<3;i++) valueVec[i] = value[index][i];
-                weightP = weight[index][subCell]*weight2[index][subCell];
-                weightField[cellI] += weightP;
-                if(weightP > 0) field[cellI] = valueVec; //field[cellI] = valueVec/weightP;
+                cellI = particleCloud_.cellIDs()[index][subCell];
+                if (cellI >= 0)
+                {
+                    for(int i=0;i<3;i++) valueVec[i] = value[index][i];
+                    weightP = weight[index][subCell]*weight2[index][subCell];
+                    weightField[cellI] += weightP;
+                    if(weightP > 0) field[cellI] = valueVec; //field[cellI] = valueVec/weightP;
+                }
             }
         }
     }
     else //standard, i.e., volume-averaged - has no effect, just weight is DIFFERENT!
-    for(int index=0; index< particleCloud_.numberOfParticles(); index++)
     {
-        for(int subCell=0;subCell<particleCloud_.cellsPerParticle()[index][0];subCell++)
+        for(int index=0; index< particleCloud_.numberOfParticles(); index++)
         {
-            //Info << "subCell=" << subCell << endl;
-            cellI = particleCloud_.cellIDs()[index][subCell];
-
-            if (cellI >= 0)
+            for(int subCell=0;subCell<particleCloud_.cellsPerParticle()[index][0];subCell++)
             {
-                for(int i=0;i<3;i++) valueVec[i] = value[index][i];
-                weightP = weight[index][subCell];
-                weightField[cellI] += weightP;
-                if(weightP > 0) field[cellI] = valueVec; //field[cellI] = valueVec/weightP;
-                else Warning << "!!! W A R N I N G --- weightP <= 0" << endl;
+                //Info << "subCell=" << subCell << endl;
+                cellI = particleCloud_.cellIDs()[index][subCell];
+
+                if (cellI >= 0)
+                {
+                    for(int i=0;i<3;i++) valueVec[i] = value[index][i];
+                    weightP = weight[index][subCell];
+                    weightField[cellI] += weightP;
+                    if(weightP > 0) field[cellI] = valueVec; //field[cellI] = valueVec/weightP;
+                    //else Warning << "!!! W A R N I N G --- weightP <= 0" << endl;
+                }
             }
         }
     }

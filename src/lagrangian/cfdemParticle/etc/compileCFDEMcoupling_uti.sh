@@ -72,7 +72,7 @@ else
         #wait until prev. compilation is finished
         echo "waiting..."
         #until [ `ps -a | grep make | wc -l` -eq 0 ]; 
-        until [ `ls -a | $logpath/grep *.tempXYZ | wc -l` -eq 0 ];
+        until [ `ls -a | grep $logpath/*.tempXYZ | wc -l` -eq 0 ];
         do 
             sleep 2
         done

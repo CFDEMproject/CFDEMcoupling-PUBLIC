@@ -15,7 +15,7 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-application     cfdemSolverPisoScalar;
+application     cfdemSolverPisoSTM;
 
 startFrom       startTime;
 

@@ -50,6 +50,21 @@ inline void cfdemCloud::setCG(double cg) const
     Info << "cg is set to: " << cg_ << endl;
 };
 
+inline void cfdemCloud::setCGTypeSpecific(int type, double cg) const
+{
+    if(int(cgTypeSpecific_.size())!=type)   
+        FatalError  << "setCGTypeSpecific attempts to set at location "
+                    << cgTypeSpecific_.size()
+                    << ", but caller requests to set at "
+                    << type
+                    << ". This is fatal. "
+                    << abort(FatalError);
+    cgTypeSpecific_.push_back(cg);
+    if(cg<cg_*0.99999 || cg>cg_*1.00001) cgTypeSpecificDifferent = true;
+    
+    Info << "type specific cg for type " << type << " is set to: " << cg << endl;
+}
+
 inline const bool& cfdemCloud::impDEMdrag() const
 { 
     return impDEMdrag_;
@@ -73,6 +88,11 @@ inline const bool& cfdemCloud::treatVoidCellsAsExplicitForce() const
 inline const scalar& cfdemCloud::cg() const
 { 
     return cg_;
+};
+
+inline const scalar& cfdemCloud::cg(int type) const
+{ 
+    return cgTypeSpecific_[type];
 };
 
 inline const bool& cfdemCloud::ignore() const
@@ -216,7 +236,8 @@ inline double cfdemCloud::d32(bool recalc)
             Ntot+=2*r*r*r;
             Dtot+=r*r;
         }
-        d32_=Ntot/Dtot;
+        if(Ntot>SMALL) d32_ = Ntot/Dtot;
+        else d32_ = 0.;
     }
 
     return d32_;

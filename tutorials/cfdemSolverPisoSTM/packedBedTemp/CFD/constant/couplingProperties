@@ -41,7 +41,7 @@ regionModel allRegion;
 
 IOModel basicIO;
 
-probeModel particleProbe;
+probeModel off;
 
 dataExchangeModel twoWayMPI;
 
@@ -54,7 +54,7 @@ smoothingModel off;
 forceModels
 (
     KochHillDrag
-    scalarGeneralExchange  
+    scalarGeneralExchange
     Archimedes
 );
 
@@ -124,9 +124,9 @@ scalarGeneralExchangeProps
 
 implicitCoupleProps
 {
-    velFieldName            "U";
-    granVelFieldName        "Us";
-    voidfractionFieldName   "voidfraction";
+    velFieldName "U";
+    granVelFieldName "Us";
+    voidfractionFieldName "voidfraction";
     //KslLimit 0;  // source switched off!!!
 }
 
@@ -163,12 +163,6 @@ viscForceProps
 {
     velocityFieldName "U";
     interpolation true;
-}
-
-oneWayVTKProps
-{
-    couplingFilename "vtk_out%4.4d.vtk";
-    maxNumberOfParticles 30000;
 }
 
 twoWayMPIProps

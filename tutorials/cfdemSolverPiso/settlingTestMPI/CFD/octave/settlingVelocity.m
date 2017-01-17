@@ -1,3 +1,4 @@
+%
 close all;
 clear;
 clc;
@@ -55,7 +56,8 @@ hold on
 plot(t_sim,-U_sim(:,2),'rd-')
 legend("analytical - Stokes","simulation - DiFelice?") 
 
-print('cfdemSolverPiso_settlingTestMPI.eps','-deps2')
+%print('cfdemSolverPiso_settlingTestMPI.eps','-deps2')
+print -color "cfdemSolverPiso_settlingTestMPI.png"
 
 %figure(2)
 %plot(t_,X_)

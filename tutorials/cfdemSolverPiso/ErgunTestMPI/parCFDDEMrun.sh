@@ -77,21 +77,8 @@ if [ $postproc == "true" ]
     echo "...press enter to clean up case"
     echo "press Ctr+C to keep data"
     read
-
 fi
 
 #- clean up case
-echo "deleting data at: $casePath ?\n"
-read
-source $WM_PROJECT_DIR/bin/tools/CleanFunctions
-cd $casePath/CFD
-cleanCase
-rm -r $casePath/CFD/clockData
-rm $casePath/CFD/octave/octave-workspace
-rm -r $casePath/CFD/hpctoolkit-*
-rm $casePath/DEM/post/*.*
-touch $casePath/DEM/post/.gitignore
-#rm $casePath/DEM/post/restart/*.*
-rm $casePath/DEM/post/restart/liggghts.restartCFDEM*
-touch $casePath/DEM/post/restart/.gitignore
-echo "done"
+keepDEMrestart="false"
+cleanCFDEMcase $casePath/CFD $keepDEMrestart

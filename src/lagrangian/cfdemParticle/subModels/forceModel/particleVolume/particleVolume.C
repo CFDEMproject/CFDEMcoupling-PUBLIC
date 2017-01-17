@@ -62,20 +62,12 @@ particleVolume::particleVolume
 :
     forceModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
-    startTime_(0.),
+    startTime_(propsDict_.lookupOrDefault<scalar>("startTime",0.)),
     scaleDia_(1.),
     path_("postProcessing/particleVolume"),
     sPtr_(NULL),
-    writeToFile_(true)
+    writeToFile_(propsDict_.lookupOrDefault<Switch>("writeToFile",false))
 {
-    if (propsDict_.found("startTime")){
-        startTime_=readScalar(propsDict_.lookup("startTime"));
-    }
-
-    if (propsDict_.found("writeToFile")){
-        writeToFile_=Switch(propsDict_.lookup("writeToFile"));
-    }
-
     // init force sub model
     setForceSubModels(propsDict_);
 
@@ -127,12 +119,15 @@ void particleVolume::setForce() const
         
         for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
         {
-            ds = 2*particleCloud_.radius(index)/scaleDia_;
-            VsTot += ds*ds*ds*fpth;
+            if(particleCloud_.cellIDs()[index][0] >= 0)
+            {
+                ds = 2*particleCloud_.radius(index)/scaleDia_;
+                VsTot += ds*ds*ds*fpth;
+            }
         }
 
         reduce(VsTot, sumOp<scalar>());
-        if(forceSubM(0).verbose()) Info << "Total particle volume = " << VsTot << endl;
+        if(forceSubM(0).verbose()) Info << "Total particle volume (located in domain) = " << VsTot << endl;
 
         // write to file
         if(writeToFile_)

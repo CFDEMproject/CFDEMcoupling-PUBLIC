@@ -1,7 +1,7 @@
-"CFDEMproject WWW Site"_lws :c
+"CFDEM(R)project WWW Site"_lws :c
 
 :line
-CFDEMcoupling Documentation :h2,c
+CFDEM(R)coupling Documentation :h2,c
 :line
 :c,image(Portfolio_CFDEMcoupling.png)
 :line
@@ -13,9 +13,9 @@ CFDEMcoupling Documentation :h2,c
 
 1. Contents :h3
 
-The CFDEMcoupling documentation is organized into the following sections. If you find any errors or omissions in this manual or have suggestions for useful information to add, please send an email to the developers so the CFDEMcoupling documentation can be improved.
+The CFDEM(R)coupling documentation is organized into the following sections. If you find any errors or omissions in this manual or have suggestions for useful information to add, please send an email to the developers so the CFDEM(R)coupling documentation can be improved.
 
-1.1 "About CFDEMcoupling"_#1_1
+1.1 "About CFDEM(R)coupling"_#1_1
 1.2 "Installation"_#1_2
 1.3 "Tutorials"_#1_3
 1.4 "couplingProperties dictionary"_#1_4
@@ -24,9 +24,9 @@ The CFDEMcoupling documentation is organized into the following sections. If you
 
 :line
 
-1.1 About CFDEMcoupling :link(1_1),h4
+1.1 About CFDEM(R)coupling :link(1_1),h4
 
-CFDEM coupling provides an open source parallel coupled CFD-DEM framework combining the strengths of "LIGGGHTS"_lig DEM code and the Open Source CFD package "OpenFOAM(R)(*)"_of. The CFDEMcoupling toolbox allows to expand standard CFD solvers of "OpenFOAM(R)(*)"_of to include a coupling to the DEM code "LIGGGHTS"_lig. In this toolbox the particle representation within the CFD solver is organized by "cloud" classes. Key functionalities are organised in sub-models (e.g. force models, data exchange models, etc.) which can easily be selected and combined by dictionary settings.
+CFDEM(R)coupling provides an open source parallel coupled CFD-DEM framework combining the strengths of "LIGGGHTS(R)"_lig DEM code and the Open Source CFD package "OpenFOAM(R)(*)"_of. The CFDEM(R)coupling toolbox allows to expand standard CFD solvers of "OpenFOAM(R)(*)"_of to include a coupling to the DEM code "LIGGGHTS(R)"_lig. In this toolbox the particle representation within the CFD solver is organized by "cloud" classes. Key functionalities are organised in sub-models (e.g. force models, data exchange models, etc.) which can easily be selected and combined by dictionary settings.
 
 The coupled solvers run fully parallel on distributed-memory clusters. Features are:
 
@@ -41,18 +41,18 @@ The file structure:
 
 {src} directory including the source files of the coupling toolbox and models :ulb,l
 {applications} directory including the solver files for coupled CFD-DEM simulations :l
-{doc} directory including the documentation of CFDEMcoupling :l
+{doc} directory including the documentation of CFDEM(R)coupling :l
 {tutorials} directory including basic tutorial cases showing the functionality  :l
 :ule
 
-Details on installation are given on the "CFDEMproject WWW Site"_lws .
+Details on installation are given on the "CFDEM(R)project WWW Site"_lws .
 The functionality of this CFD-DEM framework is described via "tutorial cases"_#_1_2 showing how to use different solvers and models.
 
-CFDEMcoupling stands for Computational Fluid Dynamics (CFD) -Discrete Element Method (DEM) coupling.
+CFDEM(R)coupling stands for Computational Fluid Dynamics (CFD) -Discrete Element Method (DEM) coupling.
 
-CFDEMcoupling is an open-source code, distributed freely under the terms of the GNU Public License (GPL).
+CFDEM(R)coupling is an open-source code, distributed freely under the terms of the GNU Public License (GPL).
 
-Core development of CFDEMcoupling is done by Christoph Goniva and Christoph Kloss, both at DCS Computing GmbH, 2012
+Core development of CFDEM(R)coupling is done by Christoph Goniva and Christoph Kloss, both at DCS Computing GmbH, 2012
 
 This documentation was written by Christoph Goniva, DCS Computing GmbH, 2012
 
@@ -72,7 +72,7 @@ In order to get the latest code version, please use the git repository at http:/
 
 [General:]
 
-Each solver of the CFDEMcoupling comes with at least one tutorial example, showing its functionality and correct usage. Provided that the installation is correct, the tutorials can be run via "Allrun.sh" shell scripts. These scripts perform all necessary steps (preprocessing, run, postprocessing, visualization).
+Each solver of the CFDEM(R)coupling comes with at least one tutorial example, showing its functionality and correct usage. Provided that the installation is correct, the tutorials can be run via "Allrun.sh" shell scripts. These scripts perform all necessary steps (preprocessing, run, postprocessing, visualization).
 
 [Location:]
 
@@ -90,11 +90,11 @@ Provided that the installation is correct, the tutorials can be run via "Allrun.
 
 The main settings of a simulation are done via dictionaries:
 
-The DEM setup of each case is defined by a "LIGGGHTS"_lig input file located in $caseDir/DEM (e.g. in.liggghts_init). For details on the "LIGGGHTS"_lig setup, please have a look at the "LIGGGHTS"_lig manual.
+The DEM setup of each case is defined by a "LIGGGHTS(R)"_lig input file located in $caseDir/DEM (e.g. in.liggghts_init). For details on the "LIGGGHTS(R)"_lig setup, please have a look at the "LIGGGHTS(R)"_lig manual.
 
 Standard CFD settings are defined in $caseDir/CFD/constant (e.g. transportProperties, RASproperties, etc.) and $caseDir/CFD/system (e.g. fvSchemes, controlDict). You can find more information on that in "OpenFOAM(R)(*)"_of documentations (www.openFoam.com)(*).
 
-Settings of the coupling routines are defined in $caseDir/CFD/constant/"couplingProperies"_#1_3 (e.g. force models, data exchange model, etc.) and $caseDir/CFD/constant/"liggghtsCommands"_#1_3 (allows to execute a LIGGGHTS command during a coupled simulation).
+Settings of the coupling routines are defined in $caseDir/CFD/constant/"couplingProperies"_#1_3 (e.g. force models, data exchange model, etc.) and $caseDir/CFD/constant/"liggghtsCommands"_#1_3 (allows to execute a LIGGGHTS(R) command during a coupled simulation).
 
 :line
 
@@ -134,7 +134,7 @@ Reasonable example settings for the "couplingProperties" dictionary are given in
 
 modelType :pre
 
-"modelType" refers to the formulation of the equations to be solved. Choose "A", "B" or "Bfull", according to Zhou et al. (2010): "Discrete particle simulation of particle-fluid flow: model formulations and their applicability", JFM. "A" requires the use of the force models gradPForce and viscForce, whereas "B" requires the force model "Archimedes". "Bfull" refers to model type I.
+"modelType" refers to the formulation of the equations to be solved. Choose "A", "B" or "Bfull", according to Zhou et al. (2010): "Discrete particle simulation of particle-fluid flow: model formulations and their applicability", JFM. "A" requires the use of the force models gradPForce and viscForce, whereas "B" requires the force model "Archimedes". "Bfull" refers to model type I, "A" refers to model type II and "B" refers to type III in the nomenclature used by Zhou et al.
 
 couplingInterval :pre
 
@@ -153,7 +153,7 @@ Example: DEMts=0.00001s, couplingInterval=10 exchange data (=couple) will happen
 
 [General:]
 
-In the "liggghtsCommands" dictionary liggghts commands being executed during a coupled CFD-DEM simulation are specified.
+In the "liggghtsCommands" dictionary LIGGGHTS(R) commands being executed during a coupled CFD-DEM simulation are specified.
 
 [Location:] $caseDir/CFD/constant
 
@@ -190,10 +190,14 @@ listing below of styles within certain commands.
 "averagingModel_dilute"_averagingModel_dilute.html,
 "cfdemSolverIB"_cfdemSolverIB.html,
 "cfdemSolverPiso"_cfdemSolverPiso.html,
+"cfdemSolverPisoSTM"_cfdemSolverPisoSTM.html,
 "cfdemSolverPisoScalar"_cfdemSolverPisoScalar.html,
 "clockModel"_clockModel.html,
 "clockModel_noClock"_clockModel_noClock.html,
 "clockModel_standardClock"_clockModel_standardClock.html,
+"couple/cfd"_fix_couple_cfd.html,
+"couple/cfd/force"_fix_couple_cfd_force.html,
+"couple/cfd/force/implicit"_fix_couple_cfd_force_implicit.html,
 "dataExchangeModel"_dataExchangeModel.html,
 "dataExchangeModel_noDataExchange"_dataExchangeModel_noDataExchange.html,
 "dataExchangeModel_oneWayVTK"_dataExchangeModel_oneWayVTK.html,
@@ -244,6 +248,7 @@ listing below of styles within certain commands.
 "regionModel"_regionModel.html,
 "regionModel_allRegion"_regionModel_allRegion.html,
 "scalarTransportModel"_scalarTransportModel.html,
+"scalarTransportModel_generalManual"_scalarTransportModel_generalManual.html,
 "smoothingModel"_smoothingModel.html,
 "smoothingModel_constDiffSmoothing"_smoothingModel_constDiffSmoothing.html,
 "smoothingModel_noSmoothing"_smoothingModel_noSmoothing.html,

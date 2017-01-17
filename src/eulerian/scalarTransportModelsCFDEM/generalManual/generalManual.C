@@ -121,6 +121,10 @@ void generalManual::setSources()
     for (int i=0;i<eulerianFieldList_.size();i++)
             eulerianScalarF(i).pullCloudFields();
 
+    //Communicate exchange terms to DEM
+    for (int iModel=0; iModel<particleCloud_.nrForceModels(); iModel++)
+        particleCloud_.forceM(iModel).commToDEM();
+
     //Send Sources to External Code (i.e., Lagrangian arrays handled by LIGGGHTS)
     particleCloud_.giveUSERdata();
 }

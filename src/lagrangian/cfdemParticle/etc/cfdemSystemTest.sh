@@ -12,7 +12,7 @@ source $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/functions.sh
 checkGPP="true"
 
 #- sys check for add on
-checkAddOn="true"
+checkAddOn="false"
 
 #- system settings
 printHeader
@@ -50,6 +50,23 @@ echo '$WM_LABEL_SIZE = '"$WM_LABEL_SIZE"
 if [ $WM_LABEL_SIZE != 32 ]; then 
     echo "!!!! Warning: WM_LABEL_SIZE must be 32!!!!! (Please correct in $FOAM_ETC/bashrc.)"
 fi
+echo ""
+echo "Additional lib settings"
+cat <<EOT > .Makefile_vtk_tmp
+include $CFDEM_ADD_LIBS_DIR/$CFDEM_ADD_LIBS_NAME
+
+.PHONY: all
+
+all:
+	@echo "VTK_PATH = \$(VTK_PATH)"
+	@echo "VTK_LIB = \$(VTK_LIB)"
+	@echo "VTK_INC = \$(VTK_INC)"
+	@echo "CFDEM_ADD_LIB_PATHS = \$(CFDEM_ADD_LIB_PATHS)"
+	@echo "CFDEM_ADD_LIBS = \$(CFDEM_ADD_LIBS)"
+EOT
+make -f .Makefile_vtk_tmp
+rm -f .Makefile_vtk_tmp
+echo
 
 echo "*******************"
 
@@ -80,6 +97,14 @@ if [ $checkAddOn == "true" ]
   then
     packageName=c3po
     filePath=$CFDEM_SRC_DIR/$packageName
+    if [ $(checkDir $filePath) == "true" ]; then
+        source $filePath/etc/$packageName"SystemTest.sh"
+    else
+        echo "$packageName does not exist." 
+    fi
+
+    packageName=parScale
+    filePath=$PASCAL_SRC_DIR/..
     if [ $(checkDir $filePath) == "true" ]; then
         source $filePath/etc/$packageName"SystemTest.sh"
     else

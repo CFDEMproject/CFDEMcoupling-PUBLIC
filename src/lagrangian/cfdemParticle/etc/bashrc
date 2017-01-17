@@ -36,12 +36,22 @@
 #------------------------------------------------------------------------------
 #- export environment variables (adapt to your paths)
 #------------------------------------------------------------------------------
+echo "************************************"
 
 #check if default lammps lib path should be used
 if [[ $CFDEM_LAMMPS_LIB_DIR == "" ]]; then
-    export CFDEM_LAMMPS_LIB_DIR=$CFDEM_LIGGGHTS_SRC_DIR/../lib/
+    export CFDEM_LAMMPS_LIB_DIR=$CFDEM_LIGGGHTS_SRC_DIR/../lib
 else
     echo "using CFDEM_LAMMPS_LIB_DIR=$CFDEM_LAMMPS_LIB_DIR defined by user."
+fi
+
+#test CFDEM_LAMMPS_LIB_DIR
+if [ -f "$CFDEM_LAMMPS_LIB_DIR/poems/Makefile.lammps" ]; then
+    :
+else
+    echo ""
+    echo "   !!! WARNING CFDEM_LAMMPS_LIB_DIR = $CFDEM_LAMMPS_LIB_DIR seems to be wrong !!!"
+    echo ""
 fi
 
 #- LIGGGHTS lib name
@@ -54,16 +64,18 @@ export CFDEM_LIB_NAME=lagrangianCFDEM-$CFDEM_VERSION-$WM_PROJECT_VERSION
 export CFDEM_LIB_COMP_NAME=lagrangianCFDEMcomp-$CFDEM_VERSION-$WM_PROJECT_VERSION
 
 #check if additional libraries should be compiled together with solvers
-if [[ $CFDEM_ADD_LIBS_NAME == "" ]]; then
-    export CFDEM_ADD_LIBS_NAME=additionalLibs_$WM_PROJECT_VERSION
-    echo "using CFDEM_ADD_LIBS_NAME=$CFDEM_ADD_LIBS_NAME ."
-else
-    echo "using CFDEM_ADD_LIBS_NAME=$CFDEM_ADD_LIBS_NAME defined by user."
-fi
 if [[ $CFDEM_ADD_LIBS_DIR == "" ]]; then
-    export CFDEM_ADD_LIBS_DIR=$CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc
+    export CFDEM_ADD_LIBS_DIR=$CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/addLibs_universal
+    echo "using default CFDEM_ADD_LIBS_DIR=$CFDEM_ADD_LIBS_DIR"
 else
     echo "using CFDEM_ADD_LIBS_DIR=$CFDEM_ADD_LIBS_DIR defined by user."
+fi
+
+if [[ $CFDEM_ADD_LIBS_NAME == "" ]]; then
+    export CFDEM_ADD_LIBS_NAME=additionalLibs_$WM_PROJECT_VERSION
+    echo "using default CFDEM_ADD_LIBS_NAME=$CFDEM_ADD_LIBS_NAME"
+else
+    echo "using CFDEM_ADD_LIBS_NAME=$CFDEM_ADD_LIBS_NAME defined by user."
 fi
 
 # check addLibs path and file name
@@ -79,23 +91,15 @@ export CFDEM_Many2ManyLIB_PATH=$CFDEM_SRC_DIR/lagrangian/cfdemParticle/subModels
 export CFDEM_Many2ManyLIB_MAKEFILENAME=$CFDEM_LIGGGHTS_MAKEFILE_NAME
 
 #- LMP M2M lib path and makefile
-export CFDEM_M2MLIB_PATH=$CFDEM_SRC_DIR/lagrangian/cfdemParticle/subModels/dataExchangeModel/twoWayM2M/library
+export CFDEM_M2MLIB_PATH=$CFDEM_SRC_DIR/lagrangian/cfdemParticle/subModels/dataExchangeModel/M2M/library
 export CFDEM_M2MLIB_MAKEFILENAME=$CFDEM_LIGGGHTS_MAKEFILE_NAME
 
-#- LMP POEMS lib path and makefile
+#- LMP M2MMS lib path and makefile
+export CFDEM_M2MMSLIB_PATH=$CFDEM_SRC_DIR/lagrangian/cfdemParticle/subModels/dataExchangeModel/M2M/library
+export CFDEM_M2MMSLIB_MAKEFILENAME=$CFDEM_LIGGGHTS_MAKEFILE_NAME
+
+#- LMP POEMS lib default path
 export CFDEM_POEMSLIB_PATH=$CFDEM_LAMMPS_LIB_DIR/poems
-export CFDEM_POEMSLIB_MAKEFILENAME=Install
-
-#- LMP ASPHERE lib path and makefile
-export CFDEM_ASPHERELIB_PATH=$CFDEM_LAMMPS_LIB_DIR/ASPHERE
-export CFDEM_ASPHERELIB_MAKEFILENAME=Install
-
-#- PARSCALE lib path and makefile
-export CFDEM_PARSCALELIB_PATH=$CFDEM_LAMMPS_LIB_DIR/PASCAL
-export CFDEM_PARSCALELIB_MAKEFILENAME=Install
-
-#-C3PO library
-export C3PO_SRC_DIR=$CFDEM_SRC_DIR/c3po
 #-----------------------------------------------------
 
 #- path to test harness
@@ -250,6 +254,22 @@ if [[ $WM_PROJECT_VERSION == 4.* ]]; then
     sleep 1.5
 elif [[ $WM_PROJECT_VERSION == 3.0.* ]]; then
     export CFDEM_WM_PROJECT_VERSION=30
+elif [[ $WM_PROJECT_VERSION == v1606+ ]]; then 
+    export CFDEM_WM_PROJECT_VERSION=1606
+    echo "************************************"
+    echo "WARNING from your CFDEM code!"
+    echo "WARNING: Coupling with your OpenFOAM(R) version is currently under development!"
+    echo "In doubt switch to another version."
+    echo "************************************"
+    sleep 1.5
+elif [[ $WM_PROJECT_VERSION == v1612+ ]]; then 
+    export CFDEM_WM_PROJECT_VERSION=1612
+    echo "************************************"
+    echo "WARNING from your CFDEM code!"
+    echo "WARNING: Coupling with your OpenFOAM(R) version is currently under development!"
+    echo "In doubt switch to another version."
+    echo "************************************"
+    sleep 1.5
 elif [[ $WM_PROJECT_VERSION == 2.4.* ]]; then
     export CFDEM_WM_PROJECT_VERSION=24
 elif [[ $WM_PROJECT_VERSION == "3.2" && $WM_FORK == "extend" ]]; then
@@ -263,3 +283,5 @@ else
     echo "************************************"
     sleep 1.5
 fi
+
+echo "************************************"

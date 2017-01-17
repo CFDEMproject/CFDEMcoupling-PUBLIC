@@ -31,7 +31,7 @@ couplingInterval 100;
 
 voidFractionModel divided;//centre;//bigParticle;//
 
-locateModel engine;///ijk;//standard;
+locateModel engine;//turboEngineM2M;//
 
 meshMotionModel noMeshMotion;
 
@@ -41,7 +41,7 @@ IOModel basicIO; //trackIO; //
 
 probeModel off;
 
-dataExchangeModel twoWayMPI;//twoWayFiles;//oneWayVTK;//
+dataExchangeModel twoWayMPI;//M2M;//
 
 averagingModel dense;//dilute;//
 
@@ -137,7 +137,7 @@ oneWayVTKProps
     maxNumberOfParticles 30000;
 }
 
-twoWayMPIProps
+"(twoWayMPIProps|M2MProps)"
 {
     liggghtsPath "../DEM/in.liggghts_run";
 }
@@ -166,7 +166,7 @@ bigParticleProps
     scaleUpVol 1.0;
 }
 
-engineProps
+"(engineProps|turboEngineM2MProps)"
 {
     treeSearch true;
 }

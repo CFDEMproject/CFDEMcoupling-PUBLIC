@@ -32,7 +32,7 @@ couplingInterval 100;
 
 voidFractionModel divided;//centre;//
 
-locateModel engine;//turboEngineM2M;//
+locateModel engine;
 
 meshMotionModel noMeshMotion;
 
@@ -199,14 +199,6 @@ centreProps
 engineProps
 {
     treeSearch true;
-}
-
-turboEngineM2MProps
-{
-    turboEngineProps
-    {
-        treeSearch true;
-    }
 }
 
 dividedProps

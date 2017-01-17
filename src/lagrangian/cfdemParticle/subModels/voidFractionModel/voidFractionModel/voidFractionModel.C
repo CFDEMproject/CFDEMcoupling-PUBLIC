@@ -187,9 +187,17 @@ bool Foam::voidFractionModel::requiresSuperquadric() const
 
 double Foam::voidFractionModel::pointInParticle(int index, vector positionCenter, vector point, double scale) const
 {
-  scalar radius =  particleCloud_.radius(index);
-  scalar pointDistSq = magSqr(point - positionCenter);
-  return pointDistSq / (scale*scale*radius*radius) - 1.0;
+    scalar radius =  particleCloud_.radius(index);
+    //Pout << "radius=" << radius << endl;
+    if(radius>SMALL)
+    {
+        scalar pointDistSq = magSqr(point - positionCenter);
+        return pointDistSq / (scale*scale*radius*radius) - 1.0;
+    }
+    else
+    {
+        return 0.;
+    }
 }
 
 double Foam::voidFractionModel::pointInParticle(int index, vector positionCenter, vector point) const {

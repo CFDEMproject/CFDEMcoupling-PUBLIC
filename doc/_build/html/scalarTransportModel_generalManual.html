@@ -1,0 +1,278 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>scalarTransportModel_generalManual command &mdash; CFDEMcoupling v3.X documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="CFDEMcoupling v3.X documentation" href="index.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="CFDEMcoupling_Manual.html" class="icon icon-home"> CFDEMcoupling
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                v3.X
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <!-- Local TOC -->
+                <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">scalarTransportModel_generalManual command</a><ul>
+<li><a class="reference internal" href="#syntax">Syntax</a></li>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+<li><a class="reference internal" href="#description">Description</a></li>
+<li><a class="reference internal" href="#restrictions">Restrictions</a></li>
+<li><a class="reference internal" href="#related-commands">Related commands</a></li>
+</ul>
+</li>
+</ul>
+</div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="CFDEMcoupling_Manual.html">CFDEMcoupling</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="CFDEMcoupling_Manual.html">Docs</a> &raquo;</li>
+      
+    <li>scalarTransportModel_generalManual command</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        
+          <a href="http://www.cfdem.com"> Website</a>
+        
+      
+    </li>
+  </ul>
+  <hr/>
+  
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="scalartransportmodel-generalmanual-command">
+<span id="index-0"></span><h1>scalarTransportModel_generalManual command<a class="headerlink" href="#scalartransportmodel-generalmanual-command" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="syntax">
+<h2>Syntax<a class="headerlink" href="#syntax" title="Permalink to this headline">¶</a></h2>
+<p>Defined in scalarTransportProperties dictionary.</p>
+<p>scalarTransportModel generalManual;</p>
+<pre class="literal-block">
+generalManualProps
+{
+    phiFieldName <em>phiName</em>;
+    voidfractionFieldName <em>voidfractionName</em>;
+    ScT <em>scalar1</em>;
+    PrT <em>scalar2</em>;
+    cpVolumetric <em>scalar3</em>;
+    cpVolumetricFieldName <em>word1</em>;
+    rhoMixFieldName <em>word2</em>;
+    eulerianFields
+    (
+        <em>C</em>
+        <em>T</em>
+    );
+</pre>
+<div class="highlight-python"><div class="highlight"><pre>}
+</pre></div>
+</div>
+<ul class="simple">
+<li><em>phiName</em> = (optional) name of the surface field for the SUPERFICIAL flux, default &#8220;phi&#8221;.</li>
+<li><em>voidfractionName</em> = (optional) name of the finite volume voidfraction field, default &#8220;voidfraction&#8221;.</li>
+<li><em>scalar1</em> = (optional, default 0.7) turbulent Schmidt Nr, set to large value to suppress turbulent species transport</li>
+<li><em>scalar2</em> = (optional, default 0.7) turbulent Prandtl Nr, set to large value to suppress turbulent heat transport</li>
+<li><em>scalar3</em> = (optional, alternatively define word1) volumetric heat capacity as a global constant (in contrast to cpVolumetricFieldName for a field). This is the mixture density times the heat capacity <strong>J/K/(m_voidspace)^3</strong>, will only be used if cpVolumetricFieldName, or updateMixtureProperties = false</li>
+<li><em>word1</em> = (optional, alternatively define scalar3) volumetric heat capacity as a field</li>
+<li><em>word3</em> = mixture density field</li>
+<li><em>C</em> = concentration field name</li>
+<li><em>T</em> = temperature field name</li>
+</ul>
+</div>
+<div class="section" id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre>generalManualProps
+{
+    phiFieldName &quot;phi&quot;;
+    ScT 0.7;
+    PrT 0.7;
+    cpVolumetric 1196;
+    rhoMixFieldName &quot;rhoMix&quot;;
+    eulerianFields
+    (
+        C
+        T
+    );
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">fvOptionsC</span>
+<span class="p">{</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">fvOptionsT</span>
+<span class="p">{</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre>}
+</pre></div>
+</div>
+</div>
+<div class="section" id="description">
+<h2>Description<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h2>
+<p>Solves the advection-dispersion transport equation for a dilute scalar quantity in the fluid phase. fvOptions can be specified to model sources, etc. in the fluid phase. Exchange models with a particle phase can be included by including appropriate forceModels in couplingProperties.</p>
+</div>
+<div class="section" id="restrictions">
+<h2>Restrictions<a class="headerlink" href="#restrictions" title="Permalink to this headline">¶</a></h2>
+<p>The user MUST ensure the &#8220;phi&#8221; field is SUPERFICIAL (i.e., the fluid-phase velocity times voidfraction interpolatedat the cells&#8217; faces). The code cannot know or check whether this is the case, so the user of a certain solver has to ensure this.</p>
+</div>
+<div class="section" id="related-commands">
+<h2>Related commands<a class="headerlink" href="#related-commands" title="Permalink to this headline">¶</a></h2>
+<p>none.</p>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, DCS Computing GmbH, JKU Linz.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'v3.X',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

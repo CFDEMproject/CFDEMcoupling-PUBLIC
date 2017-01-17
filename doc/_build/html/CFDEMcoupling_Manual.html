@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>CFDEMcoupling Documentation &mdash; CFDEMcoupling v3.X documentation</title>
+  <title>CFDEM(R)coupling Documentation &mdash; CFDEMcoupling v3.X documentation</title>
   
 
   
@@ -82,9 +82,9 @@
             
                 <!-- Local TOC -->
                 <div class="local-toc"><ul>
-<li><a class="reference internal" href="#">CFDEMcoupling Documentation</a><ul>
+<li><a class="reference internal" href="#">CFDEM(R)coupling Documentation</a><ul>
 <li><a class="reference internal" href="#contents">Contents</a><ul>
-<li><a class="reference internal" href="#about-cfdemcoupling">About CFDEMcoupling</a></li>
+<li><a class="reference internal" href="#about-cfdem-r-coupling">About CFDEM(R)coupling</a></li>
 <li><a class="reference internal" href="#installation">Installation</a></li>
 <li><a class="reference internal" href="#tutorials">Tutorials</a></li>
 <li><a class="reference internal" href="#couplingproperties-dictionary">&#8220;couplingProperties&#8221; dictionary</a></li>
@@ -124,7 +124,7 @@
   <ul class="wy-breadcrumbs">
     <li><a href="#">Docs</a> &raquo;</li>
       
-    <li>CFDEMcoupling Documentation</li>
+    <li>CFDEM(R)coupling Documentation</li>
     <li class="wy-breadcrumbs-aside">
       
         
@@ -139,16 +139,16 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="cfdemcoupling-documentation">
-<h1>CFDEMcoupling Documentation<a class="headerlink" href="#cfdemcoupling-documentation" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="cfdem-r-coupling-documentation">
+<h1>CFDEM(R)coupling Documentation<a class="headerlink" href="#cfdem-r-coupling-documentation" title="Permalink to this headline">¶</a></h1>
 <hr class="docutils" />
 <img alt="_images/Portfolio_CFDEMcoupling.png" class="align-center" src="_images/Portfolio_CFDEMcoupling.png" />
 <hr class="docutils" />
 <div class="section" id="contents">
 <h2>Contents<a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h2>
-<p>The CFDEMcoupling documentation is organized into the following sections. If you find any errors or omissions in this manual or have suggestions for useful information to add, please send an email to the developers so the CFDEMcoupling documentation can be improved.</p>
+<p>The CFDEM(R)coupling documentation is organized into the following sections. If you find any errors or omissions in this manual or have suggestions for useful information to add, please send an email to the developers so the CFDEM(R)coupling documentation can be improved.</p>
 <div class="line-block">
-<div class="line">1.1 <a class="reference internal" href="#id1"><em>About CFDEMcoupling</em></a></div>
+<div class="line">1.1 <a class="reference internal" href="#id1"><em>About CFDEM(R)coupling</em></a></div>
 <div class="line">1.2 <a class="reference internal" href="#id2"><em>Installation</em></a></div>
 <div class="line">1.3 <a class="reference internal" href="#id3"><em>Tutorials</em></a></div>
 <div class="line">1.4 <a class="reference internal" href="#id4"><em>couplingProperties dictionary</em></a></div>
@@ -157,9 +157,9 @@
 <div class="line"><br /></div>
 </div>
 <hr class="docutils" />
-<div class="section" id="about-cfdemcoupling">
-<span id="id1"></span><h3>About CFDEMcoupling<a class="headerlink" href="#about-cfdemcoupling" title="Permalink to this headline">¶</a></h3>
-<p>CFDEM coupling provides an open source parallel coupled CFD-DEM framework combining the strengths of <a class="reference external" href="http://www.cfdem.com">LIGGGHTS</a> DEM code and the Open Source CFD package <a class="reference external" href="http://www.openfoam.com">OpenFOAM(R)(*)</a>. The CFDEMcoupling toolbox allows to expand standard CFD solvers of <a class="reference external" href="http://www.openfoam.com">OpenFOAM(R)(*)</a> to include a coupling to the DEM code <a class="reference external" href="http://www.cfdem.com">LIGGGHTS</a>. In this toolbox the particle representation within the CFD solver is organized by &#8220;cloud&#8221; classes. Key functionalities are organised in sub-models (e.g. force models, data exchange models, etc.) which can easily be selected and combined by dictionary settings.</p>
+<div class="section" id="about-cfdem-r-coupling">
+<span id="id1"></span><h3>About CFDEM(R)coupling<a class="headerlink" href="#about-cfdem-r-coupling" title="Permalink to this headline">¶</a></h3>
+<p>CFDEM(R)coupling provides an open source parallel coupled CFD-DEM framework combining the strengths of <a class="reference external" href="http://www.cfdem.com">LIGGGHTS(R)</a> DEM code and the Open Source CFD package <a class="reference external" href="http://www.openfoam.com">OpenFOAM(R)(*)</a>. The CFDEM(R)coupling toolbox allows to expand standard CFD solvers of <a class="reference external" href="http://www.openfoam.com">OpenFOAM(R)(*)</a> to include a coupling to the DEM code <a class="reference external" href="http://www.cfdem.com">LIGGGHTS(R)</a>. In this toolbox the particle representation within the CFD solver is organized by &#8220;cloud&#8221; classes. Key functionalities are organised in sub-models (e.g. force models, data exchange models, etc.) which can easily be selected and combined by dictionary settings.</p>
 <p>The coupled solvers run fully parallel on distributed-memory clusters. Features are:</p>
 <ul class="simple">
 <li>its modular approach allows users to easily implement new models</li>
@@ -172,14 +172,14 @@
 <ul class="simple">
 <li><em>src</em> directory including the source files of the coupling toolbox and models</li>
 <li><em>applications</em> directory including the solver files for coupled CFD-DEM simulations</li>
-<li><em>doc</em> directory including the documentation of CFDEMcoupling</li>
+<li><em>doc</em> directory including the documentation of CFDEM(R)coupling</li>
 <li><em>tutorials</em> directory including basic tutorial cases showing the functionality</li>
 </ul>
-<p>Details on installation are given on the <a class="reference external" href="http://www.cfdem.com">CFDEMproject WWW Site</a> .
+<p>Details on installation are given on the <a class="reference external" href="http://www.cfdem.com">CFDEM(R)project WWW Site</a> .
 The functionality of this CFD-DEM framework is described via <em class="xref std std-ref">tutorial cases</em> showing how to use different solvers and models.</p>
-<p>CFDEMcoupling stands for Computational Fluid Dynamics (CFD) -Discrete Element Method (DEM) coupling.</p>
-<p>CFDEMcoupling is an open-source code, distributed freely under the terms of the GNU Public License (GPL).</p>
-<p>Core development of CFDEMcoupling is done by Christoph Goniva and Christoph Kloss, both at DCS Computing GmbH, 2012</p>
+<p>CFDEM(R)coupling stands for Computational Fluid Dynamics (CFD) -Discrete Element Method (DEM) coupling.</p>
+<p>CFDEM(R)coupling is an open-source code, distributed freely under the terms of the GNU Public License (GPL).</p>
+<p>Core development of CFDEM(R)coupling is done by Christoph Goniva and Christoph Kloss, both at DCS Computing GmbH, 2012</p>
 <p>This documentation was written by Christoph Goniva, DCS Computing GmbH, 2012</p>
 <hr class="docutils" />
 <p>(*) This offering is not approved or endorsed by OpenCFD Limited, the producer of the OpenFOAM software and owner of the OPENFOAM®  and OpenCFD®  trade marks.</p>
@@ -194,7 +194,7 @@ In order to get the latest code version, please use the git repository at <a cla
 <div class="section" id="tutorials">
 <span id="id3"></span><h3>Tutorials<a class="headerlink" href="#tutorials" title="Permalink to this headline">¶</a></h3>
 <p><strong>General:</strong></p>
-<p>Each solver of the CFDEMcoupling comes with at least one tutorial example, showing its functionality and correct usage. Provided that the installation is correct, the tutorials can be run via &#8220;Allrun.sh&#8221; shell scripts. These scripts perform all necessary steps (preprocessing, run, postprocessing, visualization).</p>
+<p>Each solver of the CFDEM(R)coupling comes with at least one tutorial example, showing its functionality and correct usage. Provided that the installation is correct, the tutorials can be run via &#8220;Allrun.sh&#8221; shell scripts. These scripts perform all necessary steps (preprocessing, run, postprocessing, visualization).</p>
 <p><strong>Location:</strong></p>
 <p>The tutorials can be found in the directory $CFDEM_PROJECT_DIR/tutorials, which can be reached by typing &#8220;cfdemTut&#8221;</p>
 <p><strong>Structure:</strong></p>
@@ -203,9 +203,9 @@ In order to get the latest code version, please use the git repository at <a cla
 <p>Provided that the installation is correct, the tutorials can be run via &#8220;Allrun.sh&#8221; shell script, executed by typing &#8221;./Allrun.sh&#8221;. The successful run of the script might need some third party software (e.g. octave, evince, etc.).</p>
 <p><strong>Settings:</strong></p>
 <p>The main settings of a simulation are done via dictionaries:</p>
-<p>The DEM setup of each case is defined by a <a class="reference external" href="http://www.cfdem.com">LIGGGHTS</a> input file located in $caseDir/DEM (e.g. in.liggghts_init). For details on the <a class="reference external" href="http://www.cfdem.com">LIGGGHTS</a> setup, please have a look at the <a class="reference external" href="http://www.cfdem.com">LIGGGHTS</a> manual.</p>
+<p>The DEM setup of each case is defined by a <a class="reference external" href="http://www.cfdem.com">LIGGGHTS(R)</a> input file located in $caseDir/DEM (e.g. in.liggghts_init). For details on the <a class="reference external" href="http://www.cfdem.com">LIGGGHTS(R)</a> setup, please have a look at the <a class="reference external" href="http://www.cfdem.com">LIGGGHTS(R)</a> manual.</p>
 <p>Standard CFD settings are defined in $caseDir/CFD/constant (e.g. transportProperties, RASproperties, etc.) and $caseDir/CFD/system (e.g. fvSchemes, controlDict). You can find more information on that in <a class="reference external" href="http://www.openfoam.com">OpenFOAM(R)(*)</a> documentations (www.openFoam.com)(*).</p>
-<p>Settings of the coupling routines are defined in $caseDir/CFD/constant/<a class="reference internal" href="#id3"><em>couplingProperies</em></a> (e.g. force models, data exchange model, etc.) and $caseDir/CFD/constant/<a class="reference internal" href="#id3"><em>liggghtsCommands</em></a> (allows to execute a LIGGGHTS command during a coupled simulation).</p>
+<p>Settings of the coupling routines are defined in $caseDir/CFD/constant/<a class="reference internal" href="#id3"><em>couplingProperies</em></a> (e.g. force models, data exchange model, etc.) and $caseDir/CFD/constant/<a class="reference internal" href="#id3"><em>liggghtsCommands</em></a> (allows to execute a LIGGGHTS(R) command during a coupled simulation).</p>
 <hr class="docutils" />
 </div>
 <div class="section" id="couplingproperties-dictionary">
@@ -236,7 +236,7 @@ In order to get the latest code version, please use the git repository at <a cla
 <div class="highlight-python"><div class="highlight"><pre><span class="n">modelType</span>
 </pre></div>
 </div>
-<p>&#8220;modelType&#8221; refers to the formulation of the equations to be solved. Choose &#8220;A&#8221;, &#8220;B&#8221; or &#8220;Bfull&#8221;, according to Zhou et al. (2010): &#8220;Discrete particle simulation of particle-fluid flow: model formulations and their applicability&#8221;, JFM. &#8220;A&#8221; requires the use of the force models gradPForce and viscForce, whereas &#8220;B&#8221; requires the force model &#8220;Archimedes&#8221;. &#8220;Bfull&#8221; refers to model type I.</p>
+<p>&#8220;modelType&#8221; refers to the formulation of the equations to be solved. Choose &#8220;A&#8221;, &#8220;B&#8221; or &#8220;Bfull&#8221;, according to Zhou et al. (2010): &#8220;Discrete particle simulation of particle-fluid flow: model formulations and their applicability&#8221;, JFM. &#8220;A&#8221; requires the use of the force models gradPForce and viscForce, whereas &#8220;B&#8221; requires the force model &#8220;Archimedes&#8221;. &#8220;Bfull&#8221; refers to model type I, &#8220;A&#8221; refers to model type II and &#8220;B&#8221; refers to type III in the nomenclature used by Zhou et al.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">couplingInterval</span>
 </pre></div>
 </div>
@@ -251,7 +251,7 @@ In order to get the latest code version, please use the git repository at <a cla
 <div class="section" id="liggghtscommands-dictionary">
 <span id="id5"></span><h3>&#8220;liggghtsCommands&#8221; dictionary<a class="headerlink" href="#liggghtscommands-dictionary" title="Permalink to this headline">¶</a></h3>
 <p><strong>General:</strong></p>
-<p>In the &#8220;liggghtsCommands&#8221; dictionary liggghts commands being executed during a coupled CFD-DEM simulation are specified.</p>
+<p>In the &#8220;liggghtsCommands&#8221; dictionary LIGGGHTS(R) commands being executed during a coupled CFD-DEM simulation are specified.</p>
 <p><strong>Location:</strong> $caseDir/CFD/constant</p>
 <p><strong>Structure:</strong></p>
 <p>The dictionary is divided into two parts, first a list of &#8220;liggghtsCommandModels&#8221; is defined, then the settings for each model must be specified.</p>
@@ -265,8 +265,8 @@ In order to get the latest code version, please use the git repository at <a cla
 listing below of styles within certain commands.</p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="52%" />
 <col width="48%" />
+<col width="52%" />
 </colgroup>
 <tbody valign="top">
 <tr class="row-odd"><td><a class="reference internal" href="IOModel.html"><em>IOModel</em></a></td>
@@ -284,11 +284,17 @@ listing below of styles within certain commands.</p>
 <tr class="row-odd"><td><a class="reference internal" href="cfdemSolverIB.html"><em>cfdemSolverIB</em></a></td>
 <td><a class="reference internal" href="cfdemSolverPiso.html"><em>cfdemSolverPiso</em></a></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="cfdemSolverPisoScalar.html"><em>cfdemSolverPisoScalar</em></a></td>
-<td><a class="reference internal" href="clockModel.html"><em>clockModel</em></a></td>
+<tr class="row-even"><td><a class="reference internal" href="cfdemSolverPisoSTM.html"><em>cfdemSolverPisoSTM</em></a></td>
+<td><a class="reference internal" href="cfdemSolverPisoScalar.html"><em>cfdemSolverPisoScalar</em></a></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="clockModel_noClock.html"><em>clockModel_noClock</em></a></td>
-<td><a class="reference internal" href="clockModel_standardClock.html"><em>clockModel_standardClock</em></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="clockModel.html"><em>clockModel</em></a></td>
+<td><a class="reference internal" href="clockModel_noClock.html"><em>clockModel_noClock</em></a></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="clockModel_standardClock.html"><em>clockModel_standardClock</em></a></td>
+<td><a class="reference internal" href="fix_couple_cfd.html"><em>couple/cfd</em></a></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="fix_couple_cfd_force.html"><em>couple/cfd/force</em></a></td>
+<td><a class="reference internal" href="fix_couple_cfd_force_implicit.html"><em>couple/cfd/force/implicit</em></a></td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="dataExchangeModel.html"><em>dataExchangeModel</em></a></td>
 <td><a class="reference internal" href="dataExchangeModel_noDataExchange.html"><em>dataExchangeModel_noDataExchange</em></a></td>
@@ -365,23 +371,23 @@ listing below of styles within certain commands.</p>
 <tr class="row-even"><td><a class="reference internal" href="regionModel_allRegion.html"><em>regionModel_allRegion</em></a></td>
 <td><a class="reference internal" href="scalarTransportModel.html"><em>scalarTransportModel</em></a></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="smoothingModel.html"><em>smoothingModel</em></a></td>
-<td><a class="reference internal" href="smoothingModel_constDiffSmoothing.html"><em>smoothingModel_constDiffSmoothing</em></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="scalarTransportModel_generalManual.html"><em>scalarTransportModel_generalManual</em></a></td>
+<td><a class="reference internal" href="smoothingModel.html"><em>smoothingModel</em></a></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="smoothingModel_noSmoothing.html"><em>smoothingModel_noSmoothing</em></a></td>
-<td><a class="reference internal" href="voidFractionModel.html"><em>voidfractionModel</em></a></td>
+<tr class="row-even"><td><a class="reference internal" href="smoothingModel_constDiffSmoothing.html"><em>smoothingModel_constDiffSmoothing</em></a></td>
+<td><a class="reference internal" href="smoothingModel_noSmoothing.html"><em>smoothingModel_noSmoothing</em></a></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="voidFractionModel_GaussVoidFraction.html"><em>voidfractionModel_GaussVoidFraction</em></a></td>
-<td><a class="reference internal" href="voidFractionModel_IBVoidFraction.html"><em>voidfractionModel_IBVoidFraction</em></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="voidFractionModel.html"><em>voidfractionModel</em></a></td>
+<td><a class="reference internal" href="voidFractionModel_GaussVoidFraction.html"><em>voidfractionModel_GaussVoidFraction</em></a></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="voidFractionModel_bigParticleVoidFraction.html"><em>voidfractionModel_bigParticleVoidFraction</em></a></td>
-<td><a class="reference internal" href="voidFractionModel_centreVoidFraction.html"><em>voidfractionModel_centreVoidFraction</em></a></td>
+<tr class="row-even"><td><a class="reference internal" href="voidFractionModel_IBVoidFraction.html"><em>voidfractionModel_IBVoidFraction</em></a></td>
+<td><a class="reference internal" href="voidFractionModel_bigParticleVoidFraction.html"><em>voidfractionModel_bigParticleVoidFraction</em></a></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="voidFractionModel_dividedVoidFraction.html"><em>voidfractionModel_dividedVoidFraction</em></a></td>
-<td><a class="reference internal" href="voidFractionModel_noVoidFraction.html"><em>voidfractionModel_noVoidFractionVoidFraction</em></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="voidFractionModel_centreVoidFraction.html"><em>voidfractionModel_centreVoidFraction</em></a></td>
+<td><a class="reference internal" href="voidFractionModel_dividedVoidFraction.html"><em>voidfractionModel_dividedVoidFraction</em></a></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="voidFractionModel_trilinearVoidFraction.html"><em>voidfractionModel_trilinearVoidFraction</em></a></td>
-<td>&nbsp;</td>
+<tr class="row-even"><td><a class="reference internal" href="voidFractionModel_noVoidFraction.html"><em>voidfractionModel_noVoidFractionVoidFraction</em></a></td>
+<td><a class="reference internal" href="voidFractionModel_trilinearVoidFraction.html"><em>voidfractionModel_trilinearVoidFraction</em></a></td>
 </tr>
 </tbody>
 </table>

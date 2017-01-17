@@ -1,0 +1,28 @@
+.. index:: cfdemSolverPisoSTM
+
+cfdemSolverPisoSTM command
+==========================
+
+Description
+"""""""""""
+
+"cfdemSolverPisoSTM" is a coupled CFD-DEM solver using CFDEMcoupling, an open source parallel coupled CFD-DEM framework. Based on pisoFoam(R)(*), a finite volume based solver for turbulent Navier-Stokes equations applying PISO algorithm, "cfdemSolverPisoSTM" has additional functionality for a coupling to the DEM code "LIGGGHTS" as well as a scalar transport equation. The volume averaged Navier-Stokes Equations are solved accounting for momentum exchange and volume displacement of discrete particles, whose trajectories are calculated in the DEM code LIGGGHTS. Scalar transport equations coupled to scalar properties of the particle phase, (e.g. convective heat transfer) in a fluid granular system can be modeled with "cfdemSolverPisoSTM".
+
+see:
+
+GONIVA, C., KLOSS, C., HAGER,A. and PIRKER, S. (2010): "An Open Source CFD-DEM Perspective", Proc. of OpenFOAM Workshop, Göteborg, June 22.-24.
+
+
+----------
+
+
+(*) This offering is not approved or endorsed by OpenCFD Limited, the producer of the OpenFOAM software and owner of the OPENFOAM®  and OpenCFD®  trade marks.
+
+
+----------
+
+
+
+.. _liws: http://www.cfdem.com
+.. _ld: Manual.html
+.. _lc: Section_commands.html#comm

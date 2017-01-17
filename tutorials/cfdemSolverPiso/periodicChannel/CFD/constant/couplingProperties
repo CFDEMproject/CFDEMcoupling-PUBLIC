@@ -1,0 +1,116 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.4                                   |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+
+    root            "";
+    case            "";
+    instance        "";
+    local           "";
+
+    class           dictionary;
+    object          couplingProperties;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+//===========================================================================//
+// sub-models & settings
+
+modelType "A"; // A or B
+
+couplingInterval 100;
+
+voidFractionModel divided;//centre;//
+
+locateModel engine;//engineIB;//
+
+meshMotionModel noMeshMotion;
+
+regionModel allRegion;
+
+IOModel basicIO;
+
+probeModel off;
+
+dataExchangeModel twoWayMPI;
+
+averagingModel dense;//dilute;//
+
+clockModel off;//standardClock;//
+
+smoothingModel off;// localPSizeDiffSmoothing;// constDiffSmoothing; //
+
+forceModels
+(
+    KochHillDrag
+    gradPForce
+    viscForce
+);
+
+momCoupleModels
+(
+    implicitCouple
+);
+
+//turbulenceModelType "RASProperties";//"LESProperties";//OFversion24x
+turbulenceModelType turbulenceProperties;//"LESProperties";//OFversion30x
+
+//===========================================================================//
+// sub-model properties
+
+implicitCoupleProps
+{
+    velFieldName "U";
+    granVelFieldName "Us";
+    voidfractionFieldName "voidfraction";
+}
+
+gradPForceProps
+{
+    pFieldName "p";
+    voidfractionFieldName "voidfraction";
+    velocityFieldName "U";
+    interpolation true;
+}
+
+viscForceProps
+{
+    velocityFieldName "U";
+    interpolation true;
+}
+
+KochHillDragProps
+{
+    velFieldName "U";
+    rhoParticle 1500;
+    voidfractionFieldName "voidfraction";
+    interpolation true;
+}
+
+engineProps
+{
+    treeSearch true;
+}
+
+dividedProps
+{
+    alphaMin 0.1;
+    scaleUpVol 1.0;
+}
+
+twoWayMPIProps
+{
+    maxNumberOfParticles 10100;
+    liggghtsPath "../DEM/in.liggghts_resume";
+}
+// ************************************************************************* //

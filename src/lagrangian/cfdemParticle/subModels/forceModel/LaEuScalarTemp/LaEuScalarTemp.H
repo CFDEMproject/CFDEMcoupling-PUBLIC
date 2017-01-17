@@ -134,6 +134,8 @@ public:
         void setForce() const;
 
         void manipulateScalarField(volScalarField&) const;
+
+        void commToDEM() const;
 };
 
 

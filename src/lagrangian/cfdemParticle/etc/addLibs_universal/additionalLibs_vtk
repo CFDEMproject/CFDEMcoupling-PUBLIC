@@ -1,0 +1,50 @@
+# VTK library, OPTIONAL
+#
+# VTK_INC = path for VTK header files (not needed in coupling, only in here to identify VTK version)
+# VTK_PATH = path for VTK library
+# VTK_LIB = name of VTK library
+#
+# If the automatic detection does not work for you, e.g. because of a custom installation of VTK,
+# then you should set VTK_INC, VTK_PATH and VTK_LIB in your shell environment (e.g. via export in
+# your ~/.bashrc).
+
+VTK_INC  ?= -I$(shell ls -d /usr/include/vtk* | tail -n 1)
+VTK_TMP := $(shell grep -d skip VTK_MAJOR_VERSION $(subst -I,,$(VTK_INC))/* | grep define)
+VTK_MAJOR_VERSION := $(word $(words $(VTK_TMP)),$(VTK_TMP))
+VTK_TMP := $(shell grep -d skip VTK_MINOR_VERSION $(subst -I,,$(VTK_INC))/* | grep define)
+VTK_MINOR_VERSION := $(word $(words $(VTK_TMP)),$(VTK_TMP))
+VTK_VERSION=$(VTK_MAJOR_VERSION).$(VTK_MINOR_VERSION)
+ifeq ($(VTK_MAJOR_VERSION),5)
+    VTK_LIB  = -lvtkCommon \
+               -lvtkFiltering \
+               -lvtkIO \
+               -lvtkParallel \
+               -lvtkGraphics
+    VTK_PATH ?= -L$(dir $(shell find /usr/lib* -name 'libvtkCommon.so' | tail -n 1))
+else
+    ifeq ($(VTK_MAJOR_VERSION),$(filter $(VTK_MAJOR_VERSION),6 7))
+        VTK_LIB  =  -lvtkCommonCore-$(VTK_VERSION) \
+                    -lvtkIOCore-$(VTK_VERSION) \
+                    -lvtkIOXML-$(VTK_VERSION) \
+                    -lvtkIOLegacy-$(VTK_VERSION) \
+                    -lvtkCommonDataModel-$(VTK_VERSION) \
+                    -lvtkParallelCore-$(VTK_VERSION) \
+                    -lvtkParallelMPI-$(VTK_VERSION) \
+                    -lvtkCommonExecutionModel-$(VTK_VERSION) \
+                    -lvtkFiltersCore-$(VTK_VERSION) \
+                    -lvtkFiltersHybrid-$(VTK_VERSION)
+        # For VTK >= 6.2 we need to use lvtkIOParallelXML
+        MINOR_GE_6_2 := $(shell [ $(VTK_MAJOR_VERSION) -gt 6 ] || [ $(VTK_MINOR_VERSION) -ge 2 ] && echo true)
+        ifeq ($(MINOR_GE_6_2),true)
+            VTK_LIB += -lvtkIOParallelXML-$(VTK_VERSION)
+        else
+            VTK_LIB += -lvtkIOParallel-$(VTK_VERSION)
+        endif
+        VTK_PATH ?= -L$(dir $(shell find /usr/lib* -name 'libvtkCommonCore-$(VTK_VERSION).so' | tail -n 1))
+    else
+        TMP:=$(error Unsupported VTK major version $(VTK_VERSION))
+    endif
+endif
+
+CFDEM_ADD_LIB_PATHS += $(VTK_PATH)
+CFDEM_ADD_LIBS += $(VTK_LIB)

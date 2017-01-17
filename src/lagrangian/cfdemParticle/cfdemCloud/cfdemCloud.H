@@ -89,11 +89,13 @@ protected:
 
     IOdictionary liggghtsCommandDict_;
 
+    Switch allowAdjustTimeStep_;
+
     Switch solveFlow_;
 
     Switch solveScalarTransport_;
 
-    bool verbose_;
+    Switch verbose_;
 
     bool debug_;
 
@@ -154,6 +156,8 @@ protected:
     mutable bool isLES_;
 
     mutable scalar cg_;
+    
+    mutable std::vector<double> cgTypeSpecific_;
 
     bool cgOK_;
 
@@ -170,6 +174,8 @@ protected:
     mutable volScalarField ddtVoidfraction_;
 
     mutable Switch checkPeriodicCells_;
+
+    bool meshHasUpdated_;
 
     #if defined(version24Dev)
         const turbulenceModel& turbulence_;
@@ -216,6 +222,12 @@ protected:
     virtual void giveDEMdata();
 
     virtual void setNumberOfParticles(int);
+
+    virtual void setNumberOfClumps(int);
+
+    virtual void setPositionsCM(label,double*);
+
+    virtual void setCellIDsCM(label,int*);
 
     virtual void findCells();
 
@@ -285,8 +297,14 @@ public:
        label liggghtsCommandModelIndex(word);
 
        inline void setCG(double) const;
+       
+       inline void setCGTypeSpecific(int, double) const;
+
+       mutable bool cgTypeSpecificDifferent;
 
        inline const scalar& cg() const;
+       
+       inline const scalar& cg(int) const;
 
        inline const bool& impDEMdrag() const;
 
@@ -299,6 +317,8 @@ public:
        inline const bool& ignore() const;
 
        inline const fvMesh& mesh() const;
+
+       inline bool allowAdjustTimeStep() const;
 
        inline bool solveFlow() const;
 
@@ -353,7 +373,11 @@ public:
        virtual inline bool multipleTypesDMin() {return false;}
        virtual inline double ** particleDensity() const {return NULL;};
        virtual inline int ** particleTypes() const {return NULL;};
-       virtual label particleType(label index) const {return -1;};
+       virtual label particleType(label index) const 
+       {
+            FatalError << "cfdemCloud::particleType(index): you are attempting to get the particle type, but this array is not transferred to CFDEM for this cloud. Use a different cloud, or avoid asking for the particle type." << abort(FatalError);
+            return -1;
+       };
 
        //access to the particle's rotation and torque data
        virtual inline double ** DEMTorques() const {return NULL;};
@@ -531,6 +555,8 @@ public:
         void accessParticleDatFieldsUserCFDEMToExt(word fieldToAccess, double **& fieldData);
         //=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=
         bool checkPeriodicCells() { return checkPeriodicCells_; }
+        bool meshHasUpdated() { return meshHasUpdated_; }
+        void setMeshHasUpdatedFlag(bool hasUpdated) { meshHasUpdated_ = hasUpdated; }
 
 };
 

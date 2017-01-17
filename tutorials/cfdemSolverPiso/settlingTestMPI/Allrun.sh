@@ -18,6 +18,18 @@ else
     blockMesh
 fi
 
+# keep old couplingProperties
+cp $casePath/CFD/constant/couplingProperties $casePath/CFD/constant/couplingProperties_backup
+
+# change to M2M
+#changeDictionary -constant -dict changeDicts/changeDictionaryDict_1 -case $casePath/CFD
+
+# change to MPI
+#changeDictionary -constant -dict changeDicts/changeDictionaryDict_2 -case $casePath/CFD
+
 #- run parallel CFD-DEM in new terminal
 #gnome-terminal --title='cfdemSolverPiso settlingTest CFD'  -e "bash $casePath/parCFDDEMrun.sh"
 . $casePath/parCFDDEMrun.sh
+
+# restore old couplingProperties
+mv $casePath/CFD/constant/couplingProperties_backup $casePath/CFD/constant/couplingProperties 

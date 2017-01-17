@@ -75,9 +75,10 @@ Foam::cfdemCloud::cfdemCloud
             IOobject::NO_WRITE
         )
     ),
+    allowAdjustTimeStep_(couplingProperties_.lookupOrDefault<Switch>("allowAdjustTimeStep", false)),
     solveFlow_(true),
     solveScalarTransport_(true),
-    verbose_(false),
+    verbose_(couplingProperties_.lookupOrDefault<Switch>("verbose", false)),
     debug_(false),
     allowCFDsubTimestep_(true),
     ignore_(false),
@@ -127,6 +128,7 @@ Foam::cfdemCloud::cfdemCloud
         dimensionedScalar("zero", dimensionSet(0,0,-1,0,0), 0)  // 1/s
     ),
     checkPeriodicCells_(false),
+    meshHasUpdated_(false),
     turbulence_
     (
         #if defined(version24Dev)
@@ -264,6 +266,9 @@ Foam::cfdemCloud::cfdemCloud
     averagingM().applyDebugSettings(debugMode());
     //--
 
+    //push dummy to type-specific cg factor since types start with 1
+    cgTypeSpecific_.push_back(-1);
+    cgTypeSpecificDifferent=false;
     dataExchangeM().setCG();
 
     Info << "If BC are important, please provide volScalarFields -imp/expParticleForces-" << endl;
@@ -283,7 +288,6 @@ Foam::cfdemCloud::cfdemCloud
 
     if (couplingProperties_.found("treatVoidCellsAsExplicitForce"))
         treatVoidCellsAsExplicitForce_ = readBool(couplingProperties_.lookup("treatVoidCellsAsExplicitForce"));
-    if (couplingProperties_.found("verbose")) verbose_=true;
     if (couplingProperties_.found("ignore")) ignore_=true;
     if (turbulenceModelType_=="LESProperties")
     {
@@ -319,6 +323,11 @@ Foam::cfdemCloud::cfdemCloud
         );
         forceModel_[i]().applyDebugSettings(debugMode());
     }
+
+    if (nrForceModels()<SMALL)
+        FatalError  << "Please use at least one forceModel ! "
+                    << "(e.g. noDrag) \n"
+                    << abort(FatalError);
 
     momCoupleModel_ = new autoPtr<momCoupleModel>[momCoupleModels_.size()];
     for (int i=0;i<momCoupleModels_.size();i++)
@@ -379,6 +388,13 @@ Foam::cfdemCloud::cfdemCloud
     {
         if(verbose_) Info << "nPatchesNonCyclic=" << nPatchesNonCyclic << ", nPatchesCyclic=" << nPatchesCyclic << endl;
         Warning << "Periodic handing is disabled because the domain is not fully periodic!\n" << endl;
+    }
+
+    //Check if user attempts to change fluid time step
+    if( mesh_.time().controlDict().lookupOrDefault<Switch>("adjustTimeStep", false) && !allowAdjustTimeStep_ )
+    {
+        FatalError << "cfdemCloud:: you want to adjustTimeStep in controlDict. This is not allowed in this version of CFDEM."
+                   << abort(FatalError);
     }
 }
 
@@ -475,6 +491,21 @@ void Foam::cfdemCloud::setNumberOfParticles(int nP)
         numberOfParticlesChanged_ = true;
         numberOfParticles_ = nP;
     }
+}
+
+void Foam::cfdemCloud::setNumberOfClumps(int nC)
+{
+    //Info << "Foam::cfdemCloud::setNumberOfClumps(int nC) ... do nothing" << endl;
+}
+
+void Foam::cfdemCloud::setPositionsCM(label n,double* pos)
+{
+    //Info << "Foam::cfdemCloud::setPositionsCM(int nC) ... do nothing" << endl;
+}
+
+void Foam::cfdemCloud::setCellIDsCM(label n,int* ID)
+{
+    //Info << "Foam::cfdemCloud::setCellIDsCM(int nC) ... do nothing" << endl;
 }
 
 void Foam::cfdemCloud::findCells()
@@ -717,6 +748,10 @@ bool Foam::cfdemCloud::evolve
         //      IMPLICIT FORCE CONTRIBUTION AND SOLVER USE EXACTLY THE SAME AVERAGED
         //      QUANTITIES AT THE GRID!
         Info << "\n timeStepFraction() = " << dataExchangeM().timeStepFraction() << endl;
+        if( dataExchangeM().timeStepFraction() > 1.000000000000000001)
+        {
+            FatalError << "cfdemCloud::dataExchangeM().timeStepFraction()>1: Do not do this, since dangerous. This might be due to the fact that you used a adjustable CFD time step. Please use a fixed CFD time step." << abort(FatalError);
+        }
         clockM().start(24,"interpolateEulerFields");
 
         // update voidFractionField

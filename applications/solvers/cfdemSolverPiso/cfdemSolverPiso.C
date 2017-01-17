@@ -44,13 +44,17 @@ Description
 #else
     #include "turbulenceModel.H"
 #endif
+#if defined(versionv1606plus) || defined(version40)
+    #include "fvOptions.H"
+#else
+    #include "fvIOoptionList.H"
+#endif
 #include "fixedFluxPressureFvPatchScalarField.H"
 #include "cfdemCloud.H"
 
 #if defined(anisotropicRotation)
     #include "cfdemCloudRotation.H"
 #endif
-#include "superquadric_flag.h"
 #if defined(SUPERQUADRIC_ACTIVE_FLAG)
     #include "cfdemCloudRotationSuperquadric.H"
 #endif
@@ -72,6 +76,7 @@ int main(int argc, char *argv[])
         #include "createTimeControls.H"
     #endif
     #include "createFields.H"
+    #include "createFvOptions.H"
     #include "initContinuityErrs.H"
 
     // create cfdemCloud
@@ -89,8 +94,6 @@ int main(int argc, char *argv[])
     Info<< "\nStarting time loop\n" << endl;
     while (runTime.loop())
     {
-        particleCloud.clockM().start(1,"Global");
-
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
         #if defined(version30)
@@ -103,6 +106,7 @@ int main(int argc, char *argv[])
         #endif
 
         // do particle stuff
+        particleCloud.clockM().start(1,"Global");
         particleCloud.clockM().start(2,"Coupling");
         bool hasEvolved = particleCloud.evolve(voidfraction,Us,U);
 
@@ -139,9 +143,11 @@ int main(int argc, char *argv[])
                   + particleCloud.divVoidfractionTau(U, voidfraction)
                   ==
                   - fvm::Sp(Ksl/rho,U)
+                  + fvOptions(U)
                 );
 
                 UEqn.relax();
+                fvOptions.constrain(UEqn);
 
                 #if defined(version30)
                     if (piso.momentumPredictor())
@@ -153,6 +159,8 @@ int main(int argc, char *argv[])
                         solve(UEqn == - fvc::grad(p) + Ksl/rho*Us);
                     else
                         solve(UEqn == - voidfraction*fvc::grad(p) + Ksl/rho*Us);
+
+                    fvOptions.correct(U);
                 }
 
                 // --- PISO loop
@@ -190,7 +198,11 @@ int main(int argc, char *argv[])
                         {
                             setSnGrad<fixedFluxPressureFvPatchScalarField>
                             (
-                                p.boundaryField(),
+                                #ifdef versionv1612plus
+                                    p.boundaryFieldRef(),
+                                #else
+                                    p.boundaryField(),
+                                #endif
                                 (
                                     phi.boundaryField()
                                   - (mesh.Sf().boundaryField() & U.boundaryField())
@@ -200,7 +212,11 @@ int main(int argc, char *argv[])
                         {
                             setSnGrad<fixedFluxPressureFvPatchScalarField>
                             (
-                                p.boundaryField(),
+                                #ifdef versionv1612plus
+                                    p.boundaryFieldRef(),
+                                #else
+                                    p.boundaryField(),
+                                #endif
                                 (
                                     phi.boundaryField()
                                   - (mesh.Sf().boundaryField() & U.boundaryField())
@@ -258,6 +274,7 @@ int main(int argc, char *argv[])
                         U -= voidfraction*rUA*fvc::grad(p) - Ksl/rho*Us*rUA;
 
                     U.correctBoundaryConditions();
+                    fvOptions.correct(U);
 
                 } // end piso loop
             }

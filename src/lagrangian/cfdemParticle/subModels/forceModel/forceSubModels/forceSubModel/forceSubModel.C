@@ -59,7 +59,7 @@ forceSubModel::forceSubModel
     dict_(dict),
     particleCloud_(sm),
     forceModel_(fm),
-    nrDefaultSwitches_(10),                                          // !!!
+    nrDefaultSwitches_(11),                                          // !!!
     switchesNameList_(wordList(nrDefaultSwitches_)),
     switchesList_(List<Switch>(nrDefaultSwitches_)),
     switches_(List<Switch>(nrDefaultSwitches_)),
@@ -134,6 +134,7 @@ forceSubModel::forceSubModel
 	switchesNameList_[iCounter]="implForceDEMaccumulated";iCounter++;             //7
 	switchesNameList_[iCounter]="scalarViscosity";iCounter++;                     //8
 	switchesNameList_[iCounter]="verboseToDisk";iCounter++;                       //9
+    switchesNameList_[iCounter]="useCorrectedVoidage";iCounter++;                 //10
 
     // should be done by default
     //for(int i=0;i<switchesList_.size();i++)
@@ -154,6 +155,10 @@ forceSubModel::forceSubModel
         scaleDia_=particleCloud_.cg();
         Info << "using scale from liggghts cg = " << scaleDia_ << endl;
     }
+
+    // info about scaleDrag being used
+    if (scaleDrag_ != 1.)
+        Info << "using scaleDrag = " << scaleDrag_ << endl;
 }
 
 
@@ -318,29 +323,39 @@ void forceSubModel::update( label    particleI,
     //no action
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-void forceSubModel::scaleDia(scalar& d) const
+void forceSubModel::scaleDia(scalar& d, int index) const
 {
-    d /= scaleDia_;
+    if(particleCloud_.cgTypeSpecificDifferent)
+        d /= particleCloud_.cg(particleCloud_.particleType(index));
+    else
+        d /= scaleDia_;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+void forceSubModel::scaleForce(vector& force, scalar& d, int index) const
+{
+    if(particleCloud_.cgTypeSpecificDifferent)
+    {
+        double cgCurr = particleCloud_.cg(particleCloud_.particleType(index));
+        force *= cgCurr*cgCurr*cgCurr;
+    }
+    else
+        force *= scaleDia_*scaleDia_*scaleDia_;
+           
+    force *= scaleDrag_;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-void forceSubModel::scaleForce(vector& force, scalar& d) const
+void forceSubModel::scaleCoeff(scalar& coeff, scalar& d, int index) const
 {
-    force *= scaleDia_*scaleDia_*scaleDia_*scaleDrag_;
-}
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-void forceSubModel::scaleForce(vector& force) const
-{
-    Warning << "Function not defined!" << endl;
-}
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-void forceSubModel::scaleCoeff(scalar& coeff,scalar& d) const
-{
-    coeff *= scaleDia_*scaleDia_*scaleDia_*scaleDrag_;
-}
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-void forceSubModel::scaleCoeff(scalar& coeff) const
-{
-    Warning << "Function not defined!" << endl;
+    if(particleCloud_.cgTypeSpecificDifferent)
+    {
+        double cgCurr = particleCloud_.cg(particleCloud_.particleType(index));
+        coeff *= cgCurr*cgCurr*cgCurr;
+    }
+    else
+        coeff *= scaleDia_*scaleDia_*scaleDia_;
+        
+    coeff *= scaleDrag_;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 void forceSubModel::explicitLimit

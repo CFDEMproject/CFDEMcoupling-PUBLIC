@@ -1,0 +1,35 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  3.0.x                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      fvOptions;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+momentumSource
+{
+    type            meanSupVelocityForce;
+    active          yes;
+
+    meanSupVelocityForceCoeffs
+    {
+        selectionMode   all; // apply force to all cells
+
+        fieldNames      (U); // name of velocity field
+        Ubar            (10 0 0);// desired mean velocity
+        relaxation      0.9; // optional relaxation factor
+        voidfractionField "voidfraction";
+    }
+}
+
+
+// ************************************************************************* //

@@ -1,0 +1,54 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.4                                   |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+
+    root            "";
+    case            "";
+    instance        "";
+    local           "";
+
+    class           dictionary;
+    object          scalarTransportProperties;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+//===========================================================================//
+// sub-models & settings
+
+scalarTransportModel generalManual;
+
+generalManualProps
+{
+    ScT 0.7; //optional
+    PrT 0.7; //optional
+
+    //in case the user does not want to generate a separate field,
+    //the volumetric heat capacity can be set here (as a global constant)
+    cpVolumetric 1196; //this is the mixture density times the heat capacity
+                       //must have dimensions [J/K/(m_voidspace)³]
+                       //will only be used if cpVolumetricFieldName, or updateMixtureProperties = false
+
+//    cpVolumetricFieldName   "cpRho"; 
+//    rhoMixFieldName         "rhoMix"; 
+
+    eulerianFields
+    (
+        //C
+        T
+    );
+
+   //    fvOptionsC {};
+    fvOptionsT {};
+};
+// ************************************************************************* //

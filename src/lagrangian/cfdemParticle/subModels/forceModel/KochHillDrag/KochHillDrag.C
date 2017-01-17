@@ -181,7 +181,7 @@ void KochHillDrag::setForce() const
 
                 ds = particleCloud_.d(index);
                 dParcel = ds;
-                forceSubM(0).scaleDia(ds); //caution: this fct will scale ds!
+                forceSubM(0).scaleDia(ds,index); //caution: this fct will scale ds!
                 nuf = nufField[cellI];
                 rho = rhoField[cellI];
 
@@ -241,7 +241,7 @@ void KochHillDrag::setForce() const
                     if (modelType_=="B")
                         dragCoefficient /= voidfraction;
 
-                    forceSubM(0).scaleCoeff(dragCoefficient,dParcel);
+                    forceSubM(0).scaleCoeff(dragCoefficient,dParcel,index);
 
                     if(forceSubM(0).switches()[7]) // implForceDEMaccumulated=true
                     {

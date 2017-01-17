@@ -172,7 +172,7 @@ void MeiLift::setForce() const
                 {
                     ds  = 2*particleCloud_.radius(index);
                     dParcel = ds;
-                    forceSubM(0).scaleDia(ds); //caution: this fct will scale ds!
+                    forceSubM(0).scaleDia(ds,index); //caution: this fct will scale ds!
                     nuf = nufField[cellI];
                     rho = rhoField[cellI];
 
@@ -232,7 +232,7 @@ void MeiLift::setForce() const
                            *magUr*Ur^vorticity/magVorticity
                            *ds*ds; //total force on all particles in parcel
 
-                    forceSubM(0).scaleForce(lift,dParcel);
+                    forceSubM(0).scaleForce(lift,dParcel,index);
 
                     if (modelType_=="B")
                     {

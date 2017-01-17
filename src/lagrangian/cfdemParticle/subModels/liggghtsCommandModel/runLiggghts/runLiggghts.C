@@ -81,6 +81,10 @@ runLiggghts::runLiggghts
 
     strCommand_=createCommand(command_);
 
+    //this allows to do run command only once, better use checkTimeMode(propsDict_) to get all options
+    runFirst_=Switch(propsDict_.lookupOrDefault<Switch>("runFirst",false));
+    if(runFirst_) lastCouplingStep_ = firstCouplingStep_;
+
     checkTimeSettings(dict_);
 }
 
@@ -111,12 +115,15 @@ string runLiggghts::createCommand( word command, int interval, word appendix, wo
 
 bool runLiggghts::runCommand(int couplingStep)
 {
-    //change command to  "run xxx pre no"
-    if (preNo_ && (couplingStep > firstCouplingStep_))
-        strCommand_=createCommand(command_, particleCloud_.dataExchangeM().couplingInterval(),"pre","no","post","no");
-    else
-        strCommand_=createCommand(command_, particleCloud_.dataExchangeM().couplingInterval());
-
+    if(couplingStep <= lastCouplingStep_)
+    {
+        //change command to  "run xxx pre no"
+        if (preNo_ && (couplingStep > firstCouplingStep_))
+            strCommand_=createCommand(command_, particleCloud_.dataExchangeM().couplingInterval(),"pre","no","post","no");
+        else
+            strCommand_=createCommand(command_, particleCloud_.dataExchangeM().couplingInterval());
+    }else strCommand_=createCommand(command_, 0);
+    
     return runThisCommand(couplingStep);
 }
 

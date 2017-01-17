@@ -1,0 +1,47 @@
+.. index:: couple/cfd
+
+couple/cfd command
+==================
+
+Syntax
+""""""
+
+.. parsed-literal::
+
+   fix ID group-ID couple/cfd couple_every N mpi
+
+* ID, group-ID are documented in :doc:`fix <fix>` command
+* couple/cfd = style name of this fix command
+* couple_every = obligatory keyword
+* N = number of DEM time steps between two coupling steps
+
+
+
+Examples
+""""""""
+
+fix cfd all couple/cfd couple_every 1000 mpi
+
+Description
+"""""""""""
+
+This fix is responsible for the coupling between CFD and DEM calculation, i.e. for pushing and pulling of properties.
+
+Restrictions
+""""""""""""
+
+
+None.
+
+**Related Commands:**
+:doc:`fix couple/cfd/force <fix_couple_cfd_force>`
+
+Default
+"""""""
+
+None
+
+
+.. _liws: http://www.cfdem.com
+.. _ld: Manual.html
+.. _lc: Section_commands.html#comm

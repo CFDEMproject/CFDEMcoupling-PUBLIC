@@ -97,7 +97,7 @@ dividedVoidFraction::dividedVoidFraction
             FatalError << typeName << ": You are requesting procBoundaryCorrection, this requires the use of engineIB!\n"
                        << abort(FatalError);
         }
-    }else{
+    } else {
         if(particleCloud_.locateM().type()=="engineIB")
         {
             FatalError << typeName << ": You are using engineIB, this requires using procBoundaryCorrection=true!\n"
@@ -105,6 +105,49 @@ dividedVoidFraction::dividedVoidFraction
             //Warning << "You are trying to use engineIB, this requires using procBoundaryCorrection=true\n"
             //        << "  procBoundaryCorrection will be used!\n" << endl;
             //procBoundaryCorrection_ = true;
+        }
+    }
+    //generate marker points
+    int m = 0;
+    offsets[m][0] = offsets[m][1] = offsets[m][2] = 0.0;
+    m ++;
+
+    // for 2 different radii
+    double r1 = cbrt(1.0/29.0);
+    double r2 = cbrt(15.0/29.0);
+    scalar r[] = { 0.75* (r2*r2*r2*r2 - r1*r1*r1*r1)/(r2*r2*r2 - r1*r1*r1),
+                   0.75* (1.0 - r2*r2*r2*r2)/(1.0 - r2*r2*r2) };
+
+    for(label ir = 0; ir <= 1; ir += 1)
+    {
+        // try 8 subpoint derived from spherical coordinates
+        for (scalar zeta = 0.25*M_PI; zeta < 2.0*M_PI; zeta += 0.5*M_PI)
+        {
+            for (scalar theta = 0.25*M_PI; theta < M_PI; theta += 0.5*M_PI)
+            {
+                offsets[m][0] = r[ir]*Foam::sin(theta)*Foam::cos(zeta);
+                offsets[m][1] = r[ir]*Foam::sin(theta)*Foam::sin(zeta);
+                offsets[m][2] = r[ir]*Foam::cos(theta);
+                m ++;
+            }
+        }
+        // try 2 more subpoints for each coordinate direction (6 total)
+        for (int j = -1; j <= 1; j += 2)
+        {
+            offsets[m][0] = r[ir]*static_cast<double>(j);
+            offsets[m][1] = 0.;
+            offsets[m][2] = 0.;
+            m ++;
+
+            offsets[m][0] = 0.;
+            offsets[m][1] = r[ir]*static_cast<double>(j);
+            offsets[m][2] = 0.;
+            m ++;
+
+            offsets[m][0] = 0.;
+            offsets[m][1] = 0.;
+            offsets[m][2] = r[ir]*static_cast<double>(j);
+            m ++;
         }
     }
 }
@@ -125,14 +168,13 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
     else
         reAllocArrays();
 
-    scalar pi = M_PI;
     vector position(0.,0.,0.);
     label cellID = -1;
     scalar radius(-1.);
     scalar volume(0.);
     scalar cellVol(0.);
     scalar scaleVol= weight();
-    scalar scaleRadius = pow(porosity(),1./3.);
+    scalar scaleRadius = cbrt(porosity());
     const boundBox& globalBb = particleCloud_.mesh().bounds();
 
     for(int index=0; index< particleCloud_.numberOfParticles(); index++)
@@ -159,7 +201,7 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
             cellVol = 0.;
 
             //--variables for sub-search
-            int nPoints = 29;
+            int nPoints = numberOfMarkerPoints;
             int nNotFound=0,nUnEqual=0,nTotal=0;
             vector offset(0.,0.,0.);
             int cellsSet = 0;
@@ -175,73 +217,39 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
             if (cellID >= 0)  // particle centre is in domain
             {
                 cellVol = particleCloud_.mesh().V()[cellID];
-
-                // for 2 different radii
-                for(scalar r = 0.623926*radius;r < radius;r+=0.293976*radius)
+                for(int i = 0; i < numberOfMarkerPoints; i++)
                 {
-                    // try 8 subpoint derived from spherical coordinates
-                    for (scalar zeta=pi/4.;zeta<(2.*pi);zeta+=(pi/2.))
+                    if((i == 0 && procBoundaryCorrection_) || i > 0)
                     {
-                        for (scalar theta=(pi/4.);theta<pi;theta+=(pi/2.))
-                        {
-                            offset[0]=r*Foam::sin(theta)*Foam::cos(zeta);
-                            offset[1]=r*Foam::sin(theta)*Foam::sin(zeta);
-                            offset[2]=r*Foam::cos(theta);
-                            #include "setWeightedSource.H"   // set source terms at position+offset
-                        }
+                        offset = radius*offsets[i];
+                        #include "setWeightedSource.H"   // set source terms at position+offset
                     }
-                    // try 2 more subpoints for each coordinate direction (6 total)
-                    for (int j=-1;j<=1;j+=2)
-                    {
-                        offset[0]=r*static_cast<double>(j);
-                        offset[1]=0.;
-                        offset[2]=0.;
-                        #include "setWeightedSource.H"   //NP set source terms at position+offset
+                }
 
-                        offset[0]=0.;
-                        offset[1]=r*static_cast<double>(j);
-                        offset[2]=0.;
-                        #include "setWeightedSource.H"   //NP set source terms at position+offset
-
-                        offset[0]=0.;
-                        offset[1]=0.;
-                        offset[2]=r*static_cast<double>(j);
-                        #include "setWeightedSource.H"   //NP set source terms at position+offset
-                    }
-                }// end loop radiivoidfractions
-
-                if(cellsSet>29 || cellsSet<0)
+                if(cellsSet > numberOfMarkerPoints || cellsSet<0)
                 {
                     Info << "ERROR  cellsSet =" << cellsSet << endl;
                 }
 
-                scalar centreWeight = 0;
-                if(procBoundaryCorrection_)
-                {
-                    //possible if we are sure all particles were found
-                    if(cellWithCenter >= 0)
-                        centreWeight = 1./nPoints;
-                }else
+                if(!procBoundaryCorrection_)
                 {
                     // set source for particle center; source 1/nPts+weight of all subpoints that have not been found
-                    centreWeight = 1./nPoints*(nPoints-cellsSet);
+                    scalar centreWeight = 1./nPoints*(nPoints-cellsSet);
+                    // update voidfraction for each particle read
+                    scalar newAlpha = voidfractionNext_[cellID]- volume*centreWeight/cellVol;
+                    if(newAlpha > alphaMin_) voidfractionNext_[cellID] = newAlpha;
+                    else
+                    {
+                        voidfractionNext_[cellID] = alphaMin_;
+                        tooMuch_ += (alphaMin_-newAlpha) * cellVol;
+                    }
+                    // store cellweight for each particle --- this should be done for subpoints as well!!
+                    particleWeights[index][0] += centreWeight;
+
+                    // store particleVolume for each particle
+                    particleVolumes[index][0] += volume*centreWeight;
+                    particleV[index][0] += volume*centreWeight;
                 }
-
-                // update voidfraction for each particle read
-                scalar newAlpha = voidfractionNext_[cellID]- volume*centreWeight/cellVol;
-                if(newAlpha > alphaMin_) voidfractionNext_[cellID] = newAlpha;
-                else
-                {
-                    voidfractionNext_[cellID] = alphaMin_;
-                    tooMuch_ += (alphaMin_-newAlpha) * cellVol;
-                }
-                // store cellweight for each particle --- this should be done for subpoints as well!!
-                particleWeights[index][0] += centreWeight;
-
-                // store particleVolume for each particle
-                particleVolumes[index][0] += volume*centreWeight;
-                particleV[index][0] += volume*centreWeight;
-
                 /*//OUTPUT
                 if (index==0 && verbose_)
                 {

@@ -184,6 +184,8 @@ public:
         void applyDebugSettings(bool) const;
 
         virtual void setForce() const = 0;
+
+        virtual void setForcesOnParticle() const {};
         
         virtual void multiphaseTurbulence(volScalarField&, bool) const;
 
@@ -192,6 +194,8 @@ public:
         virtual void manipulateScalarField(volScalarField&) const;
 
         virtual void manipulateScalarField(volScalarField&, volScalarField&, int) const;
+
+        virtual void commToDEM() const;
 
     // Access
         word modelType(){ return modelType_; };

@@ -38,6 +38,7 @@ liggghtsCommandModels
 writeLiggghtsProps
 {
     writeLast off;
+    //path "../DEM"; // optional setting
     writeName "post/restart/liggghts.restartCFDEM";
     overwrite on;
 }

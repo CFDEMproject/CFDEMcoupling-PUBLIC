@@ -1,0 +1,26 @@
+sinclude $(GENERAL_RULES)/mplib$(WM_MPLIB)
+sinclude $(RULES)/mplib$(WM_MPLIB)
+
+GIT_VERSION := $(shell git describe --dirty --always --tags)
+PFLAGS+= -DGITVERSION=\"$(GIT_VERSION)\"
+PFLAGS+= -DDEBUGFLAG=\"$(DEBUG)\"
+PFLAGS+= -DCFDEMWMPROJECTVERSION="$(CFDEM_WM_PROJECT_VERSION)"
+
+include $(CFDEM_ADD_LIBS_DIR)/$(CFDEM_ADD_LIBS_NAME)
+
+EXE_INC = \
+     $(PFLAGS) \
+     $(PINC) \
+    -I$(LIB_SRC)/finiteVolume/lnInclude \
+    -I$(LIB_SRC)/meshTools/lnInclude \
+    -I$(LIB_SRC)/sampling/lnInclude \
+    -I$(LIB_SRC)/fvOptions/lnInclude \
+    -I$(CFDEM_OFVERSION_DIR) \
+
+
+LIB_LIBS = \
+     $(PLIBS) \
+    -lfiniteVolume \
+    -lsampling \
+    -lmeshTools \
+    -lfvOptions

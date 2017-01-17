@@ -194,7 +194,7 @@ void GidaspowDrag::setForce() const
                 Us = particleCloud_.velocity(index);
                 ds = 2*particleCloud_.radius(index);
                 dParcel = ds;
-                forceSubM(0).scaleDia(ds); //caution: this fct will scale ds!
+                forceSubM(0).scaleDia(ds,index); //caution: this fct will scale ds!
                 rho = rhoField[cellI];
                 nuf = nufField[cellI];
 
@@ -243,7 +243,7 @@ void GidaspowDrag::setForce() const
                 if (modelType_=="B")
                     dragCoefficient /= voidfraction;
 
-                forceSubM(0).scaleCoeff(dragCoefficient,dParcel);
+                forceSubM(0).scaleCoeff(dragCoefficient,dParcel,index);
                 drag = dragCoefficient * Ur;
 
                 // explicitCorr

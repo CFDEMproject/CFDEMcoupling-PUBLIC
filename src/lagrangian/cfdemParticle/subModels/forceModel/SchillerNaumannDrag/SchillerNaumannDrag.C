@@ -161,7 +161,7 @@ void SchillerNaumannDrag::setForce() const
             Us = particleCloud_.velocity(index);
             ds = 2*particleCloud_.radius(index);
             dParcel = ds;
-            forceSubM(0).scaleDia(ds); //caution: this fct will scale ds!
+            forceSubM(0).scaleDia(ds,index); //caution: this fct will scale ds!
             nuf = nufField[cellI];
             rho = rhoField[cellI];
 
@@ -200,7 +200,7 @@ void SchillerNaumannDrag::setForce() const
                     dragCoefficient /= voidfraction;
 
                 // calc particle's drag
-                forceSubM(0).scaleCoeff(dragCoefficient,dParcel);
+                forceSubM(0).scaleCoeff(dragCoefficient,dParcel,index);
                 drag = dragCoefficient*Ur;
 
                 // explicitCorr

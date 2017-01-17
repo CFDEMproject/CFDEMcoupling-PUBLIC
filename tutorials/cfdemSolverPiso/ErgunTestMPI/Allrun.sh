@@ -25,6 +25,21 @@ else
     $casePath/parDEMrun.sh
 fi
 
+# keep old couplingProperties
+cp $casePath/CFD/constant/couplingProperties $casePath/CFD/constant/couplingProperties_backup
+
+# change to M2M + type B
+#changeDictionary -constant -dict changeDicts/changeDictionaryDict_1 -case $casePath/CFD
+
+# change to MPI + type A
+#changeDictionary -constant -dict changeDicts/changeDictionaryDict_2 -case $casePath/CFD
+
+# change to MPI + engineIB
+#changeDictionary -constant -dict changeDicts/changeDictionaryDict_3 -case $casePath/CFD
+
 #- run parallel CFD-DEM in new terminal
 #gnome-terminal --title='cfdemSolverPiso ErgunTestMPI CFD'  -e "bash $casePath/parCFDDEMrun.sh" 
 . $casePath/parCFDDEMrun.sh
+
+# restore old couplingProperties
+mv $casePath/CFD/constant/couplingProperties_backup $casePath/CFD/constant/couplingProperties 

@@ -114,8 +114,11 @@ int main(int argc, char *argv[])
         particleCloud.setPos(positions_);
 
         particleCloud.voidFractionM().setvoidFraction(NULL,voidfractions_,particleWeights_,particleVolumes_,particleV_);
-
-        voidfraction.internalField() = particleCloud.voidFractionM().voidFractionInterp();
+        #ifdef versionv1612plus 
+            voidfraction = particleCloud.voidFractionM().voidFractionInterp();
+        #else
+            voidfraction.internalField() = particleCloud.voidFractionM().voidFractionInterp();
+        #endif
         voidfraction.correctBoundaryConditions();
 
         particleCloud.averagingM().setVectorAverage

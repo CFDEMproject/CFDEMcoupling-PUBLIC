@@ -39,20 +39,20 @@ if [ $runOctave == "true" ]
     cd octave
 
     #- rmove old graph
-    rm *.eps
+    rm *.png
 
     #- run octave
     octave totalPressureDropAndNusselt.m
 
     #- show plots 
-    evince cfdemSolverPisoScalar_Nusselt.eps &
-    evince cfdemSolverPisoScalar_pressureDrop.eps
+    eog cfdemSolverPisoSTM_Nusselt.png &
+    eog cfdemSolverPisoSTM_pressureDrop.png
     #------------------------------#
 
     #- copy log file to test harness
     cp ../../$logfileName $testHarnessPath
-    cp cfdemSolverPisoScalar_Nusselt.eps $testHarnessPath
-    cp cfdemSolverPisoScalar_pressureDrop.eps $testHarnessPath
+    cp cfdemSolverPisoSTM_Nusselt.png $testHarnessPath
+    cp cfdemSolverPisoSTM_pressureDrop.png $testHarnessPath
 
 fi
 
@@ -86,18 +86,9 @@ fi
 #- clean up case
 if [ $cleanup == "true" ]
   then
-    echo "deleting data at: $casePath : \n"
-    source $WM_PROJECT_DIR/bin/tools/CleanFunctions
-    cd $casePath/CFD
-    cleanCase
-    rm -r $casePath/CFD/clockData
-    rm $casePath/DEM/post/*.*
-    #rm -r $casePath/DEM/post/restart/*.*
-    echo "done"
-
-    #- preserve post directory
-    touch $casePath/DEM/post/.gitignore
-    touch $casePath/DEM/post/restart/.gitignore
+    #- clean up case
+    keepDEMrestart="false"
+    cleanCFDEMcase $casePath/CFD $keepDEMrestart
 fi
 
 

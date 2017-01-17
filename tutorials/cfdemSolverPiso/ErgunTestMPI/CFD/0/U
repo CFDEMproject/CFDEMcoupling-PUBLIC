@@ -39,7 +39,7 @@ boundaryField
 
         //type            zeroGradient;
 
-/*        type            groovyBC;
+        /*type            groovyBC;
         variables       "Uend=vector(0,0,0.02);tEnd=0.1;";
         valueExpression "((time() < tEnd) ? Uend/tEnd*time():Uend)";
         value           uniform (0 0 0);*/

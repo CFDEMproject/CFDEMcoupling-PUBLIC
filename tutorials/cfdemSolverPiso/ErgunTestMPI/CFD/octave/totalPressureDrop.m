@@ -9,13 +9,6 @@ clc;
 rhoG = 10			% density in kg/m3
 %path = '../probes/0/p'; % ext32
 path = '../postProcessing/probes/0/p';
-
-%- nomenclature before 2.4.x
-%columns=22;
-%headerlines=4;
-%data = loaddata(path,columns,headerlines);
-%data=transpose(data);
-
 data = load(path);
 [x,y]=size(data)
 dp_sim = (data(:,2)-data(:,y))*rhoG; %conversion to Pa!

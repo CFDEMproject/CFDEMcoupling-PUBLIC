@@ -1,0 +1,115 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.6                                   |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+application     pisoFoam;
+
+startFrom       startTime;
+
+startTime       0;
+
+stopAt          endTime;
+
+endTime         2.0;
+
+deltaT          1e-5;
+
+writeControl    adjustableRunTime;
+
+writeInterval   0.2;
+
+purgeWrite      0;
+
+writeFormat     ascii;
+
+writePrecision  6;
+
+writeCompression uncompressed;
+
+timeFormat      general;
+
+timePrecision   6;
+
+runTimeModifiable yes;
+
+adjustTimeStep  no;
+
+maxCo 0.1;
+
+//libs ( "libgroovyBC.so" );
+
+functions
+(
+
+/*    probes
+    {
+        type        probes;
+        // Where to load it from
+        functionObjectLibs ( "libsampling.so" );  
+        // Name of the directory for probe data
+        name        probes;
+        probeLocations
+        (
+            (0 0 0)
+        );
+
+        // Fields to be probed
+        fields ( avUslipX avUslipY avUslipZ );
+
+        // Write at same frequency as fields
+        outputControl   timeStep;//outputTime;
+        outputInterval  1;
+    }
+/*/
+
+    volAvU
+    {
+        type            cellSource;
+        functionObjectLibs ("libfieldFunctionObjects.so");
+        enabled         true;
+        outputControl   outputTime;//timeStep;//
+        log             false;
+        valueOutput     false;
+        source          all;
+        operation       weightedAverage;
+        weightField     "voidfraction";
+        fields
+        (
+            U 
+        );
+    }
+
+   /*pressureDrop
+   {
+     type patchAverage;
+     functionObjectLibs
+     (
+         "libsimpleFunctionObjects.so"
+     );
+     verbose true;
+     patches
+     (
+         inlet
+         outlet
+     );
+     fields
+     (
+         p
+     );
+     factor  1;
+   }*/
+);
+// ************************************************************************* //

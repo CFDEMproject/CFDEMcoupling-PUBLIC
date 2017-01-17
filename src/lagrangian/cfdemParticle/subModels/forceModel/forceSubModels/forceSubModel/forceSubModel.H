@@ -54,7 +54,9 @@ namespace Foam
 
 class forceSubModel
 {
+private:
 
+       
 protected:
 
     // Protected data
@@ -168,20 +170,17 @@ public:
                             scalar& scalToUpdate1,  scalar&  scalToUpdate2,
                             bool  verbose) const;
 
-        virtual void scaleDia(scalar& d) const;
+        virtual void scaleDia(scalar& d, int index=0) const;
 
-        virtual void scaleForce(vector& force) const;
+        virtual void scaleForce(vector& force, scalar& d, int index=0) const;
 
-        virtual void scaleForce(vector& force, scalar& d) const;
-
-        virtual void scaleCoeff(scalar& coeff) const;
-
-        virtual void scaleCoeff(scalar& coeff, scalar& d) const;
+        virtual void scaleCoeff(scalar& coeff, scalar& d, int index=0) const;
 
         virtual void explicitLimit(vector&, vector&, scalar&) const;
         
         virtual void verboseToDiskWrite(Field<scalar>& writeValues) const {};//implement writing to disk
 
+        virtual scalar calculateCorrectedVoidage(scalar voidfraction) const {return voidfraction;};
 
     // Access
         inline bool implForceDEM() const { return switches_[2]; }
@@ -207,6 +206,8 @@ public:
         }
 
         virtual word myType() const=0;
+
+        inline bool useCorrectedVoidage() const { return switches_[10]; }
 
         inline forceModel& myForceM() const { return forceModel_; }
 

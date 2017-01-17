@@ -430,14 +430,63 @@ cleanCFDEMcase()
     #--------------------------------------------------------------------------------#
     #- define variables
     casepath="$1"
+    keepDEMrestart="$2"
     #--------------------------------------------------------------------------------#
 
-    echo "deleting data at: $casePath :\n"
+    echo "deleting data at: $casePath ? otherwise press Ctrl-C:\n"
+    read
     source $WM_PROJECT_DIR/bin/tools/CleanFunctions
+    #CFD
     cd $casePath/CFD
     cleanCase
-    rm -r $casePath/DEM/post/*
-    echo "dummyfile" >> $casePath/DEM/post/dummy
+    #CFDEM
+    rm -r $casePath/CFD/clockData
+    rm -r $casePath/CFD/particleProbes
+    rm -r $casePath/CFD/averageProps/
+    rm -r $casePath/CFD/octave/octave-core
+    rm -r $casePath/CFD/octave/octave-workspace
+    rm -r $casePath/remotePlace
+    rm -r $casePath/CFD/oldProcDirs
+    rm -r $casePath/CFD/tmp.balance
+    rm $casePath/CFD/callgrind.out.*
+    rm -r $casePath/CFD/hpctoolkit-*
+    rm  $casePath/log_*
+    #DEM
+    rm $casePath/DEM/post/*
+    touch $casePath/DEM/post/.gitignore
+    if [[ $keepDEMrestart == true ]]; then
+        echo "keeping DEM restart files"
+    else
+    rm  $casePath/DEM/post/restart/*
+    fi
+    touch $casePath/DEM/post/restart/.gitignore
+    rm  $casePath/DEM/tmp.lammps.variable
+    rm  $casePath/DEM/log*
+    #ParScale
+    rm $casePath/CFD/*.dat
+    rm $casePath/CFD/*.pascal
+    rm $casePath/CFD/*.profile
+    rm -r $casePath/CFD/pascal/0.*
+    rm -r $casePath/CFD/pascal/1
+    rm -r $casePath/CFD/pascal/1.*
+    rm -r $casePath/CFD/pascal/2
+    rm -r $casePath/CFD/pascal/2.*
+    rm -r $casePath/CFD/pascal/3
+    rm -r $casePath/CFD/pascal/3.*
+    rm -r $casePath/CFD/pascal/4
+    rm -r $casePath/CFD/pascal/4.*
+    rm -r $casePath/CFD/pascal/5
+    rm -r $casePath/CFD/pascal/5.*
+    rm -r $casePath/CFD/pascal/6
+    rm -r $casePath/CFD/pascal/6.*
+    rm -r $casePath/CFD/pascal/7
+    rm -r $casePath/CFD/pascal/7.*
+    rm -r $casePath/CFD/pascal/8
+    rm -r $casePath/CFD/pascal/8.*
+    rm -r $casePath/CFD/pascal/9
+    rm -r $casePath/CFD/pascal/9.*
+    rm -r $casePath/CFD/pascal/10
+    rm -r $casePath/CFD/pascal/10.*
     cd $casePath
     echo "done"
 }
@@ -687,9 +736,27 @@ parCFDDEMrun()
         #debugMode="valgrind --leak-check=full -v --trace-children=yes --track-origins=yes" 
         debugMode="valgrind --tool=memcheck --leak-check=yes --leak-check-heuristics=stdstring,length64,newarray,multipleinheritance --show-reachable=no --num-callers=20 --track-fds=yes --xml=yes --xml-file=valgrind.xml"  
     elif [[ $debugMode == "profile" ]]; then
-        # make sure you did hpcstruct before
-        debugMode="hpcrun"
-        rm -r $casePath/CFD/hpctoolkit-$solverName-measurements
+        if [[ $WM_COMPILE_OPTION == "Debug" ]]; then
+            # make sure you did hpcstruct before
+            debugMode="hpcrun"
+            rm -r $casePath/CFD/hpctoolkit-$solverName-measurements
+        else
+            echo ""
+            echo "WARNING - you do not use proper Debug flags! (for hpcrun you need Debug)"
+            echo "using debugMode off now."
+            debugMode=""
+            read
+        fi
+    elif [[ $debugMode == "callgrind" ]]; then
+        if [[ $WM_COMPILE_OPTION == "Debug" ]]; then
+            debugMode="valgrind --tool=callgrind"
+        else
+            echo ""
+            echo "WARNING - you do not use proper Debug flags! Only when using debug, cachegrind will be able to look through you code."
+            debugMode="valgrind --tool=callgrind"
+            read
+        fi
+
     else
         debugMode=""
     fi
@@ -755,8 +822,13 @@ parCFDDEMrun()
     fi
 
     if [[ $debugMode == "hpcrun" ]]; then
-        rm hpctoolkit-$solverName-database*
-        hpcprof -S $CFDEM_APP_DIR/$solverName.hpcstruct -I ./'*' hpctoolkit-$solverName-measurements   
+        if [ -f $CFDEM_APP_DIR/$solverName.hpcstruct ]; then
+            rm -r hpctoolkit-$solverName-database*
+            hpcprof -S $CFDEM_APP_DIR/$solverName.hpcstruct -I ./'*' hpctoolkit-$solverName-measurements
+        else
+            echo "you need to run hpcstruct first for your app!"
+            read
+        fi   
     fi
 
     #- keep terminal open (if started in new terminal)

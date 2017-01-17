@@ -351,6 +351,7 @@ bool Foam::twoWayMPI::couple(int i) const
         // give nr of particles to cloud
         double newNpart = liggghts_get_maxtag(lmp);
         setNumberOfParticles(newNpart);
+        setNumberOfClumps(-2);
 
         // re-allocate arrays of cloud
         particleCloud_.clockM().start(4,"LIGGGHTS_reallocArrays");

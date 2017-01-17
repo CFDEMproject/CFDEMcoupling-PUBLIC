@@ -157,7 +157,7 @@ public:
 
         word myType() const{return typeName; };
 
-        void setCG() const { particleCloud_.setCG(lmp->force->cg()); };
+        void setCG() const { setCGs(lmp); };
 };
 
 

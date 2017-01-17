@@ -41,6 +41,13 @@ SourceFiles
 
 #include "fvCFD.H"
 #include "cfdemCloud.H"
+
+#include "mpi.h"
+#include <lammps.h>
+#include <pair.h>
+#include <force.h>
+#include <atom.h>
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -116,6 +123,8 @@ public:
 
     // Member Function
         void setNumberOfParticles(int) const;
+
+        void setNumberOfClumps(int) const;
 
         inline const int& maxNumberOfParticles() const {return maxNumberOfParticles_;};
 
@@ -255,9 +264,32 @@ public:
                 particleCloud_.cellIDs_[i][0]=ID[i];
         };
 
+        inline void setPositionsCM(label n,double* pos) const
+        {
+            particleCloud_.setPositionsCM(n,pos);
+        };
+        inline void setCellIDsCM(label n,int* ID) const
+        {
+            particleCloud_.setCellIDsCM(n,ID);
+        };
+
         virtual word myType() const=0;
 
-        virtual void setCG() const { Warning << "setCG() not executed correctly!" << endl; };
+        virtual void setCG() const { FatalError<<"\nsetCG() not executed correctly!\n"<< abort(FatalError); };
+
+        void setCGs(LAMMPS_NS::LAMMPS *lmp) const 
+        { 
+            particleCloud_.setCG(lmp->force->cg(int(GREAT))); 
+            
+            Info << "LIGGGHTS hosts " << lmp->atom->ntypes << " atom types." << endl;
+
+            #if defined(typeSecificCG)
+            Warning << "\nYou are using untested code (type specific coarse graining)!!!\n" 
+                    << "\nThis will most probably give wrong results for most models!!!\n"<< endl;
+            for(int iTyp=1; iTyp<=lmp->atom->ntypes; iTyp++)
+                particleCloud_.setCGTypeSpecific(iTyp,lmp->force->cg(iTyp));
+            #endif
+        };
 };
 
 

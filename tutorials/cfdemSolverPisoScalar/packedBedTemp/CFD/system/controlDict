@@ -70,7 +70,7 @@ functions
         );
 
         // Fields to be probed
-        fields ( p T);
+        fields ( p T );
 
         // Write at same frequency as fields
         outputControl   timeStep;//outputTime;

@@ -1,0 +1,13 @@
+/* sources */
+derivedSources=sources/derived
+derivedConstraints=constraints/derived
+
+$(derivedSources)/pressureGradientExplicitSourceIB/pressureGradientExplicitSourceIB.C
+$(derivedSources)/pressureGradientExplicitSourceIB/pressureGradientExplicitSourceIBIO.C
+$(derivedSources)/pressureGradientTorus/pressureGradientTorus.C
+$(derivedSources)/pressureGradientTorus/pressureGradientTorusIO.C
+$(derivedSources)/meanSupVelocityForce/meanSupVelocityForce.C
+
+$(derivedConstraints)/fixedBulkConstraint/fixedBulkConstraint.C
+
+LIB = $(CFDEM_LIB_DIR)/libfvOptionsCFDEM

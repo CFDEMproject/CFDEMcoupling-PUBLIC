@@ -47,7 +47,6 @@ Contributions
 #else
     #include "turbulenceModel.H"
 #endif
-#include "superquadric_flag.h"
 #include "cfdemCloudIB.H"
 #if defined(SUPERQUADRIC_ACTIVE_FLAG)
 #include "cfdemCloudIBSuperquadric.H"
@@ -108,7 +107,7 @@ int main(int argc, char *argv[])
 
         //=== dyM ===================
         interFace = mag(mesh.lookupObject<volScalarField>("voidfractionNext"));
-        mesh.update(); //dyM
+        particleCloud.setMeshHasUpdatedFlag(mesh.update()); //dyM
 
         #if defined(version30)
             #include "readTimeControls.H"

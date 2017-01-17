@@ -45,12 +45,17 @@ defineRunTimeSelectionTable(dataExchangeModel, dictionary);
 
 // * * * * * * * * * * * * * * protected Member Functions  * * * * * * * * * * * * * //
 
+// * * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * * //
+
 void Foam::dataExchangeModel::setNumberOfParticles(int numberOfParticles) const
 {
     particleCloud_.setNumberOfParticles(numberOfParticles);
 }
 
-// * * * * * * * * * * * * * * public Member Functions  * * * * * * * * * * * * * //
+void Foam::dataExchangeModel::setNumberOfClumps(int numberOfClumps) const
+{
+    particleCloud_.setNumberOfClumps(numberOfClumps);
+}
 
 //====
 // double **

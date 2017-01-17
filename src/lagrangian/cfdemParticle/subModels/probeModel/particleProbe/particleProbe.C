@@ -321,7 +321,7 @@ void particleProbe::writeProbe(int index, Field<scalar> sValues, Field<vector> v
 
         //index and time
         *sPtr <<    setprecision(IOstream::defaultPrecision()+7) ;
-        *sPtr << index  << tab 
+        *sPtr << index  << "   " 
                 << particleCloud_.mesh().time().value()  << "   " ;
         *sPtr << "||   ";
         

@@ -34,6 +34,7 @@ liggghtsCommandModels
 writeLiggghtsProps
 {
     writeLast off;
+    path "../DEM/post/restart";
     //writeName "name";
     overwrite on;
     verbose;

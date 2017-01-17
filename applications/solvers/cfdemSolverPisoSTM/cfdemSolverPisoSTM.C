@@ -44,7 +44,11 @@ Description
     #include "turbulenceModel.H"
 #endif
 #include "fixedFluxPressureFvPatchScalarField.H"
-#include "cfdemCloud.H"
+#ifdef MS
+    #include "cfdemCloudMS.H"
+#else
+    #include "cfdemCloud.H"
+#endif
 #if defined(anisotropicRotation)
     #include "cfdemCloudRotation.H"
 #endif
@@ -73,7 +77,11 @@ int main(int argc, char *argv[])
     #if defined(anisotropicRotation)
         cfdemCloudRotation particleCloud(mesh);
     #else
-        cfdemCloud particleCloud(mesh);
+        #ifdef MS
+            cfdemCloudMS particleCloud(mesh);
+        #else
+            cfdemCloud particleCloud(mesh);
+        #endif
     #endif
     #include "checkModelType.H"
 
@@ -124,13 +132,8 @@ int main(int argc, char *argv[])
 
         particleCloud.clockM().start(26,"Flow");
 
-        // get scalar source from DEM        
-        particleCloud.forceM(1).manipulateScalarField(Tsource);
-        Tsource.correctBoundaryConditions();
-
+        //Scalar transport if desired. Use "none" (noTransport) if no scalar transport is desired
         stm().update();
-
-        particleCloud.clockM().start(26,"Flow");
 
         if(particleCloud.solveFlow())
         {
@@ -196,7 +199,11 @@ int main(int argc, char *argv[])
                         {
                             setSnGrad<fixedFluxPressureFvPatchScalarField>
                             (
-                                p.boundaryField(),
+                                #ifdef versionv1612plus
+                                    p.boundaryFieldRef(),
+                                #else
+                                    p.boundaryField(),
+                                #endif
                                 (
                                     phi.boundaryField()
                                   - (mesh.Sf().boundaryField() & U.boundaryField())
@@ -206,7 +213,11 @@ int main(int argc, char *argv[])
                         {
                             setSnGrad<fixedFluxPressureFvPatchScalarField>
                             (
-                                p.boundaryField(),
+                                #ifdef versionv1612plus
+                                    p.boundaryFieldRef(),
+                                #else
+                                    p.boundaryField(),
+                                #endif
                                 (
                                     phi.boundaryField()
                                   - (mesh.Sf().boundaryField() & U.boundaryField())

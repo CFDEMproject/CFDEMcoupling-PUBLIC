@@ -15,10 +15,10 @@ dp = 0.022;			% particle diameter
 phip = 1;			% sphericity
 epsilon = 0.4436;		        % voidfraction
 U = 1;    			% superficial velocity
-L = 1;			% length of bed
-rhoG = 1.188;			% density in kg/m
-nuG = 1.5e-3;	        	% kinemat Visk in m2/s
-muG = nuG*rhoG			% dynam visc in Pa s
+L = 1;			    % length of bed
+rhoG = 1.188;		% density in kg/m
+nuG = 1.5e-3;	    % kinemat Visk in m2/s
+muG = nuG*rhoG		% dynam visc in Pa s
 
 dpErgun= L * (
                 150*((1-epsilon)^2/epsilon^3)*((muG*U)/(phip*dp)^2) 
@@ -29,14 +29,8 @@ fprintf('final pressure drop = %f Pa\n',dpErgun)
 %====================================%
 % simulation data
 %====================================%
-%path = '../probes/0/p'; % 2.1.x
-path = '../postProcessing/probes/0/p'; % 2.2.x
-
-%- nomenclature before 2.4.x
-%columns=3;
-%headerlines=5;
-%data = loaddata(path,columns,headerlines);
-%data=transpose(data);
+%path = '../probes/0/p'; % ext32
+path = '../postProcessing/probes/0/p';
 
 data = load(path);
 [x,y]=size(data);
@@ -54,7 +48,7 @@ title("Ergun pressure drop")
 legend("analytical - Ergun","simulation") 
 
 %print('cfdemSolverPiso_settlingTest.eps','-deps2')
-print -color "cfdemSolverPisoScalar_pressureDrop.eps"
+print -color "cfdemSolverPisoSTM_pressureDrop.png"
 
 %*********************************************************************%
 % heat transfer
@@ -74,13 +68,8 @@ Tp = 600;
 Np = 1005;
 lambda = 0.0256;
 
-%path = '../probes/0/T'; % 2.1.x
-path = '../postProcessing/probes/0/T'; % 2.2.x
-%- nomenclature before 2.4.x
-%columns=5;
-%headerlines=5;
-%data = loaddata(path,columns,headerlines);
-%data=transpose(data);
+%path = '../probes/0/T'; % ext32
+path = '../postProcessing/probes/0/T';
 
 data = load(path);
 [x,y]=size(data);
@@ -130,14 +119,14 @@ plot(t_sim,Nu_LiMason,t_sim,Nu_sim)
 title("Nusselt nr")
 legend("analytical - ","simulation") 
 
-%print('cfdemSolverPisoScalar_NusseltNr.eps','-deps2')
-print -color "cfdemSolverPisoScalar_Nusselt.eps"
+%print('cfdemSolverPisoSTM_NusseltNr.eps','-deps2')
+print -color "cfdemSolverPisoSTM_Nusselt.png"
 
 figure(3)
 plot(t_sim,Tin_sim,t_sim,Tout_sim)
 title("inlet/outlet temperature")
 legend("inlet","outlet") 
 
-%print('cfdemSolverPisoScalar_NusseltNr.eps','-deps2')
-print -color "cfdemSolverPisoScalar_temperatures.eps"
+%print('cfdemSolverPisoSTM_NusseltNr.eps','-deps2')
+print -color "cfdemSolverPisoSTM_temperatures.png"
 

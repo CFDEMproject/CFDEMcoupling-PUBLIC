@@ -32,7 +32,7 @@ couplingInterval 100;
 
 voidFractionModel divided;//centre;//
 
-locateModel engine;
+locateModel engine;//engineIB;//
 
 meshMotionModel noMeshMotion;
 
@@ -46,7 +46,7 @@ dataExchangeModel twoWayMPI;
 
 averagingModel dense;//dilute;//
 
-clockModel standardClock;//off;
+clockModel off;//standardClock;//
 
 smoothingModel off;// localPSizeDiffSmoothing;// constDiffSmoothing; //
 
@@ -259,18 +259,26 @@ centreProps
     alphaMin 0.1;
 }
 
-engineProps
+"(engineProps|turboEngineM2MProps)"
 {
     treeSearch true;
+}
+
+engineIBProps
+{
+    treeSearch true;
+    zSplit 8;
+    xySplit 16;
 }
 
 dividedProps
 {
     alphaMin 0.1;
     scaleUpVol 1.0;
+    //procBoundaryCorrection true;
 }
 
-twoWayMPIProps
+"(twoWayMPIProps|M2MProps)"
 {
     liggghtsPath "../DEM/in.liggghts_run";
 }

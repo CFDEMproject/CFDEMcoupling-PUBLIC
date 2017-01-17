@@ -57,7 +57,8 @@ fix         cfd2 all couple/cfd/force
 # heat transfer
 fix         ftco all property/global thermalConductivity peratomtype 5. # lambda in [W/(K*m)]
 fix         ftca all property/global thermalCapacity peratomtype 0.1    # cp in [J/(kg*K)]
-fix         cfd3 all couple/cfd/convection T0       600
+fix         cfd3 all couple/cfd/convection T0 600
+fix         heattransfer all heat/gran initial_temperature 600.
 
 # species transfer
 fix         specCap all property/global              speciesCCapacity peratomtype 1.0
@@ -68,17 +69,12 @@ run         0
 region      total block INF INF INF INF INF INF units box
 set         region total property/atom Temp 600.
 
-
-# this one invokes heat transfer calculation, transfers per-particle temperature and adds convective heat flux to particles
-
-
-
 # apply nve integration to all particles that are inserted as single particles
 fix         integr all nve/sphere
 
 # output settings, include total thermal energy
 compute         rke all erotate/sphere
-thermo_style    custom step atoms ke c_rke 
+thermo_style    custom step atoms ke c_rke vol f_heattransfer
 thermo          1000
 thermo_modify   lost ignore norm no
 compute_modify  thermo_temp dynamic yes

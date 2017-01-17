@@ -45,7 +45,7 @@ Examples
 Description
 """""""""""
 
-This "forceModel" does not influence the particles or the simulation - it is a postprocessing tool! The total volume of the particles is calculated.
+This "forceModel" does not influence the particles or the simulation - it is a postprocessing tool! The total volume of the particles located in the CFD domain is calculated.
 
 Restrictions
 """"""""""""

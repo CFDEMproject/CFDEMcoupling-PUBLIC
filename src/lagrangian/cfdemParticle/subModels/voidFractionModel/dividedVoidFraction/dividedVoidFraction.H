@@ -45,6 +45,7 @@ SourceFiles
 
 namespace Foam
 {
+const int numberOfMarkerPoints = 29;
 
 /*---------------------------------------------------------------------------*\
                            Class noDrag Declaration
@@ -76,6 +77,8 @@ private:
         {
             return 4.188790205*radius*radius*radius*scaleVol; //4/3*pi=4.188790205
         };
+
+        vector offsets[numberOfMarkerPoints];
 
 public:
 

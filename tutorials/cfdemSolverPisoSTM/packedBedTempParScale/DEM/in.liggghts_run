@@ -1,0 +1,95 @@
+echo            both
+log             ../DEM/log.liggghts
+thermo_log      ../DEM/post/thermo.txt
+
+#######################################################
+# variables                                           #
+#######################################################
+variable r0 equal 0.011
+#######################################################
+
+# read packed bed and calc convective heat transfer
+atom_style      granular
+atom_modify     map array
+boundary        m m m
+newton          off
+
+communicate     single vel yes
+
+units           si
+processors      1 1 2
+
+# read the restart file
+read_restart    ../DEM/post/restart/liggghts.restart
+
+neighbor        ${r0} bin
+neigh_modify    delay 0 binsize 0.01
+
+
+# Material properties required for granular pair styles
+
+fix         m1 all property/global youngsModulus peratomtype 5.e6
+fix         m2 all property/global poissonsRatio peratomtype 0.45
+fix         m3 all property/global coefficientRestitution peratomtypepair 1 0.3
+fix         m4 all property/global coefficientFriction peratomtypepair 1 0.5
+
+# pair style
+pair_style  gran model hertz tangential history
+pair_coeff  * *
+
+# timestep, gravity
+timestep    0.00001
+fix         gravi all gravity 9.81 vector 0. 0. -1.
+
+# walls
+fix     xwalls1 all wall/gran model hertz tangential history primitive type 1 xplane 0.0
+fix     xwalls2 all wall/gran model hertz tangential history primitive type 1 xplane 0.1
+fix     ywalls1 all wall/gran model hertz tangential history primitive type 1 yplane 0.0
+fix     ywalls2 all wall/gran model hertz tangential history primitive type 1 yplane 0.1
+fix     zwalls1 all wall/gran model hertz tangential history primitive type 1 zplane 0.0
+fix     zwalls2 all wall/gran model hertz tangential history primitive type 1 zplane 1.1
+
+# cfd coupling
+fix         cfd all couple/cfd couple_every 100 mpi
+fix         cfd2 all couple/cfd/force
+
+
+# heat transfer
+fix         ftco all property/global thermalConductivity peratomtype 5. # lambda in [W/(K*m)]
+fix         ftca all property/global thermalCapacity peratomtype 0.1    # cp in [J/(kg*K)]
+fix         heattransfer all heat/gran initial_temperature 999 ##temperature not relevant - will be overwritten by ParScale
+
+#Option 1: cool with implicit coupling
+#fix     cfd3 all couple/cfd/convectiveImpl #this is an IMPLICIT coupling
+
+#Option 2: cool with explicit setting of flux
+fix     cfd3 all couple/cfd/convection T0 0 #Temperature is irrelevant, so set to 0
+fix     heatTransCoeff all property/atom heatTransCoeff scalar yes no no 0 #NOT USED, but pulled from ParScale by default, so need to provide something here!
+fix     heatFluid all property/atom heatFluid scalar yes no no 0 #NOT USED, but pulled from ParScale by default, so need to provide something here!
+
+# set particle temperature for the bed
+run         0
+region      total block INF INF INF INF INF INF units box
+set         region total property/atom Temp 600.
+
+# apply nve integration to all particles that are inserted as single particles
+fix         integr all nve/sphere
+
+#------------------------------Parscale Coupling_pascal-----------------------------------------------
+
+fix         coupling_pascal all couple/pascal reneighbor_at_least_every 1 couple_every 1
+fix         heatAv          all property/atom heatAv    scalar no yes no none  #average temperature
+fix         TempMin         all property/atom TempMin   scalar no yes no none #minimum particle 
+
+#-----------------------------------------------------------------------------------------------------
+
+# output settings, include total thermal energy
+compute         rke all erotate/sphere
+thermo_style    custom step atoms ke c_rke vol
+thermo          1000
+thermo_modify   lost ignore norm no
+compute_modify  thermo_temp dynamic yes
+
+dump        dmp all custom 20000 ../DEM/post/dump*.liggghts_run id type x y z ix iy iz vx vy vz fx fy fz omegax omegay omegaz radius f_Temp[0] f_heatFlux[0] #f_speciesC[0] f_speciesCFlux[0]
+
+run         1

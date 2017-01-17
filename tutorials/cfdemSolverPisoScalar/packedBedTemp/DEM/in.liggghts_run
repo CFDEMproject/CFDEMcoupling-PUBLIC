@@ -49,23 +49,21 @@ fix     ywalls2 all wall/gran model hertz tangential history primitive type 1 yp
 fix     zwalls1 all wall/gran model hertz tangential history primitive type 1 zplane 0.0
 fix     zwalls2 all wall/gran model hertz tangential history primitive type 1 zplane 1.1
 
+# cfd coupling
+fix         cfd all couple/cfd couple_every 100 mpi
+fix         cfd2 all couple/cfd/force
+
 
 # heat transfer
 fix         ftco all property/global thermalConductivity peratomtype 5. # lambda in [W/(K*m)]
 fix         ftca all property/global thermalCapacity peratomtype 0.1    # cp in [J/(kg*K)]
+fix         cfd3 all couple/cfd/convection T0 600
 fix         heattransfer all heat/gran initial_temperature 600.
 
 # set particle temperature for the bed
 run         0
 region      total block INF INF INF INF INF INF units box
 set         region total property/atom Temp 600.
-
-# cfd coupling
-fix         cfd all couple/cfd couple_every 100 mpi
-fix         cfd2 all couple/cfd/force
-
-# this one invokes heat transfer calculation, transfers per-particle temperature and adds convective heat flux to particles
-fix         cfd3 all couple/cfd/convection T0 600
 
 # apply nve integration to all particles that are inserted as single particles
 fix         integr all nve/sphere
@@ -77,6 +75,6 @@ thermo          1000
 thermo_modify   lost ignore norm no
 compute_modify  thermo_temp dynamic yes
 
-dump        dmp all custom 100 ../DEM/post/dump.liggghts_run id type x y z ix iy iz vx vy vz fx fy fz omegax omegay omegaz radius f_Temp[0] f_heatFlux[0]
+dump        dmp all custom 20000 ../DEM/post/dump*.liggghts_run id type x y z ix iy iz vx vy vz fx fy fz omegax omegay omegaz radius f_Temp[0] f_heatFlux[0]
 
 run         0

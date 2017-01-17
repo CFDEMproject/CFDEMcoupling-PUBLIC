@@ -64,7 +64,7 @@ particleCellVolume::particleCellVolume
     forceModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
     mesh_(particleCloud_.mesh()),
-    startTime_(0.),
+    startTime_(propsDict_.lookupOrDefault<scalar>("startTime",0.)),
     scalarFieldName_("voidfraction"),
     scalarField_
     (   
@@ -96,16 +96,8 @@ particleCellVolume::particleCellVolume
     lowerThreshold_(readScalar(propsDict_.lookup("lowerThreshold"))),
     path_("postProcessing/particleCellVolume"),
     sPtr_(NULL),
-    writeToFile_(false)
+    writeToFile_(propsDict_.lookupOrDefault<Switch>("writeToFile",false))
 {
-    if (propsDict_.found("startTime")){
-        startTime_=readScalar(propsDict_.lookup("startTime"));
-    }
-
-    if (propsDict_.found("writeToFile")){
-        writeToFile_=Switch(propsDict_.lookup("writeToFile"));
-    }
-
     // init force sub model
     setForceSubModels(propsDict_);
 

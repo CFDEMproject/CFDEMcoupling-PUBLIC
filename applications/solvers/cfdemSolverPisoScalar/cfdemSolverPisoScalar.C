@@ -121,6 +121,7 @@ int main(int argc, char *argv[])
         // get scalar source from DEM        
         particleCloud.forceM(1).manipulateScalarField(Tsource);
         Tsource.correctBoundaryConditions();
+        particleCloud.forceM(1).commToDEM();
 
         // solve scalar transport equation
         fvScalarMatrix TEqn
@@ -198,7 +199,11 @@ int main(int argc, char *argv[])
                         {
                             setSnGrad<fixedFluxPressureFvPatchScalarField>
                             (
-                                p.boundaryField(),
+                                #ifdef versionv1612plus
+                                    p.boundaryFieldRef(),
+                                #else
+                                    p.boundaryField(),
+                                #endif
                                 (
                                     phi.boundaryField()
                                   - (mesh.Sf().boundaryField() & U.boundaryField())
@@ -208,7 +213,11 @@ int main(int argc, char *argv[])
                         {
                             setSnGrad<fixedFluxPressureFvPatchScalarField>
                             (
-                                p.boundaryField(),
+                                #ifdef versionv1612plus
+                                    p.boundaryFieldRef(),
+                                #else
+                                    p.boundaryField(),
+                                #endif
                                 (
                                     phi.boundaryField()
                                   - (mesh.Sf().boundaryField() & U.boundaryField())

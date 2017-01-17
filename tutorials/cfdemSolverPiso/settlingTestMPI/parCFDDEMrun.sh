@@ -37,17 +37,17 @@ if [ $runOctave == "true" ]
         cd octave
 
         #- rmove old graph
-        rm cfdemSolverPiso_settlingTestMPI.eps
+        rm cfdemSolverPiso_settlingTestMPI.png
 
         #- run octave
         octave settlingVelocity.m
 
         #- show plot 
-        evince cfdemSolverPiso_settlingTestMPI.eps
+        eog cfdemSolverPiso_settlingTestMPI.png
 
         #- copy log file to test harness
         cp ../../$logfileName $testHarnessPath
-        cp cfdemSolverPiso_settlingTestMPI.eps $testHarnessPath
+        cp cfdemSolverPiso_settlingTestMPI.png $testHarnessPath
 fi
 
 if [ $postproc == "true" ]
@@ -79,17 +79,6 @@ fi
 #- clean up case
 if [ $cleanUp == "true" ]
   then
-    echo "deleting data at: $casePath :\n"
-    source $WM_PROJECT_DIR/bin/tools/CleanFunctions
-    cd $casePath/CFD
-    cleanCase
-    cd $casePath
-    rm -r $casePath/CFD/clockData
-    rm -r $casePath/DEM/post/*
-    rm -r $casePath/DEM/liggghts.restartCFDEM*
-    echo "done"
+    keepDEMrestart="false"
+    cleanCFDEMcase $casePath/CFD $keepDEMrestart
 fi
-
-#- preserve post directory
-touch $casePath/DEM/post/.gitignore
-

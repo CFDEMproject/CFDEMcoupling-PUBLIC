@@ -100,6 +100,17 @@ public:
             vector& position,
             label& oldCellID
         ) const;
+
+        label intersection
+        (
+                const point& pStart,
+                const point& pEnd
+        ) const;
+
+        label findNearestCell
+        (
+                const point& pStart
+        ) const;
 };
 
 

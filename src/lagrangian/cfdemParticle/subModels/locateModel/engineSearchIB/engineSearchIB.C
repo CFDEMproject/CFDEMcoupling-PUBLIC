@@ -66,8 +66,22 @@ engineSearchIB::engineSearchIB
 :
     engineSearch(dict,sm,typeName),
     zSplit_(readLabel(propsDict_.lookup("zSplit"))),
-    xySplit_(readLabel(propsDict_.lookup("xySplit")))
-{}
+    xySplit_(readLabel(propsDict_.lookup("xySplit"))),
+    coef_(2.0),
+    verbose_(propsDict_.lookupOrDefault<Switch>("verbose", false)),
+    numberOfSatellitePoints_((zSplit_-1)*xySplit_ + 2)
+{
+    bbPtr_.reset(new boundBox(particleCloud_.mesh().points(), false));
+    if(verbose_)
+    {
+        Pout<<"MinBounds (x,y,z): "<<bbPtr_().min()<<endl;
+        Pout<<"MaxBounds (x,y,z): "<<bbPtr_().max()<<endl;
+    }
+    for(int countPoints = 0; countPoints < numberOfSatellitePoints_; ++countPoints)
+    {
+        satellitePoints_.push_back(generateSatellitePoint(countPoints));
+    }
+}
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
@@ -88,10 +102,18 @@ label engineSearchIB::findCell
 ) const
 {
     bool checkPeriodicCells(particleCloud_.checkPeriodicCells());
-    int numprocs, me;
-    MPI_Comm_size(MPI_COMM_WORLD, &numprocs);
-    MPI_Comm_rank(MPI_COMM_WORLD, &me);
     const boundBox& globalBb = particleCloud_.mesh().bounds();
+
+    if(particleCloud_.meshHasUpdated())
+    {
+        searchEngine_.correct();
+        bbPtr_.reset(new boundBox(particleCloud_.mesh().points(), false));
+        if(verbose_)
+        {
+            Pout<<"MinBounds (x,y,z): "<<bbPtr_().min()<<endl;
+            Pout<<"MaxBounds (x,y,z): "<<bbPtr_().max()<<endl;
+        }
+    }
 
     vector position;
     for(int index = 0;index < size; ++index)
@@ -104,38 +126,68 @@ label engineSearchIB::findCell
             // create pos vector
             for(int i=0;i<3;i++) position[i] = positions[index][i];
 
-            // find cell
-            label oldID = cellIDs[index][0];
-            cellIDs[index][0] = findSingleCell(position,oldID);
-            //cellIDs[index][0] = particleCloud_.mesh().findCell(position);
+            bool isInside = isInsideRectangularDomain(position, coef_*radius);
 
-            //mod by alice upon from here
-            if(cellIDs[index][0] < 0)
+            if(!isInside && checkPeriodicCells)
             {
-                vector pos = position;
-                label altStartPos = -1;
-                label numberOfPoints = (zSplit_-1)*xySplit_ + 2; // 1 point at bottom, 1 point at top
-
-                for(int countPoints = 0; countPoints < numberOfPoints; ++countPoints)
+                vector positionCenterPeriodic;
+                for(int xDir=-1; xDir<=1; xDir++)
                 {
-                    pos = generateSatellitePoint(index, countPoints);
+                    positionCenterPeriodic[0] =  position[0]
+                                              + static_cast<double>(xDir)
+                                              * (globalBb.max()[0]-globalBb.min()[0]);
+                    for(int yDir=-1; yDir<=1; yDir++)
+                    {
+                        positionCenterPeriodic[1] =  position[1]
+                                                  + static_cast<double>(yDir)
+                                                  * (globalBb.max()[1]-globalBb.min()[1]);
+                        for(int zDir=-1; zDir<=1; zDir++)
+                        {
+                            positionCenterPeriodic[2] =  position[2]
+                                                      + static_cast<double>(zDir)
+                                                      * (globalBb.max()[2]-globalBb.min()[2]);
+                            isInside = isInsideRectangularDomain(positionCenterPeriodic, coef_*radius);
+                            if(isInside) break;
+                        }
+                        if(isInside) break;
+                    }
+                    if(isInside) break;
+                }
+            }
 
-                    altStartPos=findSingleCell(pos,oldID); //particleCloud_.mesh().findCell(pos);//
+
+            if(isInside)
+            {
+              // find cell
+              label oldID = cellIDs[index][0];
+              cellIDs[index][0] = findSingleCell(position,oldID);
+
+              if(cellIDs[index][0] < 0)
+              {
+                  label altStartPos = -1;
+
+                  for(unsigned int countPoints = 0; countPoints < satellitePoints_.size(); ++countPoints)
+                  {
+                    vector pos = getSatellitePoint(index, countPoints);
+                    isInside = isInsideRectangularDomain(pos, SMALL);
+
+                    if(isInside)
+                        altStartPos = findSingleCell(pos,oldID);
+
                     //check for periodic domains
                     if(checkPeriodicCells)
                     {
                         for(int iDir=0;iDir<3;iDir++)
                         {
                             if( pos[iDir] > globalBb.max()[iDir] )
-                            {
                                 pos[iDir]-=globalBb.max()[iDir]-globalBb.min()[iDir];
-                            }
                             else if( pos[iDir] < globalBb.min()[iDir] )
-                            {
                                 pos[iDir]+=globalBb.max()[iDir]-globalBb.min()[iDir];
-                            }
                         }
-                        altStartPos=findSingleCell(pos,oldID); //particleCloud_.mesh().findCell(pos);//
+                        isInside = isInsideRectangularDomain(pos, SMALL);
+
+                        if(isInside)
+                          altStartPos=findSingleCell(pos,oldID); //particleCloud_.mesh().findCell(pos);//
                     }
 
                     if(altStartPos >= 0) // found position, we're done
@@ -143,35 +195,51 @@ label engineSearchIB::findCell
                         cellIDs[index][0] = altStartPos;
                         break;
                     }
-            	}
-
+                }
+              }
             }
         }
     }
     return 1;
 }
 
-vector engineSearchIB::generateSatellitePoint(int index, int countPoints) const
+bool engineSearchIB::isInsideRectangularDomain(vector centre, scalar skin) const
 {
-  vector position = particleCloud_.position(index);
-  scalar theta, phi;
-  const scalar thetaSize = 180./zSplit_, phiSize = 360./xySplit_;
-  const scalar deg2rad = M_PI/180.;
-  vector pos = position;
-  double radius=particleCloud_.radius(index);
-  if(countPoints == 0) {
-    pos[2] += radius;
-  } else if(countPoints == 1) {
-    pos[2] -= radius;
-  } else {
-    scalar thetaLevel = (countPoints - 2) / xySplit_;
-    theta = deg2rad * thetaSize * (thetaLevel+1);
-    phi = deg2rad * phiSize * (countPoints - 2 - thetaLevel*xySplit_);
-    pos[0] += radius * sin(theta) * cos(phi);
-    pos[1] += radius * sin(theta) * sin(phi);
-    pos[2] += radius * cos(theta);
-  }
-  return pos;
+    vector offset(skin, skin, skin);
+    boundBox bb(bbPtr_().min()-offset, bbPtr_().max() + offset);
+    return bb.contains(centre);
+}
+
+vector engineSearchIB::generateSatellitePoint(int countPoints) const
+{
+    scalar theta, phi;
+    const scalar thetaSize = 180./zSplit_, phiSize = 360./xySplit_;
+    const scalar deg2rad = M_PI/180.;
+    vector pos(0.0, 0.0, 0.0);
+    // 1 point at bottom, 1 point at top
+    if(countPoints == 0)
+    {
+        pos[2] = 1.0;
+    } else if(countPoints == 1)
+    {
+        pos[2] = -1.0;
+    } else {
+        scalar thetaLevel = (countPoints - 2) / xySplit_;
+        theta = deg2rad * thetaSize * (thetaLevel+1);
+        phi = deg2rad * phiSize * (countPoints - 2 - thetaLevel*xySplit_);
+        pos[0] = sin(theta) * cos(phi);
+        pos[1] = sin(theta) * sin(phi);
+        pos[2] = cos(theta);
+    }
+    return pos;
+}
+
+vector engineSearchIB::getSatellitePoint(int index, int countPoints) const
+{
+    double radius=particleCloud_.radius(index);
+    vector position = particleCloud_.position(index);
+    vector pos = radius*satellitePoints_[countPoints] + position;
+    return pos;
 }
 
 

@@ -6,73 +6,22 @@ scalarTransportModel command
 Syntax
 """"""
 
-Defined in scalarTransportProperties dictionary. A variety of derived classes exist that implement different physics of the scalarTransportModel. Here, the most general one, i.e., 'generalManual' is discussed. If no scalar transport shall be used, use the model 'none'.
+Defined in scalarTransportProperties dictionary. A variety of derived classes exist that implement different physics of the scalarTransportModel. If no scalar transport shall be used, use the model 'none'.
 
 .. parsed-literal::
 
-   generalManualProps
-   {
-       phiFieldName *phiName*;
-       voidfractionFieldName *voidfractionName*;
-       ScT *scalar1*;
-       PrT *scalar2*;
-       cpVolumetric *scalar3*;
-       cpVolumetricFieldName *word1*;
-       rhoMixFieldName *word2*;
-       eulerianFields
-       (
-           *C*
-           *T*
-       );
+   scalarTransportModel model;
 
-.. parsed-literal::
-
-   }
-
-* *phiName* = (optional) name of the surface field for the SUPERFICIAL flux, default "phi".
-* *voidfractionName* = (optional) name of the finite volume voidfraction field, default "voidfraction".
-* *scalar1* = (optional, default 0.7) turbulent Schmidt Nr, set to large value to suppress turbulent species transport
-* *scalar2* = (optional, default 0.7) turbulent Prandtl Nr, set to large value to suppress turbulent heat transport
-* *scalar3* = (optional, alternatively define word1) volumetric heat capacity as a global constant (in contrast to cpVolumetricFieldName for a field). This is the mixture density times the heat capacity **J/K/(m_voidspace)^3**, will only be used if cpVolumetricFieldName, or updateMixtureProperties = false
-* *word1* = (optional, alternatively define scalar3) volumetric heat capacity as a field
-* *word3* = mixture density field
-* *C* = concentration field name
-* *T* = temperature field name
-
+* model = name of the scalarTransportModel to be applied
 
 Examples
 """"""""
 
 .. parsed-literal::
 
-   generalManualProps
-   {
-       phiFieldName "phi";
-       ScT 0.7;
-       PrT 0.7;
-       cpVolumetric 1196;
-       rhoMixFieldName "rhoMix";
-       eulerianFields
-       (
-           C
-           T
-       );
+   scalarTransportModel generalManual;
 
-.. parsed-literal::
-
-       fvOptionsC
-       {
-       };
-
-.. parsed-literal::
-
-       fvOptionsT
-       {
-       };
-
-.. parsed-literal::
-
-   }
+Note: This examples list might not be complete - please look for other models (scalarTransportModel_XY) in this documentation.
 
 Description
 """""""""""
@@ -81,13 +30,9 @@ Solves the advection-dispersion transport equation for a dilute scalar quantity 
 
 Restrictions
 """"""""""""
+ none.
 
-The user MUST ensure the "phi" field is SUPERFICIAL (i.e., the fluid-phase velocity times voidfraction interpolatedat the cells' faces). The code cannot know or check whether this is the case, so the user of a certain solver has to ensure this.
-
-Related commands
-""""""""""""""""
-
-none.
+**Default:** none.
 
 
 .. _liws: http://www.cfdem.com

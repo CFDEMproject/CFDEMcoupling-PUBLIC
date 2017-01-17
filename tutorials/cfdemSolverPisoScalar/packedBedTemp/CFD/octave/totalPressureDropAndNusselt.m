@@ -48,7 +48,7 @@ title("Ergun pressure drop")
 legend("analytical - Ergun","simulation") 
 
 %print('cfdemSolverPiso_settlingTest.eps','-deps2')
-print -color "cfdemSolverPisoScalar_pressureDrop.eps"
+print -color "cfdemSolverPisoScalar_pressureDrop.png"
 
 %*********************************************************************%
 % heat transfer
@@ -120,7 +120,7 @@ title("Nusselt nr")
 legend("analytical - ","simulation") 
 
 %print('cfdemSolverPisoScalar_NusseltNr.eps','-deps2')
-print -color "cfdemSolverPisoScalar_Nusselt.eps"
+print -color "cfdemSolverPisoScalar_Nusselt.png"
 
 figure(3)
 plot(t_sim,Tin_sim,t_sim,Tout_sim)
@@ -128,5 +128,5 @@ title("inlet/outlet temperature")
 legend("inlet","outlet") 
 
 %print('cfdemSolverPisoScalar_NusseltNr.eps','-deps2')
-print -color "cfdemSolverPisoScalar_temperatures.eps"
+print -color "cfdemSolverPisoScalar_temperatures.png"
 

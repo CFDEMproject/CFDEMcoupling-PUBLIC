@@ -18,14 +18,14 @@ logDir="log"
 cd $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc
 mkdir -p $logDir
 
-#================================================================================#
-# Must compile (but not clean) LIGGGHTS libraries, since it could have been 
-# compiled before with the compileLIGGGHTS command
-# Then, check successful compilation
-#================================================================================#
-bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/compileLIGGGHTS_lib.sh noClean
-echo "...now checking if LIGGGHTS libraries are compiled that are needed for CFDEM's src packages."
-bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/compileLIGGGHTS_lib.sh false
+##================================================================================#
+## Must compile (but not clean) LIGGGHTS libraries, since it could have been 
+## compiled before with the compileLIGGGHTS command
+## Then, check successful compilation
+##================================================================================#
+#bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/compileLIGGGHTS_lib.sh noClean
+#echo "...now checking if LIGGGHTS libraries are compiled that are needed for CFDEM's src packages."
+#bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/compileLIGGGHTS_lib.sh false
 
 #================================================================================#
 # compile src

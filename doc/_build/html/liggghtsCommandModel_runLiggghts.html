@@ -149,6 +149,7 @@ runLiggghtsProps
 {
     preNo true;
     verbose; (optional)
+    runFirst true; (optional, default false)
 }
 </pre></div>
 </div>
@@ -164,7 +165,7 @@ runLiggghtsProps
 </div>
 <div class="section" id="description">
 <h2>Description<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h2>
-<p>The liggghtsCommand models can be used to execute a LIGGGHTS command during a CFD run. The &#8220;runLiggghts&#8221; command executes the command &#8220;run $nrDEMsteps&#8221;, where $nrDEMsteps is automatically set according to the coupling intervals, every coupling step. Optionally a dictionary called runLiggghtsProps can be specified where the &#8220;preNo&#8221; switch can be set, which uses the command &#8220;run $nrDEMsteps pre no&#8221; for every time step except the first.</p>
+<p>The liggghtsCommand models can be used to execute a LIGGGHTS command during a CFD run. The &#8220;runLiggghts&#8221; command executes the command &#8220;run $nrDEMsteps&#8221;, where $nrDEMsteps is automatically set according to the coupling intervals, every coupling step. Optionally a dictionary called runLiggghtsProps can be specified where the &#8220;preNo&#8221; switch can be set, which uses the command &#8220;run $nrDEMsteps pre no&#8221; for every time step except the first. If the runFirst option is chosen the run command is executed only at the first coupling step.</p>
 </div>
 <div class="section" id="restrictions">
 <h2>Restrictions<a class="headerlink" href="#restrictions" title="Permalink to this headline">¶</a></h2>

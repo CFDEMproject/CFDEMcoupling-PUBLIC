@@ -1,0 +1,50 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.6                                   |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    location    "0.05";
+    object      TSource;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 0 -1 1 0 0 0];
+
+// Tsource[K/s] = q[W/m3]/(rho[kg/m3]*cp[W*s/(kg*K)])
+// Q=10 W
+// V=0.01 m3
+// q=1000 W/m3
+// cp=1000
+// rho=1
+// --> Tsource = 1 
+
+internalField   uniform 0;  
+
+boundaryField
+{
+    inlet
+    {
+        type            zeroGradient;
+        value           uniform 0;
+    }
+    outlet
+    {
+        type            zeroGradient;
+        value           uniform 0;
+    }
+    wall
+    {
+        type            zeroGradient;
+        value           uniform 0;
+    }
+}
+
+
+// ************************************************************************* //
