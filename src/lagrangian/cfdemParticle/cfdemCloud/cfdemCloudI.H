@@ -54,7 +54,7 @@ inline void cfdemCloud::setCGTypeSpecific(int type, double cg) const
 {
     if(int(cgTypeSpecific_.size())!=type)   
         FatalError  << "setCGTypeSpecific attempts to set at location "
-                    << cgTypeSpecific_.size()
+                    << int(cgTypeSpecific_.size())
                     << ", but caller requests to set at "
                     << type
                     << ". This is fatal. "

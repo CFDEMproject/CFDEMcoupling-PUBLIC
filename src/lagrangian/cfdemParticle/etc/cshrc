@@ -267,10 +267,22 @@ else if ( $WM_PROJECT_VERSION =~ "v1612+" ) then
     sleep 1.5
 else if ( $WM_PROJECT_VERSION =~ "2.4.*" ) then
     setenv CFDEM_WM_PROJECT_VERSION 24
+    echo "************************************"
+    echo "WARNING from your CFDEM code!"
+    echo "WARNING: Coupling with your OpenFOAM(R) version is not supported any more!"
+    echo "In doubt switch to another version."
+    echo "************************************"
+    sleep 1.5
 else if ( $WM_PROJECT_VERSION == "3.2" ) then
     if ( $WM_FORK == "extend" ) then
         setenv CFDEM_WM_PROJECT_VERSION 132
     endif
+    echo "************************************"
+    echo "WARNING from your CFDEM code!"
+    echo "WARNING: Coupling with your OpenFOAM(R) version is not supported any more!"
+    echo "In doubt switch to another version."
+    echo "************************************"
+    sleep 1.5
 else
     clear
     echo "************************************"

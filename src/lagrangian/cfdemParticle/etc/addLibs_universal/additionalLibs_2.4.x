@@ -23,12 +23,15 @@ include $(CFDEM_ADD_LIBS_DIR)/additionalLibs_superquadric
 CFDEM_ADD_INCOMPTURBMOD_PATHS = \
 -I$(LIB_SRC)/turbulenceModels/incompressible/turbulenceModel \
 -I$(LIB_SRC)/fvOptions/lnInclude \
+-I$(LIB_SRC)/sampling/lnInclude
 
 # libs for turbulence models to use
 CFDEM_ADD_INCOMPTURBMOD_LIBS = \
 -lincompressibleRASModels \
 -lincompressibleLESModels \
 -lfvOptions \
+-lsampling
+
 
 #----------------------------------------------------------------
 # compressible turbulence model settings
