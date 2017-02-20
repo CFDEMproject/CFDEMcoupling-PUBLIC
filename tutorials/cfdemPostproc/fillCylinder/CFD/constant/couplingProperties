@@ -82,6 +82,10 @@ typeConcentrationProps
     );
 }
 
+noDragProps
+{
+}
+
 oneWayVTKProps
 {
     DEMts 0.0001;

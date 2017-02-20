@@ -72,8 +72,7 @@ oneWayVTK::oneWayVTK
     setNumberOfParticles(maxNumberOfParticles_);
 
     // make a const char* from word
-    string HH=string(filename_);
-    charFilename_=HH.c_str();
+    charFilename_ = wordToChar(filename_);
 
     Info << "relativePath_" << relativePath_ << endl;
 }
@@ -84,14 +83,18 @@ oneWayVTK::oneWayVTK
 oneWayVTK::~oneWayVTK()
 {}
 
-
+// * * * * * * * * * * * * * * * private Member Functions  * * * * * * * * * * * * * //
+char* oneWayVTK::wordToChar(word& inWord) const
+{
+    return const_cast<char*>(inWord.c_str());
+}
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 void oneWayVTK::getData
 (
     word name,
     word type,
     double ** const& field,
-    label step
+    int step
 ) const
 {
     if (type == "scalar-atom")
@@ -101,13 +104,14 @@ void oneWayVTK::getData
         sprintf(index, charFilename_, step);
         //fileName H(particleCloud_.mesh().time().path()/".."/"DEM"/"post"/index);
         fileName H(particleCloud_.mesh().time().path()/relativePath_/index);
-        Info << "opening file: " <<H << endl;
+        Info << "opening file: " << H << endl;
 
         // set file pointer
         string HH=string(H);
         const char * paricleFilePath=HH.c_str();
         ifstream* inputPtr;
         inputPtr = new ifstream(paricleFilePath);
+        if(!*inputPtr) FatalError << "File not found!, " << H << "\n" << abort(FatalError);
 
         if (name == "radius")
         {
@@ -142,15 +146,17 @@ void oneWayVTK::getData
         // get path to particle VTK files
         char index[100];
         sprintf(index, charFilename_, step);
+        Info << "debug: index is " << index << endl; //JOKER
         //fileName H(particleCloud_.mesh().time().path()/".."/"DEM"/"post"/index);
         fileName H(particleCloud_.mesh().time().path()/relativePath_/index);
-        Info << "opening file: " <<H << endl;
+        Info << "opening file: " << H << endl;
 
         // set file pointer
         string HH=string(H);
         const char * paricleFilePath=HH.c_str();
         ifstream* inputPtr;
         inputPtr = new ifstream(paricleFilePath);
+        if(!*inputPtr) FatalError << "File not found!, " << H << "\n" << abort(FatalError);
 
         // read position data from VTK file
         //NP: secial case as position data has no "name" in the vtk file
@@ -159,7 +165,6 @@ void oneWayVTK::getData
             int numberOfParticles;  // remove this?
 
             string just_read = " ";
-            if(!*inputPtr) cerr << "File not found!, " << H << endl;
             while(just_read.compare("POINTS") != 0)  *inputPtr >> just_read;   //read until we read "POINTS"
             *inputPtr >> numberOfParticles;                           //this is now the number of points in the file
             *inputPtr >> just_read;                                    // skip text for dataType

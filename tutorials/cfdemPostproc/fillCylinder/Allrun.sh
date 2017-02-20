@@ -93,6 +93,7 @@ read
 source $WM_PROJECT_DIR/bin/tools/CleanFunctions
 cd $casePath/CFD
 cleanCase
+rm -r $casePath/CFD/postProcessing
 rm -r $casePath/CFD/lagrangian
 rm -r $casePath/CFD/clockData
 rm $casePath/CFD/octave/octave-workspace

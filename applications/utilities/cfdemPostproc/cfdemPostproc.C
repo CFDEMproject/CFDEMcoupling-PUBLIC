@@ -71,14 +71,14 @@ int main(int argc, char *argv[])
     int DEM_dump_Interval=1000;
     particleCloud.reAllocArrays();
 
-    double **positions_;
-    double **velocities_;
-    double **radii_;
-    double **voidfractions_;
-    double **particleWeights_;
-    double **particleVolumes_;
-    double **particleV_;
-    double **cellIDs_;
+    double **positions_(NULL);
+    double **velocities_(NULL);
+    double **radii_(NULL);
+    double **voidfractions_(NULL);
+    double **particleWeights_(NULL);
+    double **particleVolumes_(NULL);
+    double **particleV_(NULL);
+    double **cellIDs_(NULL);
     
     particleCloud.dataExchangeM().allocateArray(positions_,0.,3);
     particleCloud.dataExchangeM().allocateArray(velocities_,0.,3);

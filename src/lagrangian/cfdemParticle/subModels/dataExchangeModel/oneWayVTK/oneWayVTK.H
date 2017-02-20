@@ -66,6 +66,10 @@ private:
 
     const char* charFilename_;
 
+  // private member functions
+
+    char* wordToChar(word&) const;
+
 public:
 
     //- Runtime type information
@@ -113,6 +117,11 @@ public:
         ) const;
 
         word myType() const{return typeName; };
+
+        void setCG() const { 
+            //no coarse graining data available, assume 1
+            particleCloud_.setCG(1.); 
+         };
 };
 
 
