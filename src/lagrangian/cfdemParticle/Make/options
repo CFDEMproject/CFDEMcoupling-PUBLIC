@@ -1,0 +1,36 @@
+sinclude $(GENERAL_RULES)/mplib$(WM_MPLIB)
+sinclude $(RULES)/mplib$(WM_MPLIB)
+
+$(shell if [ ! -e "$(CFDEM_LIB_DIR)" ]; then mkdir -p "$(CFDEM_LIB_DIR)"; fi)
+$(shell ln -sf $(CFDEM_LIGGGHTS_LIB_PATH)/lib$(CFDEM_LIGGGHTS_LIB_NAME).so $(CFDEM_LIB_DIR)/)
+
+GIT_VERSION := $(shell git describe --dirty --always --tags)
+PFLAGS+= -DGITVERSION=\"$(GIT_VERSION)\"
+PFLAGS+= -DDEBUGFLAG=\"$(WM_COMPILE_OPTION)\"
+PFLAGS+= -DCFDEMWMPROJECTVERSION="$(CFDEM_WM_PROJECT_VERSION)"
+
+include $(CFDEM_ADD_LIBS_DIR)/$(CFDEM_ADD_LIBS_NAME)
+
+EXE_INC = \
+     $(PFLAGS) \
+     $(PINC) \
+    -I ./cfdemParticle \
+    -I$(LIB_SRC)/finiteVolume/lnInclude \
+    -I$(LIB_SRC)/transportModels \
+    $(CFDEM_ADD_INCOMPTURBMOD_PATHS) \
+    -I$(LIB_SRC)/meshTools/lnInclude \
+    -I$(LIB_SRC)/lagrangian/basic/lnInclude \
+    -I$(LIB_SRC)/OpenFOAM/containers/HashTables/labelHashSet \
+    -I$(CFDEM_LIGGGHTS_SRC_DIR) \
+    -I$(CFDEM_SRC_DIR)/cfdTools \
+
+LIB_LIBS = \
+     $(PLIBS) \
+    -L$(CFDEM_LIB_DIR) \
+    -lfiniteVolume \
+    $(CFDEM_ADD_INCOMPTURBMOD_LIBS) \
+    -lmeshTools \
+    -llagrangian \
+    -Wl,--whole-archive -l$(CFDEM_LIGGGHTS_LIB_NAME) -Wl,--no-whole-archive \
+     $(CFDEM_ADD_LIB_PATHS) \
+     $(CFDEM_ADD_STATICLIBS) 
