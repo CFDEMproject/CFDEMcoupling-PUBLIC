@@ -19,7 +19,7 @@ model = name of the locateModel to be applied :ul
 
 locateModel engine; :pre
 
-Note: This examples list might not be complete - please look for other models (locateModel_XY) in this documentation.
+NOTE: This examples list might not be complete - please look for other models (locateModel_XY) in this documentation.
 
 [Description:]
 

@@ -36,8 +36,6 @@ locateModel engine;//engineIB;//
 
 meshMotionModel noMeshMotion;
 
-regionModel allRegion;
-
 IOModel basicIO;
 
 probeModel off;

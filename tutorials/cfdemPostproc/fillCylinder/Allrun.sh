@@ -44,9 +44,9 @@ if [ $liggghtsSim == "true" ]
     DEMrun $logpath $logfileName $casePath $headerText $solverName
 
 
-    #- generate VTK data
-    cd $casePath/DEM/post
-    python $CFDEM_LPP_DIR/lpp.py  dump.liggghts_init
+    #- generate VTK data (no longer needed as we directly write vtk)
+    #cd $casePath/DEM/post
+    #python $CFDEM_LPP_DIR/lpp.py  dump.liggghts_init
 
 fi
 

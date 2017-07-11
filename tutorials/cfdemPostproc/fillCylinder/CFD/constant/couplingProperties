@@ -36,8 +36,6 @@ locateModel standard;
 
 meshMotionModel noMeshMotion;
 
-regionModel allRegion;
-
 IOModel basicIO;
 
 probeModel off;

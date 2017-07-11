@@ -90,7 +90,7 @@ generalCorrelationParameters =  list with a predefined number of parameters (for
 {switch5} = (optional, default false) sub model switch, see "forceSubModel"_forceSubModel.html for details :l
 {scalar5} = (optional) optional, only if switch5 is true :l
 {switch6} = (optional, default false) can be used to suppress the output of the probe model :l
-{scalar7} = (optional) scaling of particle diameter :l
+{scalar7} = (optional) scaling of particle diameter: d_sim=scale*d_real. d_sim=(potentially coarse grained) particle diameter. scale=coarse graining factor. d_real= particle diameter as it is measured. :l
 {scalar7} = limit maximal turbulence :l
 :ule
 
@@ -153,7 +153,7 @@ Using the particles' temperature and/or species a scalar field
 representing "particle-fluid heatflux" and/or "particle-fluid speciesflux" is calculated. 
 
 This code is designed to realize coupled CFD-DEM simulations using LIGGGHTS
-and OpenFOAM(R). Note: this code is not part of OpenFOAM(R) (see DISCLAIMER).
+and OpenFOAM®. Note: this code is not part of OpenFOAM® (see DISCLAIMER).
 
 Two way general scalar exchange between DEM and CFD
 convective heat and species transfer model. The standard model is that of

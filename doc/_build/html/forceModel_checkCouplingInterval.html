@@ -150,10 +150,11 @@ checkCouplingIntervalProps
     velocityFieldName           word1;
     rhoP                        scalar1;
     maxCFL                      scalar2;
-    maxAccNr                    scalar3;
-    UmaxExpected                scalar4;
-    minAllowedVcellByVparcel    scalar5;
-    timeInterval                scalar6;
+    maxPCFL                     scalar3;
+    maxAccNr                    scalar4;
+    UmaxExpected                scalar5;
+    minAllowedVcellByVparcel    scalar6;
+    timeInterval                scalar7;
 };
 </pre></div>
 </div>
@@ -162,10 +163,11 @@ checkCouplingIntervalProps
 <li><em>word1</em> = (optional, default U) name of velocity field.</li>
 <li><em>scalar1</em> = particle density assumed for calculation of the particle relaxation time</li>
 <li><em>scalar2</em> = (optional, default=50) maximum allowed CFL number.</li>
-<li><em>scalar3</em> = (optional, default=0.1) maximum allowed ratio of coupling time to particle relaxation time.</li>
-<li><em>scalar4</em> = maximum expected velocity fluid velocity (e.g. due to BCs) - used for CFL estimation.</li>
-<li><em>scalar5</em> = (optional, default=3) min allowed volume ratio of cell / particle.</li>
-<li><em>scalar6</em> = (optional, default=coupling time) interval of execution.</li>
+<li><em>scalar3</em> = (optional, default=50) maximum allowed particle coupling CFL number.</li>
+<li><em>scalar4</em> = (optional, default=0.005) maximum allowed ratio of coupling time to particle relaxation time.</li>
+<li><em>scalar5</em> = maximum expected velocity fluid velocity (e.g. due to BCs) - used for CFL estimation.</li>
+<li><em>scalar6</em> = (optional, default=3) min allowed volume ratio of cell / particle.</li>
+<li><em>scalar7</em> = (optional, default=coupling time) interval of execution.</li>
 </ul>
 </div>
 <div class="section" id="examples">
@@ -185,7 +187,15 @@ checkCouplingIntervalProps
 </div>
 <div class="section" id="description">
 <h2>Description<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h2>
-<p>This &#8220;forceModel&#8221; does not influence the particles or the simulation - it is a postprocessing tool! At the first coupling step and at every time interval several criteria are checked: (i) The acceleration number is defined as the ratio of DEMtime/particleRelaxationTime, where DEMtime is DEM time step size * coupling interval. The acceleration nr should be smaller than ~0.1. (ii) The Courant Number (CFL). If the CFL number exceeds a reasonable value the quality of the result becomes bad - therefore the simulation settings should be changed. (iii) The ratio of smallest cell biggest particle volume. Typically this should be larger than 3. (iiii) The minimum and maximum Stokes Number. For the criteria (i)-(iii) the user can define its own allowed bounds and with the flag &#8220;warnOnly&#8221; the user can choose if the simulation should be stopped or if just a warning is given if a criterion is broken.</p>
+<p>This &#8220;forceModel&#8221; does not influence the particles or the simulation - it is a postprocessing tool! At the first coupling step and at every time interval several criteria are checked:</p>
+<ol class="arabic simple">
+<li>The acceleration number is defined as the ratio of DEMtime/particleRelaxationTime, where DEMtime is DEM time step size * coupling interval. The acceleration nr should be smaller than ~0.005.</li>
+<li>The Courant Number (CFL). If the CFL number exceeds a reasonable value the quality of the result becomes bad - therefore the simulation settings should be changed.</li>
+<li>The particle coupling Courant number (pCFL). Similar to the fluid CFL, the pCFL should not exceed a reasonable value. It is defined as max(vparticle)*couplingTime/min(cellLength) .</li>
+<li>The ratio of smallest cell biggest particle volume. Typically this should be larger than 3.</li>
+<li>The minimum and maximum Stokes Number. The Stokes number is a measure for in how far the particles follow the flow. It is calculated as the product of the particle relaxation time and the relative velocity between fluid and particle over the particle diameter: relaxation time * relative velocity / particle diameter. Note that the highest appearing value of scaleDrag will be used to scale the relaxation time reciprocally.</li>
+</ol>
+<p>For the criteria (1)-(4) the user can define its own allowed bounds and with the flag &#8220;warnOnly&#8221; the user can choose if the simulation should be stopped or if just a warning is given if a criterion is broken.</p>
 </div>
 <div class="section" id="restrictions">
 <h2>Restrictions<a class="headerlink" href="#restrictions" title="Permalink to this headline">¶</a></h2>

@@ -218,8 +218,11 @@ scalar Foam::dataExchangeModel::timeStepFraction() const
     //return fraction between previous coupling TS and actual TS
     //scalar DEMtime = DEMts_ * couplingInterval_;
     //scalar frac = ( ( particleCloud_.mesh().time().value()-particleCloud_.mesh().time().startTime().value() ) - (couplingStep_) * DEMtime) / DEMtime; //Chr 05.03.2013
-    scalar frac = ( particleCloud_.mesh().time().value()-particleCloud_.mesh().time().startTime().value() - couplingStep_ * couplingTime() ) / couplingTime();
-    if (frac < 1e-4) frac = 1.;
+
+    //scalar frac = ( particleCloud_.mesh().time().value()-particleCloud_.mesh().time().startTime().value() - couplingStep_ * couplingTime() ) / couplingTime();
+    //if (frac < 1e-4) frac = 1.;
+
+    scalar frac = ( particleCloud_.mesh().time().value()-particleCloud_.mesh().time().startTime().value() - (couplingStep_-1) * couplingTime() ) / couplingTime();
 
     return frac;
 }

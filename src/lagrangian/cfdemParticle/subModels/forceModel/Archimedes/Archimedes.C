@@ -93,27 +93,20 @@ Archimedes::Archimedes
     setForceSubModels(propsDict_);
 
     // define switches which can be read from dict (default = false)
-    forceSubM(0).setSwitchesList(1,true); // activate treatForceDEM switch (DEM side only treatment)
     forceSubM(0).setSwitchesList(3,true); // activate search for verbose switch
 
     //set default switches (hard-coded default = false)
-    forceSubM(0).setSwitches(1,true);  // will treat forces on DEM side only - IMPORTANT!
+    forceSubM(0).setSwitches(1,true);       // Archimedes only on DEM side (treatForceDEM=true)
+
+    // formally, according to Zhou et al. B would have treatForceDEM=false
+    // , but we do not have g-body force term in NSE --> so treatForceDEM=true always?
+    //if (modelType_=="A" || modelType_=="Bfull")
+    //    forceSubM(0).setSwitches(1,true);       // Archimedes only on DEM side (treatForceDEM=true)
+    //else if (modelType_=="B")
+    //    forceSubM(0).setSwitches(1,false);      // Archimedes on CFD and DEM side (treatForceDEM=false)
 
     for (int iFSub=0;iFSub<nrForceSubModels();iFSub++)
         forceSubM(iFSub).readSwitches();
-
-    if (modelType_=="A" || modelType_=="Bfull"){
-        if(!forceSubM(0).switches()[1]) // treatDEM != true
-        {
-            Warning << "Usually model type A and Bfull need Archimedes only on DEM side only (treatForceDEM=true)! are you sure about your settings?" << endl;
-        }
-    }
-    if (modelType_=="B"){
-        if(forceSubM(0).switches()[1]) // treatDEM = true
-        {
-            Warning << "Usually model type B needs Archimedes on CFD and DEM side (treatForceDEM=false)! are you sure about your settings?" << endl;
-        }
-    }
 
     particleCloud_.checkCG(true);
 }

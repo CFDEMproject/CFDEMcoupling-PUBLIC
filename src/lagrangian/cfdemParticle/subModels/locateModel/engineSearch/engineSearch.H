@@ -107,6 +107,12 @@ public:
                 const point& pEnd
         ) const;
 
+        label intersections
+        (
+                const point& pStart,
+                const point& pEnd
+        ) const;
+
         label findNearestCell
         (
                 const point& pStart

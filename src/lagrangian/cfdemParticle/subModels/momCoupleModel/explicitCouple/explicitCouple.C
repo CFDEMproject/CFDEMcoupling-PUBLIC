@@ -145,7 +145,12 @@ tmp<volVectorField> explicitCouple::expMomSource() const
     //This INCLUDES the source field that is set separately!
     scalar tsf = particleCloud_.dataExchangeM().timeStepFraction();
 
-    if(1-tsf < 1e-4) //tsf==1
+    // update fNext at last subTS
+    //if(1-tsf < 1e-4) //tsf==1
+
+    // update KslNext in first subTS
+    // NOTE: without following if we could update f every subTS (based on current values) and use this value
+    if(tsf < particleCloud_.mesh().time().deltaT().value()/particleCloud_.dataExchangeM().couplingTime() + 0.000001 )
     {
         // calc fNext
         forAll(fNext_,cellI)
@@ -158,11 +163,15 @@ tmp<volVectorField> explicitCouple::expMomSource() const
                 if (mag(fNext_[cellI][i]) > fLimit_[i]) fNext_[cellI][i] = fLimit_[i];
             }
         }
+    }
+
+    /*if(1-tsf < 1e-4) //tsf==1
+    {
         return tmp<volVectorField>
         (
             new volVectorField("f_explicitCouple", fPrev_)
         );
-    }else
+    }else*/
     {
         return tmp<volVectorField>
         (

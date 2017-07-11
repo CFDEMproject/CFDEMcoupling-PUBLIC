@@ -114,15 +114,17 @@ void Foam::voidFractionModel::applyDebugSettings(bool debug) const
 tmp<volScalarField> Foam::voidFractionModel::voidFractionInterp() const
 {
     scalar tsf = particleCloud_.dataExchangeM().timeStepFraction();
-    if(1-tsf < 1e-4 && particleCloud_.dataExchangeM().couplingStep() > 1) //tsf==1
+    /*if(1-tsf < 1e-4 && particleCloud_.dataExchangeM().couplingStep() > 1)   // if no subTS &&  !firstTS
     {
+        //Info << "using voidfractionPrev" << endl;
         return tmp<volScalarField>
         (
             new volScalarField("alpha_voidFractionModel", voidfractionPrev_)
         );
     }
-    else
+    else*/                                                                    // if subTS || firstTS
     {
+        //Info << "using voidfraction blend, tsf=" << tsf << endl;
         return tmp<volScalarField>
         (
             new volScalarField("alpha_voidFractionModel", (1 - tsf) * voidfractionPrev_ + tsf * voidfractionNext_)
@@ -207,25 +209,33 @@ double Foam::voidFractionModel::pointInParticle(int index, vector positionCenter
 //Function to determine minimal distance of point
 //to one of the periodic images of a particle
 double Foam::voidFractionModel::minPeriodicDistance(int index,
-                                           vector    cellCentrePosition,
-                                           vector    positionCenter,
-                                           boundBox  globalBb,
-                                           vector&   minPeriodicPos)const
+                                                    vector    cellCentrePosition,
+                                                    vector    positionCenter,
+                                                    boundBox  globalBb,
+                                                    vector&   minPeriodicPos,
+                                                    vector    dirCheckRange
+                                                   )const
 {
     double f=999e32;
     vector positionCenterPeriodic;
 
-    for(int xDir=-1; xDir<=1; xDir++)
+    for(  int xDir=-static_cast<int>(dirCheckRange[0]); 
+              xDir<=static_cast<int>(dirCheckRange[0]); 
+              xDir++)
     {
         positionCenterPeriodic[0] =  positionCenter[0]
                                   + static_cast<double>(xDir)
                                   * (globalBb.max()[0]-globalBb.min()[0]);
-        for(int yDir=-1; yDir<=1; yDir++)
+        for(int yDir=-static_cast<int>(dirCheckRange[1]);
+                yDir<=static_cast<int>(dirCheckRange[1]); 
+                yDir++)
         {
             positionCenterPeriodic[1] =  positionCenter[1]
                                       + static_cast<double>(yDir)
                                       * (globalBb.max()[1]-globalBb.min()[1]);
-            for(int zDir=-1; zDir<=1; zDir++)
+            for(int zDir=-static_cast<int>(dirCheckRange[2]); 
+                    zDir<=static_cast<int>(dirCheckRange[2]); 
+                    zDir++)
             {
                 positionCenterPeriodic[2] =  positionCenter[2]
                                           + static_cast<double>(zDir)

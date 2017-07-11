@@ -39,8 +39,8 @@ Defined in couplingProperties dictionary.
 * *type1* = (optional, default cellPoint) interpolation type for voidfraction field
 * *type2* = (optional, default cellPointFace) interpolation type for velocity field
 * *switch2* = (optional, default false) can be used to suppress the output of the probe model
-* *scalar1* = (optional) scaling of particle diameter
-* *scalar2* = (optional) scaling of drag law
+* *scalar1* = (optional) scaling of particle diameter: d_sim=scale*d_real. d_sim=(potentially coarse grained) particle diameter. scale=coarse graining factor. d_real= particle diameter as it is measured.
+* *scalar2* = (optional) scaling factor which directly scales the drag force.
 * *switch3* = sub model switch, see :doc:`forceSubModel <forceSubModel>` for details
 * *switch4* = sub model switch, see :doc:`forceSubModel <forceSubModel>` for details
 * *switch5* = sub model switch, see :doc:`forceSubModel <forceSubModel>` for details

@@ -21,7 +21,9 @@ Examples
 
    clockModel standardClock;
 
-Note: This examples list might not be complete - please look for other models (clockModel_XY) in this documentation.
+.. note::
+
+   This examples list might not be complete - please look for other models (clockModel_XY) in this documentation.
 
 Description
 """""""""""

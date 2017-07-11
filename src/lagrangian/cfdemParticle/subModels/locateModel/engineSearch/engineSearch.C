@@ -136,6 +136,15 @@ label engineSearch::intersection
     return face;
 }
 
+label engineSearch::intersections
+(
+    const point& pStart,
+    const point& pEnd
+) const
+{
+    return searchEngine_.intersection(pEnd,pStart).index();
+}
+
 label engineSearch::findNearestCell
 (
     const point& pStart

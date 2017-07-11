@@ -38,8 +38,6 @@ locateModel engineIB;//standard;//
 
 meshMotionModel noMeshMotion;
 
-regionModel allRegion;
-
 dataExchangeModel twoWayMPI;//twoWayFiles;
 
 IOModel basicIO;

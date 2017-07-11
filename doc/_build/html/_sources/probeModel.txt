@@ -17,13 +17,8 @@ Use probe model "off" to disable this feature.
 .. parsed-literal::
 
    myProbeModelProps
-
-.. parsed-literal::
-
    {
-
-.. parsed-literal::
-
+   probeModelSetting mySetting
    };
 
 Examples
@@ -31,12 +26,14 @@ Examples
 
 See :doc:`particleProbe <probeModel_particleProbe>`
 
-Note: This examples list might not be complete - please check below for the list of force models that can perform particle probing.
+.. note::
+
+   This examples list might not be complete - please check below for the list of force models that can perform particle probing.
 
 Description
 """""""""""
 
-The probeModel feature allows to implement various probing features in CFDEM. Currently, only the :doc:`particleProbe <probeModel_particleProbe>` model is implemented, that performs probing of particle forces.
+The probeModel feature allows to implement various probing features in CFDEM®. Currently, only the :doc:`particleProbe <probeModel_particleProbe>` model is implemented, that performs probing of particle forces.
 
 Restrictions
 """"""""""""

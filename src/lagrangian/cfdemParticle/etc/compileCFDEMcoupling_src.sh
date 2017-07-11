@@ -18,6 +18,9 @@ logDir="log"
 cd $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc
 mkdir -p $logDir
 
+rm $logDir/log_compile_results_src_success
+rm $logDir/log_compile_results_src_fail
+
 ##================================================================================#
 ## Must compile (but not clean) LIGGGHTS libraries, since it could have been 
 ## compiled before with the compileLIGGGHTS command
@@ -104,5 +107,13 @@ do
         # remove old log file
         rm "$logpath/$logfileName"*
         compileLib $logpath $logfileName $casePath $headerText
+
+        if [ ${PIPESTATUS[0]} -ne 0 ]; then         
+            exit 1
+        fi
+
+        collectLogCFDEMcoupling_src $logpath $logfileName $casePath
+        
+
 done
 

@@ -1,0 +1,183 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  1.4                                   |
+|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+
+
+FoamFile
+{
+    version         2.0;
+    format          ascii;
+
+    root            "";
+    case            "";
+    instance        "";
+    local           "";
+
+    class           dictionary;
+    object          couplingProperties;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+//===========================================================================//
+// sub-models & settings
+solveFlow   true;
+
+modelType B; // A or B
+
+couplingInterval 500;
+
+voidFractionModel divided;
+
+locateModel engine;
+
+meshMotionModel noMeshMotion;
+
+IOModel basicIO;
+
+probeModel off;//particleProbe;
+
+dataExchangeModel twoWayMPI;
+
+averagingModel dense;//dilute;//
+
+clockModel off;//standardClock;//
+
+smoothingModel off;
+
+forceModels
+(
+    KochHillDrag
+    scalarGeneralExchange
+    Archimedes
+);
+
+momCoupleModels
+(
+    implicitCouple
+);
+
+//turbulenceModelType RASProperties;//LESProperties;//OFversion24x
+turbulenceModelType turbulenceProperties;//OFversion30x
+
+//===========================================================================//
+// sub-model properties
+particleProbeProps
+{
+    particleIDsToSample (0 0);
+    verboseToFile;      //main switch
+    printEvery 20;      //print every this many CFD time steps
+    sampleAll;          //Activate sampling for all particles
+    probeDebug;         //probes additional fields
+    includePosition;    //will include particle position in the output file
+    writePrecision 4;   //number of significant digits to print
+}
+
+scalarGeneralExchangeProps
+{
+/*    verbose                 true;*/
+    velFieldName            "U";
+    voidfractionFieldName   "voidfraction";
+    tempFieldName           "T";
+    partTempName            "Temp";
+    //Option 1: cool with implicit coupling
+/*    partHeatTransCoeffName  "heatTransCoeff"; //switch off for explicit coupling, e.g., to ParScale    */
+/*    partHeatFluidName       "heatFluid"; //switch off for explicit coupling, e.g., to ParScale    */
+
+    //Option 2: cool with explicit setting of flux
+    partHeatFluxName        "convectiveHeatFlux"; //switch off for implicit coupling, e.g., to ParScale  
+
+    lambda                  0.0256;
+    //Cp                      1007;
+    Prandtl                 70.097; //WARNING: this is not a typical gas - just for testing purposes!
+    useLiMason              true; 
+    
+    //Lists with information for each species FOR THE PARTICLES
+    //MUST be in the same order as eulerian species in 'scalarTransportProperties'
+    //MUST correspond to property/atom in liggghts (use 'couple/cfd/speciesConvection' to auto-generate individual fields)
+    partSpeciesNames
+    (
+    );
+    partSpeciesFluxNames
+    (
+    );
+    partSpeciesTransCoeffNames
+    (
+    );
+    partSpeciesFluidNames
+    (
+    );
+    DMolecular
+    (
+    );
+    //parameters for the vapor pressure model
+    parameterVap
+    (
+        0
+    );
+}
+
+implicitCoupleProps
+{
+    velFieldName "U";
+    granVelFieldName "Us";
+    voidfractionFieldName "voidfraction";
+    //KslLimit 0;  // source switched off!!!
+}
+
+explicitCoupleProps
+{
+    //fLimit (0 0 0);
+}
+
+KochHillDragProps
+{
+    velFieldName "U";
+    voidfractionFieldName "voidfraction";
+}
+
+ArchimedesProps
+{
+    gravityFieldName "g";
+}
+gradPForceProps
+{
+    pFieldName "p";
+    voidfractionFieldName "voidfraction";
+    velocityFieldName "U";
+    //interpolation true;
+}
+
+viscForceProps
+{
+    velocityFieldName "U";
+    interpolation true;
+}
+
+twoWayMPIProps
+{
+    maxNumberOfParticles 10000;
+    liggghtsPath "../DEM/in.liggghts_run";
+}
+
+centreProps
+{
+    alphaMin 0.1;
+}
+
+dividedProps
+{
+    alphaMin 0.4;
+    scaleUpVol 1.0;
+}
+
+engineProps
+{
+    treeSearch true;
+}
+
+// ************************************************************************* //

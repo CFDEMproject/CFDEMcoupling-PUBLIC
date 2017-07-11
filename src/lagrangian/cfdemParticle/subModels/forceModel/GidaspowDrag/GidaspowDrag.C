@@ -67,7 +67,7 @@ GidaspowDrag::GidaspowDrag
     U_(sm.mesh().lookupObject<volVectorField> (velFieldName_)),
     voidfractionFieldName_(propsDict_.lookup("voidfractionFieldName")),
     voidfraction_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),
-    phi_(readScalar(propsDict_.lookup("phi"))),
+    phi_(propsDict_.lookupOrDefault<scalar>("phi",1.)),
     UsFieldName_(propsDict_.lookup("granVelFieldName")),
     UsField_(sm.mesh().lookupObject<volVectorField> (UsFieldName_)),
     switchingVoidfraction_(0.8)

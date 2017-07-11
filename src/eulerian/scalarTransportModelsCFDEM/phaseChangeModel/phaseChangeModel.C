@@ -126,6 +126,7 @@ void phaseChangeModel::update(const volScalarField&      voidfraction,   //this 
         mSaturation_[iter] = pVapor( temp[iter] )  / temp[iter] / Rvap_; 
 
     //update the reference quantities
+
     volScalarField tempF =      voidfraction 
 	                              / ( 
                                               fromField.m()
@@ -136,7 +137,11 @@ void phaseChangeModel::update(const volScalarField&      voidfraction,   //this 
 
 
     //leaving mass rate - implicit/explicit term (divided by fromFiel.m())
+#if defined(version40) || defined(versionv1612plus)
     fromField.mSource()    -= (1-alphaImExSplit_) * tempF * fromField.m()
+#else
+    fromField.mSource().internalField()     -= (1-alphaImExSplit_) * tempF.internalField()  * fromField.m()
+#endif
                                               / tEvap_.value()  //characteristic evaporation time
                                             * (   
                                                  mSaturation_ 
@@ -144,7 +149,11 @@ void phaseChangeModel::update(const volScalarField&      voidfraction,   //this 
                                                 *fromField.rhoCarrier()
                                               );
 
+#if defined(version40) || defined(versionv1612plus)
     fromField.mSourceKImpl() -= alphaImExSplit_ * tempF
+#else
+    fromField.mSourceKImpl().internalField()  -= alphaImExSplit_ * tempF.internalField() 
+#endif
                                               / tEvap_.value()  //characteristic evaporation time
                                             * (   
                                                  mSaturation_ 
@@ -157,16 +166,28 @@ void phaseChangeModel::update(const volScalarField&      voidfraction,   //this 
 
 
     //entering mass rate - explicit & implicit term
-    toField.mSource()     += tempF * mSaturation_;
-    toField.mSourceKImpl()-= tempF * toField.rhoCarrier();
+
+#if defined(version40) || defined(versionv1612plus)
+        toField.mSource()     += tempF * mSaturation_;
+        toField.mSourceKImpl()-= tempF * toField.rhoCarrier();
+#else
+        toField.mSource().internalField()       += tempF.internalField()   * mSaturation_;
+        toField.mSourceKImpl().internalField()  -= tempF.internalField()   * toField.rhoCarrier();
+#endif
+
 
     //set the rate
+#if defined(version40) || defined(versionv1612plus)
     mSource_  = tempF 
+#else
+    mSource_.internalField()  = tempF   .internalField()
+#endif
                               * (   
                                     mSaturation_
                                   - toField.m()
                                   * toField.rhoCarrier() 
                                 );
+
     if(verboseToDisk())
         computeIntegral(mSource_);
 }
@@ -174,11 +195,21 @@ void phaseChangeModel::update(const volScalarField&      voidfraction,   //this 
 //************************************************
 void phaseChangeModel::setEnthalpySource(const eulerianScalarField& Temperature) const
 {
+
     //update the heat source
-    Temperature.mSource() -= mSource_
+#if defined(version40) || defined(versionv1612plus)
+       Temperature.mSource() -= mSource_
                                            * (   deltaHEvap_.value() 
                                                - Temperature.m() * (cpFromField_ - cpToField_)
                                              );
+#else
+       Temperature.mSource().internalField() -= mSource_.internalField()
+                                           * (   deltaHEvap_.value() 
+                                               - Temperature.m().internalField() * (cpFromField_ - cpToField_)
+                                             );
+#endif
+
+
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

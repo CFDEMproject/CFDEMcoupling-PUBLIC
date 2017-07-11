@@ -151,10 +151,15 @@
 <h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
 <p>fix     cfd  all couple/cfd couple_every 100 mpi
 fix cfd2 all couple/cfd/force</p>
+<p>fix cfd  all couple/cfd couple_every 100 mpi
+fix cfd2 all couple/cfd/force/implicit transfer_type yes</p>
+<p>fix cfd  all couple/cfd couple_every 100 mpi
+fix cfd2 all couple/cfd/force/implicit transfer_property name color type scalar-atom</p>
 </div>
 <div class="section" id="description">
 <h2>Description<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h2>
-<p>The command couple/cfd/force can only be used in combination with <a class="reference internal" href="fix_couple_cfd.html"><em>fix_couple_cfd</em></a>. This model transfers the force that the fluid exceeds on each particle to the DEM calculation. At every coupling time step the force term, which contains contributions from all force models active in the CFD calculation, is passed on to LIGGGHTS(R). This (constant) term is then used in the particle calculations at every DEM time step until the next coupling takes place.</p>
+<p>The command couple/cfd/force can only be used in combination with <a class="reference internal" href="fix_couple_cfd.html"><em>fix_couple_cfd</em></a>. This model transfers the force that the fluid exceeds on each particle to the DEM calculation. At every coupling time step the force term, which contains contributions from all force models active in the CFD calculation, is passed on to LIGGGHTS®. This (constant) term is then used in the particle calculations at every DEM time step until the next coupling takes place.</p>
+<p>Additional information, as the LIGGGHTS® atom_type can be transferred to the CFDEMcoupling environment with the keywork transfer_type yes. Similar keywords are transfer_density, transfer_torque and the more general transfer_property. The syntax is transfer_property name &#8220;name&#8221; type &#8220;data-type&#8221;. The data-type can be scalar-atom or vector-atom and this needs to be a per atom property previously defined.</p>
 </div>
 <div class="section" id="restrictions">
 <h2>Restrictions<a class="headerlink" href="#restrictions" title="Permalink to this headline">¶</a></h2>

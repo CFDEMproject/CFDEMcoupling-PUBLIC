@@ -241,7 +241,6 @@ void forceModel::setForceSubModels(dictionary& dict)
 
     delete[] forceSubModel_;
     forceSubModel_ = new autoPtr<forceSubModel>[nrForceSubModels()];
-    Info << "nrForceSubModels()=" << nrForceSubModels() << endl;
     for (int i=0;i<nrForceSubModels();i++)
     {
         forceSubModel_[i] = forceSubModel::New

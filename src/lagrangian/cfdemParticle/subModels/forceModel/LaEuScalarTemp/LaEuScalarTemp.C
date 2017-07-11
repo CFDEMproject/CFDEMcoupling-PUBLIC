@@ -85,6 +85,12 @@ LaEuScalarTemp::LaEuScalarTemp
     lambda_(readScalar(propsDict_.lookup("lambda"))),
     Cp_(readScalar(propsDict_.lookup("Cp")))
 {
+    if (lambda_<SMALL)
+    {
+        Warning << "you tried using an invalid value for lambda - using SMALL instead!" << endl;
+        lambda_=SMALL;
+    }
+
     allocateMyArrays();
 
     if (propsDict_.found("maxSource"))
@@ -273,7 +279,6 @@ void LaEuScalarTemp::manipulateScalarField(volScalarField& EuField) const
 
                 if(forceSubM(0).verbose() && index >=0 && index <2)
                 {
-                    Pout << "partHeatFlux = " << partHeatFlux << endl;
                     Pout << "magUr = " << magUr << endl;
                     Pout << "As = " << As << endl;
                     Pout << "r = " << particleCloud_.radius(index) << endl;
@@ -283,7 +288,8 @@ void LaEuScalarTemp::manipulateScalarField(volScalarField& EuField) const
                     Pout << "Pr = " << Pr << endl;
                     Pout << "Nup = " << Nup << endl;
                     Pout << "voidfraction = " << voidfraction << endl;
-                    Pout << "partTemp_[index][0] = " << partTemp_[index][0] << endl  ;
+                    Pout << "partTemp_[index][0] = " << partTemp_[index][0] << endl;
+                    Pout << "partHeatFlux_[index][0] = " << partHeatFlux_[index][0] << endl;
                     Pout << "Tfluid = " << Tfluid << endl  ;
                 }
             }

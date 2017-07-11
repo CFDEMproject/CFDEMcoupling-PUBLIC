@@ -15,8 +15,8 @@ cd $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc
 mkdir -p $logDir
 
 #- remove old success/fail logs
-rm $logDir/log_compile_results_success
-rm $logDir/log_compile_results_fail
+rm $logDir/log_compile_results_sol_success
+rm $logDir/log_compile_results_sol_fail
 
 CWD="$(dirname "$(readlink -f ${BASH_SOURCE[0]})")"
 NOW="$(date +"%Y-%m-%d-%H:%M")"

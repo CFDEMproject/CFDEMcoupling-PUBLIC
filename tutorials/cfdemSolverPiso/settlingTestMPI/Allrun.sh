@@ -20,6 +20,7 @@ fi
 
 # keep old couplingProperties
 cp $casePath/CFD/constant/couplingProperties $casePath/CFD/constant/couplingProperties_backup
+cp $casePath/CFD/system/controlDict $casePath/CFD/system/controlDict_backup
 
 # change to M2M
 #changeDictionary -constant -dict changeDicts/changeDictionaryDict_1 -case $casePath/CFD
@@ -27,9 +28,13 @@ cp $casePath/CFD/constant/couplingProperties $casePath/CFD/constant/couplingProp
 # change to MPI
 #changeDictionary -constant -dict changeDicts/changeDictionaryDict_2 -case $casePath/CFD
 
+# change to subTS
+#changeDictionary -constant -dict changeDicts/changeDictionaryDict_3 -case $casePath/CFD
+
 #- run parallel CFD-DEM in new terminal
 #gnome-terminal --title='cfdemSolverPiso settlingTest CFD'  -e "bash $casePath/parCFDDEMrun.sh"
 . $casePath/parCFDDEMrun.sh
 
 # restore old couplingProperties
-mv $casePath/CFD/constant/couplingProperties_backup $casePath/CFD/constant/couplingProperties 
+mv $casePath/CFD/constant/couplingProperties_backup $casePath/CFD/constant/couplingProperties
+mv $casePath/CFD/system/controlDict_backup $casePath/CFD/system/controlDict

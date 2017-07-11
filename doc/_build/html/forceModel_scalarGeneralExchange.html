@@ -220,7 +220,7 @@ scalarGeneralExchangeProps
 <li><em>switch5</em> = (optional, default false) sub model switch, see <a class="reference internal" href="forceSubModel.html"><em>forceSubModel</em></a> for details</li>
 <li><em>scalar5</em> = (optional) optional, only if switch5 is true</li>
 <li><em>switch6</em> = (optional, default false) can be used to suppress the output of the probe model</li>
-<li><em>scalar7</em> = (optional) scaling of particle diameter</li>
+<li><em>scalar7</em> = (optional) scaling of particle diameter: d_sim=scale*d_real. d_sim=(potentially coarse grained) particle diameter. scale=coarse graining factor. d_real= particle diameter as it is measured.</li>
 <li><em>scalar7</em> = limit maximal turbulence</li>
 </ul>
 </div>
@@ -283,7 +283,7 @@ scalarGeneralExchangeProps
 Using the particles&#8217; temperature and/or species a scalar field
 representing &#8220;particle-fluid heatflux&#8221; and/or &#8220;particle-fluid speciesflux&#8221; is calculated.</p>
 <p>This code is designed to realize coupled CFD-DEM simulations using LIGGGHTS
-and OpenFOAM(R). Note: this code is not part of OpenFOAM(R) (see DISCLAIMER).</p>
+and OpenFOAM®. Note: this code is not part of OpenFOAM® (see DISCLAIMER).</p>
 <p>Two way general scalar exchange between DEM and CFD
 convective heat and species transfer model. The standard model is that of
 Deen, N.G. et al., Review of direct numerical simulation of

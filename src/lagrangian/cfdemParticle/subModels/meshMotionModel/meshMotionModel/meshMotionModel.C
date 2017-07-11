@@ -56,7 +56,8 @@ meshMotionModel::meshMotionModel
 )
 :
     dict_(dict),
-    particleCloud_(sm)
+    particleCloud_(sm),
+    moveZoneName_("")
 {}
 
 

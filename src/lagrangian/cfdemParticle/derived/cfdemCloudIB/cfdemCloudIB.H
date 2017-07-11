@@ -62,6 +62,8 @@ protected:
     label pRefCell_;
     scalar pRefValue_;
     
+    mutable double **DEMTorques_;
+
     mutable bool haveEvolvedOnce_;
     mutable bool skipLagrangeToEulerMapping_;
     mutable bool skipAfter_;
@@ -69,6 +71,10 @@ protected:
     mutable bool calculateTortuosity_;
 
     vector flowDir_;
+
+    //for refinement - needed to ensure correct probing around the interface
+    volScalarField*     frontMeshRefineField_;
+    bool                frontMeshRefine_;
 
 public:
 
@@ -86,9 +92,13 @@ public:
 
 
     // Member Functions
+        void giveDEMdata();
+
         void getDEMdata();
 
         bool reAllocArrays() const;
+
+        inline double ** DEMTorques() const;
     
         bool evolve(volScalarField&,volScalarField&);
 
@@ -103,9 +113,11 @@ public:
         {
             return angularVelocities_;
         };
-        void setInterFace(volScalarField& interFace);
+        void setInterFace(volScalarField& interFace);   //this field can be used for refinement outside of the cloud
 
         double getTortuosity(vector dir);
+
+       void setRefinementField(volScalarField* refine_); //this pointer is meant for a field that is used refinement outside of the cloud. can point to the same field as interFace
 
 };
 

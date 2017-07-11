@@ -19,7 +19,7 @@ model = name of the voidfractionModel to be applied :ul
 
 voidfractionModel centre; :pre
 
-Note: This examples list might not be complete - please look for other models (voidfractionModel_XY) in this documentation.
+NOTE: This examples list might not be complete - please look for other models (voidfractionModel_XY) in this documentation.
 
 [Description:]
 

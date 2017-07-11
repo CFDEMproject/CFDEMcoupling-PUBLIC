@@ -67,7 +67,8 @@ checkCouplingInterval::checkCouplingInterval
     U_(sm.mesh().lookupObject<volVectorField> (velocityFieldName_)),
     rhoP_(readScalar(propsDict_.lookup("rhoP"))),
     maxCFL_(propsDict_.lookupOrDefault<scalar>("maxCFL", 50.)),
-    maxAccNr_(propsDict_.lookupOrDefault<scalar>("maxAccNr", 0.1)),
+    maxPCFL_(propsDict_.lookupOrDefault<scalar>("maxPCFL", 50.)),
+    maxAccNr_(propsDict_.lookupOrDefault<scalar>("maxAccNr", 0.005)),
     UmaxExpected_(readScalar(propsDict_.lookup("UmaxExpected"))),
     minAllowedVcellByVparcel_(propsDict_.lookupOrDefault<scalar>("minAllowedVcellByVparcel", 3.)),
     nextRun_(0),
@@ -195,6 +196,10 @@ void checkCouplingInterval::setForce() const
         scalar maxSt = -1;
         scalar maxStAll = -1;
 
+        // max particle CFL Nr
+        scalar maxVel = -1;
+        scalar maxVelAll = -1;
+
         // find max parcel diameter
         scalar maxDparcel = -1;
         scalar maxDparcelAll = -1;
@@ -202,6 +207,11 @@ void checkCouplingInterval::setForce() const
         // find min cell vol
         scalar minVcell = 1e10;
         scalar minVcellAll = 1e10;
+
+        // get info on scaleDrag being used.
+        // we do not call getProperty in constructor to be independent of order of forceModels
+        scalar scaleDrag=particleCloud_.registryM().getProperty("scaleDrag");
+        Info << "checkCouplingInterval considers scaleDrag = "<< scaleDrag << endl;
 
         for(int index = 0;index <  particleCloud_.numberOfParticles(); index++)
         {
@@ -212,7 +222,7 @@ void checkCouplingInterval::setForce() const
                 rad = particleCloud_.radius(index);
                 scaledRad = rad/particleCloud_.cg();
                 tauP = rhoP_*4*scaledRad*scaledRad/
-                        (18 * nufField[cellI] * rhoField[cellI]);
+                        (18 * nufField[cellI] * rhoField[cellI])/scaleDrag;
                 minTauP = min(minTauP,tauP);
 
                 maxDparcel = max(maxDparcel,2*particleCloud_.radius(index));
@@ -223,6 +233,8 @@ void checkCouplingInterval::setForce() const
                 St = tauP*mag(U_[cellI]-particleCloud_.velocity(index))/(2*rad);
                 minSt = min(minSt,St);
                 maxSt = max(maxSt,St);
+
+                maxVel = max(maxVel,mag(particleCloud_.velocity(index)));
             }
         }
 
@@ -232,6 +244,7 @@ void checkCouplingInterval::setForce() const
         MPI_Allreduce(&maxSt, &maxStAll, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
         MPI_Allreduce(&maxDparcel, &maxDparcelAll, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
         MPI_Allreduce(&minVcell, &minVcellAll, 1, MPI_DOUBLE, MPI_MIN, MPI_COMM_WORLD);
+        MPI_Allreduce(&maxVel, &maxVelAll, 1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD);
 
         // calc based on reduced results
 
@@ -243,6 +256,9 @@ void checkCouplingInterval::setForce() const
         // calc min cell/parcel volume ratio
         scalar maxVparcelAll = maxDparcelAll*maxDparcelAll*maxDparcelAll*3.1416/6.0;
         scalar minVcellByVparcel = minVcellAll/maxVparcelAll;
+
+        //particle CFL number
+        scalar pCFL = maxVelAll*particleCloud_.dataExchangeM().couplingTime()/pow(minVcell,1./3.);
 
         if(accNr > maxAccNr_)
         {
@@ -259,7 +275,7 @@ void checkCouplingInterval::setForce() const
         {
             Info << "min. occurring particle relaxation time [s]: " << minTauPAll << endl;
             Info << "coupling interval [s]: " << DEMtime << endl;
-            Info << "max. occurring acceleration nr: " << accNr << endl;
+            Info << "max. occurring acceleration nr (coupling time [s] / min. particle relaxation time [s]): " << accNr << endl;
         }
 
         if(minVcellByVparcel < minAllowedVcellByVparcel_)
@@ -277,6 +293,20 @@ void checkCouplingInterval::setForce() const
             Info << "min. ratio of Vcell / Vparcel is " << minVcellByVparcel << endl;
 
         Info << "min./max. Stokes Nr: " << minStAll << " / " << maxStAll << endl;
+
+        if(pCFL > maxPCFL_)
+        {
+            if(warnOnly_)
+                Warning << "The max. particle coupling CFL number is aboce the maximum allowed value " << maxPCFL_
+                           << ", and reached the value:" << pCFL
+                           << "\ncheck your settings." << endl;
+            else
+                FatalError << "The max. particle coupling CFL number is aboce the maximum allowed value " << maxPCFL_
+                           << ", and reached the value:" << pCFL
+                           << "\ncheck your settings." << abort(FatalError);
+        }
+        else
+        Info << "max. particle coupling CFL Nr: " << pCFL << endl;
 
         Info << "========================================================================" << endl;
 

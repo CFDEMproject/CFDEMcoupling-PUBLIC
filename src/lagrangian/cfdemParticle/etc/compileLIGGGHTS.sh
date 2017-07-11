@@ -32,10 +32,16 @@ headerText="$logfileName""-$NOW"
 #================================================================================#
 bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/compileLIGGGHTS_lib.sh 
 
+if [ ${PIPESTATUS[0]} -ne 0 ]; then
+    exit 1
+fi
+
 #================================================================================#
 # compile LIGGGHTS src
 #================================================================================#
 
 compileLIGGGHTS $logpath $logfileName $headerText
 
-
+if [ ${PIPESTATUS[0]} -ne 0 ]; then         
+    exit 1
+fi

@@ -37,6 +37,12 @@ cp $casePath/CFD/constant/couplingProperties $casePath/CFD/constant/couplingProp
 # change to MPI + engineIB
 #changeDictionary -constant -dict changeDicts/changeDictionaryDict_3 -case $casePath/CFD
 
+# change to MPI + subTS (bigger coupling interval)
+#changeDictionary -constant -dict changeDicts/changeDictionaryDict_4 -case $casePath/CFD
+
+# change to MPI + type Bfull
+#changeDictionary -constant -dict changeDicts/changeDictionaryDict_5 -case $casePath/CFD
+
 #- run parallel CFD-DEM in new terminal
 #gnome-terminal --title='cfdemSolverPiso ErgunTestMPI CFD'  -e "bash $casePath/parCFDDEMrun.sh" 
 . $casePath/parCFDDEMrun.sh

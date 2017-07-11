@@ -38,6 +38,7 @@ Description
 #include "IOModel.H"
 #include "mpi.h"
 #include "IOmanip.H"
+#include "OFversion.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -56,13 +57,15 @@ cfdemCloudIB::cfdemCloudIB
 :
     cfdemCloud(mesh),
     angularVelocities_(NULL),
+    DEMTorques_(NULL),
     pRefCell_(readLabel(mesh.solutionDict().subDict("PISO").lookup("pRefCell"))),
     pRefValue_(readScalar(mesh.solutionDict().subDict("PISO").lookup("pRefValue"))),
     haveEvolvedOnce_(false),
     skipLagrangeToEulerMapping_(false),
     skipAfter_(false),
     timeStepsToSkip_(0),
-    calculateTortuosity_(false)
+    calculateTortuosity_(false),
+    frontMeshRefine_(false)
 {
     if(this->couplingProperties().found("skipLagrangeToEulerMapping"))
     {
@@ -85,6 +88,22 @@ cfdemCloudIB::cfdemCloudIB
         flowDir_ = flowDir_ / mag(flowDir_);
         Info << "Will calculate tortuosity in the mean flow direction ("<<flowDir_[0]<<" "<<flowDir_[1]<<" "<<flowDir_[2]<<")"<< endl;
     }
+
+     //Must check for walls in case of checkPeriodicCells
+     //periodic check will mirror particles and probing points to ensure proper behavior near processor bounds
+     if(checkPeriodicCells_)
+     {
+        //Enforce reading of the blocking for periodic checks
+        if(readBool(this->couplingProperties().subDict("wall_blockPeriodicityCheck").lookup("x")))
+            wall_periodicityCheckRange_[0] = 0;
+        if(readBool(this->couplingProperties().subDict("wall_blockPeriodicityCheck").lookup("y")))
+            wall_periodicityCheckRange_[1] = 0;
+        if(readBool(this->couplingProperties().subDict("wall_blockPeriodicityCheck").lookup("z")))
+            wall_periodicityCheckRange_[2] = 0;
+
+        if(this->couplingProperties().found("wall_periodicityCheckTolerance"))
+            wall_periodicityCheckTolerance_ = readScalar (this->couplingProperties().lookup("wall_periodicityCheckTolerance"));
+     }
 }
 
 
@@ -94,6 +113,7 @@ cfdemCloudIB::~cfdemCloudIB()
 {
     dataExchangeM().destroy(angularVelocities_,3);
     dataExchangeM().destroy(dragPrev_,3);
+    dataExchangeM().destroy(DEMTorques_,3);
 }
 
 
@@ -102,6 +122,7 @@ void Foam::cfdemCloudIB::getDEMdata()
 {
     cfdemCloud::getDEMdata();
     dataExchangeM().getData("omega","vector-atom",angularVelocities_);
+    dataExchangeM().getData("torque","vector-atom",DEMTorques_);
 }
 
 bool Foam::cfdemCloudIB::reAllocArrays() const
@@ -111,10 +132,24 @@ bool Foam::cfdemCloudIB::reAllocArrays() const
         Info <<"Foam::cfdemCloudIB::reAllocArrays()"<<endl;
         dataExchangeM().allocateArray(angularVelocities_,0,3);
         dataExchangeM().allocateArray(dragPrev_,0,3);
+        dataExchangeM().allocateArray(DEMTorques_,0,3);
         return true;
     }
     return false;
 }
+
+void Foam::cfdemCloudIB::giveDEMdata()
+{
+
+    cfdemCloud::giveDEMdata();
+    dataExchangeM().giveData("hdtorque","vector-atom", DEMTorques_);
+}
+
+inline double ** Foam::cfdemCloudIB::DEMTorques() const
+{
+    return DEMTorques_;
+}
+
 
 bool Foam::cfdemCloudIB::evolve
 (
@@ -155,9 +190,9 @@ bool Foam::cfdemCloudIB::evolve
             voidFractionM().setvoidFraction(NULL,voidfractions_,particleWeights_,particleVolumes_,particleV_);
             if(verbose_) Info << "setvoidFraction done." << endl;
 
-            Info <<"SetInterFace"<<endl;
+            if(verbose_) Info <<"setInterFace"<<endl;
             setInterFace(interFace);
-            Info <<"SetInterFace done"<<endl;
+            if(verbose_) Info <<"setInterFace done"<<endl;
         }
 
         // update voidFractionField
@@ -199,6 +234,8 @@ bool Foam::cfdemCloudIB::evolve
     return doCouple;
 }
 
+//defines the mesh refinement zone around a particle
+//twice the particle size in each direction
 void Foam::cfdemCloudIB::setInterFace
 (
     volScalarField& interFace
@@ -219,13 +256,14 @@ void Foam::cfdemCloudIB::setInterFace
                 // In this case, the particle center has to be mirrored in order to correctly
                 // evaluate the interpolation points.
                 vector minPeriodicParticlePos=ParPos;
-                voidFractionM().minPeriodicDistance(par,posC, ParPos, globalBb, minPeriodicParticlePos);
+                voidFractionM().minPeriodicDistance(par,posC, ParPos, globalBb, 
+                                                    minPeriodicParticlePos);
                 ParPos = minPeriodicParticlePos;
             }
-            double aaa2 = voidFractionM().pointInParticle(par, ParPos, posC, skin);
-            if(aaa2 <= 0.0)
+            double value = voidFractionM().pointInParticle(par, ParPos, posC, skin);
+            if(value <= 0.0)
             {
-                interFace[cellI] = aaa2 + 1.0;
+                interFace[cellI] = value + 1.0;
             }
         }
     }
@@ -277,8 +315,8 @@ void Foam::cfdemCloudIB::setParticleVelocity
     vector rVec(0,0,0);
     vector velRot(0,0,0);
     vector angVel(0,0,0);
-
-    for(int index=0; index< numberOfParticles(); index++)
+    
+    for(int index=0; index < numberOfParticles(); index++)
     {
         for(int subCell=0;subCell<cellsPerParticle()[index][0];subCell++)
         {
@@ -331,6 +369,15 @@ double Foam::cfdemCloudIB::getTortuosity(vector dir)
     reduce(ux, sumOp<scalar>());
     double tortuosity = ux == 0.0 ? 1.0 : umag / ux;
     return tortuosity;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+void cfdemCloudIB::setRefinementField(volScalarField* refine_)
+{
+ //Function to allow for setting and activating special refinement operations
+ frontMeshRefineField_ = refine_;
+ frontMeshRefine_ = true;
+
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

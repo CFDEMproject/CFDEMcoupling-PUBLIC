@@ -48,7 +48,7 @@ LaEuScalarTempProps
 {type1} = (optional, default cellPoint) interpolation type for T field :l
 {switch2} = (optional, default false) sub model switch, see "forceSubModel"_forceSubModel.html for details :l
 {scalar3} = (optional) limit maximal turbulence :l
-{scalar4} = scaling of particle diameter :l
+{scalar4} = scaling of particle diameter: d_sim=scale*d_real. d_sim=(potentially coarse grained) particle diameter. scale=coarse graining factor. d_real= particle diameter as it is measured. :l
 {switch3} = (optional, default false) sub model switch, see "forceSubModel"_forceSubModel.html for details :l
 {scalar5} = optional, only if switch3 is true :l
 :ule

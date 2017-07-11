@@ -92,7 +92,7 @@
 //========================
 // scalar field modelling
 //========================
-    Info<< "\nCreating dummy density field rho = 1\n" << endl;
+    Info<< "\nCreating T field\n" << endl;
     volScalarField T
     (
         IOobject
@@ -134,10 +134,26 @@
         )
     );
 
-    dimensionedScalar DT
+    // kinematic turbulent thermal thermal conductivity m2/s
+    Info<< "Reading field alphat\n" << endl;
+    volScalarField alphat
     (
-        transportProperties.lookup("DT")
+        IOobject
+        (
+            "alphat",
+            runTime.timeName(),
+            mesh,
+            IOobject::MUST_READ,
+            IOobject::AUTO_WRITE
+        ),
+        mesh
     );
+
+    // Laminar Prandtl number
+    dimensionedScalar Pr("Pr", dimless, transportProperties);
+
+    // Turbulent Prandtl number
+    dimensionedScalar Prt("Prt", dimless, transportProperties);
 
 //========================
 

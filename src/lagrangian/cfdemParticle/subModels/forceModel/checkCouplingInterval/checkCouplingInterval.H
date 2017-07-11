@@ -72,6 +72,8 @@ private:
 
     scalar maxCFL_;
 
+    scalar maxPCFL_;
+
     scalar maxAccNr_;
 
     scalar UmaxExpected_;

@@ -54,7 +54,6 @@ Contributions
 #include "implicitCouple.H"
 
 #include "averagingModel.H"
-#include "regionModel.H"
 #include "voidFractionModel.H"
 
 #include "dynamicFvMesh.H"

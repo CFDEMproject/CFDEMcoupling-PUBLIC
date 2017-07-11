@@ -28,15 +28,13 @@ FoamFile
 
 modelType "A"; // A or B
 
-couplingInterval 100;
+couplingInterval 50;
 
 voidFractionModel divided;//centre;//
 
 locateModel engine;//engineIB;//
 
 meshMotionModel noMeshMotion;
-
-regionModel allRegion;
 
 IOModel basicIO;
 

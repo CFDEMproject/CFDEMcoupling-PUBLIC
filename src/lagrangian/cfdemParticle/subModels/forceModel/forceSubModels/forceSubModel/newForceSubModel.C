@@ -48,7 +48,7 @@ autoPtr<forceSubModel> forceSubModel::New
     word forceType
 )
 {
-    Info<< "Selecting forceSubModel "
+    Info<< " Selecting forceSubModel "
          << forceType << endl;
 
     dictionaryConstructorTable::iterator cstrIter =

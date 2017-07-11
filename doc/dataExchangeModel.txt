@@ -20,11 +20,13 @@ model = name of data exchange model to be applied :ul
 dataExchangeModel twoWayFiles;
 dataExchangeModel twoWayMPI; :pre
 
-Note: This examples list might not be complete - please look for other models (dataExchangeModel_XY) in this documentation.
+NOTE: This examples list might not be complete - please look for other models (dataExchangeModel_XY) in this documentation.
 
 [Description:]
 
-The data exchange model performs the data exchange between the DEM code and the CFD code.
+The data exchange model performs the data exchange between LIGGGHTS® and the cfdemCloud within CFDEM®coupling toolbox. The exchanged data at least consits of positions, radii, velocities and forces.
+
+The twoWayMPI model is considered as the standard model, whereas the file-exchange is much slower and its purpose is debugging.
 
 [Restrictions:]
 

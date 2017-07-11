@@ -34,9 +34,13 @@ checkDirComment "$CFDEM_SRC_DIR" '$CFDEM_SRC_DIR' "yes"
 checkDirComment "$CFDEM_SOLVER_DIR" '$CFDEM_SOLVER_DIR' "yes"
 checkDirComment "$CFDEM_TUT_DIR" '$CFDEM_TUT_DIR' "yes"
 checkDirComment "$CFDEM_LIGGGHTS_SRC_DIR" '$CFDEM_LIGGGHTS_SRC_DIR' "yes"
+checkDirComment "$CFDEM_LIGGGHTS_LIB_PATH" '$CFDEM_LIGGGHTS_LIB_PATH' "yes"
 checkDirComment "$CFDEM_LPP_DIR" '$CFDEM_LPP_DIR' "yes"
 checkDirComment "$CFDEM_ADD_LIBS_DIR" '$CFDEM_ADD_LIBS_DIR' "yes"
-checkDirComment "$CFDEM_PIZZA_DIR" '$CFDEM_PIZZA_DIR' "no"
+checkDirComment "$CFDEM_LIB_DIR" '$CFDEM_LIB_DIR' "yes"
+checkDirComment "$CFDEM_APP_DIR" '$CFDEM_APP_DIR' "yes"
+checkDirComment "$CFDEM_USER_LIB_DIR" '$CFDEM_USER_LIB_DIR' "no"
+checkDirComment "$CFDEM_USER_APP_DIR" '$CFDEM_USER_APP_DIR' "no"
 checkDirComment "$CFDEM_TEST_HARNESS_PATH" '$CFDEM_TEST_HARNESS_PATH' "no"
 checkDirComment "$C3PO_SRC_DIR" '$C3PO_SRC_DIR' "no"
 echo ""
@@ -47,26 +51,27 @@ echo '$CFDEM_LIB_NAME = '"$CFDEM_LIB_NAME"
 echo '$LD_LIBRARY_PATH  = '"$LD_LIBRARY_PATH"
 echo '$WM_NCOMPPROCS  = '"$WM_NCOMPPROCS"
 echo '$WM_LABEL_SIZE = '"$WM_LABEL_SIZE"
-if [ $WM_LABEL_SIZE != 32 ]; then 
+if [ $WM_LABEL_SIZE != 32 ]; then
     echo "!!!! Warning: WM_LABEL_SIZE must be 32!!!!! (Please correct in $FOAM_ETC/bashrc.)"
 fi
 echo ""
 echo "Additional lib settings"
+echo 'CFDEM_ADD_LIBS_DIR/CFDEM_ADD_LIBS_NAME = '"${CFDEM_ADD_LIBS_DIR}/${CFDEM_ADD_LIBS_NAME}"
 cat <<EOT > .Makefile_vtk_tmp
 include $CFDEM_ADD_LIBS_DIR/$CFDEM_ADD_LIBS_NAME
 
 .PHONY: all
 
 all:
-	@echo "VTK_PATH = \$(VTK_PATH)"
-	@echo "VTK_LIB = \$(VTK_LIB)"
-	@echo "VTK_INC = \$(VTK_INC)"
 	@echo "CFDEM_ADD_LIB_PATHS = \$(CFDEM_ADD_LIB_PATHS)"
 	@echo "CFDEM_ADD_LIBS = \$(CFDEM_ADD_LIBS)"
 EOT
 make -f .Makefile_vtk_tmp
 rm -f .Makefile_vtk_tmp
 echo
+
+echo "LIGGGHTS library link (created during compilation of CFDEM)"
+ls -al ${CFDEM_LIB_DIR}/liblmp*
 
 echo "*******************"
 

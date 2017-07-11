@@ -19,12 +19,14 @@ Examples
 
 IOModel "off";
 
-Note: This examples list might not be complete - please look for other models (IOModel_XY) in this documentation.
+.. note::
+
+   This examples list might not be complete - please look for other models (IOModel_XY) in this documentation.
 
 Description
 """""""""""
 
-The IO-model is the base class to write data (e.g. particle properties) to files.
+The IO-model is the base class to write data (e.g. particle properties) to files within the CFD file-structure.
 
 Restrictions
 """"""""""""
@@ -35,7 +37,7 @@ none.
 Related commands
 """"""""""""""""
 
-Note: This examples list may be incomplete - please look for other models (IOModel_XY) in this documentation.
+:doc:`basicIO <IOModel_basicIO>`, :doc:`noIO <IOModel_noIO>`, :doc:`sophIO <IOModel_sophIO>`, :doc:`trackIO <IOModel_trackIO>`
 
 **Default:** none.
 

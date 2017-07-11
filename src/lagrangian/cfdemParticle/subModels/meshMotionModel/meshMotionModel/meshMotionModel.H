@@ -60,6 +60,8 @@ protected:
 
         cfdemCloud& particleCloud_;
 
+        mutable word moveZoneName_;
+
     // Protected member functions
 
 public:
@@ -107,6 +109,10 @@ public:
 
 
     // Member Function
+        virtual labelList moveZone() const {return labelList(0);};
+
+        const word& moveZoneName() const {return moveZoneName_;}
+
         virtual tmp<volVectorField> setMotion() const=0;
 
         virtual void correctF(volVectorField&) const {};

@@ -129,6 +129,16 @@ public:
             return -1;
         };
 
+        virtual label intersections
+        (
+                const point& pStart,
+                const point& pEnd
+        ) const
+        {
+            FatalError << "The locate model you use does not define the function intersections(...)." << abort(FatalError);
+            return -1;
+        };
+
         virtual label findNearestCell
         (
                 const point& pStart

@@ -149,15 +149,14 @@
 <div class="section" id="examples">
 <h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-python"><div class="highlight"><pre>smoothingModel off;
+smoothingModel  constDiffSmoothing;
+smoothingModel  localPSizeDiffSmoothing;
 </pre></div>
 </div>
-<div class="highlight-python"><div class="highlight"><pre>smoothingModel  constDiffSmoothing;
-</pre></div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This examples list might not be complete - please look for other models (smoothingModel_XY) in this documentation.</p>
 </div>
-<div class="highlight-python"><div class="highlight"><pre>smoothingModel  localPSizeDiffSmoothing;
-</pre></div>
-</div>
-<p>Note: This examples list might not be complete - please look for other models (smoothingModel_XY) in this documentation.</p>
 <p>ATTENTION: In case a smoothing model is used in conjunction with &#8220;PimpleImEx&#8221; solvers, the fields &#8220;f&#8221; and &#8220;fSmooth&#8221; must be placed in the initial time directory! This is because zeroGradient boundary conditions for the fields &#8220;f&#8221; and &#8220;fSmooth&#8221; must be specified, otherwise the smoothing operation will give an Error.</p>
 </div>
 <div class="section" id="description">

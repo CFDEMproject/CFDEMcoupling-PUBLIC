@@ -39,6 +39,7 @@ Description
 #include "voidFractionModel.H"
 #include "locateModel.H"
 #include "probeModel.H"
+#include "registryModel.H"
 
 namespace Foam
 {
@@ -302,6 +303,11 @@ inline const IOModel& cfdemCloud::IOM() const
 inline const probeModel& cfdemCloud::probeM() const
 {
     return probeModel_;
+}
+
+inline const registryModel& cfdemCloud::registryM() const
+{
+    return registryModel_;
 }
 
 inline const voidFractionModel& cfdemCloud::voidFractionM() const

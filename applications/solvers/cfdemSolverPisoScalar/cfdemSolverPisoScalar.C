@@ -44,6 +44,7 @@ Description
 #else
     #include "turbulenceModel.H"
 #endif
+#include "radiationModel.H"
 #include "fixedFluxPressureFvPatchScalarField.H"
 #include "cfdemCloud.H"
 #if defined(anisotropicRotation)
@@ -66,10 +67,12 @@ int main(int argc, char *argv[])
         #include "createTimeControls.H"
     #endif
     #include "createFields.H"
+    #include "createIncompressibleRadiationModel.H"
     #include "initContinuityErrs.H"
 
     // create cfdemCloud
     #include "readGravitationalAcceleration.H"
+    #include "checkImCoupleM.H"
     #if defined(anisotropicRotation)
         cfdemCloudRotation particleCloud(mesh);
     #else
@@ -104,7 +107,7 @@ int main(int argc, char *argv[])
         }
     
         Info << "update Ksl.internalField()" << endl;
-        Ksl = particleCloud.momCoupleM(0).impMomSource();
+        Ksl = particleCloud.momCoupleM(particleCloud.registryM().getProperty("implicitCouple_index")).impMomSource();
         Ksl.correctBoundaryConditions();
 
         surfaceScalarField voidfractionf = fvc::interpolate(voidfraction);
@@ -124,16 +127,23 @@ int main(int argc, char *argv[])
         particleCloud.forceM(1).commToDEM();
 
         // solve scalar transport equation
+        {
+        alphat = turbulence->nut()/Prt;
+        alphat.correctBoundaryConditions();
+        volScalarField alphaEff("alphaEff", turbulence->nu()/Pr + alphat);
         fvScalarMatrix TEqn
         (
            fvm::ddt(voidfraction,T) - fvm::Sp(fvc::ddt(voidfraction),T)
          + fvm::div(phi, T) - fvm::Sp(fvc::div(phi),T)
-         - fvm::laplacian(DT*voidfraction, T)
+         - fvm::laplacian(alphaEff*voidfraction, T)
          ==
            Tsource
+         + radiation->ST(rhoCpRef, T)
         );
         TEqn.relax();
         TEqn.solve();
+        radiation->correct();
+        }
 
         if(particleCloud.solveFlow())
         {

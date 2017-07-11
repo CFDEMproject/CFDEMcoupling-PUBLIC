@@ -47,7 +47,7 @@ Defined in couplingProperties dictionary.
 * *type1* = (optional, default cellPoint) interpolation type for T field
 * *switch2* = (optional, default false) sub model switch, see :doc:`forceSubModel <forceSubModel>` for details
 * *scalar3* = (optional) limit maximal turbulence
-* *scalar4* = scaling of particle diameter
+* *scalar4* = scaling of particle diameter: d_sim=scale*d_real. d_sim=(potentially coarse grained) particle diameter. scale=coarse graining factor. d_real= particle diameter as it is measured.
 * *switch3* = (optional, default false) sub model switch, see :doc:`forceSubModel <forceSubModel>` for details
 * *scalar5* = optional, only if switch3 is true
 

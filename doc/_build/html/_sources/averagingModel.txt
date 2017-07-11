@@ -22,7 +22,9 @@ Examples
    averagingModel dense;
    averagingModel dilute;
 
-Note: This examples list might not be complete - please have a look for other averaging models (averagingModel_XY) in this documentation.
+.. note::
+
+   This examples list might not be complete - please have a look for other averaging models (averagingModel_XY) in this documentation.
 
 Description
 """""""""""

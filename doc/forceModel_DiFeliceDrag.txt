@@ -40,8 +40,8 @@ DiFeliceDragProps
 {type1} = (optional, default cellPoint) interpolation type for voidfraction field :l
 {type2} = (optional, default cellPointFace) interpolation type for velocity field :l
 {switch2} = (optional, default false) can be used to suppress the output of the probe model :l
-{scalar1} = (optional) scaling of particle diameter :l
-{scalar2} = (optional) scaling of drag law :l
+{scalar1} = (optional) scaling of particle diameter: d_sim=scale*d_real. d_sim=(potentially coarse grained) particle diameter. scale=coarse graining factor. d_real= particle diameter as it is measured. :l
+{scalar2} = (optional) scaling factor which directly scales the drag force. :l
 {switch3} = sub model switch, see "forceSubModel"_forceSubModel.html for details :l
 {switch4} = sub model switch, see "forceSubModel"_forceSubModel.html for details :l
 {switch5} = sub model switch, see "forceSubModel"_forceSubModel.html for details :l

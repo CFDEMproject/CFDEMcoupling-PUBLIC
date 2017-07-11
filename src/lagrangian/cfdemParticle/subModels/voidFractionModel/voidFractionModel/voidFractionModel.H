@@ -168,7 +168,8 @@ public:
             vector    cellCentrePosition,
             vector    positionCenter,
             boundBox  globalBb,
-            vector&   minPeriodicPos
+            vector&   minPeriodicPos,
+            vector    dirCheckRange = vector(1,1,1)
         ) const;
         virtual double pointInParticle(int index, vector positionCenter, vector point, double scale) const;
         virtual double pointInParticle(int index, vector positionCenter, vector point) const;

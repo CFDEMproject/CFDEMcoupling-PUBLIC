@@ -319,18 +319,22 @@ void Foam::averagingModel::undoWeightFields(double**const& mask) const
 
 tmp<volVectorField> Foam::averagingModel::UsInterp() const
 {
-    if (particleCloud_.dataExchangeM().couplingStep() > 1)
+    scalar tsf = particleCloud_.dataExchangeM().timeStepFraction();
+    /*if(1-tsf < 1e-4 && particleCloud_.dataExchangeM().couplingStep() > 1)   // if no subTS &&  !firstTS
     {
-        return tmp<volVectorField>
-        (
-            new volVectorField("Us_averagingModel", (1 - particleCloud_.dataExchangeM().timeStepFraction()) * UsPrev_ + particleCloud_.dataExchangeM().timeStepFraction() * UsNext_)
-        );
-    }
-    else
-    {
+        //Info << "using UsNext" << endl;
+        // NOTE: voidfraction uses Prev (does not work due to Ksl?)
         return tmp<volVectorField>
         (
             new volVectorField("Us_averagingModel", UsNext_)
+        );
+    }
+    else */                                                                   // if subTS || firstTS
+    {
+        //Info << "using Us blend, tsf=" << tsf << endl;
+        return tmp<volVectorField>
+        (
+            new volVectorField("Us_averagingModel", (1 - tsf) * UsPrev_ + tsf * UsNext_)
         );
     }
 }

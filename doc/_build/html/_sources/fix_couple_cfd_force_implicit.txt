@@ -18,20 +18,17 @@ Examples
 fix	cfd  all couple/cfd couple_every 100 mpi
 fix cfd2 all couple/cfd/force/implicit
 
-fix cfd  all couple/cfd couple_every 100 mpi
-fix cfd2 all couple/cfd/force/implicit transfer_type yes
-
 fix	cfd  all couple/cfd couple_every 100 mpi
 fix cfd2 all couple/cfd/force/implicit CrankNicolson 0.5 CAddRhoFluid 0.4
 
 Description
 """""""""""
 
-The usage of the couple/cfd/force/implicit can only be used in combination with a :doc:`fix couple/cfd <fix_couple_cfd>` command. At every coupling time step the drag coefficient and the fluid velocity is transferred to LIGGGHTS(R). Depending on the varying particle velocity (and thus relative velocity between fluid and particles) the drag force on the particles is calculated at every DEM time step until new data is obtained in the next coupline time step.
+The usage of the couple/cfd/force/implicit can only be used in combination with a :doc:`fix couple/cfd <fix_couple_cfd>` command. At every coupling time step the drag coefficient and the fluid velocity is transferred to LIGGGHTS®. Depending on the varying particle velocity (and thus relative velocity between fluid and particles) the drag force on the particles is calculated at every DEM time step until new data is obtained in the next coupling time step.
 
 If the Crank-Nicolson keyword is present, Crank-Nicolson integration scheme with given CN is applied.
 
-When the CAddRhoFluid keyword is active, couple/cfd/force/implicit will consider added mass.
+When the CAddRhoFluid keyword is active, couple/cfd/force/implicit will consider added mass, where CAddRhoFluid = rhoFluid / rhoParticle.
 
 Restrictions
 """"""""""""

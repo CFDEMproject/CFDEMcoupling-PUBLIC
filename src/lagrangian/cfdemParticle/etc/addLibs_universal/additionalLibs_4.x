@@ -8,9 +8,7 @@
 CFDEM_ADD_STATICLIBS = \
 -lmpi_cxx \
 
-# If you don't want VTK comment the following line and use the appropriate LIGGGHTS Makefile
-# via setting CFDEM_LIGGGHTS_MAKEFILE_NAME that does not contain VTK.
-include $(CFDEM_ADD_LIBS_DIR)/additionalLibs_vtk
+# include flags for compiling with SQ
 include $(CFDEM_ADD_LIBS_DIR)/additionalLibs_superquadric
 
 #################################################################

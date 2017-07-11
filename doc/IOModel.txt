@@ -19,11 +19,11 @@ model = name of IO-model to be applied :ul
 
 IOModel "off";
 
-Note: This examples list might not be complete - please look for other models (IOModel_XY) in this documentation.
+NOTE: This examples list might not be complete - please look for other models (IOModel_XY) in this documentation.
 
 [Description:]
 
-The IO-model is the base class to write data (e.g. particle properties) to files.
+The IO-model is the base class to write data (e.g. particle properties) to files within the CFD file-structure.
 
 [Restrictions:]
 
@@ -31,6 +31,6 @@ none.
 
 [Related commands:]
 
-Note: This examples list may be incomplete - please look for other models (IOModel_XY) in this documentation.
+"basicIO"_IOModel_basicIO.html, "noIO"_IOModel_noIO.html, "sophIO"_IOModel_sophIO.html, "trackIO"_IOModel_trackIO.html
 
 [Default:] none.

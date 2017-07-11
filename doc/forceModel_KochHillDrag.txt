@@ -42,7 +42,7 @@ KochHillDragProps
 {type2} = (optional, default cellPointFace) interpolation type for velocity field :l
 {switch2} = (optional, normally off) flag to use implicit formulation of drag on DEM side:l
 {switch3} = (optional, default false) can be used to suppress the output of the probe model :l
-{scalar1} = (optional) scaling of particle diameter :l
+{scalar1} = (optional) scaling of particle diameter: d_sim=scale*d_real. d_sim=(potentially coarse grained) particle diameter. scale=coarse graining factor. d_real= particle diameter as it is measured. :l
 {scalar2} = (optional) scaling of drag law :l
 {switch4} = (optional, default false) sub model switch, see "forceSubModel"_forceSubModel.html for details :l
 {switch5} = (optional, default false) sub model switch, see "forceSubModel"_forceSubModel.html for details :l

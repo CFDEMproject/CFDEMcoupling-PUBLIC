@@ -72,6 +72,8 @@ oneWayVTK::oneWayVTK
     setNumberOfParticles(maxNumberOfParticles_);
 
     // make a const char* from word
+    //string HH=string(filename_);
+    //charFilename_=const_cast<char*>(HH.c_str());
     charFilename_ = wordToChar(filename_);
 
     Info << "relativePath_" << relativePath_ << endl;
@@ -165,6 +167,7 @@ void oneWayVTK::getData
             int numberOfParticles;  // remove this?
 
             string just_read = " ";
+//            if(!*inputPtr) FatalIOError << "File not found!, " << H << "\n" << abort(FatalError);
             while(just_read.compare("POINTS") != 0)  *inputPtr >> just_read;   //read until we read "POINTS"
             *inputPtr >> numberOfParticles;                           //this is now the number of points in the file
             *inputPtr >> just_read;                                    // skip text for dataType

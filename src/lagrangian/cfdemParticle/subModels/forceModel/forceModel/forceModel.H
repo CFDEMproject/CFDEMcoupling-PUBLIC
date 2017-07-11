@@ -86,14 +86,18 @@ protected:
         bool requiresSuperquadric_;
         
         bool pullPushRotation_;     //will exchange rotation information
+
+        bool implicitDrag_;             //will exchange Ksl 
         
-        bool implicitAnisotropicDrag_; //will exchange anisotropic Ksl 
+        bool implicitAnisotropicDrag_;  //will exchange anisotropic Ksl 
         
-        bool implicitRotation_;        //will exchange rotational Ksl value
+        bool implicitRotation_;         //will exchange rotational Ksl value
 
         wordList forceSubModels_;
 
         autoPtr<forceSubModel>* forceSubModel_;
+
+        mutable autoPtr<interpolation<scalar> > GInterpolator_;
 
         mutable autoPtr<interpolation<scalar> > voidfractionInterpolator_;
 
@@ -233,6 +237,8 @@ public:
         virtual inline bool& requiresShape() { return requiresShape_;};
 
         virtual inline bool& pullPushRotation() {return pullPushRotation_;};
+
+        virtual inline bool& implicitDrag() {return implicitDrag_;};
         
         virtual inline bool& implicitAnisotropicDrag() {return implicitAnisotropicDrag_;};
         

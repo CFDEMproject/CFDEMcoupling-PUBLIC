@@ -159,6 +159,8 @@ forceSubModel::forceSubModel
     // info about scaleDrag being used
     if (scaleDrag_ != 1.)
         Info << "using scaleDrag = " << scaleDrag_ << endl;
+
+    particleCloud_.registryM().addProperty("scaleDrag",scaleDrag_);
 }
 
 
@@ -178,9 +180,9 @@ void forceSubModel::partToArray
 ) const
 {
     // forces for CFD
-    if(!switches_[1])// !treatDEM
+    if(!switches_[1])// !treatForceDEM
     {
-        if(switches_[0]) // treatExplicit
+        if(switches_[0]) // treatForceExplicit
         {
             for(int j=0;j<3;j++)
                 myForceM().expForces()[index][j] += dragTot[j];
@@ -372,19 +374,51 @@ void forceSubModel::explicitLimit
 
 void forceSubModel::readSwitches() const
 {
-    Info << "\nreading switches for forceSubModel:" << myType() << endl;
+    bool first(true);
     forAll(switchesNameList_,i)
     {
-        if(switchesList_[i] > 0+SMALL) //check if switch is required
+        if(switchesList_[i] > 0+SMALL) //check if switch is read from dict
         {
-            Info << "  looking for " << switchesNameList_[i] << " ..." << endl;
+            if(first)
+            {
+                Info << " reading switches:" << endl;
+                first = false;
+            }    
+            Info << "  looking for " << switchesNameList_[i] << " ... ";
             if (dict_.found(switchesNameList_[i]))
+            {
+                Info << " found in dict. " ;
                 switches_[i]=Switch(dict_.lookup(switchesNameList_[i]));
+            }else Info << " not found in dict, using default. " ;
                 
-            Info << "\t" << switchesNameList_[i] << " = " << switches_[i] << endl;
-        }        
+            // user set treatForceExplicit to true && no explicitCouple model is defined && treatForceDEM=false(i.e. it will go to f) && modelType != "none"
+            if(i==0 && switches_[0] > 0+SMALL && particleCloud_.registryM().getProperty("explicitCouple_index") < 0 && switches_[1] < 0+SMALL && particleCloud_.modelType() != "none")
+                FatalError <<  "You are using treatForceExplicit=true here, this requres having an explicit momentum couple model!" << abort(FatalError);
+            else
+                Info << switchesNameList_[i] << " = " << switches_[i] << endl;
+        } 
     }
     Info << endl;
+
+    /*// sanity check
+    if(switchesList_[0] < 0+SMALL) //check if switch is not read from dict
+    {
+        // (treatForceExplicit is set to true) && no explicitCouple model is defined && treatForceDEM=false
+        if(switches_[0] > 0+SMALL && particleCloud_.registryM().getProperty("explicitCouple_index") < 0 && switches_[1] < 0+SMALL)
+            FatalError <<  "treatForceExplicit = true. This requres having an explicit momentum couple model!" << abort(FatalError);
+    }
+
+
+    // debug info
+    Info << "other switches for forceSubModel which are auot-set:" << myType() << endl;
+    forAll(switchesNameList_,i)
+    {
+        if(switchesList_[i] < 0+SMALL) //check if switch is NOT read from dict but exists
+        {
+            Info << "\t" << switchesNameList_[i] << " = " << switches_[i] << endl;
+        }      
+    }
+    Info << endl;*/
 
     if(switches_[2]) // implForceDEM=true
     {

@@ -38,13 +38,13 @@ Defined in couplingProperties dictionary.
 * *U* = name of the finite volume fluid velocity field
 * *voidfraction* = name of the finite volume voidfraction field
 * *Us* = name of the finite volume cell averaged particle velocity field
-* *scalar1* = drag correction factor (in doubt 1)
+* *scalar1* = (optional, default 1) drag correction factor
 * *switch1* = (optional, default off) flag to use interpolated voidfraction and fluid velocity values
 * *type1* = (optional, default cellPoint) interpolation type for voidfraction field
 * *type2* = (optional, default cellPointFace) interpolation type for velocity field
 * *switch2* = (optional, default false) flag to use implicit formulation of drag on DEM side
   *switch3* = (optional, default false) can be used to suppress the output of the probe model
-* *scalar2* = (optional) scaling of particle diameter
+* *scalar2* = (optional) scaling of particle diameter: d_sim=scale*d_real. d_sim=(potentially coarse grained) particle diameter. scale=coarse graining factor. d_real= particle diameter as it is measured.
 * *scalar3* = (optional) scaling of drag law
 * *scalar4* = (optional) voidfraction above which dilute formulation will be used
 * *switch4* = (optional, default false) sub model switch, see :doc:`forceSubModel <forceSubModel>` for details

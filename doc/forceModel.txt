@@ -27,11 +27,13 @@ forceModels
     DiFeliceDrag
 ); :pre
 
-Note: This examples list might not be complete - please look for other models (forceModel_XY) in this documentation.
+NOTE: This examples list might not be complete - please look for other models (forceModel_XY) in this documentation.
 
 [Description:]
 
-The force model performs the calculation of forces (e.g. fluid-particle interaction forces) acting on each DEM particle. All force models selected are executed sequentially and the forces on the particles are superposed. If the fluid density field is needed, by default a field named "rho" will be used. Via the forceSubModel an alternative field can be chosen.
+The force model performs the calculation of forces (e.g. fluid-particle interaction forces) acting on each DEM particle and on each CFD cell. All force models selected are executed sequentially and the forces on the particles are superposed. If the fluid density field is needed, by default a field named "rho" will be used. Via the forceSubModel an alternative field can be chosen.
+
+Some force models aren't actual force calculations, but might be used to create additional output fields.
 
 [Restrictions:]
 

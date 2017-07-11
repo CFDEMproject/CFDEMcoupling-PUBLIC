@@ -65,42 +65,27 @@ viscForce::viscForce
     U_(sm.mesh().lookupObject<volVectorField> (velocityFieldName_)),
     addedMassCoeff_(0.0)
 {
+    // block viscForceModel for type B
+    if (modelType_ == "B") FatalError <<"using  model viscForce with model type B is not valid\n" << abort(FatalError);
 
     // init force sub model
     setForceSubModels(propsDict_);
 
     // define switches which can be read from dict
-    forceSubM(0).setSwitchesList(0,true); // activate treatExplicit switch
-    forceSubM(0).setSwitchesList(1,true); // activate treatForceDEM switch
+    forceSubM(0).setSwitchesList(0,true); // activate search for treatForceExplicit switch
     forceSubM(0).setSwitchesList(4,true); // activate search for interpolate switch
     forceSubM(0).setSwitchesList(8,true); // activate scalarViscosity switch
 
     //set default switches (hard-coded default = false)
-    forceSubM(0).setSwitches(0,true);  // enable treatExplicit, otherwise this force would be implicit in slip vel! - IMPORTANT!
+    forceSubM(0).setSwitches(0,true);       // make treatForceExplicit=true the default (is desired, otherwise this force would be implicit in slip vel!)
+    if (modelType_ == "Bfull")              // type Bfull
+        forceSubM(0).setSwitches(1,false);  // treatForceDEM = false
+    else                                    // type A
+        forceSubM(0).setSwitches(1,true);   // treatForceDEM = true
 
+    // read user defined switches
     for (int iFSub=0;iFSub<nrForceSubModels();iFSub++)
         forceSubM(iFSub).readSwitches();
-
-
-    if (modelType_ == "B")
-    {
-        FatalError <<"using  model viscForce with model type B is not valid\n" << abort(FatalError);
-    }else if (modelType_ == "Bfull")
-    {
-        if(forceSubM(0).switches()[1])
-        {
-            Info << "Using treatForceDEM false!" << endl;
-            forceSubM(0).setSwitches(1,false); // treatForceDEM = false
-        }
-
-    }else // modelType_=="A"
-    {
-        if(!forceSubM(0).switches()[1])
-        {
-            Info << "Using treatForceDEM true!" << endl;
-            forceSubM(0).setSwitches(1,true); // treatForceDEM = true
-        }
-    }
 
     if (propsDict_.found("useAddedMass")) 
     {

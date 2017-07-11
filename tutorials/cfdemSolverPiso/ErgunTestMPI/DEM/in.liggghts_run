@@ -50,12 +50,25 @@ fix         integr all nve/sphere
 # center of mass
 compute     centerOfMass all com
 
-# compute total dragforce
-compute     dragtotal all reduce sum f_dragforce[1] f_dragforce[2] f_dragforce[3]
+# compute explicit dragforce
+compute     explDrag all reduce update_on_run_end yes sum f_dragforce[1] f_dragforce[2] f_dragforce[3]
+
+# sum of explicit and implicit drag force given from CFD to DEM
+variable    totalDragX equal f_cfd2[1]
+variable    totalDragY equal f_cfd2[2]
+variable    totalDragZ equal f_cfd2[3]
+
+# explicit drag force given from CFD to DEM
+variable    explicitDragX equal c_explDrag[1]
+variable    explicitDragY equal c_explDrag[2]
+variable    explicitDragZ equal c_explDrag[3]
+
+variable    time equal step*dt
+fix         extra all print 10 "${time} ${explicitDragX} ${explicitDragY} ${explicitDragZ} ${totalDragX} ${totalDragY} ${totalDragZ}" file ../DEM/post/forces.txt title "# time expDrag(X Y Z) totDrag(X Y Z)"
 
 # screen output
 compute         rke all erotate/sphere
-thermo_style    custom step atoms ke c_rke vol c_centerOfMass[3] c_dragtotal[1] c_dragtotal[2] c_dragtotal[3]
+thermo_style    custom step atoms ke c_rke vol c_centerOfMass[3] c_explDrag[1] c_explDrag[2] c_explDrag[3] f_cfd2[1] f_cfd2[2] f_cfd2[3]
 thermo          10
 thermo_modify   lost ignore norm no
 compute_modify  thermo_temp dynamic yes

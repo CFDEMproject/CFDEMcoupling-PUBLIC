@@ -68,6 +68,8 @@ private:
 
         const scalar scaleUpVol_;        //NP scaling radius, keeping volume of particle
         
+        const scalar sqrtThree_;
+
 public:
 
     //- Runtime type information

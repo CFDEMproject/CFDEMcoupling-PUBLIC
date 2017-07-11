@@ -68,7 +68,8 @@ ShirgaonkarIB::ShirgaonkarIB
     velFieldName_(propsDict_.lookup("velFieldName")),
     U_(sm.mesh().lookupObject<volVectorField> (velFieldName_)),
     pressureFieldName_(propsDict_.lookup("pressureFieldName")),
-    p_(sm.mesh().lookupObject<volScalarField> (pressureFieldName_))
+    p_(sm.mesh().lookupObject<volScalarField> (pressureFieldName_)),
+    useTorque_(false)
 {
     //Append the field names to be probed
     particleCloud_.probeM().initialize(typeName, typeName+".logDat");
@@ -83,6 +84,8 @@ ShirgaonkarIB::ShirgaonkarIB
         Info << "2-dimensional simulation - make sure DEM side is 2D" << endl;
         Info << "depth of domain is assumed to be :" << depth_ << endl;
     }
+
+    if(propsDict_.found("useTorque")) useTorque_ = true;
 
     // init force sub model
     setForceSubModels(propsDict_);
@@ -112,6 +115,7 @@ void ShirgaonkarIB::setForce() const
 
     label cellI;
     vector drag;
+    vector torque;
 
     volVectorField h=forceSubM(0).IBDragPerV(U_,p_);
 
@@ -122,6 +126,8 @@ void ShirgaonkarIB::setForce() const
         //if(mask[index][0])
         //{
             drag=vector::zero;
+            torque=vector::zero;
+            vector positionCenter = particleCloud_.position(index);
 
             for(int subCell=0;subCell<particleCloud_.cellsPerParticle()[index][0];subCell++)
             {
@@ -130,7 +136,9 @@ void ShirgaonkarIB::setForce() const
 
                 if (cellI > -1) // particle Found
                 {
-                    drag += h[cellI]*h.mesh().V()[cellI];
+                    vector rc = particleCloud_.mesh().C()[cellI];
+                    drag   += h[cellI]*h.mesh().V()[cellI];
+                    torque += (rc - positionCenter)^h[cellI]*h.mesh().V()[cellI];
                 }
 
             }
@@ -152,6 +160,7 @@ void ShirgaonkarIB::setForce() const
             forceSubM(0).partToArray(index,drag,vector::zero);
 
             if(forceSubM(0).verbose()) Info << "impForces = " << impForces()[index][0]<<","<<impForces()[index][1]<<","<<impForces()[index][2] << endl;
+            if(useTorque_) for(int j=0;j<3;j++) particleCloud_.DEMTorques()[index][j] = torque[j];
         //}
     }
 }

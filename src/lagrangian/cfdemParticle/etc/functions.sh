@@ -100,6 +100,10 @@ compileLib()
     #fi
     wmake libso 2>&1 | tee -a $logpath/$logfileName
 
+    if [ ${PIPESTATUS[0]} -ne 0 ]; then 
+        return 1
+    fi
+
     #- keep terminal open
     #read
 }
@@ -201,21 +205,25 @@ compileLIGGGHTS()
     if [[ $clean == "false" ]]; then
         echo "not cleaning LIGGGHTS"
     else
-        rm $CFDEM_LIGGGHTS_SRC_DIR/"lmp_"$CFDEM_LIGGGHTS_MAKEFILE_NAME
+        rm $CFDEM_LIGGGHTS_SRC_DIR/$CFDEM_LIGGGHTS_LIB_NAME
+        make clean-$CFDEM_LIGGGHTS_MAKEFILE_NAME postfix=$CFDEM_LIGGGHTS_MAKEFILE_POSTFIX 2>&1 | tee -a $logpath/$logfileName
         rm $CFDEM_LIGGGHTS_SRC_DIR/"lib"$CFDEM_LIGGGHTS_LIB_NAME".a"
-        make clean-$CFDEM_LIGGGHTS_MAKEFILE_NAME 2>&1 | tee -a $logpath/$logfileName
         echo "cleaning LIGGGHTS"
     fi
     if [[ $WM_NCOMPPROCS == "" ]]; then
         echo "compiling LIGGGHTS on one CPU"
-        make $CFDEM_LIGGGHTS_MAKEFILE_NAME 2>&1 | tee -a $logpath/$logfileName
+        make $CFDEM_LIGGGHTS_MAKEFILE_NAME postfix=$CFDEM_LIGGGHTS_MAKEFILE_POSTFIX 2>&1 | tee -a $logpath/$logfileName
     else
         echo "compiling LIGGGHTS on $WM_NCOMPPROCS CPUs"
-        make $CFDEM_LIGGGHTS_MAKEFILE_NAME -j $WM_NCOMPPROCS 2>&1 | tee -a $logpath/$logfileName
+        make $CFDEM_LIGGGHTS_MAKEFILE_NAME postfix=$CFDEM_LIGGGHTS_MAKEFILE_POSTFIX -j $WM_NCOMPPROCS 2>&1 | tee -a $logpath/$logfileName
         #make $CFDEM_LIGGGHTS_MAKEFILE_NAME -j $WM_NCOMPPROCS yes-XYZ 2>&1 | tee -a $logpath/$logfileName
     fi
-    make makelib 2>&1 | tee -a $logpath/$logfileName
-    make -f Makefile.lib $CFDEM_LIGGGHTS_MAKEFILE_NAME 2>&1 | tee -a $logpath/$logfileName
+    make makeshlib 2>&1 | tee -a $logpath/$logfileName
+    make -f Makefile.shlib $CFDEM_LIGGGHTS_MAKEFILE_NAME postfix=$CFDEM_LIGGGHTS_MAKEFILE_POSTFIX 2>&1 | tee -a $logpath/$logfileName
+
+    if [ ${PIPESTATUS[0]} -ne 0 ]; then 
+        return 1
+    fi
 }
 
 #==================================#
@@ -299,6 +307,10 @@ compileLMPlib()
             echo "make" 2>&1 | tee -a $logpath/$logfileName
             echo 2>&1 | tee -a $logpath/$logfileName
             make -f $makeFileName 2>&1 | tee -a $logpath/$logfileName
+
+            if [ ${PIPESTATUS[0]} -ne 0 ]; then 
+                return 1
+            fi
         fi
     fi
 }
@@ -431,6 +443,7 @@ cleanCFDEMcase()
     #- define variables
     casepath="$1"
     keepDEMrestart="$2"
+    keepCFDmesh="$3"
     #--------------------------------------------------------------------------------#
 
     echo "deleting data at: $casePath ? otherwise press Ctrl-C:\n"
@@ -438,7 +451,17 @@ cleanCFDEMcase()
     source $WM_PROJECT_DIR/bin/tools/CleanFunctions
     #CFD
     cd $casePath/CFD
-    cleanCase
+    if [[ $keepCFDmesh == true ]]; then
+        echo "keeping CFD mesh files"
+        cp -r constant/polyMesh constant/polyMesh_backup
+        cleanCase
+        mv constant/polyMesh_backup/* constant/polyMesh
+        rm -r constant/polyMesh_backup
+    else
+        echo "deleting CFD mesh files"
+        cleanCase
+    fi
+
     #CFDEM
     rm -r $casePath/CFD/clockData
     rm -r $casePath/CFD/particleProbes
@@ -534,7 +557,7 @@ DEMrun()
     echo 2>&1 | tee -a $logpath/$logfileName
 
     #- run applictaion
-    $debugMode $CFDEM_LIGGGHTS_SRC_DIR/$CFDEM_LIGGGHTS_LIB_NAME < $solverName 2>&1 | tee -a $logpath/$logfileName
+    $debugMode $CFDEM_LIGGGHTS_EXEC -in $solverName 2>&1 | tee -a $logpath/$logfileName
 
     #- keep terminal open (if started in new terminal)
     #read
@@ -587,9 +610,9 @@ parDEMrun()
 
     #- run applictaion
     if [[ $machineFileName == "none" ]]; then
-        mpirun -np $nrProcs $debugMode $CFDEM_LIGGGHTS_SRC_DIR/$CFDEM_LIGGGHTS_LIB_NAME < $solverName 2>&1 | tee -a $logpath/$logfileName
+        mpirun -np $nrProcs $debugMode $CFDEM_LIGGGHTS_EXEC -in $solverName 2>&1 | tee -a $logpath/$logfileName
     else
-        mpirun -machinefile $machineFileName -np $nrProcs $debugMode $CFDEM_LIGGGHTS_SRC_DIR/$CFDEM_LIGGGHTS_LIB_NAME < $solverName 2>&1 | tee -a $logpath/$logfileName
+        mpirun -machinefile $machineFileName -np $nrProcs $debugMode $CFDEM_LIGGGHTS_EXEC -in $solverName 2>&1 | tee -a $logpath/$logfileName
     fi
 
     #- keep terminal open (if started in new terminal)
@@ -880,9 +903,33 @@ collectLogCFDEMcoupling_sol()
 
     # log if compilation was success  
     if [[ $LASTWORD == $SOLVERNAME || $LASTWORD == "date." ]]; then
-        echo "$SOLVERNAME" >> $logpath/log_compile_results_success
+        echo "$SOLVERNAME" >> $logpath/log_compile_results_sol_success
     else
-        echo "$SOLVERNAME" >> $logpath/log_compile_results_fail
+        echo "$SOLVERNAME" >> $logpath/log_compile_results_sol_fail
+    fi
+}
+
+collectLogCFDEMcoupling_src()
+{
+    #--------------------------------------------------------------------------------#
+    #- define variables
+    logpath="$1"
+    logfileName="$2"
+    casePath="$3"
+    #--------------------------------------------------------------------------------#
+    # read name of solver
+    SOLVERNAME=$(basename $casePath)
+    
+    # read last line of log
+    LASTLINE=`tac $logpath/$logfileName | egrep -m 1 .`
+    LASTSTRING=`echo ${LASTLINE##* }`
+    LASTWORD=$(basename $LASTSTRING)
+
+    # log if compilation was success  
+    if [[ $LASTWORD == $SOLVERNAME || $LASTWORD == "date." ]]; then
+        echo "$SOLVERNAME" >> $logpath/log_compile_results_src_success
+    else
+        echo "$SOLVERNAME" >> $logpath/log_compile_results_src_fail
     fi
 }
 #==================================#
@@ -1284,3 +1331,53 @@ linkProcDirs()
     # success
     echo "linking was successful"
 }
+
+#========================================#
+#- function to enable a LIGGGHTS package
+enableLiggghtsPackage()
+{
+    #--------------------------------------------------------------------------------#
+    #- define variables
+    pkgName="$1"
+    whitelist="$CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/package-liggghts-list.txt"
+    #--------------------------------------------------------------------------------#
+
+    if [ ! -f "$CWD/$whitelist" ];then
+        echo "$whitelist does not exist in $CWD. Nothing will be done."
+        NLINES=0
+        COUNT=0
+    else
+        NLINES=`wc -l < $CWD/$whitelist`
+        COUNT=0
+    fi
+
+		found=false
+    while [ $COUNT -lt $NLINES ]
+    do
+            let COUNT++  
+            LINE=`head -n $COUNT $CWD/$whitelist | tail -1`
+  
+            # white lines
+            if [[ "$LINE" == "" ]]; then
+                continue
+            # comments
+            elif [[ "$LINE" == \#* ]]; then
+                continue
+             # paths
+            elif [[ "$LINE" == */dir ]]; then
+                LINE=$(echo "${LINE%????}")
+								echo "$LINE"
+								if [[ "$LINE" == "$pkgName" ]]; then
+										echo "Package $pkgName already enabled"
+										found=true
+										break
+								fi
+            fi
+    done
+
+		if [ $found = false ]; then
+				echo "Package $pkgName not found - add it to list"
+				echo $pkgName"/dir" >> $CWD/$whitelist
+		fi
+}
+

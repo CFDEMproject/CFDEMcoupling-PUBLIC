@@ -19,7 +19,7 @@ model = name of the clockModel to be applied :ul
 
 clockModel standardClock; :pre
 
-Note: This examples list might not be complete - please look for other models (clockModel_XY) in this documentation.
+NOTE: This examples list might not be complete - please look for other models (clockModel_XY) in this documentation.
 
 [Description:]
 

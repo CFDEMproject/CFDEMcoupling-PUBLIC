@@ -29,12 +29,14 @@ Examples
       writeLiggghts
    );
 
-Note: This examples list might not be complete - please look for other models (liggghtsCommandModel_XY) in this documentation.
+.. note::
+
+   This examples list might not be complete - please look for other models (liggghtsCommandModel_XY) in this documentation.
 
 Description
 """""""""""
 
-The liggghtsCommandModel is the base class to execute DEM commands within a CFD run.
+The liggghtsCommandModel is the base class to execute DEM commands within a CFDEM® run.
 
 Restrictions
 """"""""""""

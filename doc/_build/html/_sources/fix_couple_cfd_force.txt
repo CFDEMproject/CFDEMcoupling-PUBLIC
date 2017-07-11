@@ -19,10 +19,18 @@ Examples
 fix	cfd  all couple/cfd couple_every 100 mpi
 fix cfd2 all couple/cfd/force
 
+fix cfd  all couple/cfd couple_every 100 mpi
+fix cfd2 all couple/cfd/force/implicit transfer_type yes
+
+fix cfd  all couple/cfd couple_every 100 mpi
+fix cfd2 all couple/cfd/force/implicit transfer_property name color type scalar-atom
+
 Description
 """""""""""
 
-The command couple/cfd/force can only be used in combination with :doc:`fix_couple_cfd <fix_couple_cfd>`. This model transfers the force that the fluid exceeds on each particle to the DEM calculation. At every coupling time step the force term, which contains contributions from all force models active in the CFD calculation, is passed on to LIGGGHTS(R). This (constant) term is then used in the particle calculations at every DEM time step until the next coupling takes place.
+The command couple/cfd/force can only be used in combination with :doc:`fix_couple_cfd <fix_couple_cfd>`. This model transfers the force that the fluid exceeds on each particle to the DEM calculation. At every coupling time step the force term, which contains contributions from all force models active in the CFD calculation, is passed on to LIGGGHTS®. This (constant) term is then used in the particle calculations at every DEM time step until the next coupling takes place.
+
+Additional information, as the LIGGGHTS® atom_type can be transferred to the CFDEMcoupling environment with the keywork transfer_type yes. Similar keywords are transfer_density, transfer_torque and the more general transfer_property. The syntax is transfer_property name "name" type "data-type". The data-type can be scalar-atom or vector-atom and this needs to be a per atom property previously defined.
 
 Restrictions
 """"""""""""

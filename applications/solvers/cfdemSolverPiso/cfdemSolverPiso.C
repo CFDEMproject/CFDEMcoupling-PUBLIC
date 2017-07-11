@@ -81,6 +81,7 @@ int main(int argc, char *argv[])
 
     // create cfdemCloud
     #include "readGravitationalAcceleration.H"
+    #include "checkImCoupleM.H"
     #if defined(anisotropicRotation)
         cfdemCloudRotation particleCloud(mesh);
     #elif defined(SUPERQUADRIC_ACTIVE_FLAG)
@@ -115,8 +116,7 @@ int main(int argc, char *argv[])
             particleCloud.smoothingM().smoothenAbsolutField(particleCloud.forceM(0).impParticleForces());
         }
     
-        Info << "update Ksl.internalField()" << endl;
-        Ksl = particleCloud.momCoupleM(0).impMomSource();
+        Ksl = particleCloud.momCoupleM(particleCloud.registryM().getProperty("implicitCouple_index")).impMomSource();
         Ksl.correctBoundaryConditions();
 
         surfaceScalarField voidfractionf = fvc::interpolate(voidfraction);

@@ -21,7 +21,9 @@ Examples
 
    meshMotionModel noMeshMotion;
 
-Note: This examples list might not be complete - please look for other models (meshMotionModel_XY) in this documentation.
+.. note::
+
+   This examples list might not be complete - please look for other models (meshMotionModel_XY) in this documentation.
 
 Description
 """""""""""

@@ -170,13 +170,13 @@ GidaspowDragProps
 <li><em>U</em> = name of the finite volume fluid velocity field</li>
 <li><em>voidfraction</em> = name of the finite volume voidfraction field</li>
 <li><em>Us</em> = name of the finite volume cell averaged particle velocity field</li>
-<li><em>scalar1</em> = drag correction factor (in doubt 1)</li>
+<li><em>scalar1</em> = (optional, default 1) drag correction factor</li>
 <li><em>switch1</em> = (optional, default off) flag to use interpolated voidfraction and fluid velocity values</li>
 <li><em>type1</em> = (optional, default cellPoint) interpolation type for voidfraction field</li>
 <li><em>type2</em> = (optional, default cellPointFace) interpolation type for velocity field</li>
 <li><em>switch2</em> = (optional, default false) flag to use implicit formulation of drag on DEM side
 <em>switch3</em> = (optional, default false) can be used to suppress the output of the probe model</li>
-<li><em>scalar2</em> = (optional) scaling of particle diameter</li>
+<li><em>scalar2</em> = (optional) scaling of particle diameter: d_sim=scale*d_real. d_sim=(potentially coarse grained) particle diameter. scale=coarse graining factor. d_real= particle diameter as it is measured.</li>
 <li><em>scalar3</em> = (optional) scaling of drag law</li>
 <li><em>scalar4</em> = (optional) voidfraction above which dilute formulation will be used</li>
 <li><em>switch4</em> = (optional, default false) sub model switch, see <a class="reference internal" href="forceSubModel.html"><em>forceSubModel</em></a> for details</li>

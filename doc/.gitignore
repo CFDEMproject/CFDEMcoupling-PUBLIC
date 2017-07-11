@@ -1,3 +1,7 @@
+#ignore .rst build files
+*.rst
+_tmp/*
+
 # C++.gitignore from github
 # Compiled Object files
 *.slo

@@ -9,7 +9,26 @@ cfdemSolverPisoScalar command :h3
 
 [Description:]
 
-"cfdemSolverPisoScalar" is a coupled CFD-DEM solver using CFDEMcoupling, an open source parallel coupled CFD-DEM framework. Based on pisoFoam(R)(*), a finite volume based solver for turbulent Navier-Stokes equations applying PISO algorithm, "cfdemSolverPisoScalar" has additional functionality for a coupling to the DEM code "LIGGGHTS" as well as a scalar transport equation. The volume averaged Navier-Stokes Equations are solved accounting for momentum exchange and volume displacement of discrete particles, whose trajectories are calculated in the DEM code LIGGGHTS. The scalar transport equation is coupled to scalar properties of the particle phase, thus convective heat transfer in a fluid granular system can be modeled with "cfdemSolverPisoScalar". 
+"cfdemSolverPisoScalar" is a coupled CFD-DEM solver using CFDEMcoupling, an open source parallel coupled CFD-DEM framework. Based on pisoFoam®(*), a finite volume based solver for turbulent Navier-Stokes equations applying PISO algorithm, "cfdemSolverPisoScalar" has additional functionality for a coupling to the DEM code "LIGGGHTS" as well as a scalar transport equation. The volume averaged Navier-Stokes Equations are solved accounting for momentum exchange and volume displacement of discrete particles, whose trajectories are calculated in the DEM code LIGGGHTS. The scalar transport equation is coupled to scalar properties of the particle phase, thus convective heat transfer in a fluid granular system can be modeled with "cfdemSolverPisoScalar". 
+
+The transport equation uses a field "alphat" to calculate local kinematic turbulent thermal conductivities based on the laminar and turbulent Prandtl numbers. There can be source terms with the field Tsource and radiation.
+
+Necessary additional input is:
+
+name, location, type, unit
+T, 0, scalar field, K
+Tsource, 0, scalar field, K/s
+alphat, 0, scalar field, m²/s
+Pr, transportProperties, scalar, 1
+Prt, transportProperties, scalar, 1 :tb
+
+The transport equation is:
+
+alphat = nut/Prt
+
+alphaEff = nu/Pr + alphat
+
+d(voidfraction*T)/dt + div(phi*T) - div(alphaEff*voidfraction grad(T)) = Tsource + SourceRadiation
 
 see:
 

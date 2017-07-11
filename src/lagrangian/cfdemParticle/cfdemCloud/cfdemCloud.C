@@ -40,6 +40,7 @@ Description
 #include "dataExchangeModel.H"
 #include "IOModel.H"
 #include "probeModel.H"
+#include "registryModel.H"
 #include "averagingModel.H"
 #include "clockModel.H"
 #include "smoothingModel.H"
@@ -79,6 +80,7 @@ Foam::cfdemCloud::cfdemCloud
     solveFlow_(true),
     solveScalarTransport_(true),
     verbose_(couplingProperties_.lookupOrDefault<Switch>("verbose", false)),
+    expCorrDeltaUError_(false),
     debug_(false),
     allowCFDsubTimestep_(true),
     ignore_(false),
@@ -128,6 +130,8 @@ Foam::cfdemCloud::cfdemCloud
         dimensionedScalar("zero", dimensionSet(0,0,-1,0,0), 0)  // 1/s
     ),
     checkPeriodicCells_(false),
+    wall_periodicityCheckRange_(vector(1,1,1)),
+    wall_periodicityCheckTolerance_(1e-07),
     meshHasUpdated_(false),
     turbulence_
     (
@@ -203,6 +207,14 @@ Foam::cfdemCloud::cfdemCloud
             *this,
             (char *)"none",
             (char *)"none"
+        )
+    ),
+    registryModel_
+    (
+        registryModel::New
+        (
+            couplingProperties_,
+            *this
         )
     ),
     voidFractionModel_
@@ -312,6 +324,19 @@ Foam::cfdemCloud::cfdemCloud
     else        
         Info << "ignoring ddt(voidfraction)" << endl;
 
+    momCoupleModel_ = new autoPtr<momCoupleModel>[momCoupleModels_.size()];
+    for (int i=0;i<momCoupleModels_.size();i++)
+    {
+        momCoupleModel_[i] = momCoupleModel::New
+        (
+            couplingProperties_,
+            *this,
+            momCoupleModels_[i]
+        );
+        momCoupleModel_[i]().applyDebugSettings(debugMode());
+        registryM().addProperty(momCoupleModel_[i]().type()+"_index",i);
+    }
+
     forceModel_ = new autoPtr<forceModel>[nrForceModels()];
     for (int i=0;i<nrForceModels();i++)
     {
@@ -328,18 +353,6 @@ Foam::cfdemCloud::cfdemCloud
         FatalError  << "Please use at least one forceModel ! "
                     << "(e.g. noDrag) \n"
                     << abort(FatalError);
-
-    momCoupleModel_ = new autoPtr<momCoupleModel>[momCoupleModels_.size()];
-    for (int i=0;i<momCoupleModels_.size();i++)
-    {
-        momCoupleModel_[i] = momCoupleModel::New
-        (
-            couplingProperties_,
-            *this,
-            momCoupleModels_[i]
-        );
-        momCoupleModel_[i]().applyDebugSettings(debugMode());
-    }
 
     // run liggghts commands from cfdem
     liggghtsCommand_ = new autoPtr<liggghtsCommandModel>[liggghtsCommandModelList_.size()];
@@ -384,6 +397,11 @@ Foam::cfdemCloud::cfdemCloud
     }
     if(nPatchesNonCyclic==0)
         checkPeriodicCells_=true;
+
+    //hard set checkperiodic cells if wished
+    if(this->couplingProperties().found("checkPeriodicCells"))
+        checkPeriodicCells_ = couplingProperties().lookupOrDefault<Switch>("checkPeriodicCells", checkPeriodicCells_);
+
     if(nPatchesCyclic>0 && nPatchesNonCyclic>0)
     {
         if(verbose_) Info << "nPatchesNonCyclic=" << nPatchesNonCyclic << ", nPatchesCyclic=" << nPatchesCyclic << endl;
@@ -395,6 +413,16 @@ Foam::cfdemCloud::cfdemCloud
     {
         FatalError << "cfdemCloud:: you want to adjustTimeStep in controlDict. This is not allowed in this version of CFDEM."
                    << abort(FatalError);
+    }
+
+    //Check if mesh is empty (decomposition error)
+    if(mesh_.cells().size() < 1) 
+    {
+        int nprocs;
+        MPI_Comm_size(MPI_COMM_WORLD,&nprocs);
+        if(nprocs > 2)  FatalError << endl << "cfdemCloud:: local mesh has zero cells. Please check the mesh and the decomposition!" << abort(FatalError);
+        
+        Pout << "WARNING: cfdemCloud:: local mesh has zero cells. Please check the mesh and the decomposition!" << endl;
     }
 }
 
@@ -748,7 +776,7 @@ bool Foam::cfdemCloud::evolve
         //      IMPLICIT FORCE CONTRIBUTION AND SOLVER USE EXACTLY THE SAME AVERAGED
         //      QUANTITIES AT THE GRID!
         Info << "\n timeStepFraction() = " << dataExchangeM().timeStepFraction() << endl;
-        if( dataExchangeM().timeStepFraction() > 1.000000000000000001)
+        if( dataExchangeM().timeStepFraction() > 1.0000001)
         {
             FatalError << "cfdemCloud::dataExchangeM().timeStepFraction()>1: Do not do this, since dangerous. This might be due to the fact that you used a adjustable CFD time step. Please use a fixed CFD time step." << abort(FatalError);
         }

@@ -9,13 +9,13 @@
 
         // check if Archimedes is used
         bool found=false;
-        forAll(particleCloud.forceModels(),i)
+        /*forAll(particleCloud.forceModels(),i)
         {
             if(particleCloud.forceModels()[i]=="Archimedes")
                 found=true;
         }
         if(!found)
-            FatalError <<"Archimedes model not found!\n" << abort(FatalError);
+            FatalError <<"Archimedes model not found!\n" << abort(FatalError);*/
 
         // check if gradPForce is used
         found=false;

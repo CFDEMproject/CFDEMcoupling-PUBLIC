@@ -74,6 +74,8 @@ private:
 
     const volScalarField& p_;
 
+    bool useTorque_;
+
 public:
 
     //- Runtime type information

@@ -67,6 +67,7 @@ class voidFractionModel;
 class dataExchangeModel;
 class IOModel;
 class probeModel;
+class registryModel;
 class averagingModel;
 class clockModel;
 class smoothingModel;
@@ -96,6 +97,8 @@ protected:
     Switch solveScalarTransport_;
 
     Switch verbose_;
+
+    Switch expCorrDeltaUError_;
 
     bool debug_;
 
@@ -173,7 +176,14 @@ protected:
 
     mutable volScalarField ddtVoidfraction_;
 
+    //Variable used to de-activate mirroring across periodic boundary conditions 
     mutable Switch checkPeriodicCells_;
+    //de-activation and tolerance variables
+    //if set to  (for a specific direction), the periodic check will NOT be done
+    //default = (1,1,1), i.e., periodic checks will be done
+    //important for probing ambient points. Only read-in in case checkPeriodicCells is active
+    mutable vector wall_periodicityCheckRange_;
+    scalar         wall_periodicityCheckTolerance_;
 
     bool meshHasUpdated_;
 
@@ -203,6 +213,8 @@ protected:
     autoPtr<IOModel> IOModel_;
 
     autoPtr<probeModel> probeModel_;
+
+    autoPtr<registryModel> registryModel_;
 
     autoPtr<voidFractionModel> voidFractionModel_;
 
@@ -271,6 +283,10 @@ public:
        bool allowCFDsubTimestep(){ return allowCFDsubTimestep_;};
 
        void setAllowCFDsubTimestep(bool b){allowCFDsubTimestep_=b;};
+
+       bool expCorrDeltaUError(){ return expCorrDeltaUError_;};
+
+       void setExpCorrDeltaUError(){expCorrDeltaUError_=couplingProperties_.lookupOrDefault<Switch>("expCorrDeltaUError", false);};
 
        void checkCG(bool);
 
@@ -438,12 +454,16 @@ public:
        virtual inline double ** CdsRotation() const { return NULL;};    //three extra components of rotational drag
        virtual inline double ** omegaFluid() const { return NULL;};     //the fluid rotation rate
 
+       virtual inline bool implicitDrag() const {return false;}
        virtual inline bool implicitAnisotropicDrag() const {return false;}
        virtual inline bool implicitRotation()        const {return false;}
        double **dragPrev();
 
        //Detector if SRF module is enable or not
        virtual inline bool SRFOn(){return false;}
+
+       //allow handshake with refinement field
+       virtual void setRefinementField(volScalarField* refine_) {};
 
        inline int numberOfParticles() const;
 
@@ -470,6 +490,8 @@ public:
        inline const IOModel& IOM() const;
 
        inline const probeModel& probeM() const;
+
+       inline const registryModel& registryM() const;
 
        inline const averagingModel& averagingM() const;
 
@@ -555,6 +577,8 @@ public:
         void accessParticleDatFieldsUserCFDEMToExt(word fieldToAccess, double **& fieldData);
         //=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=
         bool checkPeriodicCells() { return checkPeriodicCells_; }
+        int  wall_periodicityCheckRange(int dir) {return static_cast<int>(wall_periodicityCheckRange_[dir]);}
+        vector  wall_periodicityCheckRange() {return wall_periodicityCheckRange_;}
         bool meshHasUpdated() { return meshHasUpdated_; }
         void setMeshHasUpdatedFlag(bool hasUpdated) { meshHasUpdated_ = hasUpdated; }
 
