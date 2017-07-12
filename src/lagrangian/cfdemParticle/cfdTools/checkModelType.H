@@ -5,7 +5,7 @@
 
     //Warning << "model type not being checked" << endl;
     if (modelType=="Bfull"){
-        Info << "solving volume averaged Navier Stokes equations of type B\n"<< endl;
+        Info << "solving volume averaged Navier Stokes equations of type Bfull\n"<< endl;
 
         // check if Archimedes is used
         bool found=false;
