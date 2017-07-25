@@ -21,7 +21,9 @@ Christoph Goniva, christoph.goniva@dcs-computing.com
 LIGGGHTS® and CFDEM® are registered trade marks of DCS Computing GmbH, 
 the producer of the LIGGGHTS® software and the CFDEM®coupling software.  
 See http://www.cfdem.com/terms-trademark-policy for details.
+
 ---
+
 ## Copyright
 
 Copyright 2012-         DCS Computing GmbH, Linz
@@ -32,7 +34,9 @@ parts is held by the OpenFOAM® Foundation (www.openFoam.org)
 and potentially other parties.  
 Some parts of CFDEMcoupling are contributied by other parties, which are
 holding the Copyright. This is listed in each file of the distribution.
+
 ---
+
 ## License
 
 This file is part of CFDEMcoupling.
@@ -50,7 +54,9 @@ for more details.
 You should have received a copy of the GNU General Public License
 along with CFDEMcoupling; if not, write to the Free Software Foundation,
 Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+
 ---
+
 ## Description
 This code provides models and solvers to realize coupled CFD-DEM simulations
 using LIGGGHTS and OpenFOAM® technology.
@@ -59,8 +65,8 @@ This code is not part of OpenFOAM®.
 This offering is not approved or endorsed by OpenCFD Limited, 
 the producer of the OpenFOAM® software and owner of the OPENFOAM®
 and OpenCFD®  trade marks.
----
 
+---
 
 CFDEM® coupling provides an open source parallel coupled CFD-DEM framework 
 combining the strengths of LIGGGHTS® DEM code and the Open Source 
@@ -101,7 +107,9 @@ CFDEM®coupling stands for Computational Fluid Dynamics (CFD) -
 Discrete Element Method (DEM) coupling.
 
 ---
+
 (*) This offering is not approved or endorsed by OpenCFD Limited,
 the producer of the OpenFOAM software and 
 owner of the OPENFOAM® and OpenCFD® trade marks.
+
 ---
