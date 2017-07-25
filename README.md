@@ -90,7 +90,7 @@ Features are:
 
 The CFDEM®coupling distribution includes the following files and directories:
 
-* "README" file (this file)
+* "README.md" file (this file)
 * "COPYING" file the GNU General Public License (GPL)
 * "DISCLAIMER" file
 * "src" directory including the source files of the coupling toolbox and models
