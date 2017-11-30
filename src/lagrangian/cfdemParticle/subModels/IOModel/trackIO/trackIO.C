@@ -60,13 +60,16 @@ trackIO::trackIO
     cfdemCloud& sm
 )
 :
-    sophIO(dict,sm)
+    sophIO(dict,sm),
+    partID_(NULL)
 {}
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 trackIO::~trackIO()
-{}
+{
+        particleCloud_.dataExchangeM().destroy(partID_,-1);
+}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
@@ -79,13 +82,16 @@ int trackIO::dumpDEMdata() const
 
     if (dumpNow())
     {
-        npProcs = sophIO::dumpDEMdata();
+        npProcs=sophIO::dumpDEMdata();
+
+
+        // get id data from liggghts
+        particleCloud_.dataExchangeM().allocateArray(partID_,0.,1);
+        particleCloud_.dataExchangeM().getData("id","scalar-atom",partID_);
 
         // stream data to file
-        streamDataToPath(lagPath_, particleCloud_.velocities(),npProcs,"origId","label","labelField","");
-        streamDataToPath(lagPath_, particleCloud_.velocities(),npProcs,"origProcId","origProcId","labelField","");
+        streamDataToPath(lagPath_, partID_,npProcs,"id","scalar","scalarField","");
     }
-
     return npProcs;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

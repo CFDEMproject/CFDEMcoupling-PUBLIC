@@ -71,8 +71,6 @@ protected:
 
         mutable volVectorField expParticleForces_;  // sum of explicit particle forces [N]
 
-        bool coupleForce_;
-
         const word modelType_;
 
         bool probeIt_;
@@ -225,8 +223,6 @@ public:
         inline double ** omegaFluid() const { return particleCloud_.omegaFluid();};
 
         inline double ** fluidVel() const { return particleCloud_.fluidVel_;};
-
-        inline const bool& coupleForce() const { return coupleForce_;};
 
         virtual inline bool& requiresEx() { return requiresEx_;};
 

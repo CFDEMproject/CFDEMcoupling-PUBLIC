@@ -205,8 +205,8 @@ Foam::cfdemCloud::cfdemCloud
         (
             couplingProperties_,
             *this,
-            (char *)"none",
-            (char *)"none"
+            const_cast<char *>("none"),
+            const_cast<char *>("none")
         )
     ),
     registryModel_
@@ -367,7 +367,7 @@ Foam::cfdemCloud::cfdemCloud
         );
     }
 
-    Switch cgWarnOnly_(couplingProperties_.lookupOrDefault<Switch>("cgWarnOnly", true));
+    Switch cgWarnOnly_(couplingProperties_.lookupOrDefault<Switch>("cgWarnOnly", false));
     if (!cgOK_ && cg_ > 1)
     {
         if(cgWarnOnly_)
@@ -474,16 +474,14 @@ void Foam::cfdemCloud::getDEMdata()
 
 void Foam::cfdemCloud::giveDEMdata()
 {
-    if(forceM(0).coupleForce())
-    {
-        dataExchangeM().giveData("dragforce","vector-atom",DEMForces_);
 
-        if(impDEMdrag_)
-        {
-            if(verbose_) Info << "sending Ksl and uf" << endl;
-            dataExchangeM().giveData("Ksl","scalar-atom",Cds_);
-            dataExchangeM().giveData("uf","vector-atom",fluidVel_);
-        }
+    dataExchangeM().giveData("dragforce","vector-atom",DEMForces_);
+
+    if(impDEMdrag_)
+    {
+        if(verbose_) Info << "sending Ksl and uf" << endl;
+        dataExchangeM().giveData("Ksl","scalar-atom",Cds_);
+        dataExchangeM().giveData("uf","vector-atom",fluidVel_);
     }
     if(verbose_) Info << "giveDEMdata done." << endl;
 }
@@ -492,17 +490,14 @@ void Foam::cfdemCloud::giveDEMdata()
 // * * *   write top level fields   * * * //
 void Foam::cfdemCloud::giveUSERdata()
 {
-    if(forceM(0).coupleForce())
+    //Handover USER-defined data 
+    for(std::vector<word>::iterator it = namesFieldsUserCFDEMToExt.begin(); it != namesFieldsUserCFDEMToExt.end(); ++it) 
     {
-        //Handover USER-defined data 
-        for(std::vector<word>::iterator it = namesFieldsUserCFDEMToExt.begin(); it != namesFieldsUserCFDEMToExt.end(); ++it) 
-        {
-            int positionInRegister = std::distance(namesFieldsUserCFDEMToExt.begin(), it);
-            dataExchangeM().giveData(namesFieldsUserCFDEMToExt[positionInRegister],"scalar-atom",
-                                     particleDatFieldsUserCFDEMToExt[positionInRegister]
-                                    );
-            Info << "giveData field with name '" << *it << "' at position: " << positionInRegister << endl;
-        }
+        int positionInRegister = std::distance(namesFieldsUserCFDEMToExt.begin(), it);
+        dataExchangeM().giveData(namesFieldsUserCFDEMToExt[positionInRegister],"scalar-atom",
+                                 particleDatFieldsUserCFDEMToExt[positionInRegister]
+                                );
+        Info << "giveData field with name '" << *it << "' at position: " << positionInRegister << endl;
     }
     if(verbose_) Info << "giveUSERdata done." << endl;
 }
@@ -776,9 +771,9 @@ bool Foam::cfdemCloud::evolve
         //      IMPLICIT FORCE CONTRIBUTION AND SOLVER USE EXACTLY THE SAME AVERAGED
         //      QUANTITIES AT THE GRID!
         Info << "\n timeStepFraction() = " << dataExchangeM().timeStepFraction() << endl;
-        if( dataExchangeM().timeStepFraction() > 1.0000001)
+        if( dataExchangeM().timeStepFraction() > 1.001 || dataExchangeM().timeStepFraction() < -0.001 )
         {
-            FatalError << "cfdemCloud::dataExchangeM().timeStepFraction()>1: Do not do this, since dangerous. This might be due to the fact that you used a adjustable CFD time step. Please use a fixed CFD time step." << abort(FatalError);
+            FatalError << "cfdemCloud::dataExchangeM().timeStepFraction() = "<< dataExchangeM().timeStepFraction() <<" must be >1 or <0 : This might be due to the fact that you used a adjustable CFD time step. Please use a fixed CFD time step." << abort(FatalError);
         }
         clockM().start(24,"interpolateEulerFields");
 

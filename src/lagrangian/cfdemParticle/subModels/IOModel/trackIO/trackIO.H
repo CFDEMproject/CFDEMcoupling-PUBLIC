@@ -64,6 +64,7 @@ public:
     //- Runtime type information
     TypeName("trackIO");
 
+    mutable int **partID_;
 
     // Constructors
 

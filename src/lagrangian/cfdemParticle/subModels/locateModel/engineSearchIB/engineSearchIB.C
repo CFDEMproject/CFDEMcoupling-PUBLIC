@@ -98,7 +98,8 @@ label engineSearchIB::findCell
     double** const& mask,
     double**& positions,
     double**& cellIDs,
-    int size
+    int size,
+    bool checkRad
 ) const
 {
     bool checkPeriodicCells(particleCloud_.checkPeriodicCells());
@@ -131,17 +132,23 @@ label engineSearchIB::findCell
             if(!isInside && checkPeriodicCells)
             {
                 vector positionCenterPeriodic;
-                for(int xDir=-1; xDir<=1; xDir++)
+                for(int xDir=-1*particleCloud_.wall_periodicityCheckRange(0); 
+                        xDir<=particleCloud_.wall_periodicityCheckRange(0); 
+                        xDir++)
                 {
                     positionCenterPeriodic[0] =  position[0]
                                               + static_cast<double>(xDir)
                                               * (globalBb.max()[0]-globalBb.min()[0]);
-                    for(int yDir=-1; yDir<=1; yDir++)
+                    for(int yDir=-1*particleCloud_.wall_periodicityCheckRange(1); 
+                            yDir<=particleCloud_.wall_periodicityCheckRange(1); 
+                            yDir++)
                     {
                         positionCenterPeriodic[1] =  position[1]
                                                   + static_cast<double>(yDir)
                                                   * (globalBb.max()[1]-globalBb.min()[1]);
-                        for(int zDir=-1; zDir<=1; zDir++)
+                        for(int zDir=-1*particleCloud_.wall_periodicityCheckRange(2); 
+                                zDir<=particleCloud_.wall_periodicityCheckRange(2); 
+                                zDir++)
                         {
                             positionCenterPeriodic[2] =  position[2]
                                                       + static_cast<double>(zDir)
@@ -174,14 +181,14 @@ label engineSearchIB::findCell
                     if(isInside)
                         altStartPos = findSingleCell(pos,oldID);
 
-                    //check for periodic domains
+                    //check for periodic domains, only do if check range is larger than 0
                     if(checkPeriodicCells)
                     {
                         for(int iDir=0;iDir<3;iDir++)
                         {
-                            if( pos[iDir] > globalBb.max()[iDir] )
+                            if( pos[iDir] > globalBb.max()[iDir] && particleCloud_.wall_periodicityCheckRange(iDir)>0 ) 
                                 pos[iDir]-=globalBb.max()[iDir]-globalBb.min()[iDir];
-                            else if( pos[iDir] < globalBb.min()[iDir] )
+                            else if( pos[iDir] < globalBb.min()[iDir] && particleCloud_.wall_periodicityCheckRange(iDir)>0 )
                                 pos[iDir]+=globalBb.max()[iDir]-globalBb.min()[iDir];
                         }
                         isInside = isInsideRectangularDomain(pos, SMALL);

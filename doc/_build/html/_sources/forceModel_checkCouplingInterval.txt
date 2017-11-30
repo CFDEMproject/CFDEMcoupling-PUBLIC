@@ -30,8 +30,8 @@ Defined in couplingProperties dictionary.
 * *bool1* = (optional, default true) switch to warn or stop simulation if criterion is broken.
 * *word1* = (optional, default U) name of velocity field.
 * *scalar1* = particle density assumed for calculation of the particle relaxation time
-* *scalar2* = (optional, default=50) maximum allowed CFL number.
-* *scalar3* = (optional, default=50) maximum allowed particle coupling CFL number.
+* *scalar2* = (optional, default=1) maximum allowed CFL number.
+* *scalar3* = (optional, default=1) maximum allowed particle coupling CFL number.
 * *scalar4* = (optional, default=0.005) maximum allowed ratio of coupling time to particle relaxation time.
 * *scalar5* = maximum expected velocity fluid velocity (e.g. due to BCs) - used for CFL estimation.
 * *scalar6* = (optional, default=3) min allowed volume ratio of cell / particle.

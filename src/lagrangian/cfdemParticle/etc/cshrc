@@ -90,6 +90,10 @@ else
     setenv CFDEM_LIGGGHTS_LIB_NAME lmp_$CFDEM_LIGGGHTS_MAKEFILE_NAME
 endif
 
+if ( ($WM_COMPILE_OPTION == Debug) && ($CFDEM_LIGGGHTS_MAKEFILE_NAME == auto) ) then
+    setenv CFDEM_LIGGGHTS_LIB_NAME "${CFDEM_LIGGGHTS_LIB_NAME}-fulldebug"
+endif
+
 #- LIGGGHTS lib path
 setVar CFDEM_LIGGGHTS_LIB_PATH $CFDEM_LIGGGHTS_SRC_DIR
 
@@ -236,6 +240,9 @@ alias cfdemCompCFDEMuti 'bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/compil
 #- shortcut to test basic tutorials
 alias cfdemTestTUT 'bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/testTutorials.sh'
 
+#- refresh link to LIGGGHTS binary
+alias cfdemRefreshLigLink='ln -sf $CFDEM_LIGGGHTS_LIB_PATH/lib$CFDEM_LIGGGHTS_LIB_NAME.so $CFDEM_LIB_DIR'
+
 #- shortcut to change dictionaries according to OF version
 #cfdemChangeTutOFversion() { bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/OFVersionChange/shellScripts/cfdemChangeTutOFversion_all.sh $1; }
 #export -f cfdemChangeTutOFversion
@@ -288,38 +295,46 @@ else
 endif
 
 # detect OF version
-if ( $WM_PROJECT_VERSION =~ "4.*" ) then
+if ( $WM_PROJECT_VERSION =~ 5.* ) then
+    setenv CFDEM_WM_PROJECT_VERSION 50
+else if ( $WM_PROJECT_VERSION =~ "4.*" ) then
     setenv CFDEM_WM_PROJECT_VERSION 40
     cfdemecho "************************************"
     cfdemecho "WARNING from your CFDEM code!"
-    cfdemecho "WARNING: Coupling with your OpenFOAM(R) version is currently under development!"
-    cfdemecho "In doubt switch to another version."
+    cfdemecho "WARNING: Coupling with your OpenFOAM(R) version is not officially supported!"
+    cfdemecho "In doubt switch to OpenFOAM(R) 5.x."
     cfdemecho "************************************"
     sleep 1.5
 else if ( $WM_PROJECT_VERSION =~ "3.0.*" ) then
     setenv CFDEM_WM_PROJECT_VERSION 30
+    cfdemecho "************************************"
+    cfdemecho "WARNING from your CFDEM code!"
+    cfdemecho "WARNING: Coupling with your OpenFOAM(R) version is not officially supported!"
+    cfdemecho "In doubt switch to OpenFOAM(R) 5.x."
+    cfdemecho "************************************"
+    sleep 1.5
 else if ( $WM_PROJECT_VERSION =~ "v1606+" ) then
     setenv CFDEM_WM_PROJECT_VERSION v1606
     cfdemecho "************************************"
     cfdemecho "WARNING from your CFDEM code!"
-    cfdemecho "WARNING: Coupling with your OpenFOAM(R) version is currently under development!"
-    cfdemecho "In doubt switch to another version."
+    cfdemecho "WARNING: Coupling with your OpenFOAM(R) version is not officially supported!"
+    cfdemecho "In doubt switch to OpenFOAM(R) 5.x."
     cfdemecho "************************************"
     sleep 1.5
 else if ( $WM_PROJECT_VERSION =~ "v1612+" ) then
     setenv CFDEM_WM_PROJECT_VERSION v1606
     cfdemecho "************************************"
     cfdemecho "WARNING from your CFDEM code!"
-    cfdemecho "WARNING: Coupling with your OpenFOAM(R) version is currently under development!"
-    cfdemecho "In doubt switch to another version."
+    cfdemecho "WARNING: Coupling with your OpenFOAM(R) version is not officially supported!"
+    cfdemecho "In doubt switch to OpenFOAM(R) 5.x."
     cfdemecho "************************************"
     sleep 1.5
 else if ( $WM_PROJECT_VERSION =~ "2.4.*" ) then
     setenv CFDEM_WM_PROJECT_VERSION 24
     cfdemecho "************************************"
     cfdemecho "WARNING from your CFDEM code!"
-    cfdemecho "WARNING: Coupling with your OpenFOAM(R) version is not supported any more!"
-    cfdemecho "In doubt switch to another version."
+    cfdemecho "WARNING: Coupling with your OpenFOAM(R) version is not officially supported!"
+    cfdemecho "In doubt switch to OpenFOAM(R) 5.x."
     cfdemecho "************************************"
     sleep 1.5
 else if ( $WM_PROJECT_VERSION == "3.2" ) then
@@ -328,8 +343,8 @@ else if ( $WM_PROJECT_VERSION == "3.2" ) then
     endif
     cfdemecho "************************************"
     cfdemecho "WARNING from your CFDEM code!"
-    cfdemecho "WARNING: Coupling with your OpenFOAM(R) version is not supported any more!"
-    cfdemecho "In doubt switch to another version."
+    cfdemecho "WARNING: Coupling with your OpenFOAM(R) version is not officially supported!"
+    cfdemecho "In doubt switch to OpenFOAM(R) 5.x."
     cfdemecho "************************************"
     sleep 1.5
 else

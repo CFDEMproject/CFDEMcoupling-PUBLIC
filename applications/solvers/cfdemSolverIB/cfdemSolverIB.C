@@ -48,7 +48,7 @@ Contributions
     #include "turbulenceModel.H"
 #endif
 #include "cfdemCloudIB.H"
-#if defined(SUPERQUADRIC_ACTIVE_FLAG)
+#if defined(superquadrics_flag)
 #include "cfdemCloudIBSuperquadric.H"
 #endif
 #include "implicitCouple.H"
@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
 
     // create cfdemCloud
     #include "readGravitationalAcceleration.H"
-    #if defined(SUPERQUADRIC_ACTIVE_FLAG)
+    #if defined(superquadrics_flag)
         cfdemCloudIBSuperquadric particleCloud(mesh);
     #else
         cfdemCloudIB particleCloud(mesh);
@@ -122,6 +122,7 @@ int main(int argc, char *argv[])
         particleCloud.evolve(voidfraction, interFace);
 
         // Pressure-velocity PISO corrector
+        if(particleCloud.solveFlow())
         {
             // Momentum predictor
 
@@ -214,9 +215,10 @@ int main(int argc, char *argv[])
 
                 U -= rUA*fvc::grad(p);
                 U.correctBoundaryConditions();
-            }
-        }
+            } 
+        } //end solveFlow
 
+        laminarTransport.correct();
         turbulence->correct();
 
         Info << "particleCloud.calcVelocityCorrection() " << endl;

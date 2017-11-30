@@ -94,6 +94,8 @@ protected:
 
         scalar scaleDrag_;
 
+        scalar scaleDH_;
+
 public:
 
     //- Runtime type information
@@ -180,7 +182,11 @@ public:
         
         virtual void verboseToDiskWrite(Field<scalar>& writeValues) const {};//implement writing to disk
 
-        virtual scalar calculateCorrectedVoidage(scalar voidfraction) const {return voidfraction;};
+        virtual scalar calculateCorrectedVoidage(scalar voidfraction, scalar cellDpRatio) const {return voidfraction;};
+
+        virtual void  updateField(volScalarField* scalField, volVectorField* vecField) const {};
+
+        virtual void  getField(vector position, label cellI, scalar& scalVal, vector& vecVal) const {};
 
     // Access
         inline bool implForceDEM() const { return switches_[2]; }

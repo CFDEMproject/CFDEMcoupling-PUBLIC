@@ -203,40 +203,7 @@ int main(int argc, char *argv[])
                         rUAvoidfraction = volScalarField("(voidfraction2|A(U))",rUA*voidfraction*voidfraction);
 
                     // Update the fixedFluxPressure BCs to ensure flux consistency
-                    #ifndef versionExt32
-                    #ifndef version40
-                        if (modelType=="A")
-                        {
-                            setSnGrad<fixedFluxPressureFvPatchScalarField>
-                            (
-                                #ifdef versionv1612plus
-                                    p.boundaryFieldRef(),
-                                #else
-                                    p.boundaryField(),
-                                #endif
-                                (
-                                    phi.boundaryField()
-                                  - (mesh.Sf().boundaryField() & U.boundaryField())
-                                )/(mesh.magSf().boundaryField()*rUAf.boundaryField()*voidfractionf.boundaryField())
-                            );
-                        }else
-                        {
-                            setSnGrad<fixedFluxPressureFvPatchScalarField>
-                            (
-                                #ifdef versionv1612plus
-                                    p.boundaryFieldRef(),
-                                #else
-                                    p.boundaryField(),
-                                #endif
-                                (
-                                    phi.boundaryField()
-                                  - (mesh.Sf().boundaryField() & U.boundaryField())
-                                )/(mesh.magSf().boundaryField()*rUAf.boundaryField())
-                            );
-                        }
-                    #endif
-                    #endif
-                    
+                    #include "fixedFluxPressureHandling.H"                    
 
                     // Non-orthogonal pressure corrector loop
                     #if defined(version30)
@@ -289,6 +256,7 @@ int main(int argc, char *argv[])
                 } // end piso loop
             }
 
+            laminarTransport.correct();
             turbulence->correct();
         }// end solveFlow
         else

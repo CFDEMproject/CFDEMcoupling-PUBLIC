@@ -19,7 +19,7 @@ neighbor        0.1 bin
 neigh_modify    delay 0
 
 # Material properties required for granular pair styles
-
+soft_particles yes
 fix         m1 all property/global youngsModulus peratomtype 5.e6
 fix         m2 all property/global poissonsRatio peratomtype 0.45
 fix         m3 all property/global coefficientRestitution peratomtypepair 1 0.3

@@ -1,0 +1,24 @@
+fvOptions dictionary
+====================
+
+Syntax
+""""""
+
+Description
+"""""""""""
+
+An fvOptions dictionary ca be used to impose physics that can be represented as forces or constraints on the governing equations, such as for example porous media or imposed flow velocities.
+
+Restrictions
+""""""""""""
+
+
+No known restrictions.
+
+Related commands
+""""""""""""""""
+
+
+.. _liws: http://www.cfdem.com
+.. _ld: Manual.html
+.. _lc: Section_commands.html#comm

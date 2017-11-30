@@ -150,13 +150,11 @@
 {</p>
 <blockquote>
 <div>noDEMForce &#8220;switch1&#8221;;
-keepCFDForce &#8220;switch2&#8221;;
-treatForceExplicit &#8220;switch3&#8221;;</div></blockquote>
+keepCFDForce &#8220;switch2&#8221;;</div></blockquote>
 <p>}</p>
 <ul class="simple">
-<li><em>switch1</em> = (optional, default false) do not apply the previously calculated forces in DEM integration</li>
-<li><em>switch2</em> = (optional, default false) do not delete the previously calculated forces and use them in CFD source terms</li>
-<li><em>switch3</em> = (optional, default false) sub model switch, see <a class="reference internal" href="forceSubModel.html"><em>forceSubModel</em></a> for details</li>
+<li><em>switch1</em> = (optional, default false) do not apply the previously calculated forces (implicitly and explicitly treated) in DEM integration</li>
+<li><em>switch2</em> = (optional, default false) do not delete the previously calculated forces (implicitly and explicitly treated) and use them in CFD source terms</li>
 </ul>
 </div>
 <div class="section" id="examples">

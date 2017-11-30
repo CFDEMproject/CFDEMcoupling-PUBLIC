@@ -76,14 +76,15 @@ label standardSearch::findCell
     double** const& mask,
     double**& positions,
     double**& cellIDs,
-    int size
+    int size,
+    bool checkRad
 ) const
 {
     vector position;
     for(int index = 0;index < size; ++index)
     {
         //if(mask[index][0] && particleCloud_.radius(index) > SMALL)
-        if(particleCloud_.radius(index) > SMALL)
+        if(!checkRad || particleCloud_.radius(index) > SMALL)
         {
             // create pos vector
             for(int i=0;i<3;i++) position[i] = positions[index][i];

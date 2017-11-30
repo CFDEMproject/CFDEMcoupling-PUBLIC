@@ -132,7 +132,8 @@ void IBVoidFraction::setvoidFraction(double** const& mask,double**& voidfraction
                 if(particleCloud_.checkPeriodicCells()) //consider minimal distance to all periodic images of this particle
                 {
                     fc = minPeriodicDistance(index,cellCentrePosition, positionCenter, globalBb,
-                                                     minPeriodicParticlePos);
+                                             minPeriodicParticlePos,
+                                             particleCloud_.wall_periodicityCheckRange());
                 }
                 scalar centreDist=mag(cellCentrePosition-minPeriodicParticlePos);
                 scalar corona = 0.5*sqrtThree_*cbrt(particleCloud_.mesh().V()[particleCenterCellID]);
@@ -156,7 +157,9 @@ void IBVoidFraction::setvoidFraction(double** const& mask,double**& voidfraction
                         vector vertexPosition = particleCloud_.mesh().points()[vertices[i]];
                         scalar fv = pointInParticle(index, positionCenter, vertexPosition);
                         if(particleCloud_.checkPeriodicCells()) { //consider minimal distance to all periodic images of this particle
-                            fv = minPeriodicDistance(index,vertexPosition, positionCenter, globalBb, minPeriodicParticlePos);
+                            fv = minPeriodicDistance(index,vertexPosition, positionCenter, globalBb, 
+                                                     minPeriodicParticlePos,
+                                                     particleCloud_.wall_periodicityCheckRange());
                         }
                         if(fc < 0.0 &&  fv < 0.0)
                             voidfractionNext_[particleCenterCellID]-=ratio;
@@ -182,11 +185,11 @@ void IBVoidFraction::setvoidFraction(double** const& mask,double**& voidfraction
                   for(int iDir=0;iDir<3;iDir++)
                   {
                     doPeriodicImage[iDir]= 0;
-                    if( (minPeriodicParticlePos[iDir]+radius)>globalBb.max()[iDir] )
+                    if( (minPeriodicParticlePos[iDir]+radius)>globalBb.max()[iDir] && particleCloud_.wall_periodicityCheckRange(iDir)>0)
                     {
                        doPeriodicImage[iDir] =-1;
                     }
-                    if( (minPeriodicParticlePos[iDir]-radius)<globalBb.min()[iDir] )
+                    if( (minPeriodicParticlePos[iDir]-radius)<globalBb.min()[iDir] && particleCloud_.wall_periodicityCheckRange(iDir)>0)
                     {
                          doPeriodicImage[iDir] = 1;
                     }

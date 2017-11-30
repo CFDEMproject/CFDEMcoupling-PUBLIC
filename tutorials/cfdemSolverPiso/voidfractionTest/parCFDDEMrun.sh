@@ -41,7 +41,7 @@ if [ $runOctave == "true" ]
         rm averageDDTvoidfraction.png
 
         #- run octave
-        octave particleCellVolume.m
+        octave --no-gui particleCellVolume.m
 
         #- show plot 
         eog averageDDTvoidfraction.png

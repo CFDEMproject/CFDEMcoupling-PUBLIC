@@ -42,7 +42,7 @@ if [ $runOctave == "true" ]
     rm *.png
 
     #- run octave
-    octave totalPressureDropAndNusselt.m
+    octave --no-gui totalPressureDropAndNusselt.m
 
     #- show plots 
     eog cfdemSolverPisoSTM_Nusselt.png &

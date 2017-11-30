@@ -80,7 +80,7 @@ compileLib()
                 echo "Please make sure to have the incompressible libraries first in the library-list.txt!"
                 cd $CFDEM_SRC_DIR/lagrangian/cfdemParticle
                 echo "changing to $PWD"
-                if [[ $WM_PROJECT_VERSION == dev || $WM_PROJECT_VERSION == 3.0.* || $WM_PROJECT_VERSION == 4.* ]]; then
+                if [[ $WM_PROJECT_VERSION == dev || $WM_PROJECT_VERSION == 3.0.* || $WM_PROJECT_VERSION == 4.*  || $WM_PROJECT_VERSION == 5.* ]]; then
                     wrmdep 2>&1 | tee -a $logpath/$logfileName
                 else
                     rmdepall 2>&1 | tee -a $logpath/$logfileName
@@ -90,7 +90,7 @@ compileLib()
             else
                 echo "Compiling a incompressible library."
         fi
-        if [[ $WM_PROJECT_VERSION == dev || $WM_PROJECT_VERSION == 3.0.* || $WM_PROJECT_VERSION == 4.* ]]; then
+        if [[ $WM_PROJECT_VERSION == dev || $WM_PROJECT_VERSION == 3.0.* || $WM_PROJECT_VERSION == 4.*  || $WM_PROJECT_VERSION == 5.* ]]; then
             wrmdep 2>&1 | tee -a $logpath/$logfileName
         else
             rmdepall 2>&1 | tee -a $logpath/$logfileName
@@ -147,7 +147,7 @@ compileSolver()
     else
         #- wclean and wmake
         #if [ $doClean != "noClean" ]; then
-            if [[ $WM_PROJECT_VERSION == dev || $WM_PROJECT_VERSION == 3.0.* || $WM_PROJECT_VERSION == 4.* ]]; then
+            if [[ $WM_PROJECT_VERSION == dev || $WM_PROJECT_VERSION == 3.0.* || $WM_PROJECT_VERSION == 4.*  || $WM_PROJECT_VERSION == 5.* ]]; then
                 wrmdep 2>&1 | tee -a $logpath/$logfileName
             else
                 rmdepall 2>&1 | tee -a $logpath/$logfileName
@@ -201,25 +201,31 @@ compileLIGGGHTS()
     pwd 2>&1 | tee -a $logpath/$logfileName
     echo 2>&1 | tee -a $logpath/$logfileName
 
-    #- wclean and wmake
+    # LIGGGHTS compilation flags
+    if [[ $WM_NCOMPPROCS == "" ]]; then
+         LIG_COMP_FLAGS=" "
+    else
+         LIG_COMP_FLAGS="-j $WM_NCOMPPROCS "
+    fi
+
+    if [[ ${WM_COMPILE_OPTION} == "Debug" ]] && [[ $CFDEM_LIGGGHTS_MAKEFILE_NAME == "auto" ]]; then
+        LIG_COMP_FLAGS="${LIG_COMP_FLAGS} debug=FULL"
+    fi
+
+    #- clean and make
     if [[ $clean == "false" ]]; then
         echo "not cleaning LIGGGHTS"
     else
         rm $CFDEM_LIGGGHTS_SRC_DIR/$CFDEM_LIGGGHTS_LIB_NAME
-        make clean-$CFDEM_LIGGGHTS_MAKEFILE_NAME postfix=$CFDEM_LIGGGHTS_MAKEFILE_POSTFIX 2>&1 | tee -a $logpath/$logfileName
+        make clean-$CFDEM_LIGGGHTS_MAKEFILE_NAME postfix=$CFDEM_LIGGGHTS_MAKEFILE_POSTFIX ${LIG_COMP_FLAGS} 2>&1 | tee -a $logpath/$logfileName
         rm $CFDEM_LIGGGHTS_SRC_DIR/"lib"$CFDEM_LIGGGHTS_LIB_NAME".a"
         echo "cleaning LIGGGHTS"
     fi
-    if [[ $WM_NCOMPPROCS == "" ]]; then
-        echo "compiling LIGGGHTS on one CPU"
-        make $CFDEM_LIGGGHTS_MAKEFILE_NAME postfix=$CFDEM_LIGGGHTS_MAKEFILE_POSTFIX 2>&1 | tee -a $logpath/$logfileName
-    else
-        echo "compiling LIGGGHTS on $WM_NCOMPPROCS CPUs"
-        make $CFDEM_LIGGGHTS_MAKEFILE_NAME postfix=$CFDEM_LIGGGHTS_MAKEFILE_POSTFIX -j $WM_NCOMPPROCS 2>&1 | tee -a $logpath/$logfileName
-        #make $CFDEM_LIGGGHTS_MAKEFILE_NAME -j $WM_NCOMPPROCS yes-XYZ 2>&1 | tee -a $logpath/$logfileName
-    fi
+    
+    echo "compiling LIGGGHTS with ${LIG_COMP_FLAGS}"
+    make $CFDEM_LIGGGHTS_MAKEFILE_NAME postfix=$CFDEM_LIGGGHTS_MAKEFILE_POSTFIX ${LIG_COMP_FLAGS} 2>&1 | tee -a $logpath/$logfileName
     make makeshlib 2>&1 | tee -a $logpath/$logfileName
-    make -f Makefile.shlib $CFDEM_LIGGGHTS_MAKEFILE_NAME postfix=$CFDEM_LIGGGHTS_MAKEFILE_POSTFIX 2>&1 | tee -a $logpath/$logfileName
+    make -f Makefile.shlib $CFDEM_LIGGGHTS_MAKEFILE_NAME postfix=$CFDEM_LIGGGHTS_MAKEFILE_POSTFIX ${LIG_COMP_FLAGS} 2>&1 | tee -a $logpath/$logfileName
 
     if [ ${PIPESTATUS[0]} -ne 0 ]; then 
         return 1
@@ -248,6 +254,23 @@ compileLMPlib()
         echo ""
         echo "lib path $libraryPath does not exist - check settings in .../etc/bashrc."
         read
+    fi
+
+    # LIGGGHTS compilation flags
+    if [[ $WM_NCOMPPROCS == "" ]]; then
+         LIG_COMP_FLAGS=" "
+    else
+         LIG_COMP_FLAGS="-j $WM_NCOMPPROCS "
+    fi
+
+    if [[ ${WM_COMPILE_OPTION} == "Debug" ]] && [[ $CFDEM_LIGGGHTS_MAKEFILE_NAME == "auto" ]]; then
+        LIG_COMP_FLAGS="${LIG_COMP_FLAGS} debug=FULL"
+    fi
+
+    # Fallback if $makeFileName does not exist
+    if [[ ! -f "${makeFileName}" ]]; then
+      echo "WARNING: userdefined Makefile ${makeFileName} cannot be found in ${libraryPath}, using default Makefile.mpi"
+      makeFileName="Makefile.mpi"
     fi
 
     #Just check if library is there and and abort if not
@@ -304,9 +327,10 @@ compileLMPlib()
             fi
 
             #- compile
+            echo "compiling LIB with ${LIG_COMP_FLAGS}"
             echo "make" 2>&1 | tee -a $logpath/$logfileName
             echo 2>&1 | tee -a $logpath/$logfileName
-            make -f $makeFileName 2>&1 | tee -a $logpath/$logfileName
+            make -f $makeFileName ${LIG_COMP_FLAGS} 2>&1 | tee -a $logpath/$logfileName
 
             if [ ${PIPESTATUS[0]} -ne 0 ]; then 
                 return 1
@@ -362,7 +386,7 @@ cleanCFDEM()
 
             cd  $path
             echo "cleaning library $PWD"
-            if [[ $WM_PROJECT_VERSION == dev || $WM_PROJECT_VERSION == 3.0.* || $WM_PROJECT_VERSION == 4.* ]]; then
+            if [[ $WM_PROJECT_VERSION == dev || $WM_PROJECT_VERSION == 3.0.* || $WM_PROJECT_VERSION == 4.* || $WM_PROJECT_VERSION == 5.* ]]; then
                 wrmdep
             else
                 rmdepall
@@ -420,7 +444,7 @@ cleanCFDEM()
 
             cd  $path            
             echo "cleaning solver $PWD"
-            if [[ $WM_PROJECT_VERSION == dev || $WM_PROJECT_VERSION == 3.0.* || $WM_PROJECT_VERSION == 4.* ]]; then
+            if [[ $WM_PROJECT_VERSION == dev || $WM_PROJECT_VERSION == 3.0.* || $WM_PROJECT_VERSION == 4.* || $WM_PROJECT_VERSION == 5.* ]]; then
                 wrmdep
             else
                 rmdepall
@@ -832,7 +856,7 @@ parCFDDEMrun()
         #- reconstruct case
         if [[ $reconstuctCase == "true" ]]; then   
             #pseudoParallelRun "reconstructPar" $nrProcs
-            reconstructPar
+            reconstructPar -noLagrangian
         fi
     else
         mpirun -machinefile $machineFileName -np $nrProcs $debugMode $solverName -parallel 2>&1 | tee -a $logpath/$logfileName
@@ -840,7 +864,7 @@ parCFDDEMrun()
         #- reconstruct case
         if [[ $reconstuctCase == "true" ]]; then   
             #pseudoParallelRun "reconstructPar" $nrProcs
-            reconstructPar
+            reconstructPar -noLagrangian
         fi
     fi
 
@@ -926,7 +950,7 @@ collectLogCFDEMcoupling_src()
     LASTWORD=$(basename $LASTSTRING)
 
     # log if compilation was success  
-    if [[ $LASTWORD == $SOLVERNAME || $LASTWORD == "date." ]]; then
+    if [[ $LASTWORD == $SOLVERNAME || ${LASTWORD: -3} == ".so" ]]; then
         echo "$SOLVERNAME" >> $logpath/log_compile_results_src_success
     else
         echo "$SOLVERNAME" >> $logpath/log_compile_results_src_fail

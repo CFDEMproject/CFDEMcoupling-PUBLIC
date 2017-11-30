@@ -102,13 +102,7 @@ void IOModel::streamDataToPath(fileName path, double** array,int nPProc,word nam
     *fileStream << "{version 2.0; format ascii;class "<< className << "; location 0;object  "<< name <<";}\n";
     *fileStream << nPProc <<"\n";
 
-
-    if(type!="origProcId")*fileStream << "(\n";
-    else if(type=="origProcId")
-    {
-        if(nPProc>0) *fileStream <<"{0}"<< "\n";
-        else *fileStream <<"{}"<< "\n";
-    }
+    *fileStream << "(\n";
 
     for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
     {
@@ -119,13 +113,38 @@ void IOModel::streamDataToPath(fileName path, double** array,int nPProc,word nam
             }else if (type=="position" || type=="vector"){
                 for(int i=0;i<3;i++) vec[i] = array[index][i];
                 *fileStream <<"( "<< vec[0] <<" "<<vec[1]<<" "<<vec[2]<<" ) "<< finaliser << " \n";
-            }else if (type=="label"){
-                *fileStream << index << finaliser << " \n";
             }
         }
     }
 
-    if(type!="origProcId")*fileStream << ")\n";
+    *fileStream << ")\n";
+    delete fileStream;
+}
+
+void IOModel::streamDataToPath(fileName path, int** array,int nPProc,word name,word type,word className,word finaliser) const
+{
+    vector vec;
+    OFstream* fileStream = new OFstream(fileName(path/name));
+    *fileStream << "FoamFile\n";
+    *fileStream << "{version 2.0; format ascii;class "<< className << "; location 0;object  "<< name <<";}\n";
+    *fileStream << nPProc <<"\n";
+
+    *fileStream << "(\n";
+
+    for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
+    {
+        if (particleCloud_.cellIDs()[index][0] > -1) // particle Found
+        {
+            if (type=="scalar"){
+                *fileStream << array[index][0] << " \n";
+            }else if (type=="position" || type=="vector"){
+                for(int i=0;i<3;i++) vec[i] = array[index][i];
+                *fileStream <<"( "<< vec[0] <<" "<<vec[1]<<" "<<vec[2]<<" ) "<< finaliser << " \n";
+            }
+        }
+    }
+
+    *fileStream << ")\n";
     delete fileStream;
 }
 

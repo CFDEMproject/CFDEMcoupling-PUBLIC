@@ -122,7 +122,6 @@ void Foam::cfdemCloudIB::getDEMdata()
 {
     cfdemCloud::getDEMdata();
     dataExchangeM().getData("omega","vector-atom",angularVelocities_);
-    dataExchangeM().getData("torque","vector-atom",DEMTorques_);
 }
 
 bool Foam::cfdemCloudIB::reAllocArrays() const
@@ -257,7 +256,9 @@ void Foam::cfdemCloudIB::setInterFace
                 // evaluate the interpolation points.
                 vector minPeriodicParticlePos=ParPos;
                 voidFractionM().minPeriodicDistance(par,posC, ParPos, globalBb, 
-                                                    minPeriodicParticlePos);
+                                                    minPeriodicParticlePos, 
+                                                    wall_periodicityCheckRange());
+
                 ParPos = minPeriodicParticlePos;
             }
             double value = voidFractionM().pointInParticle(par, ParPos, posC, skin);

@@ -16,7 +16,16 @@ FoamFile
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 //simulationType  RASModel; //OFversion24x
-simulationType  laminar; //OFversion30x
+simulationType  laminar;//RAS; //OFversion30x
+
+RAS
+{
+    RASModel        kEpsilon;//kOmegaSST;
+
+    turbulence      on;
+
+    printCoeffs     on;
+}
 
 
 // ************************************************************************* //

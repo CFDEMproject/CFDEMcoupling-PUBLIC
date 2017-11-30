@@ -38,6 +38,7 @@ Description
 
      The second order terms are based on: 
      Mei Lift force following Loth and Dorgan 2009,
+     Environ Fluid Mech (2009) 9:187–206, DOI 10.1007/s10652-009-9123-x
      and can be added to the lift coefficient if desired
      (contribution from RQ)
 

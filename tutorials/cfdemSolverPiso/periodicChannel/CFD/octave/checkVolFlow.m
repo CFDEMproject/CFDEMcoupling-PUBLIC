@@ -13,7 +13,7 @@ Ainlet=1.000000e-02;    % cross sectional area in m2
 Utarget=10;            % target superficial velocity in m/s
 Vtarget=Utarget*Ainlet; % target flowrate in m3/s
 
-filename = 'faceSource.dat';
+filename = 'surfaceFieldValue.dat';
 timedirectory = '0';
 
     %Daten einlesen
@@ -21,21 +21,21 @@ timedirectory = '0';
     data = transpose(load(strcat(path,'/',timedirectory,'/',filename)));          %data
     [x,y]=size(data);
     time=data(1,1+skip:y)
-    volFlow_inlet=data(3,1+skip:y)
+    volFlow_inlet=data(2,1+skip:y)
 
     %Daten einlesen
     path = '../../CFD/postProcessing/volFlow_outlet';
     data = transpose(load(strcat(path,'/',timedirectory,'/',filename)));          %data
     [x,y]=size(data)
     time=data(1,1+skip:y);
-    volFlow_outlet=data(3,1+skip:y);
+    volFlow_outlet=data(2,1+skip:y);
 
     %Daten einlesen
     path = '../../CFD/postProcessing/volFlow_wall';
     data = transpose(load(strcat(path,'/',timedirectory,'/',filename)));          %data
     [x,y]=size(data)
     time=data(1,1+skip:y);
-    volFlow_wall=data(3,1+skip:y);
+    volFlow_wall=data(2,1+skip:y);
 
 %- time integrate data to vol entered per TS
 deltatT=time(2)-time(1)
@@ -65,7 +65,7 @@ figure1 = figure('PaperPositionMode','manual','PaperUnits','centimeters',...
 
 % Create axes
 axes1 = axes('Parent',figure1,'YGrid','on','XGrid','on','LineWidth',1,...
-    'FontWeight','light','FontSize',11,'FontName','Helvetica-Narrow');
+    'FontWeight','normal','FontSize',11,'FontName','Helvetica-Narrow');
 box(axes1,'on');
 hold(axes1,'all');
 
@@ -97,7 +97,7 @@ figure2 = figure('PaperPositionMode','manual','PaperUnits','centimeters',...
 
 % Create axes
 axes2 = axes('Parent',figure2,'YGrid','on','XGrid','on','LineWidth',1,...
-    'FontWeight','light','FontSize',11,'FontName','Helvetica-Narrow');
+    'FontWeight','normal','FontSize',11,'FontName','Helvetica-Narrow');
 box(axes2,'on');
 hold(axes2,'all');
 
@@ -129,7 +129,7 @@ figure3 = figure('PaperPositionMode','manual','PaperUnits','centimeters',...
 
 % Create axes
 axes3 = axes('Parent',figure3,'YGrid','on','XGrid','on','LineWidth',1,...
-    'FontWeight','light','FontSize',11,'FontName','Helvetica-Narrow');
+    'FontWeight','normal','FontSize',11,'FontName','Helvetica-Narrow');
 box(axes3,'on');
 hold(axes3,'all');
 

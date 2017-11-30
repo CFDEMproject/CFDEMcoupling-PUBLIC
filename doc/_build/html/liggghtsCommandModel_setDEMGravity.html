@@ -152,6 +152,7 @@
     endTime scalar2;
     timeInterval scalar3;
     verbose;
+    unfix switch2;
 }
 </pre></div>
 </div>
@@ -161,6 +162,7 @@
 <li><em>scalar2</em> = end time of command (use simulation start time)</li>
 <li><em>scalar3</em> = time interval of command (use 1.)
 <em>verbose</em> = (normally off) for verbose run</li>
+<li><em>switch2</em> = (false by default) switch to select if the command is used as fix (default) or unfix</li>
 </ul>
 </div>
 <div class="section" id="examples">
@@ -177,6 +179,7 @@ setDEMGravityProps1
     endTime 0;
     timeInterval 1;
     verbose;
+    unfix false;
 }
 </pre></div>
 </div>

@@ -70,11 +70,21 @@ protected:
 
     // Protected data
 
+        const bool twoPhase_;
+
+        volScalarField alpha_;
+
+        const bool coupled_;
+
+	    volScalarField voidfraction_;
+
+        const word modelName_;
+
+        const scalar alphaMin_;
 
     // Protected Member Functions
 
-    virtual scalar magUbarAve(const volVectorField& U) const;
-
+        virtual scalar magUbarAve(const volVectorField& U) const;
 
 private:
 
@@ -85,17 +95,6 @@ private:
 
         //- Disallow default bitwise assignment
         void operator=(const meanSupVelocityForce&);
-
-        const word voidfractionName_;
-
-	    const volScalarField& voidfraction_;
-
-        const word modelName_;
-
-        const bool twoPhase_;
-
-        volScalarField alpha_;
-
 
 public:
 

@@ -66,6 +66,7 @@ fieldTimeAverage::fieldTimeAverage
     mesh_(particleCloud_.mesh())
 {
     init();
+    particleCloud_.checkCG(true);
 }
 
 // Construct from components
@@ -82,6 +83,7 @@ fieldTimeAverage::fieldTimeAverage
     mesh_(particleCloud_.mesh())
 {
     init(fieldPrefix);
+    particleCloud_.checkCG(true);
 }
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //

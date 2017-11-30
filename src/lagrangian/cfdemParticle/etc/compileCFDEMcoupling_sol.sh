@@ -44,6 +44,7 @@ echo ""
 #- create a tmp file and delete comments in it - work with tmp file then.
 cp $whitelist "tmpFile.txt"
 sed -i '/^#/d' "tmpFile.txt"
+sed -i '/^$/d' "tmpFile.txt"
 whitelist="tmpFile.txt"
 
 if [ ! -f "$CWD/$whitelist" ];then

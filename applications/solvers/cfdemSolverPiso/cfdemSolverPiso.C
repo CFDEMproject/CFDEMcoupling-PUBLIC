@@ -55,7 +55,7 @@ Description
 #if defined(anisotropicRotation)
     #include "cfdemCloudRotation.H"
 #endif
-#if defined(SUPERQUADRIC_ACTIVE_FLAG)
+#if defined(superquadrics_flag)
     #include "cfdemCloudRotationSuperquadric.H"
 #endif
 #include "implicitCouple.H"
@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
     #include "checkImCoupleM.H"
     #if defined(anisotropicRotation)
         cfdemCloudRotation particleCloud(mesh);
-    #elif defined(SUPERQUADRIC_ACTIVE_FLAG)
+    #elif defined(superquadrics_flag)
         cfdemCloudRotationSuperquadric particleCloud(mesh);
     #else
         cfdemCloud particleCloud(mesh);
@@ -192,39 +192,7 @@ int main(int argc, char *argv[])
                         rUAvoidfraction = volScalarField("(voidfraction2|A(U))",rUA*voidfraction*voidfraction);
 
                     // Update the fixedFluxPressure BCs to ensure flux consistency
-                    #ifndef versionExt32
-                    #ifndef version40
-                        if (modelType=="A")
-                        {
-                            setSnGrad<fixedFluxPressureFvPatchScalarField>
-                            (
-                                #ifdef versionv1612plus
-                                    p.boundaryFieldRef(),
-                                #else
-                                    p.boundaryField(),
-                                #endif
-                                (
-                                    phi.boundaryField()
-                                  - (mesh.Sf().boundaryField() & U.boundaryField())
-                                )/(mesh.magSf().boundaryField()*rUAf.boundaryField()*voidfractionf.boundaryField())
-                            );
-                        }else
-                        {
-                            setSnGrad<fixedFluxPressureFvPatchScalarField>
-                            (
-                                #ifdef versionv1612plus
-                                    p.boundaryFieldRef(),
-                                #else
-                                    p.boundaryField(),
-                                #endif
-                                (
-                                    phi.boundaryField()
-                                  - (mesh.Sf().boundaryField() & U.boundaryField())
-                                )/(mesh.magSf().boundaryField()*rUAf.boundaryField())
-                            );
-                        }
-                    #endif
-                    #endif
+                    #include "fixedFluxPressureHandling.H"
                     
 
                     // Non-orthogonal pressure corrector loop
@@ -279,6 +247,7 @@ int main(int argc, char *argv[])
                 } // end piso loop
             }
 
+            laminarTransport.correct();
             turbulence->correct();
         }// end solveFlow
         else

@@ -187,6 +187,8 @@ void oneWayVTK::getData
         {
             string just_read = " ";
             while(just_read.compare(name) != 0)  *inputPtr >> just_read;   //read until we read "name"
+            *inputPtr >> just_read;                                    // skip "3"
+            *inputPtr >> just_read;                                    // skip nr entries
             *inputPtr >> just_read;                                    // skip text for dataType
             for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
             {

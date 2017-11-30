@@ -214,8 +214,8 @@ void eulerianScalarField::update(surfaceScalarField phi, volScalarField voidfrac
             const volScalarField& cpVolumetricField_(particleCloud_.mesh().lookupObject<volScalarField> (cpVolumetricFieldName_));
 
             #if defined(version40) || defined(versionv1612plus)
-            mSource_ /= cpVolumetricField_+SMALL;
-            mSourceKImpl_ /= cpVolumetricField_+SMALL;
+            mSource_.primitiveFieldRef() /= cpVolumetricField_.primitiveField()+SMALL;
+            mSourceKImpl_.primitiveFieldRef() /= cpVolumetricField_.primitiveField()+SMALL;
             #else
             mSource_.internalField() /= cpVolumetricField_.internalField()+SMALL;
             mSourceKImpl_.internalField() /= cpVolumetricField_.internalField()+SMALL;
@@ -223,7 +223,6 @@ void eulerianScalarField::update(surfaceScalarField phi, volScalarField voidfrac
         }
     }
 
-  
     word divScheme("div(phi,m)");
     word laplacianScheme("laplacian(D,m)");
 

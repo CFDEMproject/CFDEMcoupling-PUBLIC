@@ -257,7 +257,7 @@ centreProps
     alphaMin 0.1;
 }
 
-"(engineProps|turboEngineM2MProps)"
+"(engineProps|turboEngineProps|turboEngineM2MProps)"
 {
     treeSearch true;
 }

@@ -402,50 +402,58 @@ public:
 
        //access to the particles' orientation information
        virtual inline double ** exArray() const {
-         FatalError << "cfdemCloud::exArray(): you are attempting to get an access to ex array for spheroids/superquadrics. This is not allowed for spheres. Recompile the code with #define anisotropicRotation in OFversion.H or enable superquadrics in LIGGGHTS (SUPERQUADRIC_ACTIVE_FLAG)" << abort(FatalError);
+         FatalError << "cfdemCloud::exArray(): you are attempting to get an access to ex array for spheroids/superquadrics. This is not allowed for spheres. Recompile the code with #define anisotropicRotation in OFversion.H or enable superquadrics in LIGGGHTS (superquadrics_flag)" << abort(FatalError);
+         return NULL;
+       };
+       virtual inline double ** eyArray() const {
+         FatalError << "cfdemCloud::eyArray(): you are attempting to get an access to ey array for spheroids/superquadrics. This is not allowed for spheres. Recompile the code with #define anisotropicRotation in OFversion.H or enable superquadrics in LIGGGHTS (superquadrics_flag)" << abort(FatalError);
          return NULL;
        };
        virtual vector ex(int) const {
-         FatalError << "cfdemCloud::ex(): you are attempting to get an access to ex array for spheroids/superquadrics. This is not allowed for spheres. Recompile the code with #define anisotropicRotation in OFversion.H or enable superquadrics in LIGGGHTS (SUPERQUADRIC_ACTIVE_FLAG)" << abort(FatalError);
+         FatalError << "cfdemCloud::ex(): you are attempting to get an access to ex array for spheroids/superquadrics. This is not allowed for spheres. Recompile the code with #define anisotropicRotation in OFversion.H or enable superquadrics in LIGGGHTS (superquadrics_flag)" << abort(FatalError);
+         return Foam::vector(0,0,0);
+       };
+       virtual vector ey(int) const {
+         FatalError << "cfdemCloud::ey(): you are attempting to get an access to ey array for spheroids/superquadrics. This is not allowed for spheres. Recompile the code with #define anisotropicRotation in OFversion.H or enable superquadrics in LIGGGHTS (superquadrics_flag)" << abort(FatalError);
          return Foam::vector(0,0,0);
        };
        virtual inline double ** shapeArray() const {
-         FatalError << "cfdemCloud::shapeArray(): you are attempting to get an access to shape array for spheroids/superquadrics. This is not allowed for spheres. Recompile the code with #define anisotropicRotation in OFversion.H or enable superquadrics in LIGGGHTS (SUPERQUADRIC_ACTIVE_FLAG)" << abort(FatalError);
+         FatalError << "cfdemCloud::shapeArray(): you are attempting to get an access to shape array for spheroids/superquadrics. This is not allowed for spheres. Recompile the code with #define anisotropicRotation in OFversion.H or enable superquadrics in LIGGGHTS (superquadrics_flag)" << abort(FatalError);
          return NULL;
        };
        virtual vector shape(int) const {
-         FatalError << "cfdemCloud::shapeArray(): you are attempting to get an access to shape array for spheroids/superquadrics. This is not allowed for spheres. Recompile the code with #define anisotropicRotation in OFversion.H or enable superquadrics in LIGGGHTS (SUPERQUADRIC_ACTIVE_FLAG)" << abort(FatalError);
+         FatalError << "cfdemCloud::shapeArray(): you are attempting to get an access to shape array for spheroids/superquadrics. This is not allowed for spheres. Recompile the code with #define anisotropicRotation in OFversion.H or enable superquadrics in LIGGGHTS (superquadrics_flag)" << abort(FatalError);
          return Foam::vector(0,0,0);
        };
 
        // access to complex shape information
        virtual inline double ** vectorArray() const {return NULL;};
        virtual scalar volume(int) const {
-         FatalError << "cfdemCloud::volume(): you are attempting to get an access to volume array for superquadrics. This is not allowed for spheres. Enable superquadrics in LIGGGHTS (SUPERQUADRIC_ACTIVE_FLAG)" << abort(FatalError);
+         FatalError << "cfdemCloud::volume(): you are attempting to get an access to volume array for superquadrics. This is not allowed for spheres. Enable superquadrics in LIGGGHTS (superquadrics_flag)" << abort(FatalError);
          return 0;
        };
        virtual inline double ** areaArray() const {
-         FatalError << "cfdemCloud::areaArray(): you are attempting to get an access to area array for superquadrics. This is not allowed for spheres.  Enable superquadrics in LIGGGHTS (SUPERQUADRIC_ACTIVE_FLAG)" << abort(FatalError);
+         FatalError << "cfdemCloud::areaArray(): you are attempting to get an access to area array for superquadrics. This is not allowed for spheres.  Enable superquadrics in LIGGGHTS (superquadrics_flag)" << abort(FatalError);
          return NULL;
        };
        virtual scalar area(int) const {
-         FatalError << "cfdemCloud::arrea(): you are attempting to get an access to area array for superquadrics. This is not allowed for spheres. Enable superquadrics in LIGGGHTS (SUPERQUADRIC_ACTIVE_FLAG)" << abort(FatalError);
+         FatalError << "cfdemCloud::arrea(): you are attempting to get an access to area array for superquadrics. This is not allowed for spheres. Enable superquadrics in LIGGGHTS (superquadrics_flag)" << abort(FatalError);
          return 0;
        };
        virtual inline double ** quaternionArray() const {
-         FatalError << "cfdemCloud::quaternionArray(): you are attempting to get an access to roundness array for superquadrics. This is not allowed for spheres. Enable superquadrics in LIGGGHTS (SUPERQUADRIC_ACTIVE_FLAG)" << abort(FatalError);
+         FatalError << "cfdemCloud::quaternionArray(): you are attempting to get an access to quaternion array for superquadrics. This is not allowed for spheres. Enable superquadrics in LIGGGHTS (superquadrics_flag)" << abort(FatalError);
          return NULL;
        };
        virtual quaternion quat(int) const {
-         FatalError << "cfdemCloud::quat(): you are attempting to get an access to quaternion array for superquadrics. This is not allowed for spheres. Enable superquadrics in LIGGGHTS (SUPERQUADRIC_ACTIVE_FLAG)" << abort(FatalError);
+         FatalError << "cfdemCloud::quat(): you are attempting to get an access to quaternion array for superquadrics. This is not allowed for spheres. Enable superquadrics in LIGGGHTS (superquadrics_flag)" << abort(FatalError);
          return quaternion(1);
        };
-       virtual inline double ** roundnessArray() const {
-         FatalError << "cfdemCloud::roundnessArray(): you are attempting to get an access to roundness array for superquadrics. This is not allowed for spheres. Enable superquadrics in LIGGGHTS (SUPERQUADRIC_ACTIVE_FLAG)" << abort(FatalError);
+       virtual inline double ** blockinessArray() const {
+         FatalError << "cfdemCloud::blockinessArray(): you are attempting to get an access to blockiness array for superquadrics. This is not allowed for spheres. Enable superquadrics in LIGGGHTS (superquadrics_flag)" << abort(FatalError);
          return NULL;
        };
-       virtual vector2D roundness(int) const {
-         FatalError << "cfdemCloud::roundness(): you are attempting to get an access to roundness array for superquadrics. This is not allowed for spheres. Enable superquadrics in LIGGGHTS (SUPERQUADRIC_ACTIVE_FLAG)" << abort(FatalError);
+       virtual vector2D blockiness(int) const {
+         FatalError << "cfdemCloud::blockiness(): you are attempting to get an access to blockiness array for superquadrics. This is not allowed for spheres. Enable superquadrics in LIGGGHTS (superquadrics_flag)" << abort(FatalError);
          return Foam::vector2D(0,0);
        };
 

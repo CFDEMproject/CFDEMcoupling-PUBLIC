@@ -44,7 +44,7 @@ if [ $runOctave == "true" ]
         rm *.png
 
         #- run octave
-        octave checkVolFlow.m
+        octave --no-gui checkVolFlow.m
 
         #- show plot 
         eog volflow.png

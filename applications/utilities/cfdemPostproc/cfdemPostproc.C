@@ -132,6 +132,10 @@ int main(int argc, char *argv[])
             false
         );
 
+        //write Us field
+        Us = particleCloud.averagingM().UsInterp();
+        Us.correctBoundaryConditions();
+
         for (int i=0;i<particleCloud.nrForceModels();i++) particleCloud.forceM(i).setForce();
 
         runTime.write();

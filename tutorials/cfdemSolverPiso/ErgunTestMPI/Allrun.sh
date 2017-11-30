@@ -27,6 +27,7 @@ fi
 
 # keep old couplingProperties
 cp $casePath/CFD/constant/couplingProperties $casePath/CFD/constant/couplingProperties_backup
+cp $casePath/CFD/0/p $casePath/CFD/0/p_backup
 
 # change to M2M + type B
 #changeDictionary -constant -dict changeDicts/changeDictionaryDict_1 -case $casePath/CFD
@@ -43,9 +44,21 @@ cp $casePath/CFD/constant/couplingProperties $casePath/CFD/constant/couplingProp
 # change to MPI + type Bfull
 #changeDictionary -constant -dict changeDicts/changeDictionaryDict_5 -case $casePath/CFD
 
+# change to cfdemSolverPimpleImExFace + MPI + type Bfull + explicit gradP
+#changeDictionary -constant -dict changeDicts/changeDictionaryDict_6 -case $casePath/CFD
+
+# change to M2M + type B + fixedFluxPressure
+#changeDictionary -dict changeDicts/changeDictionaryDict_0 -case $casePath/CFD
+#changeDictionary -constant -dict changeDicts/changeDictionaryDict_1 -case $casePath/CFD
+
+# change to MPI + type A + fixedFluxPressure
+#changeDictionary -dict changeDicts/changeDictionaryDict_0 -case $casePath/CFD
+#changeDictionary -constant -dict changeDicts/changeDictionaryDict_2 -case $casePath/CFD
+
 #- run parallel CFD-DEM in new terminal
 #gnome-terminal --title='cfdemSolverPiso ErgunTestMPI CFD'  -e "bash $casePath/parCFDDEMrun.sh" 
 . $casePath/parCFDDEMrun.sh
 
 # restore old couplingProperties
-mv $casePath/CFD/constant/couplingProperties_backup $casePath/CFD/constant/couplingProperties 
+mv $casePath/CFD/constant/couplingProperties_backup $casePath/CFD/constant/couplingProperties
+mv $casePath/CFD/0/p_backup $casePath/CFD/0/p 

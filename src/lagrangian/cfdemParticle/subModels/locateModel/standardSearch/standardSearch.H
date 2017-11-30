@@ -81,7 +81,8 @@ public:
             double** const& mask,
             double**& positions,
             double**& cellIDs,
-            int size
+            int size,
+            bool checkRad=true
         ) const;
 
         label findSingleCell

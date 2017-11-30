@@ -56,14 +56,14 @@ maxDeltaT       1;
 
 
 functions
-(
+{
     probes
     {
         type        probes;
         // Where to load it from
         functionObjectLibs ( "libsampling.so" );
         // Name of the directory for probe data
-        name        drag;
+        name        probes;
         probeLocations
         (
             (0.5001 0.5001 0.0001)
@@ -79,6 +79,6 @@ functions
         outputControl   timeStep;//outputTime;
         outputInterval  1;
     }
-);
+}
 
 // ************************************************************************* //

@@ -138,6 +138,8 @@ volWeightedAverage::volWeightedAverage
 	    sPtr_ = new OFstream(path_/"volWeightedAverage.txt");
         //*sPtr_ << "time | vol av. scalar field i | ... | vol av. vector field i" << nl;
     }
+
+    particleCloud_.checkCG(true);
 }
 
 

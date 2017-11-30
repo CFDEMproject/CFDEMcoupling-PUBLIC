@@ -78,6 +78,7 @@ gradPForce::gradPForce
 
     // define switches which can be read from dict
     forceSubM(0).setSwitchesList(0,true); // activate search for treatForceExplicit switch
+    forceSubM(0).setSwitchesList(3,true); // activate search for verbose switch
     forceSubM(0).setSwitchesList(4,true);   // activate search for interpolate switch
 
     //set default switches (hard-coded default = false)

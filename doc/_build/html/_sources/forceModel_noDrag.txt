@@ -19,12 +19,10 @@ noDragProps
 {
     noDEMForce "switch1";
     keepCFDForce "switch2";
-    treatForceExplicit "switch3";
 }
 
-* *switch1* = (optional, default false) do not apply the previously calculated forces in DEM integration
-* *switch2* = (optional, default false) do not delete the previously calculated forces and use them in CFD source terms
-* *switch3* = (optional, default false) sub model switch, see :doc:`forceSubModel <forceSubModel>` for details
+* *switch1* = (optional, default false) do not apply the previously calculated forces (implicitly and explicitly treated) in DEM integration
+* *switch2* = (optional, default false) do not delete the previously calculated forces (implicitly and explicitly treated) and use them in CFD source terms
 
 
 Examples

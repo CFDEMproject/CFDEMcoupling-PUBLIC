@@ -66,8 +66,8 @@ checkCouplingInterval::checkCouplingInterval
     velocityFieldName_(propsDict_.lookupOrDefault<word>("velocityFieldName", "U")),
     U_(sm.mesh().lookupObject<volVectorField> (velocityFieldName_)),
     rhoP_(readScalar(propsDict_.lookup("rhoP"))),
-    maxCFL_(propsDict_.lookupOrDefault<scalar>("maxCFL", 50.)),
-    maxPCFL_(propsDict_.lookupOrDefault<scalar>("maxPCFL", 50.)),
+    maxCFL_(propsDict_.lookupOrDefault<scalar>("maxCFL", 1.)),
+    maxPCFL_(propsDict_.lookupOrDefault<scalar>("maxPCFL", 1.)),
     maxAccNr_(propsDict_.lookupOrDefault<scalar>("maxAccNr", 0.005)),
     UmaxExpected_(readScalar(propsDict_.lookup("UmaxExpected"))),
     minAllowedVcellByVparcel_(propsDict_.lookupOrDefault<scalar>("minAllowedVcellByVparcel", 3.)),
@@ -97,6 +97,8 @@ checkCouplingInterval::checkCouplingInterval
 
     Info << "running checkCouplingInterval every " << couplingStepInterval_ << " coupling steps,"
          << "which is every " << timeInterval_ << " seconds." << endl;
+
+    particleCloud_.checkCG(true);
 }
 
 
@@ -220,7 +222,7 @@ void checkCouplingInterval::setForce() const
             if (cellI > -1) // particle Found
             {
                 rad = particleCloud_.radius(index);
-                scaledRad = rad/particleCloud_.cg();
+                forceSubM(0).scaleDia(rad,index);
                 tauP = rhoP_*4*scaledRad*scaledRad/
                         (18 * nufField[cellI] * rhoField[cellI])/scaleDrag;
                 minTauP = min(minTauP,tauP);

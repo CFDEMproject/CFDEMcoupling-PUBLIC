@@ -120,7 +120,8 @@ forceSubModel::forceSubModel
     verboseDiskIntervall_(1),
     verboseDiskCounter_(0),
     scaleDia_(dict_.lookupOrDefault<scalar>("scale",1.)),
-    scaleDrag_(dict_.lookupOrDefault<scalar>("scaleDrag",1.))
+    scaleDrag_(dict_.lookupOrDefault<scalar>("scaleDrag",1.)),
+    scaleDH_(dict_.lookupOrDefault<scalar>("scaleDH",1.))
 {
     // init standard switch list
     int iCounter(0);
@@ -160,7 +161,14 @@ forceSubModel::forceSubModel
     if (scaleDrag_ != 1.)
         Info << "using scaleDrag = " << scaleDrag_ << endl;
 
+    if (scaleDrag_ < SMALL)
+       FatalError<< "scaleDrag > 0 required" << abort(FatalError);
+
     particleCloud_.registryM().addProperty("scaleDrag",scaleDrag_);
+
+    // info about scaleDH being used
+    if (scaleDH_ != 1)
+        Info << "using scaleDH = " << scaleDH_ << endl;
 }
 
 
@@ -330,7 +338,7 @@ void forceSubModel::scaleDia(scalar& d, int index) const
     if(particleCloud_.cgTypeSpecificDifferent)
         d /= particleCloud_.cg(particleCloud_.particleType(index));
     else
-        d /= scaleDia_;
+        d /= scaleDia_ / scaleDH_;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

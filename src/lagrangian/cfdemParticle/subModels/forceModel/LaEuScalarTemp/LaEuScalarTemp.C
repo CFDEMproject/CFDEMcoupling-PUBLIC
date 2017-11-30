@@ -83,7 +83,9 @@ LaEuScalarTemp::LaEuScalarTemp
     partHeatFluid_(NULL),
     validPartHeatFluid_(false),
     lambda_(readScalar(propsDict_.lookup("lambda"))),
-    Cp_(readScalar(propsDict_.lookup("Cp")))
+    Cp_(readScalar(propsDict_.lookup("Cp"))),
+    compressible_(propsDict_.lookupOrDefault<Switch>("compressible",false)),
+    doExchange_(propsDict_.lookupOrDefault<Switch>("doExchange",true))
 {
     if (lambda_<SMALL)
     {
@@ -98,6 +100,8 @@ LaEuScalarTemp::LaEuScalarTemp
         maxSource_=readScalar(propsDict_.lookup ("maxSource"));
         Info << "limiting eulerian source field to: " << maxSource_ << endl;
     }
+    
+    if(compressible_) Info << "Compressibility mode enabled." << endl;
 
     if(partHeatFluxName_!="na") validPartHeatFlux_=true;
     if(partHeatTransCoeffName_!="na") validPartHeatTransCoeff_=true;
@@ -171,177 +175,198 @@ void LaEuScalarTemp::manipulateScalarField(volScalarField& EuField) const
 {
     // realloc the arrays
     allocateMyArrays();
-
-    // reset Scalar field (== means hard reset)
-    EuField == dimensionedScalar("zero", EuField.dimensions(), 0.);
-
-    // get DEM data
-    particleCloud_.dataExchangeM().getData(partTempName_,"scalar-atom",partTemp_);
-
-    const volScalarField& nufField = forceSubM(0).nuField();
-    const volScalarField& rhoField = forceSubM(0).rhoField();
-
-    // calc La based heat flux
-    vector position(0,0,0);
-    scalar voidfraction(1);
-    vector Ufluid(0,0,0);
-    scalar Tfluid(0);
-    label cellI=0;
-    vector Us(0,0,0);
-    scalar ds(0);
-    scalar dparcel(0);
-    scalar numberParticlesInParcel(1);
-    scalar nuf(0);
-    scalar rho(0);
-    scalar magUr(0);
-    scalar As(0);
-    scalar Rep(0);
-    scalar Pr(0);
-    scalar Nup(0);
-    scalar n = 3.5; // model parameter
-
-    #include "resetVoidfractionInterpolator.H"
-    #include "resetUInterpolator.H"
-    #include "resetTInterpolator.H"
-
-    for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
+    if(doExchange_)
     {
-        //if(particleCloud_.regionM().inRegion()[index][0])
-        //{
-            cellI = particleCloud_.cellIDs()[index][0];
-            if(cellI >= 0)
-            {
-                if(forceSubM(0).interpolation())
-                {
-	                position = particleCloud_.position(index);
-                    voidfraction = voidfractionInterpolator_().interpolate(position,cellI);
-                    Ufluid = UInterpolator_().interpolate(position,cellI);
-                    Tfluid = TInterpolator_().interpolate(position,cellI);
-                }else
-                {
-					voidfraction = voidfraction_[cellI];
-                    Ufluid = U_[cellI];
-                    Tfluid = T_[cellI];
-                }
+        // reset Scalar field (== means hard reset)
+        EuField == dimensionedScalar("zero", EuField.dimensions(), 0.);
 
-                // calc relative velocity
-                Us = particleCloud_.velocity(index);
-                ds = 2*particleCloud_.radius(index);
-                dparcel = ds;
-                forceSubM(0).scaleDia(ds,index); //caution: this fct will scale ds!
-                numberParticlesInParcel    = dparcel/ds;
-                numberParticlesInParcel   *= numberParticlesInParcel*numberParticlesInParcel;
-                nuf = nufField[cellI];
-                rho = rhoField[cellI];
+        // get DEM data
+        particleCloud_.dataExchangeM().getData(partTempName_,"scalar-atom",partTemp_);
 
-                //Update any scalar or vector quantity
-                for (int iFSub=0;iFSub<nrForceSubModels();iFSub++)
-                      forceSubM(iFSub).update(  index, 
-                                                cellI,
-                                                ds,
-                                                Ufluid, 
-                                                Us, 
-                                                nuf,
-                                                rho,
-                                                forceSubM(0).verbose()
-                                             );
+        const volScalarField& nufField = forceSubM(0).nuField();
+        const volScalarField& rhoField = forceSubM(0).rhoField();
 
-                magUr = mag(Ufluid-Us);
-                As = ds*ds*M_PI*numberParticlesInParcel;
+        // calc La based heat flux
+        vector position(0,0,0);
+        scalar voidfraction(1);
+        vector Ufluid(0,0,0);
+        scalar Tfluid(0);
+        label cellI=0;
+        vector Us(0,0,0);
+        scalar ds(0);
+        scalar dparcel(0);
+        scalar numberParticlesInParcel(1);
+        scalar nuf(0);
+        scalar rho(0);
+        scalar magUr(0);
+        scalar As(0);
+        scalar Rep(0);
+        scalar Pr(0);
+        scalar Nup(0);
+        scalar n = 3.5; // model parameter
 
-                Rep = ds*magUr/nuf;
-                Pr = max(SMALL,Cp_*nuf*rho/lambda_);
+        #include "resetVoidfractionInterpolator.H"
+        #include "resetUInterpolator.H"
+        #include "resetTInterpolator.H"
 
-                if (Rep < 200)
-                {
-                    Nup = 2+0.6*pow(voidfraction,n)*sqrt(Rep)*pow(Pr,0.33);
-                }
-                else if (Rep < 1500)
-                {
-                    Nup = 2. + (0.5 * sqrt(Rep) + 0.02 * pow(Rep,0.8)) * pow(voidfraction,n) * pow(Pr,0.33);
-                }
-                else
-                {
-                    Nup = 2+0.000045*pow(voidfraction,n)*pow(Rep,1.8);
-                }
-                scalar h = lambda_*Nup/(ds);
-
-                // calc convective heat flux [W]
-                scalar partHeatFlux     = h * As * (Tfluid - partTemp_[index][0]);
-                partHeatFlux_[index][0] = partHeatFlux;
-
-                if(validPartHeatTransCoeff_)
-                    partHeatTransCoeff_[index][0] = h;
-
-                if(validPartHeatFluid_)
-                    partHeatFluid_[index][0]      = Tfluid;
-
-
-                if(forceSubM(0).verbose() && index >=0 && index <2)
-                {
-                    Pout << "magUr = " << magUr << endl;
-                    Pout << "As = " << As << endl;
-                    Pout << "r = " << particleCloud_.radius(index) << endl;
-                    Pout << "dprim = " << ds << endl;
-                    Pout << "nuf = " << nuf << endl;
-                    Pout << "Rep = " << Rep << endl;
-                    Pout << "Pr = " << Pr << endl;
-                    Pout << "Nup = " << Nup << endl;
-                    Pout << "voidfraction = " << voidfraction << endl;
-                    Pout << "partTemp_[index][0] = " << partTemp_[index][0] << endl;
-                    Pout << "partHeatFlux_[index][0] = " << partHeatFlux_[index][0] << endl;
-                    Pout << "Tfluid = " << Tfluid << endl  ;
-                }
-            }
-        //}
-    }
-
-    particleCloud_.averagingM().setScalarSum
-    (
-        EuField,
-        partHeatFlux_,
-        particleCloud_.particleWeights(),
-        NULL
-    );
-
-    // scale with -1./(Vcell*rho*Cp)
-    forAll(EuField,cellI)
-        EuField[cellI] /= -rhoField[cellI]*Cp_*EuField.mesh().V()[cellI];
-
-    // limit source term
-    scalar EuFieldInCell;
-    forAll(EuField,cellI)
-    {
-        EuFieldInCell = EuField[cellI];
-
-        if(mag(EuFieldInCell) > maxSource_ )
+        for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
         {
-             EuField[cellI] = sign(EuFieldInCell) * maxSource_;
+            //if(particleCloud_.regionM().inRegion()[index][0])
+            //{
+                cellI = particleCloud_.cellIDs()[index][0];
+                if(cellI >= 0)
+                {
+                    if(forceSubM(0).interpolation())
+                    {
+                        position = particleCloud_.position(index);
+                        voidfraction = voidfractionInterpolator_().interpolate(position,cellI);
+                        Ufluid = UInterpolator_().interpolate(position,cellI);
+                        Tfluid = TInterpolator_().interpolate(position,cellI);
+                    }else
+                    {
+                        voidfraction = voidfraction_[cellI];
+                        Ufluid = U_[cellI];
+                        Tfluid = T_[cellI];
+                    }
+
+                    // calc relative velocity
+                    Us = particleCloud_.velocity(index);
+                    ds = 2*particleCloud_.radius(index);
+                    dparcel = ds;
+                    forceSubM(0).scaleDia(ds,index); //caution: this fct will scale ds!
+                    numberParticlesInParcel    = dparcel/ds;
+                    numberParticlesInParcel   *= numberParticlesInParcel*numberParticlesInParcel;
+                    nuf = nufField[cellI];
+                    rho = rhoField[cellI];
+
+                    //Update any scalar or vector quantity
+                    for (int iFSub=0;iFSub<nrForceSubModels();iFSub++)
+                          forceSubM(iFSub).update(  index, 
+                                                    cellI,
+                                                    ds,
+                                                    Ufluid, 
+                                                    Us, 
+                                                    nuf,
+                                                    rho,
+                                                    forceSubM(0).verbose()
+                                                 );
+
+                    magUr = mag(Ufluid-Us);
+                    As = ds*ds*M_PI*numberParticlesInParcel;
+
+                    Rep = ds*magUr/nuf;
+                    Pr = max(SMALL,Cp_*nuf*rho/lambda_);
+
+                    if (Rep < 200)
+                    {
+                        Nup = 2+0.6*pow(voidfraction,n)*sqrt(Rep)*pow(Pr,0.33);
+                    }
+                    else if (Rep < 1500)
+                    {
+                        Nup = 2. + (0.5 * sqrt(Rep) + 0.02 * pow(Rep,0.8)) * pow(voidfraction,n) * pow(Pr,0.33);
+                    }
+                    else
+                    {
+                        Nup = 2+0.000045*pow(voidfraction,n)*pow(Rep,1.8);
+                    }
+                    scalar h = lambda_*Nup/(ds);
+
+                    // calc convective heat flux [W]
+                    scalar partHeatFlux     = h * As * (Tfluid - partTemp_[index][0]);
+                    partHeatFlux_[index][0] = partHeatFlux;
+
+                    if(validPartHeatTransCoeff_)
+                        partHeatTransCoeff_[index][0] = h;
+
+                    if(validPartHeatFluid_)
+                        partHeatFluid_[index][0]      = Tfluid;
+
+
+                    if(forceSubM(0).verbose() && index >=0 && index <2)
+                    {
+                        Pout << "magUr = " << magUr << endl;
+                        Pout << "As = " << As << endl;
+                        Pout << "r = " << particleCloud_.radius(index) << endl;
+                        Pout << "dprim = " << ds << endl;
+                        Pout << "nuf = " << nuf << endl;
+                        Pout << "Rep = " << Rep << endl;
+                        Pout << "Pr = " << Pr << endl;
+                        Pout << "Nup = " << Nup << endl;
+                        Pout << "voidfraction = " << voidfraction << endl;
+                        Pout << "partTemp_[index][0] = " << partTemp_[index][0] << endl;
+                        Pout << "partHeatFlux_[index][0] = " << partHeatFlux_[index][0] << endl;
+                        Pout << "Tfluid = " << Tfluid << endl  ;
+                    }
+                }
+            //}
+        }
+
+        particleCloud_.averagingM().setScalarSum
+        (
+            EuField,
+            partHeatFlux_,
+            particleCloud_.particleWeights(),
+            NULL
+        );
+
+        // scale with -1./(Vcell*rho*Cp)
+        
+        if(compressible_)
+        {
+            forAll(EuField,cellI)
+                EuField[cellI] /= -EuField.mesh().V()[cellI];
+        } else
+        {
+            forAll(EuField,cellI)
+                EuField[cellI] /= -rhoField[cellI]*Cp_*EuField.mesh().V()[cellI];
+        }
+
+        // limit source term
+        scalar EuFieldInCell;
+        forAll(EuField,cellI)
+        {
+            EuFieldInCell = EuField[cellI];
+
+            if(mag(EuFieldInCell) > maxSource_ )
+            {
+                 EuField[cellI] = sign(EuFieldInCell) * maxSource_;
+            }
+        }
+
+        if(compressible_)
+        {
+            Info << "total convective particle-fluid heat flux [W] (Eulerian) = " 
+                 << gSum(EuField*1*EuField.mesh().V()) 
+                 << endl;
+        } else
+        {
+            Info << "total convective particle-fluid heat flux [W] (Eulerian) = " 
+                 << gSum(EuField*rhoField*Cp_*EuField.mesh().V()) 
+                 << endl;
         }
     }
-
-    Info << "total convective particle-fluid heat flux [W] (Eulerian) = " 
-         << gSum(EuField*rhoField*Cp_*EuField.mesh().V()) 
-         << endl;
 }
 
 void LaEuScalarTemp::commToDEM() const
 {
-    // give DEM data
-    if(validPartHeatFlux_)
-        particleCloud_.dataExchangeM().giveData(partHeatFluxName_,
-                                                "scalar-atom", 
-                                                partHeatFlux_);
-        
-    if(validPartHeatTransCoeff_)
-        particleCloud_.dataExchangeM().giveData(partHeatTransCoeffName_,
-                                                "scalar-atom", 
-                                                partHeatTransCoeff_);
-                
-    if(validPartHeatFluid_)
-        particleCloud_.dataExchangeM().giveData(partHeatFluidName_,
-                                                "scalar-atom", 
-                                                partHeatFluid_);
+    if(doExchange_)
+    {
+        // give DEM data
+        if(validPartHeatFlux_)
+            particleCloud_.dataExchangeM().giveData(partHeatFluxName_,
+                                                    "scalar-atom", 
+                                                    partHeatFlux_);
+            
+        if(validPartHeatTransCoeff_)
+            particleCloud_.dataExchangeM().giveData(partHeatTransCoeffName_,
+                                                    "scalar-atom", 
+                                                    partHeatTransCoeff_);
+                    
+        if(validPartHeatFluid_)
+            particleCloud_.dataExchangeM().giveData(partHeatFluidName_,
+                                                    "scalar-atom", 
+                                                    partHeatFluid_);
+    }
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

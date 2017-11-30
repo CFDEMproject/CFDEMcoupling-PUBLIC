@@ -215,15 +215,7 @@ bool Foam::dataExchangeModel::couple(int i) const
 
 scalar Foam::dataExchangeModel::timeStepFraction() const
 {
-    //return fraction between previous coupling TS and actual TS
-    //scalar DEMtime = DEMts_ * couplingInterval_;
-    //scalar frac = ( ( particleCloud_.mesh().time().value()-particleCloud_.mesh().time().startTime().value() ) - (couplingStep_) * DEMtime) / DEMtime; //Chr 05.03.2013
-
-    //scalar frac = ( particleCloud_.mesh().time().value()-particleCloud_.mesh().time().startTime().value() - couplingStep_ * couplingTime() ) / couplingTime();
-    //if (frac < 1e-4) frac = 1.;
-
-    scalar frac = ( particleCloud_.mesh().time().value()-particleCloud_.mesh().time().startTime().value() - (couplingStep_-1) * couplingTime() ) / couplingTime();
-
+    scalar frac = ( (particleCloud_.mesh().time().timeIndex()-timeIndexOffset_)*particleCloud_.mesh().time().deltaT().value() - (couplingStep_-1) * couplingTime() ) / couplingTime();
     return frac;
 }
 
@@ -264,7 +256,8 @@ dataExchangeModel::dataExchangeModel
     maxNumberOfParticles_(0),
     couplingStep_(0),
     DEMts_(-1.),
-    couplingInterval_(readScalar(dict_.lookup("couplingInterval")))
+    couplingInterval_(readScalar(dict_.lookup("couplingInterval"))),
+    timeIndexOffset_(particleCloud_.mesh().time().timeIndex())
 {}
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //

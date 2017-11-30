@@ -52,7 +52,7 @@ maxCo 0.1;
 //libs ( "libgroovyBC.so" "libfiniteVolumeCFDEM.so");
 
 functions
-(
+{
 
     probes
     {
@@ -113,5 +113,5 @@ functions
      );
      factor  1;
    }*/
-);
+}
 // ************************************************************************* //

@@ -44,7 +44,7 @@ Restrictions
 """"""""""""
 
 
-Most force models are ready to be used with coarse graining. If any force model used in the simulation is not ready for coarse graining, but is used with coarse graining, a warning is written to the terminal (log file). Setting a flag "cgWarnOnly false;" in coupling properties, the simulation will be stopped if there is a violation.
+Most force models are ready to be used with coarse graining. If any force model used in the simulation is not ready for coarse graining, but is used with coarse graining, the simulation is stopped. Setting a flag "cgWarnOnly true;" in coupling properties, the simulation will print a warning to the terminal (log file).
 
 Related commands
 """"""""""""""""

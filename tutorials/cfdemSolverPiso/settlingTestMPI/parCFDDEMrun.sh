@@ -40,7 +40,7 @@ if [ $runOctave == "true" ]
         rm cfdemSolverPiso_settlingTestMPI.png
 
         #- run octave
-        octave settlingVelocity.m
+        octave --no-gui settlingVelocity.m
 
         #- show plot 
         eog cfdemSolverPiso_settlingTestMPI.png

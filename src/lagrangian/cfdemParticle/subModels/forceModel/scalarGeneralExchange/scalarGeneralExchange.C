@@ -336,6 +336,8 @@ void scalarGeneralExchange::manipulateScalarField(volScalarField& explicitEulerS
     scalar As(0);
     scalar Rep(0);
     scalar Pr(0);
+    scalar vCell(0);
+    scalar cellDpRatio(1);
 
     #include "resetVoidfractionInterpolator.H"
     #include "resetUInterpolator.H"
@@ -358,18 +360,23 @@ void scalarGeneralExchange::manipulateScalarField(volScalarField& explicitEulerS
                     Ufluid       = U_[cellI];
                     fluidValue   = fluidScalarField_[cellI];
                 }
+
+                dscaled = 2*particleCloud_.radius(index);
+                dparcel = dscaled;
                 if(forceSubM(0).useCorrectedVoidage())
                 {
+                    vCell = U_.mesh().V()[cellI];
+                    cellDpRatio =  pow(vCell,0.3333333)/(dparcel);
+
                     for (int iFSub=0;iFSub<nrForceSubModels();iFSub++)
-                         voidfraction = forceSubM(iFSub).calculateCorrectedVoidage(voidfraction); 
+                         voidfraction = forceSubM(iFSub).calculateCorrectedVoidage(voidfraction,cellDpRatio); 
                 }
 
                 // calc relative velocity
                 Us      = particleCloud_.velocity(index);
                 Ur      = Ufluid-Us;
                 magUr   = mag(Ur);
-                dscaled = 2*particleCloud_.radius(index);
-                dparcel = dscaled;
+
                 forceSubM(0).scaleDia(dscaled,index); //caution: this fct will scale ds!
                 numberParticlesInParcel    = dparcel/dscaled;
                 numberParticlesInParcel   *= numberParticlesInParcel*numberParticlesInParcel;

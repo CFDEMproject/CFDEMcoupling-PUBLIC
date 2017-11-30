@@ -86,18 +86,22 @@ label engineSearch::findCell
     double** const& mask,
     double**& positions,
     double**& cellIDs,
-    int size
+    int size,
+    bool checkRad
 ) const
 {
     vector position;
     for(int index = 0;index < size; ++index)
     {
-        if(particleCloud_.radius(index) > SMALL)
+        if(!checkRad || particleCloud_.radius(index) > SMALL)
         {
             // create pos vector
             for(int i=0;i<3;i++) position[i] = positions[index][i];
 
             cellIDs[index][0] = searchEngine_.findCell(position,-1,treeSearch_);
+
+            // give it another try with CELL_TETS (very expensive)
+            //if(cellIDs[index][0]==-1) cellIDs[index][0] = particleCloud_.mesh().findCell(position,polyMesh::CELL_TETS);
         }
         else cellIDs[index][0] = -1;
     }
@@ -110,7 +114,12 @@ label engineSearch::findSingleCell
     label& oldCellID
 ) const
 {
-    return searchEngine_.findCell(position,oldCellID,treeSearch_);
+    label cellI = searchEngine_.findCell(position,oldCellID,treeSearch_);
+
+    // give it another try with CELL_TETS (very expensive)
+    //if(cellI==-1) cellI = particleCloud_.mesh().findCell(position,polyMesh::CELL_TETS);
+
+    return cellI;
 }
 
 label engineSearch::intersection

@@ -6,7 +6,6 @@
 
 # additional static libraries to be linked to lagrangian library
 CFDEM_ADD_STATICLIBS = \
--lmpi_cxx \
 
 # include flags for compiling with SQ
 include $(CFDEM_ADD_LIBS_DIR)/additionalLibs_superquadric
@@ -30,6 +29,15 @@ CFDEM_ADD_INCOMPTURBMOD_LIBS = \
 -lfvOptions \
 -lsampling
 
+CFDEM_TRI_SURF = \
+-ltriSurface
+
+CFDEM_SPRAY_LIBS = \
+    -lliquidProperties \
+    -lliquidMixtureProperties \
+    -lsolidProperties \
+    -lsolidMixtureProperties \
+    -lthermophysicalFunctions 
 
 #----------------------------------------------------------------
 # compressible turbulence model settings

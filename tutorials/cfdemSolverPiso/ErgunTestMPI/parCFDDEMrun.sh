@@ -43,7 +43,7 @@ if [ $runOctave == "true" ]
         rm cfdemSolverPiso_ErgunTestMPI.png
 
         #- run octave
-        octave totalPressureDrop.m
+        octave --no-gui totalPressureDrop.m
 
         #- show plot 
         eog cfdemSolverPiso_ErgunTestMPI.png

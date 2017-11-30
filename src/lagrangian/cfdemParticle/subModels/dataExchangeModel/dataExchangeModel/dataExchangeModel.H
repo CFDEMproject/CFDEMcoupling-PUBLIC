@@ -76,6 +76,8 @@ protected:
 
         int couplingInterval_;
 
+        const int timeIndexOffset_;
+
     // Protected member functions
 
 public:
@@ -215,12 +217,12 @@ public:
                 Info << "DEMts_ = " << DEMts_ << endl;
                 FatalError<<"\nError - CFD time-step bigger than coupling time (= DEM time step * coupling interval)!\n"<< abort(FatalError);
             }
-            if ( std::fabs((round(couplingTime()/particleCloud_.mesh().time().deltaT().value())*particleCloud_.mesh().time().deltaT().value())-couplingTime()) > SMALL )
+            if ( std::fabs(( round(couplingTime()/particleCloud_.mesh().time().deltaT().value()) * particleCloud_.mesh().time().deltaT().value() )-couplingTime()) > SMALL )
             {
                 Info << "particleCloud_.mesh().time().deltaT().value() = " << particleCloud_.mesh().time().deltaT().value() << endl;
                 Info << "couplingInterval_ = " << couplingInterval_ << endl;
                 Info << "DEMts_ = " << DEMts_ << endl;
-                Warning <<"\nWarning - Coupling time (= DEM time step * coupling interval) is not a multiple of  CFD time-step!\n"<< endl;
+                FatalError <<"\nWarning - Coupling time (= DEM time step * coupling interval) is not a multiple of  CFD time-step!\n"<< abort(FatalError);
             }
             if(!particleCloud_.allowCFDsubTimestep())
                 if(particleCloud_.mesh().time().deltaT().value() < couplingInterval_ * DEMts_ + SMALL)
@@ -246,14 +248,8 @@ public:
 
         inline bool doCoupleNow() const
         {
-/*          // couple at last sub TS
-            if (particleCloud_.mesh().time().value()-particleCloud_.mesh().time().startTime().value()
-             - ((1+couplingStep_)*(DEMts_*couplingInterval_))
-             + 1e-10 > 0)                                         // Chr 27.03.2013 : first coupling after DEMts_*couplingInterval_
-//             > particleCloud_.mesh().time().deltaT().value()/2) // Chr 27.03.2013*/
-
             // couple at first sub TS
-            if (particleCloud_.mesh().time().value()-particleCloud_.mesh().time().startTime().value()-SMALL
+            if ((particleCloud_.mesh().time().timeIndex()-timeIndexOffset_)*particleCloud_.mesh().time().deltaT().value()-SMALL
                 > couplingStep_*DEMts_*couplingInterval_)
             {
                 return true;
@@ -296,7 +292,7 @@ public:
 
         void setCGs(LAMMPS_NS::LAMMPS *lmp) const 
         { 
-            particleCloud_.setCG(lmp->force->cg(int(GREAT))); 
+            particleCloud_.setCG(lmp->force->cg(int(1e14)));
             
             Info << "LIGGGHTS hosts " << lmp->atom->ntypes << " atom types." << endl;
 

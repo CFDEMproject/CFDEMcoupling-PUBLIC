@@ -83,7 +83,6 @@ forceModel::forceModel
         sm.mesh(),
         dimensionedVector("zero", dimensionSet(1,1,-2,0,0), vector(0,0,0)) // N
     ),
-    coupleForce_(true),
     modelType_(sm.modelType()),
     probeIt_(sm.probeM().active()),
     requiresEx_(false),
@@ -91,6 +90,7 @@ forceModel::forceModel
     requiresQuaternion_(false),
     requiresSuperquadric_(false),
     pullPushRotation_(false),
+    implicitDrag_(false),
     implicitAnisotropicDrag_(false),
     implicitRotation_(false),
     forceSubModels_(0),

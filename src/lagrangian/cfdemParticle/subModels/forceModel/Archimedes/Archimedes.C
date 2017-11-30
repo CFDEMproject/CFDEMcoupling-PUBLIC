@@ -144,7 +144,7 @@ void Archimedes::setForce() const
             }else{
                 ds = particleCloud_.d(index);
                 scalar dParcel = ds;
-                forceSubM(0).scaleDia(dParcel); //caution: this fct will scale ds!
+                forceSubM(0).scaleDia(dParcel,index); //caution: this fct will scale ds!
                 Vs = dParcel*dParcel*dParcel*piBySix;
                 force = -g_.value()*forceSubM(0).rhoField()[cellI]*Vs;
                 forceSubM(0).scaleForce(force,ds);

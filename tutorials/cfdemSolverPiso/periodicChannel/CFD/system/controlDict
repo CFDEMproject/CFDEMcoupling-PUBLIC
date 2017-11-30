@@ -52,7 +52,7 @@ maxCo 0.1;
 libs ( "libfvOptionsCFDEM.so" );
 
 functions
-(
+{
 
     probes
     {
@@ -63,8 +63,8 @@ functions
         name        probes;
         probeLocations
         (
-            (0.00003 0.05 0.05)
-            (0.39999 0.05 0.05)
+            (0.00003 0.050001 0.050001)
+            (0.39999 0.050001 0.050001)
         );
 
         // Fields to be probed
@@ -75,65 +75,58 @@ functions
         outputInterval  1;
     }
 
-
     volFlow_inlet
     {
-        type            faceSource;
+        type            surfaceFieldValue;
         functionObjectLibs ("libfieldFunctionObjects.so");
-        enabled         true;
-        outputControl   outputTime;//timeStep;
-        log             true;
-	    writeArea	    true; //write for OF 3.0 to be consistent
-        valueOutput     true;
-        source          patch;
-        sourceName      inlet;
+        outputControl   timeStep;
+        outputInterval  1;
+        log             false;
+        writeFields     false;
+        valueOutput     false;
+        regionType      patch;
+        name            inlet;
         operation       sum;
-
         fields
         (
             phi
         );
-        surfaceFormat null;
     }
 
     volFlow_outlet
     {
-        type            faceSource;
+        type            surfaceFieldValue;
         functionObjectLibs ("libfieldFunctionObjects.so");
-        enabled         true;
-        outputControl   outputTime;//timeStep;
-        log             true;
-        writeArea       true; //write for OF 3.0 to be consistent
-        valueOutput     true;
-        source          patch;
-        sourceName      outlet;
+        outputControl   timeStep;
+        outputInterval  1;
+        log             false;
+        writeFields     false;
+        valueOutput     false;
+        regionType      patch;
+        name            outlet;
         operation       sum;
-
         fields
         (
             phi
         );
-        surfaceFormat null;
     }
 
     volFlow_wall
     {
-        type            faceSource;
+        type            surfaceFieldValue;
         functionObjectLibs ("libfieldFunctionObjects.so");
-        enabled         true;
-        outputControl   outputTime;//timeStep;
-        log             true;
-        writeArea       true; //write for OF 3.0 to be consistent
-        valueOutput     true;
-        source          patch;
-        sourceName      wall;
+        outputControl   timeStep;
+        outputInterval  1;
+        log             false;
+        writeFields     false;
+        valueOutput     false;
+        regionType      patch;
+        name            wall;
         operation       sum;
-
         fields
         (
             phi
         );
-        surfaceFormat null;
     }
-);
+}
 // ************************************************************************* //

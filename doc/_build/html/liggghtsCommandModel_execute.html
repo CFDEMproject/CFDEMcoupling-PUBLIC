@@ -163,7 +163,7 @@ executeProps0
 </pre></div>
 </div>
 <ul class="simple">
-<li><em>command</em> = LIGGGHTS command to be executed. Each word in a new line, numbers and symbols need special treatment (e.g. $couplingInterval will be replaced by correct coupling interval in the simulation)</li>
+<li><em>command</em> = LIGGGHTS command to be executed. Each word in a new line, numbers and symbols need special treatment (e.g. $couplingInterval will be replaced by correct coupling interval in the simulation). For using arbitrary labels and number use the placeholders label and number in the command and define them in a labels and scalars section below the command (see example below). For using pathes within commands, particular keywords are provided (details see description)</li>
 <li><em>switch1</em> = switch (choose on/off) if the command is executed only at first time step</li>
 <li><em>switch2</em> = switch (choose on/off) if the command is executed only at last time step</li>
 <li><em>switch3</em> = switch (choose on/off) if the command is executed at every coupling step</li>
@@ -175,6 +175,7 @@ executeProps0
 <h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-python"><div class="highlight"><pre>liggghtsCommandModels
 (
+   execute
    execute
    execute
 );
@@ -207,12 +208,43 @@ executeProps1
     runEveryCouplingStep off;
     runEveryWriteStep on;
 }
+executeProps3
+{
+    command
+    (
+        create_atoms
+        label
+        single
+        number
+        number
+        number
+        units
+        box
+    );
+    labels
+    (
+        1
+    );
+    scalars
+    (
+        0.
+        0.
+        0.001
+    );
+    runFirst off;
+    runLast off;
+    runEveryCouplingStep off;
+    runEveryWriteStep off;
+    startTime 0.09;
+    endTime 0.09;
+    timeInterval 0.001;
+}
 </pre></div>
 </div>
 </div>
 <div class="section" id="description">
 <h2>Description<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h2>
-<p>The execute liggghtsCommand Model can be used to execute a LIGGGHTS command during a CFD run. In above example execute_0 for instance executes &#8220;run $couplingInterval&#8221; every coupling step. $couplingInterval is automatically replaced by the correct number of DEM steps. Additionally execute_1 executes &#8220;write_restart ../DEM/liggghts.restart_$timeStamp&#8221; every writing step, where $timeStamp is automatically set.</p>
+<p>The execute liggghtsCommand Model can be used to execute a LIGGGHTS command during a CFD run. In above example execute_0 for instance executes &#8220;run $couplingInterval&#8221; every coupling step. $couplingInterval is automatically replaced by the correct number of DEM steps. Additionally execute_1 executes &#8220;write_restart ../DEM/liggghts.restart_$timeStamp&#8221; every writing step, where $timeStamp is automatically set. The keywords used in the command (dot, dotdot, slash) are replaced by the according signs internally, noBlanks inidicates the the following words are not separated by blanks. Using the keyword blanks would re-enable the usage of blanks again.</p>
 <div class="section" id="these-rather-complex-execute-commands-can-be-replaced-by-the-readliggghts-and-writeliggghts-commands">
 <h3>These rather complex execute commands can be replaced by the &#8220;readLiggghts&#8221; and &#8220;writeLiggghts&#8221; commands!<a class="headerlink" href="#these-rather-complex-execute-commands-can-be-replaced-by-the-readliggghts-and-writeliggghts-commands" title="Permalink to this headline">¶</a></h3>
 </div>

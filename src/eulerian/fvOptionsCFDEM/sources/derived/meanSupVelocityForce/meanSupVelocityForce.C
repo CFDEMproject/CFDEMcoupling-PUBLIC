@@ -62,9 +62,6 @@ Foam::fv::meanSupVelocityForce::meanSupVelocityForce
 )
 :
     meanVelocityForce(sourceName, modelType, dict, mesh),
-    voidfractionName_( coeffs_.lookup("voidfractionField") ),
-    voidfraction_(  mesh.lookupObject<volScalarField>(voidfractionName_) ),
-    modelName_(modelType),
     twoPhase_( coeffs_.lookupOrDefault("twoPhase",false) ),
     alpha_
     (   
@@ -78,7 +75,23 @@ Foam::fv::meanSupVelocityForce::meanSupVelocityForce
         ),
         mesh_,
         dimensionedScalar("ones", dimensionSet(0,0,0,0,0), 1)
-    )
+    ),
+    coupled_( coeffs_.lookupOrDefault("coupled",false) ),
+    voidfraction_
+    (   
+        IOobject
+        (
+            "voidfractionPrev",
+            mesh_.time().timeName(),
+            mesh_,
+            IOobject::NO_READ,//MUST_READ,
+            IOobject::NO_WRITE
+        ),
+        mesh_,
+        dimensionedScalar("ones", dimensionSet(0,0,0,0,0), 1)
+    ),
+    modelName_(modelType),
+    alphaMin_(coeffs_.lookupOrDefault("alphaMin",0.0))
 
 {
     Warning << "THE FVOPTION meanSupVelocityForce has not been tested/validated!!! " << endl;
@@ -93,11 +106,17 @@ void Foam::fv::meanSupVelocityForce::correct(volVectorField& U)
         word alphaName = coeffs_.lookup("alphaField");
         alpha_ = mesh_.lookupObject<volScalarField>(alphaName);
     }
+
+    if (coupled_)
+    {
+        word voidfractionName = coeffs_.lookup("voidfractionField");
+        voidfraction_ = mesh_.lookupObject<volScalarField>(voidfractionName);
+    }
     
-    // making sure that alpha is only set almost-only fluid regions
+    // making sure that alpha is only set almost-only fluid regions if desired
     forAll(alpha_,cellI)
     {
-        if(alpha_[cellI]<0.9999)
+        if(alpha_[cellI]<alphaMin_)
             alpha_[cellI]=0;
     }
 
@@ -214,7 +233,15 @@ void Foam::fv::meanSupVelocityForce::addSup
     }
     else
     {
-        UIndirectList<vector>(Su, cells_) = voidfraction_*flowDir_*gradP*alpha_;
+        //UIndirectList<vector>(Su, cells_) = voidfraction_*flowDir_*gradP*alpha_; // org version does not work for zones
+
+        UIndirectList<vector>(Su, cells_) = vector::zero;
+        label cellI(-1);
+        forAll(cells_,i)
+        {
+            cellI = cells_[i];
+            Su[cellI] = voidfraction_[cellI]*flowDir_*gradP*alpha_[cellI];
+        }
     }
 
     eqn += Su;

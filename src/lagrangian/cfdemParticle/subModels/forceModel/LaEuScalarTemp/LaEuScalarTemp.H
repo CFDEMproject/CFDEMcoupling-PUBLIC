@@ -107,6 +107,10 @@ protected:
     scalar lambda_;                              // fluid thermal conductivity [W/(m*K)]
 
     scalar Cp_;                                  // specific heat capacity [W*s/(kg*K)]
+    
+    bool compressible_;
+    
+    bool doExchange_;
 
     void allocateMyArrays() const;
 

@@ -17,27 +17,27 @@ FoamFile
 
 dimensions      [0 2 -2 0 0 0 0];
 
-internalField   uniform 0.001;
+internalField   uniform 1e-6;
 
 boundaryField
 {
     wall
     {
         type            kqRWallFunction;
-        value           uniform 0.001;
+        value           $internalField;
     }
     outlet
     {
         type            inletOutlet;
-        inletValue      uniform 0.001;
-        value           uniform 0.001;
+        inletValue      $internalField;
+        value           $internalField;
     }
     inlet
     {
-        /*type            turbulentIntensityKineticEnergyInlet;
-        intensity       0.05;
-        value           uniform 0.001;*/
-        type            zeroGradient;
+        type            turbulentIntensityKineticEnergyInlet;
+        intensity       0.01;
+        value           $internalField;
+        //type            zeroGradient;
     }
 }
 

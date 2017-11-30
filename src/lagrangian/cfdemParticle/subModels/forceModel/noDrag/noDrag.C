@@ -69,13 +69,11 @@ noDrag::noDrag
     setForceSubModels(propsDict_);
 
     // define switches which can be read from dict
-    forceSubM(0).setSwitchesList(0,true); // activate treatExplicit
     forceSubM(0).setSwitchesList(3,true); // activate search for verbose switch
 
     // read those switches defined above, if provided in dict
     forceSubM(0).readSwitches();
-
-    coupleForce_=false;
+    particleCloud_.checkCG(true);
 }
 
 
@@ -97,7 +95,6 @@ void noDrag::setForce() const
     }
 
     label cellI=0;
-    bool treatExplicit=forceSubM(0).switches()[0];
     for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
     {
         cellI = particleCloud_.cellIDs()[index][0];
@@ -111,8 +108,11 @@ void noDrag::setForce() const
             // set force on particle (old code)
             if(!keepCFDForce_)
             {
-                if(treatExplicit) for(int j=0;j<3;j++) expForces()[index][j] = 0.;
-                else  for(int j=0;j<3;j++) impForces()[index][j] = 0.;
+                for(int j=0;j<3;j++)
+                {
+                    expForces()[index][j] = 0.;
+                    impForces()[index][j] = 0.;
+                }
             }
             if(noDEMForce_)
             {

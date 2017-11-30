@@ -1,0 +1,164 @@
+functions
+(
+
+    probes
+    {
+        type        probes;
+        // Where to load it from
+        functionObjectLibs ( "libsampling.so" );  
+        // Name of the directory for probe data
+        name        probes;
+        probeLocations
+        (
+            (0.05 0.05 -0.499)
+            (0.05 0.05 1.499)
+        );
+
+        // Fields to be probed
+        fields ( p T );
+
+        // Write at same frequency as fields
+        outputControl   timeStep;//outputTime;
+        outputInterval  1;
+    }
+
+    volFlow_inlet
+    {
+        type            faceSource;
+        functionObjectLibs ("libfieldFunctionObjects.so");
+        enabled         true;
+        outputControl   outputTime;//timeStep;
+        log             true;
+	    writeArea	    true; //write for OF 3.0 to be consistent
+        valueOutput     true;
+        source          patch;
+        sourceName      inlet;
+        operation       sum;
+
+        fields
+        (
+            phi
+        );
+        surfaceFormat null;
+    }
+
+    volFlow_outlet
+    {
+        type            faceSource;
+        functionObjectLibs ("libfieldFunctionObjects.so");
+        enabled         true;
+        outputControl   outputTime;//timeStep;
+        log             true;
+        writeArea       true; //write for OF 3.0 to be consistent
+        valueOutput     true;
+        source          patch;
+        sourceName      outlet;
+        operation       sum;
+
+        fields
+        (
+            phi
+        );
+        surfaceFormat null;
+    }
+
+    volFlow_wall
+    {
+        type            faceSource;
+        functionObjectLibs ("libfieldFunctionObjects.so");
+        enabled         true;
+        outputControl   outputTime;//timeStep;
+        log             true;
+        writeArea       true; //write for OF 3.0 to be consistent
+        valueOutput     true;
+        source          patch;
+        sourceName      wall;
+        operation       sum;
+
+        fields
+        (
+            phi
+        );
+        surfaceFormat null;
+    }
+
+/*
+// simpleFunctionObjects
+   heatFlux
+   {
+     type patchHeatFlux;
+     functionObjectLibs
+     (
+         "libsimpleFunctionObjects.so"
+     );
+     verbose true;
+     patches
+     (
+         inlet
+         outlet
+     );
+     fields    // name of temp field
+     (
+         T
+     );
+     cp 1007;       // cp in [J/(kg*K)]
+     factor  1.188; // density for incomp solvers!
+   }
+
+   massFlux
+   {
+     type patchMassFlow;
+     functionObjectLibs
+     (
+         "libsimpleFunctionObjects.so"
+     );
+     verbose true;
+     patches
+     (
+         inlet
+         outlet
+     );
+     factor  1.188; // density for incomp solvers!
+   }
+
+   pressureDrop
+   {
+     type patchAverage;
+     functionObjectLibs
+     (
+         "libsimpleFunctionObjects.so"
+     );
+     verbose true;
+     patches
+     (
+         inlet
+         outlet
+     );
+     fields
+     (
+         p
+     );
+     factor  1;
+   }
+
+   T
+   {
+     type patchAverage;
+     functionObjectLibs
+     (
+         "libsimpleFunctionObjects.so"
+     );
+     verbose true;
+     patches
+     (
+         inlet
+         outlet
+     );
+     fields    // name of temp field
+     (
+         T
+     );
+     factor  1;
+   }*/
+);
+// ************************************************************************* // 

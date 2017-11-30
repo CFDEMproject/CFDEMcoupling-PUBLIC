@@ -1,0 +1,60 @@
+.. index:: fvOptions_meanSupVelocityForce
+
+fvOptions_meanSupVelocityForce command
+======================================
+
+Syntax
+""""""
+
+Defined in an fvOptions dictionary in the system folder of the CFD case. Can only be applied if solver is able to handle fvOptions.
+
+.. parsed-literal::
+
+   fvOptions uniformFixedValueVoidfraction;
+
+Examples
+""""""""
+
+.. parsed-literal::
+
+   momentumSource
+   {
+       type            meanSupVelocityForce;
+       active          yes; 
+       meanSupVelocityForceCoeffs  
+       {
+           seletionMode    all; // all and cellZoneSet is permitted
+           fieldNames      (U); // velocity field
+           twoPhase        true; // refers to the number of fluid/liquid phases
+           alphaField      alpha.water; // mandatory if twoPhase is set to true
+           coupled         true; // refers to the presence of a particle phase
+           voidfractionField voidfraction; // mandatory if coupled is set to true
+           Ubar            (1 0 0); // desired mean superficial velocity
+           relaxation      0.9; // optional relaxation factor; 
+           alphaMin        0.9999; // settings will only take place in cells with alpha >= alphaMin (smoothening)
+
+.. parsed-literal::
+
+       }
+   }
+
+Description
+"""""""""""
+
+The fvOption meanSupVelocityForce can be used to impose an average superficial velocity within a specific area (either defined by all when the whole domain is affected or the name of the according cellZoneSet), while at the same time accounting for the resulting pressure drop. The fvOption can be used for fluid/fluid, fluid/particle and fluid/fluid/particle cases, whereas Ubar can only be imposed to one of the fluid phases. Application examples are periodic channel flow situations or pumps within the computational domain. Please note that particularly for periodic channel flows instabilities might occur at the air-water interface due to the big differences in the densities. For such cases a cutoff-vlaue alphaMin has been introduced, which allows the user to restrict the affected area by means of a minimal phase fraction.
+
+Restrictions
+""""""""""""
+
+
+No known restrictions.
+
+Related commands
+""""""""""""""""
+
+:doc:`fvOptions <fvOptions>`
+
+
+.. _liws: http://www.cfdem.com
+.. _ld: Manual.html
+.. _lc: Section_commands.html#comm

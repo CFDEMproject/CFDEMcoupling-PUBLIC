@@ -264,7 +264,7 @@ mv LPP-master lpp
 The latest compatible OpenFOAM®-version can be found in  the in your local copy of CFDEM®coupling in src/lagrangian/cfdemParticle/cfdTools/versionInfo.H, or directly at <a class="reference external" href="https://github.com/CFDEMproject/CFDEMcoupling-PUBLIC/blob/master/src/lagrangian/cfdemParticle/cfdTools/versionInfo.H">github</a> .
 Look for the git commit hashtag in the following line:</p>
 <div class="highlight-python"><div class="highlight"><pre>word OFversion=&quot;&lt;OF-Release&gt;-commit-&lt;commitHashtag&gt;&quot;;
-e.g. word OFversion=&quot;3.0.x-commit-ac3f6c67e02f0aac3777c27f9fb7558fc3536e37&quot;;
+e.g. word OFversion=&quot;5.x-commit-538044ac05c4672b37c7df607dca1116fa88df88&quot;;
 </pre></div>
 </div>
 <p>With git you can use the following recipe to get the correct version:</p>
@@ -278,7 +278,7 @@ git checkout &lt;commitHashtag&gt;
 </pre></div>
 </div>
 <p>Without git you can visit git://github.com/OpenFOAM/OpenFOAM-&lt;OF-Release&gt;/tree/&lt;commitHashtag&gt; and use the download button.</p>
-<p>Other OpenFOAM® versions can be used for compilation, but aren&#8217;t officially supported. The list includes 4.x, 2.4.x, 1612+, 1606+ and extend-3.2</p>
+<p>Other OpenFOAM® versions can be used for compilation, but aren&#8217;t officially supported. The list includes 4.x, 3.x, 2.4.x, 1612+, 1606+ and extend-3.2</p>
 <hr class="docutils" />
 <p id="install-4"><strong>Setup prerequisites for CFDEM®project:</strong></p>
 <p>Prerequisites for OpenFOAM® can be found <a class="reference external" href="https://openfoam.org/download/source/">here</a> .
@@ -374,6 +374,12 @@ cfdemSysTest
 Changes in $CFDEM_TUT_DIR might be lost after every <em>git stash</em>.</p>
 <p>You can run all the tutorial cases by executing the alias cfdemTestTUT.
 Alternatively you can run each tutorial using the <em>Allrun.sh</em> scripts in the tutorial directories.</p>
+<p>To run pure LIGGGHTS® cases, you can use the aliases</p>
+<div class="highlight-python"><div class="highlight"><pre>cfdemLiggghts inputScriptName
+cfdemLiggghtsPar inputScriptName nOfProcs
+</pre></div>
+</div>
+<p>or you can set a link in /usr/local/bin to the LIGGGHTS® executable as described in the <a class="reference external" href="https://www.cfdem.com/media/DEM/docu/Section_start.html#steps-to-build-a-liggghts-r-public-executable">LIGGGHTS®documentation</a> .</p>
 <hr class="docutils" />
 <p><strong>Backwards Compatibility:</strong></p>
 <p>Basically CFDEM®coupling supports one OpenFOAM® version therefore all settings are prepared for that. Nevertheless we try to maintain backwards compatibility as long as it works with reasonable effort.</p>
@@ -391,6 +397,7 @@ src/lagrangian/cfdemParticle/etc/OFversion/OFversion.H
 <li><a class="reference internal" href="#ainstall-5"><em>Setup and compile OpenFOAM®</em></a></li>
 <li><a class="reference internal" href="#ainstall-6"><em>Set environment variables and paths</em></a></li>
 <li><a class="reference internal" href="#ainstall-7"><em>Compile LIGGGHTS® and CFDEM®coupling</em></a></li>
+<li><a class="reference internal" href="#ainstall-8"><em>Compiling OpenFOAM®, LIGGGHTS® and CFDEM®coupling in debug mode</em></a></li>
 </ul>
 <hr class="docutils" />
 <p id="ainstall-4"><strong>Setup prerequisites for CFDEM®project:</strong></p>
@@ -541,6 +548,11 @@ If the automated selection of the additionalLibs fails or if you wish to set it 
 <p>LIGGGHTS® needs to be compiled as library with the cfdemCompLIG command. You can compile LIGGGHTS® manually as a shared library with &#8220;make -f Makefile.shlib &lt;Makefilename&gt;&#8221; within your LIGGGHTS® src directory.
 LIGGGHTS® is included into CFDEM®coupling by the creation of a symbolic link in $CFDEM_LIB_DIR to the LIGGGHTS shared library. This link is automatically created during the compilation of the CFDEM®coupling lagrangian library at the beginning of the make phase. This means even if you compile the lagrangian library manually with &#8220;wmake libso&#8221;, the link is created.</p>
 <hr class="docutils" />
+<p id="ainstall-8"><strong>Compiling OpenFOAM®, LIGGGHTS® and CFDEM®coupling in debug mode</strong></p>
+<p>Set the WM_COMPILE_OPTION parameter in the OF bashrc to &#8220;Debug&#8221; and compile OF with the Allwmake script.
+If you are using the LIGGGHTS® auto Makefile, simply compile LIGGGHTS® and CFDEM®coupling with &#8220;cfdemCompCFDEMall&#8221;. CFDEM®coupling detects the OpenFOAM® variable compiles LIGGGHTS® in debug mode. The coupling itself is compiled with OpenFOAM®s wmake, so this is automatically taken care of.
+If you aren&#8217;t using the auto Makefile, you need to make sure the &#8220;-O0 -g&#8221; or &#8220;-O2 -g&#8221; compilation parameters are set properly within the LIGGGHTS®-Makefile.</p>
+<hr class="docutils" />
 <p id="footnotes"><strong>Footnotes:</strong></p>
 <p>OPENFOAM®  is a registered trade mark of OpenCFD Limited, producer and distributor of the OpenFOAM software via wwww.openfoam.com.</p>
 <hr class="docutils" />
@@ -579,6 +591,7 @@ LIGGGHTS® is included into CFDEM®coupling by the creation of a symbolic link i
 <p>The dictionary is divided into two parts, &#8220;sub-models &amp; settings&#8221; and &#8220;sub-model properties&#8221;.</p>
 <p>In &#8220;sub-models &amp; settings&#8221; the following routines must be specified:</p>
 <ul class="simple">
+<li>solveFlow</li>
 <li>modelType</li>
 <li>couplingInterval</li>
 <li>voidFractionModel</li>
@@ -597,6 +610,10 @@ LIGGGHTS® is included into CFDEM®coupling by the creation of a symbolic link i
 <p>In &#8220;sub-model properties&#8221; sub-dictionaries might be defined to specify model specific parameters.</p>
 <p><strong>Settings:</strong></p>
 <p>Reasonable example settings for the &#8220;couplingProperties&#8221; dictionary are given in the tutorial cases.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">solveFlow</span>
+</pre></div>
+</div>
+<p>The solveFlow switch determines, whether the fluid equations are solved or not. By setting solveFlow to false, the fluid solver becomes inactive.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="n">modelType</span>
 </pre></div>
 </div>
@@ -634,8 +651,8 @@ with commands. User-defined commands may be added.</p>
 listing below of styles within certain commands.</p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="48%" />
 <col width="52%" />
+<col width="48%" />
 </colgroup>
 <tbody valign="top">
 <tr class="row-odd"><td><a class="reference internal" href="IOModel.html"><em>IOModel</em></a></td>
@@ -707,53 +724,56 @@ listing below of styles within certain commands.</p>
 <tr class="row-odd"><td><a class="reference internal" href="forceSubModel.html"><em>forceSubModel</em></a></td>
 <td><a class="reference internal" href="forceSubModel_ImEx.html"><em>forceSubModel_ImEx</em></a></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="liggghtsCommandModel.html"><em>liggghtsCommandModel</em></a></td>
-<td><a class="reference internal" href="liggghtsCommandModel_execute.html"><em>liggghtsCommandModel_execute</em></a></td>
+<tr class="row-even"><td><a class="reference internal" href="fvOptions_meanSupVelocityForce.html"><em>fvOptions_meanSupVelocityForce</em></a></td>
+<td><a class="reference internal" href="liggghtsCommandModel.html"><em>liggghtsCommandModel</em></a></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="liggghtsCommandModel_readLiggghtsData.html"><em>liggghtsCommandModel_readLiggghtsData</em></a></td>
-<td><a class="reference internal" href="liggghtsCommandModel_runLiggghts.html"><em>liggghtsCommandModel_runLiggghts</em></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="liggghtsCommandModel_execute.html"><em>liggghtsCommandModel_execute</em></a></td>
+<td><a class="reference internal" href="liggghtsCommandModel_readLiggghtsData.html"><em>liggghtsCommandModel_readLiggghtsData</em></a></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="liggghtsCommandModel_setDEMGravity.html"><em>liggghtsCommandModel_setDEMGravity</em></a></td>
-<td><a class="reference internal" href="liggghtsCommandModel_writeLiggghts.html"><em>liggghtsCommandModel_writeLiggghts</em></a></td>
+<tr class="row-even"><td><a class="reference internal" href="liggghtsCommandModel_runLiggghts.html"><em>liggghtsCommandModel_runLiggghts</em></a></td>
+<td><a class="reference internal" href="liggghtsCommandModel_setDEMGravity.html"><em>liggghtsCommandModel_setDEMGravity</em></a></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="locateModel.html"><em>locateModel</em></a></td>
-<td><a class="reference internal" href="locateModel_engineSearch.html"><em>locateModel_engineSearch</em></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="liggghtsCommandModel_writeLiggghts.html"><em>liggghtsCommandModel_writeLiggghts</em></a></td>
+<td><a class="reference internal" href="locateModel.html"><em>locateModel</em></a></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="locateModel_engineSearchIB.html"><em>locateModel_engineSearchIB</em></a></td>
-<td><a class="reference internal" href="locateModel_standardSearch.html"><em>locateModel_standardSearch</em></a></td>
+<tr class="row-even"><td><a class="reference internal" href="locateModel_engineSearch.html"><em>locateModel_engineSearch</em></a></td>
+<td><a class="reference internal" href="locateModel_engineSearchIB.html"><em>locateModel_engineSearchIB</em></a></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="meshMotionModel.html"><em>meshMotionModel</em></a></td>
-<td><a class="reference internal" href="meshMotionModel_noMeshMotion.html"><em>meshMotionModel_noMeshMotion</em></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="locateModel_standardSearch.html"><em>locateModel_standardSearch</em></a></td>
+<td><a class="reference internal" href="meshMotionModel.html"><em>meshMotionModel</em></a></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="momCoupleModel.html"><em>momCoupleModel</em></a></td>
-<td><a class="reference internal" href="momCoupleModel_explicitCouple.html"><em>momCoupleModel_explicitCouple</em></a></td>
+<tr class="row-even"><td><a class="reference internal" href="meshMotionModel_noMeshMotion.html"><em>meshMotionModel_noMeshMotion</em></a></td>
+<td><a class="reference internal" href="momCoupleModel.html"><em>momCoupleModel</em></a></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="momCoupleModel_implicitCouple.html"><em>momCoupleModel_implicitCouple</em></a></td>
-<td><a class="reference internal" href="momCoupleModel_noCouple.html"><em>momCoupleModel_noCouple</em></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="momCoupleModel_explicitCouple.html"><em>momCoupleModel_explicitCouple</em></a></td>
+<td><a class="reference internal" href="momCoupleModel_implicitCouple.html"><em>momCoupleModel_implicitCouple</em></a></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="probeModel.html"><em>probeModel</em></a></td>
-<td><a class="reference internal" href="probeModel_noProbe.html"><em>probeModel_noProbe</em></a></td>
+<tr class="row-even"><td><a class="reference internal" href="momCoupleModel_noCouple.html"><em>momCoupleModel_noCouple</em></a></td>
+<td><a class="reference internal" href="probeModel.html"><em>probeModel</em></a></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="probeModel_particleProbe.html"><em>probeModel_particleProbe</em></a></td>
-<td><a class="reference internal" href="scalarTransportModel.html"><em>scalarTransportModel</em></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="probeModel_noProbe.html"><em>probeModel_noProbe</em></a></td>
+<td><a class="reference internal" href="probeModel_particleProbe.html"><em>probeModel_particleProbe</em></a></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="scalarTransportModel_generalManual.html"><em>scalarTransportModel_generalManual</em></a></td>
-<td><a class="reference internal" href="smoothingModel.html"><em>smoothingModel</em></a></td>
+<tr class="row-even"><td><a class="reference internal" href="scalarTransportModel.html"><em>scalarTransportModel</em></a></td>
+<td><a class="reference internal" href="scalarTransportModel_generalManual.html"><em>scalarTransportModel_generalManual</em></a></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="smoothingModel_constDiffSmoothing.html"><em>smoothingModel_constDiffSmoothing</em></a></td>
-<td><a class="reference internal" href="smoothingModel_noSmoothing.html"><em>smoothingModel_noSmoothing</em></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="smoothingModel.html"><em>smoothingModel</em></a></td>
+<td><a class="reference internal" href="smoothingModel_constDiffSmoothing.html"><em>smoothingModel_constDiffSmoothing</em></a></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="voidFractionModel.html"><em>voidfractionModel</em></a></td>
-<td><a class="reference internal" href="voidFractionModel_GaussVoidFraction.html"><em>voidfractionModel_GaussVoidFraction</em></a></td>
+<tr class="row-even"><td><a class="reference internal" href="smoothingModel_noSmoothing.html"><em>smoothingModel_noSmoothing</em></a></td>
+<td><a class="reference internal" href="voidFractionModel.html"><em>voidfractionModel</em></a></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="voidFractionModel_IBVoidFraction.html"><em>voidfractionModel_IBVoidFraction</em></a></td>
-<td><a class="reference internal" href="voidFractionModel_bigParticleVoidFraction.html"><em>voidfractionModel_bigParticleVoidFraction</em></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="voidFractionModel_GaussVoidFraction.html"><em>voidfractionModel_GaussVoidFraction</em></a></td>
+<td><a class="reference internal" href="voidFractionModel_IBVoidFraction.html"><em>voidfractionModel_IBVoidFraction</em></a></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="voidFractionModel_centreVoidFraction.html"><em>voidfractionModel_centreVoidFraction</em></a></td>
-<td><a class="reference internal" href="voidFractionModel_dividedVoidFraction.html"><em>voidfractionModel_dividedVoidFraction</em></a></td>
+<tr class="row-even"><td><a class="reference internal" href="voidFractionModel_bigParticleVoidFraction.html"><em>voidfractionModel_bigParticleVoidFraction</em></a></td>
+<td><a class="reference internal" href="voidFractionModel_centreVoidFraction.html"><em>voidfractionModel_centreVoidFraction</em></a></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="voidFractionModel_noVoidFraction.html"><em>voidfractionModel_noVoidFractionVoidFraction</em></a></td>
-<td><a class="reference internal" href="voidFractionModel_trilinearVoidFraction.html"><em>voidfractionModel_trilinearVoidFraction</em></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="voidFractionModel_dividedVoidFraction.html"><em>voidfractionModel_dividedVoidFraction</em></a></td>
+<td><a class="reference internal" href="voidFractionModel_noVoidFraction.html"><em>voidfractionModel_noVoidFractionVoidFraction</em></a></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="voidFractionModel_trilinearVoidFraction.html"><em>voidfractionModel_trilinearVoidFraction</em></a></td>
+<td>&nbsp;</td>
 </tr>
 </tbody>
 </table>

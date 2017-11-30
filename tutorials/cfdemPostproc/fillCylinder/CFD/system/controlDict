@@ -52,7 +52,7 @@ maxCo 0.1;
 // ************************************************************************* //
 
 functions
-(
+{
 
     probes
     {
@@ -63,10 +63,10 @@ functions
         name        probes;
         probeLocations
         (
-            (0.00003 0 0.0001)
-            (0.00003 0 0.01)
-            (0.00003 0 0.02)
-            (0.00003 0 0.0529)
+            (0.00003 1e-4 0.0001)
+            (0.00003 1e-4 0.01)
+            (0.00003 1e-4 0.02)
+            (0.00003 1e-4 0.0529)
         );
 
         // Fields to be probed
@@ -76,4 +76,4 @@ functions
         outputControl   timeStep;//outputTime;
         outputInterval  1;
     }
-);
+}

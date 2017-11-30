@@ -22,6 +22,7 @@ liggghtsCommandModels
        endTime scalar2;
        timeInterval scalar3;
        verbose;
+       unfix switch2;
    }
 
 * *switch1* = switch (must be on!!!) to select if executed only first step.
@@ -29,6 +30,7 @@ liggghtsCommandModels
 * *scalar2* = end time of command (use simulation start time)
 * *scalar3* = time interval of command (use 1.)
   *verbose* = (normally off) for verbose run
+* *switch2* = (false by default) switch to select if the command is used as fix (default) or unfix
 
 
 Examples
@@ -48,6 +50,7 @@ Examples
        endTime 0;
        timeInterval 1;
        verbose;
+       unfix false;
    }
 
 Description

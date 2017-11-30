@@ -45,3 +45,12 @@ compileLIGGGHTS $logpath $logfileName $headerText
 if [ ${PIPESTATUS[0]} -ne 0 ]; then         
     exit 1
 fi
+
+#================================================================================#
+# compile LIGGGHTS dataExchange libraries (forces clean, and then compile)
+#================================================================================#
+bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/compileLIGGGHTS_dataExchLib.sh 
+
+if [ ${PIPESTATUS[0]} -ne 0 ]; then
+    exit 1
+fi

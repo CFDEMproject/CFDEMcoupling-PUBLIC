@@ -120,6 +120,8 @@ fieldStore::fieldStore
             )
         );
     }
+
+    particleCloud_.checkCG(true);
 }
 
 
