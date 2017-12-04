@@ -101,6 +101,11 @@ inline const bool& cfdemCloud::ignore() const
     return ignore_;
 }
 
+inline const bool& cfdemCloud::writeTimePassed() const
+{
+    return writeTimePassed_;
+}
+
 inline const fvMesh& cfdemCloud::mesh() const
 {
     return mesh_;

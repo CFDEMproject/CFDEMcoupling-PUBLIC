@@ -176,7 +176,7 @@ bool liggghtsCommandModel::runThisCommand(int couplingStep)
     bool runIt=false;
     if(
        (!runEveryWriteStep_ && firstCouplingStep_  <= couplingStep && lastCouplingStep_  >= couplingStep)  ||
-       (runEveryWriteStep_  && particleCloud_.mesh().time().outputTime())
+       (runEveryWriteStep_  && particleCloud_.writeTimePassed())
       )
     {
         if(couplingStep >= nextRun_)

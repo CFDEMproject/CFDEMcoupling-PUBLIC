@@ -165,6 +165,7 @@ bool Foam::cfdemCloudIB::evolve
         skipLagrangeToEulerMapping_=true;
     }
 
+    if(!writeTimePassed_ && mesh_.time().outputTime()) writeTimePassed_=true;
     if (dataExchangeM().doCoupleNow())
     {
         Info << "\n timeStepFraction() = " << dataExchangeM().timeStepFraction() << endl;

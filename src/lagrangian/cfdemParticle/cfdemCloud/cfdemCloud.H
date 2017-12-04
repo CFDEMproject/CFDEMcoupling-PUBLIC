@@ -106,6 +106,8 @@ protected:
 
     bool ignore_;
 
+    bool writeTimePassed_;
+
     const word modelType_;
 
     mutable double **positions_;
@@ -331,6 +333,8 @@ public:
        inline const bool& treatVoidCellsAsExplicitForce() const;
 
        inline const bool& ignore() const;
+
+       inline const bool& writeTimePassed() const;
 
        inline const fvMesh& mesh() const;
 

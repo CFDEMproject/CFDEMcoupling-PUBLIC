@@ -84,6 +84,7 @@ Foam::cfdemCloud::cfdemCloud
     debug_(false),
     allowCFDsubTimestep_(true),
     ignore_(false),
+    writeTimePassed_(false),
     modelType_(couplingProperties_.lookup("modelType")),
     positions_(NULL),
     velocities_(NULL),
@@ -705,6 +706,7 @@ bool Foam::cfdemCloud::evolve
 
     if(!ignore())
     {
+        if(!writeTimePassed_ && mesh_.time().outputTime()) writeTimePassed_=true;
         if (dataExchangeM().doCoupleNow())
         {
             Info << "\n Coupling..." << endl;

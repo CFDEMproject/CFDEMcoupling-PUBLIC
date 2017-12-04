@@ -193,7 +193,7 @@ A general formulation with a solid phase:</p>
 <li>Calculate the voidfraction field from particle positions, particle volumes and cell volumes. (voidFractionModel)</li>
 <li>Calculate the forces on the CFD field and the particle forces. These may be assembled by various forceModels, e.g. buyoancy and a drag-law. (forceModel and forceSubModel)</li>
 <li>Calculate the implicit and if necessary explicit source terms from the force fields for the Navier-Stokes-Equations, the solver needs to solve. (momCoupleModel)</li>
-<li>Calculate the &#8220;Us&#8221; field from particle data, map the particle data to the CFD-field. (averagingModel)</li>
+<li>Calculate the &#8220;Us&#8221; field from particle data, map the particle data to the CFD field. (averagingModel)</li>
 </ul>
 <p>In the standard setting the momentum coupling model takes the calculated forces of forceModels and produces the implicit momentum source term Ksl with</p>
 <img alt="_images/Ksl.png" class="align-center" src="_images/Ksl.png" />

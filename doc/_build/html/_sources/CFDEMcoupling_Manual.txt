@@ -100,7 +100,7 @@ All cfdemSolvers use a "cfdemCloud" object, which takes care of many things. The
 * Calculate the voidfraction field from particle positions, particle volumes and cell volumes. (voidFractionModel)
 * Calculate the forces on the CFD field and the particle forces. These may be assembled by various forceModels, e.g. buyoancy and a drag-law. (forceModel and forceSubModel)
 * Calculate the implicit and if necessary explicit source terms from the force fields for the Navier-Stokes-Equations, the solver needs to solve. (momCoupleModel)
-* Calculate the "Us" field from particle data, map the particle data to the CFD-field. (averagingModel)
+* Calculate the "Us" field from particle data, map the particle data to the CFD field. (averagingModel)
 
 In the standard setting the momentum coupling model takes the calculated forces of forceModels and produces the implicit momentum source term Ksl with
 
