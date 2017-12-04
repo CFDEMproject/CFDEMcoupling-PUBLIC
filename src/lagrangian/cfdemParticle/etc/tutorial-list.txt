@@ -1,0 +1,18 @@
+
+#===================================================================#
+# This file specifies the example cases being executed by
+# .../etc/testTutorial.sh , which can be run with the alias
+# cfdemTestTUT
+# Christoph Goniva - June. 2011, DCS Computing GmbH
+#===================================================================#
+cfdemPostproc/fillCylinder/dir
+cfdemSolverPiso/settlingTestMPI/dir
+cfdemSolverPiso/ErgunTestMPI/dir
+cfdemSolverPiso/ErgunTestMPI_cgs/dir
+cfdemSolverPiso/ErgunTestMPI_restart/dir
+cfdemSolverPiso/periodicChannel/dir
+cfdemSolverPiso/voidfractionTest/dir
+cfdemSolverIB/twoSpheresGlowinskiMPI/dir
+cfdemSolverPisoScalar/packedBedTemp/dir
+cfdemSolverPisoSTM/packedBedTemp/dir
+#ParScale/cfdemSolverPisoSTM/packedBedTempParScale/dir
