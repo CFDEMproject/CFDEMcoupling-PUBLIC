@@ -1,0 +1,65 @@
+
+===============================================================
+Release notes for PUBLIC, version 3.8.0 
+
+src/lagrangian/cfdemParticle/subModels/IOModel/trackIO/trackIO.C |  Josef Kerbl (DCS) reworked the trackIO IOModel to transfer the LIGGGHTS® particle IDs to the CFDEMcoupling output 
+src/lagrangian/cfdemParticle/subModels/forceModel/checkCouplingInterval/checkCouplingInterval.C |  Josef Kerbl (DCS) changed the default maximum values of CFL and particle CFL numbers to 1 
+applications/solvers/cfdemSolverIB/cfdemSolverIB.C |  Josef Kerbl (DCS) added compatibility for non-Newtonian viscosity models 
+applications/solvers/cfdemSolverPiso/cfdemSolverPiso.C |  Josef Kerbl (DCS) added compatibility for non-Newtonian viscosity models 
+applications/solvers/cfdemSolverPisoSTM/cfdemSolverPisoSTM.C |  Josef Kerbl (DCS) added compatibility for non-Newtonian viscosity models 
+applications/solvers/cfdemSolverPisoScalar/cfdemSolverPisoScalar.C |  Josef Kerbl (DCS) added compatibility for non-Newtonian viscosity models 
+tutorials/.gitignore |  Alice Hager (DCS) moved all blockMeshDict files from constant/polyMesh to system 
+doc/_build/html/liggghtsCommandModel_execute.html |  Alice Hager (DCS) updated the documentation of new features and keywords (handling of numbers and labels, defined keywords, noBlanks, ...) 
+doc/_build/html/liggghtsCommandModel_setDEMGravity.html |  Alice Hager (DCS) added keyword unfix to documentation 
+doc/_build/html/CFDEMcoupling_Manual.html |  Alice Hager (DCS) added information about the solveFlow keyword. 
+applications/solvers/cfdemSolverIB/cfdemSolverIB.C |  Alice Hager (DCS) added the solveFlow keyword 
+cfdemCloudIB.C |  Alice Hager (DCS) removed the DEMTorques_ from the getDEMdata function (bugfix) 
+src/lagrangian/cfdemParticle/cfdemCloud/cfdemCloud.C |  Josef Kerbl (DCS) removed the unused coupleForce_ switch 
+src/lagrangian/cfdemParticle/subModels/forceModel/forceModel/forceModel.C |  Josef Kerbl (DCS) removed the unused coupleForce_ switch 
+src/lagrangian/cfdemParticle/subModels/forceModel/forceModel/forceModel.H |  Josef Kerbl (DCS) removed the unused coupleForce_ switch 
+src/lagrangian/cfdemParticle/subModels/forceModel/noDrag/noDrag.C |  Josef Kerbl (DCS) removed the unused coupleForce_ switch 
+src/lagrangian/cfdemParticle/subModels/dataExchangeModel/dataExchangeModel/dataExchangeModel.H |  Josef Kerbl (DCS) elevated the warning of non-matching DEM-timestep, couplingInterval and CFD-timestep to error 
+checkCouplingInterval.C |  Josef Kerbl (DCS) added checkCG to forceModels missing this 
+fieldStore.C |  Josef Kerbl (DCS) added checkCG to forceModels missing this 
+fieldTimeAverage.C |  Josef Kerbl (DCS) added checkCG to forceModels missing this 
+noDrag.C |  Josef Kerbl (DCS) added checkCG to forceModels missing this 
+volWeightedAverage.C |  Josef Kerbl (DCS) added checkCG to forceModels missing this 
+Archimedes.C |  Josef Kerbl (DCS) added support for typeSpecificCG to some force models 
+checkCouplingInterval.C |  Josef Kerbl (DCS) added support for typeSpecificCG to some force models 
+cfdemCloud.C |  Josef Kerbl (DCS) changed the default value of cgWarnOnly to false 
+oneWayVTK.C |  Christoph Goniva (DCS) bugfix to enable correct reading of v field (thx to Moritz Höfert) 
+applications/utilities/cfdemPostproc/cfdemPostproc.C |  Christoph Goniva (DCS) enable calculating an writing Us field (thx to Moritz Höfert) 
+meanSupVelocityForce.C |  Christoph Goniva (DCS) enable using cellZones 
+forceSubModel.C |  Josef Kerbl (DCS) added check, if scaleDrag > 0 
+bashrc |  Josef Kerbl (DCS) added support to automatically compile LIGGGHTS in debug mode for the Makefile.auto, if WM_COMPILE_OPTION is set to Debug 
+cshrc |  Josef Kerbl (DCS) added support to automatically compile LIGGGHTS in debug mode for the Makefile.auto, if WM_COMPILE_OPTION is set to Debug 
+functions.sh |  Josef Kerbl (DCS) added support to automatically compile LIGGGHTS in debug mode for the Makefile.auto, if WM_COMPILE_OPTION is set to Debug 
+cfdemSolverPisoSTM.C |  Christoph Goniva (DCS) added fvOptions and fixedFluxPressureBC for 5.x 
+cfdemSolverPiso.C |  Alice Hager (DCS) ported 5.x 
+cfdemSolverPisoSTM.C |  Christoph Goniva (DCS) - fvOptions added 
+applications/utilities/cfdemPostproc/cfdemPostproc.C |  Alice Hager (DCS) ported 5.x 
+meanSupVelocityForce.C |  Alice Hager (DCS) ported 5.x & major revision 
+eulerianScalarField.C |  Alice Hager (DCS) ported 5.x 
+cfdemCloud.C |  Alice Hager (DCS) ported 5.x 
+cfdemCloud.C |  Christoph Goniva (DCS) minor revision 
+cfdemCloudIB.C |  Alexander Podlozhnyuk (DCS) adaptions for periodic bc 
+IOModel.C |  Josef Kerbl (DCS) - revision ofor 5.x 
+dataExchangeModel.C |  Christoph Goniva (DCS) improved calculation of time step fraction 
+oneWayVTK.C |  Josef Kerbl (DCS) bugfix 
+LaEuScalarTemp.C |  Alexander Podlozhnyuk (DCS) extension for compressible flow 
+MeiLift.H |  Stefan Radl (TUG) reference added 
+checkCouplingInterval.C |  Christoph Goniva (DCS) consider scaleDia 
+checkCouplingInterval.C |  Christoph Goniva (DCS) default maxCFL=1 
+checkCouplingInterval.C |  Christoph Goniva (DCS) default maxPCFL=1 
+forceSubModel.C |  Christoph Goniva (DCS) new option scaleDH 
+gradPForce.C |  Christoph Goniva (DCS) verbose option 
+noDrag.C |  Christoph Goniva (DCS) bugfix 
+particleCellVolume.C |  Josef Kerbl (DCS) added header to output 
+scalarGeneralExchange.C |  Stefan Radl (TUG) major revisions 
+viscForce.C |  Christoph Goniva (DCS) verbose option 
+engineSearch.C |  Josef Kerbl (DCS) bugfix for MS use 
+engineSearchIB.C |  Alexander Podlozhnyuk (DCS) Stefan Radl (TUG) improved periodic 
+standardSearch.C |  Josef Kerbl (DCS) bugfix for MS use 
+IBVoidFraction.C |  Alexander Podlozhnyuk (DCS) Stefan Radl (TUG) improved periodic 
+===============================================================
+
