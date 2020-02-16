@@ -100,7 +100,7 @@ how to use different solvers and models.
 CFDEM®coupling stands for Computational Fluid Dynamics (CFD) -
 Discrete Element Method (DEM) coupling.
 
-\*---------------------------------------------------------------------------*/
+/*---------------------------------------------------------------------------*\
 (*) This offering is not approved or endorsed by OpenCFD Limited,
     the producer of the OpenFOAM software and 
     owner of the OPENFOAM® and OpenCFD® trade marks.
