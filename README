@@ -1,14 +1,14 @@
 /*---------------------------------------------------------------------------*\
-    CFDEMcoupling - Open Source CFD-DEM coupling
+    CFDEM®coupling - Open Source CFD-DEM coupling
 
     CFD-DEM coupling toolbox, released by 
     DCS Computing GmbH, Linz, Austria
     www.dcs-computing.com, office@dcs-computing.com
 
-    CFDEMcoupling is part of the CFDEMproject
+    CFDEM®coupling is part of the CFDEM®project
     www.cfdem.com
 
-    CFDEMcoupling is free software; you can redistribute it and/or modify it
+    CFDEM®coupling is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the
     Free Software Foundation; either version 3 of the License, or (at your
     option) any later version.
@@ -54,7 +54,7 @@ License
 /*---------------------------------------------------------------------------*\
 Description
     This code provides models and solvers to realize coupled CFD-DEM simulations
-    using LIGGGHTS and OpenFOAM® technology.
+    using LIGGGHTS® and OpenFOAM® technology.
     Note:   this code is not part of OpenFOAM®.
             This offering is not approved or endorsed by OpenCFD Limited, 
             the producer of the OpenFOAM® software and owner of the OPENFOAM®
