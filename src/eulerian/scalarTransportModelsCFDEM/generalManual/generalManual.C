@@ -135,7 +135,7 @@ void generalManual::evolveFields()
     //update the fields
     if(updateMixtureProperties_)
     {
-        if(eulerianScalarF(0).fieldType()=="Temperature" )
+        if(eulerianScalarF(0).fieldType()=="temperature" )
             FatalError <<"generalManual: first eulerianField is temperature, but we need a species. Please re-order your eulerianFields in the input dict. \n" 
                        << abort(FatalError);  
 
@@ -171,7 +171,7 @@ void generalManual::evolveFields()
     //Loop through all eulerian fields and update them
     for (int i=0;i<eulerianFieldList_.size();i++)
     {
-            if(eulerianScalarF(i).fieldType()=="Temperature")
+            if(eulerianScalarF(i).fieldType()=="temperature")
                 eulerianScalarF(i).update(phi, voidfraction, particleCloud_.turbulence().nuEff(), PrT_);
             else 
                 eulerianScalarF(i).update(phi, voidfraction, particleCloud_.turbulence().nuEff(), ScT_);
