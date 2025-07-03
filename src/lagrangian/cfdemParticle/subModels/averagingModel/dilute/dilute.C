@@ -96,7 +96,7 @@ void dilute::setScalarAverage
         for(int subCell=0;subCell<particleCloud_.cellsPerParticle()[index][0];subCell++)
         {
             //Info << "subCell=" << subCell << endl;
-            cellI = particleCloud_.cellIDs()[index][subCell];
+            cellI = particleCloud_.cfdemCloud::cellIDs()[index][subCell];
 
             if (cellI >= 0)
             {
@@ -134,7 +134,7 @@ void dilute::setVectorAverage
         {
             for(int subCell=0;subCell<particleCloud_.cellsPerParticle()[index][0];subCell++)
             {
-                cellI = particleCloud_.cellIDs()[index][subCell];
+                cellI = particleCloud_.cfdemCloud::cellIDs()[index][subCell];
                 if (cellI >= 0)
                 {
                     for(int i=0;i<3;i++) valueVec[i] = value[index][i];
@@ -152,7 +152,7 @@ void dilute::setVectorAverage
             for(int subCell=0;subCell<particleCloud_.cellsPerParticle()[index][0];subCell++)
             {
                 //Info << "subCell=" << subCell << endl;
-                cellI = particleCloud_.cellIDs()[index][subCell];
+                cellI = particleCloud_.cfdemCloud::cellIDs()[index][subCell];
 
                 if (cellI >= 0)
                 {

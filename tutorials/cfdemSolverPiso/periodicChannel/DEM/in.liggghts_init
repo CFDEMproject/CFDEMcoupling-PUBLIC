@@ -1,6 +1,5 @@
 echo            both
 log             ../DEM/log.liggghts
-thermo_log      ../DEM/post/thermo.txt
 
 atom_style      granular
 atom_modify     map array
@@ -55,7 +54,6 @@ compute         1 all erotate/sphere
 thermo_style    custom step atoms ke c_1 vol
 thermo          1000
 thermo_modify   lost ignore norm no
-compute_modify  thermo_temp dynamic yes
 
 # insert the first particles so that dump is not empty
 run     1

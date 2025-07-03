@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #===================================================================#
-# allrun script for testcase as part of test routine 
+# allrun script for testcase as part of test routine
 # run settlingTest
 # Christoph Goniva - August 2011
 #===================================================================#
@@ -25,6 +25,18 @@ else
     $casePath/parDEMrun.sh
 fi
 
+# keep old couplingProperties
+cp $casePath/CFD/constant/couplingProperties $casePath/CFD/constant/couplingProperties_backup
+
+# change to use Deen Nusselt correlation
+#changeDictionary -instance constant -dict changeDicts/changeDictionaryDict_1 -case $casePath/CFD
+
+# change to use Gunn Nusselt correlation
+#changeDictionary -instance constant -dict changeDicts/changeDictionaryDict_2 -case $casePath/CFD
+
 #- run parallel CFD-DEM in new terminal
 #gnome-terminal --title='cfdemSolverPisoScalar packedBedTemp CFD'  -e "bash $casePath/parCFDDEMrun.sh"
 . $casePath/parCFDDEMrun.sh
+
+# restore old couplingProperties
+mv $casePath/CFD/constant/couplingProperties_backup $casePath/CFD/constant/couplingProperties

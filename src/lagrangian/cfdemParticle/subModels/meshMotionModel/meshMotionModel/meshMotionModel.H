@@ -125,6 +125,8 @@ public:
 
         virtual tmp<volScalarField> inside() const;
 
+        virtual tmp<volVectorField> momentumSource() const;
+
         virtual void postProcessing(volScalarField&) const {};
 
     // Access

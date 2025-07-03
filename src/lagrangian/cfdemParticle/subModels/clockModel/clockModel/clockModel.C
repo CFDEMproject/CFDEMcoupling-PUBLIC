@@ -30,7 +30,7 @@ Description
 \*---------------------------------------------------------------------------*/
 
 #include "error.H"
-#include "mpi.h"
+#include <mpi.h>
 #include "clockModel.H"
 #include <unistd.h>
 

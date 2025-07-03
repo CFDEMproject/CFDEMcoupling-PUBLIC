@@ -33,6 +33,7 @@ Description
 
 #include "viscForce.H"
 #include "addToRunTimeSelectionTable.H"
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -61,18 +62,31 @@ viscForce::viscForce
 :
     forceModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
-    velocityFieldName_(propsDict_.lookup("velocityFieldName")),
+    velocityFieldName_(propsDict_.lookupOrDefault<word>("velocityFieldName","U")),
     U_(sm.mesh().lookupObject<volVectorField> (velocityFieldName_)),
     addedMassCoeff_(0.0)
 {
     // block viscForceModel for type B
     if (modelType_ == "B") FatalError <<"using  model viscForce with model type B is not valid\n" << abort(FatalError);
 
+    // suppress particle probe
+    if (probeIt_ && propsDict_.found("suppressProbe"))
+        probeIt_=!Switch(propsDict_.lookup("suppressProbe"));
+    if(probeIt_)
+    {
+        particleCloud_.probeM().initialize(typeName, typeName+".logDat");
+        particleCloud_.probeM().vectorFields_.append("viscForce"); //first entry must the be the force
+        particleCloud_.probeM().scalarFields_.append("Vs");
+        particleCloud_.probeM().writeHeader();
+    }
+
+    particleCloud_.checkCG(true);
+
     // init force sub model
     setForceSubModels(propsDict_);
 
     // define switches which can be read from dict
-    forceSubM(0).setSwitchesList(0,true); // activate search for treatForceExplicit switch
+    forceSubM(0).setSwitchesList(0,true); // activate treatExplicit switch
     forceSubM(0).setSwitchesList(3,true); // activate search for verbose switch
     forceSubM(0).setSwitchesList(4,true); // activate search for interpolate switch
     forceSubM(0).setSwitchesList(8,true); // activate scalarViscosity switch
@@ -84,30 +98,19 @@ viscForce::viscForce
     else                                    // type A
         forceSubM(0).setSwitches(1,true);   // treatForceDEM = true
 
-    // read user defined switches
+    // read those switches defined above, if provided in dict
     for (int iFSub=0;iFSub<nrForceSubModels();iFSub++)
         forceSubM(iFSub).readSwitches();
+
+    // setup required communication
+    for (int iFSub=0;iFSub<nrForceSubModels();iFSub++)
+        forceSubM(iFSub).setupCommunication();
 
     if (propsDict_.found("useAddedMass")) 
     {
         addedMassCoeff_ =  readScalar(propsDict_.lookup("useAddedMass"));
         Info << "viscForce will also include added mass with coefficient: " << addedMassCoeff_ << endl;
         Info << "WARNING: use fix nve/sphere/addedMass in LIGGGHTS input script to correctly account for added mass effects!" << endl;
-    }
-
-    particleCloud_.checkCG(true);
-
-    //Append the field names to be probed
-    // suppress particle probe
-    if (probeIt_ && propsDict_.found("suppressProbe"))
-        probeIt_=!Switch(propsDict_.lookup("suppressProbe"));
-
-    if(probeIt_)
-    {
-        particleCloud_.probeM().initialize(typeName, typeName+".logDat");
-        particleCloud_.probeM().vectorFields_.append("viscForce"); //first entry must the be the force
-        particleCloud_.probeM().scalarFields_.append("Vs");
-        particleCloud_.probeM().writeHeader();
     }
 }
 
@@ -129,60 +132,61 @@ void viscForce::setForce() const
     vector position;
     vector force;
     label cellI;
+    scalar rs(0);
+    const scalar  fourPiByThree(4./3.*M_PI);
 
     #include "resetDivTauInterpolator.H"
     #include "setupProbeModel.H"
 
     for(int index = 0;index <  particleCloud_.numberOfParticles(); index++)
     {
-        //if(mask[index][0])
-        //{
-            force=vector(0,0,0);
-            cellI = particleCloud_.cellIDs()[index][0];
+        force=vector(0,0,0);
+        cellI = particleCloud_.cfdemCloud::cellIDs()[index][0];
 
-            if (cellI > -1) // particle Found
+        if (cellI > -1) // particle Found
+        {
+            rs = particleCloud_.radius(index);
+            position = particleCloud_.cfdemCloud::position(index);
+
+            if(forceSubM(0).interpolation()) // use intepolated values for alpha (normally off!!!)
             {
-
-                position = particleCloud_.position(index);
-
-                if(forceSubM(0).interpolation()) // use intepolated values for alpha (normally off!!!)
-                {
-                    divTau = divTauInterpolator_().interpolate(position,cellI);
-                }else
-                {
-                    divTau = divTau_[cellI];
-                }
-
-                Vs = particleCloud_.particleVolume(index);
-
-                // calc the contribution of the deviatoric stress 
-                // to the generalized buoyancy force
-                force = -Vs*divTau*(1.0+addedMassCoeff_);
-
-                if(forceSubM(0).verbose() && index >0 && index <2)
-                {
-                    Info << "index = " << index << endl;
-                    Info << "gradP = " << divTau << endl;
-                    Info << "force = " << force << endl;
-                }
-
-                //Set value fields and write the probe
-                if(probeIt_)
-                {
-                    #include "setupProbeModelfields.H"
-                    // Note: for other than ext one could use vValues.append(x)
-                    // instead of setSize
-                    vValues.setSize(vValues.size()+1, force);           //first entry must the be the force
-                    sValues.setSize(sValues.size()+1, Vs);
-                    particleCloud_.probeM().writeProbe(index, sValues, vValues);
-                }
+                divTau = divTauInterpolator_().interpolate(position,cellI);
+            }else
+            {
+                divTau = divTau_[cellI];
             }
 
-            // write particle based data to global array
-            forceSubM(0).partToArray(index,force,vector::zero);
-        //}
+            Vs = particleCloud_.cfdemCloud::particleVolume(index);
+            //Vs = rs*rs*rs*fourPiByThree;  //change Vs calc to this after TH is clean!
+
+            // calc the contribution of the deviatoric stress 
+            // to the generalized buoyancy force
+            force = -Vs*divTau*(1.0+addedMassCoeff_);
+
+            if(forceSubM(0).verbose() && index >0 && index <2)
+            {
+                Info << "index = " << index << endl;
+                Info << "gradP = " << divTau << endl;
+                Info << "force = " << force << endl;
+            }
+
+            //Set value fields and write the probe
+            if(probeIt_)
+            {
+                #include "setupProbeModelfields.H"
+                // Note: for other than ext one could use vValues.append(x)
+                // instead of setSize
+                vValues.setSize(vValues.size()+1, force);           //first entry must the be the force
+                sValues.setSize(sValues.size()+1, Vs);
+                particleCloud_.probeM().writeProbe(index, sValues, vValues);
+            }
+        }
+
+        // write particle based data to global array
+        forceSubM(0).partToArray(index,force,vector::zero);
     }
 }
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

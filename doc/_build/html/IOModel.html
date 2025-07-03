@@ -1,70 +1,32 @@
-
-
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>IOModel command &mdash; CFDEMcoupling v3.X documentation</title>
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IOModel command &mdash; CFDEMcoupling 3.8.1 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   
-  
-
-  
-
-  
-  
-    
-
-  
-
-  
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-
-  
-
-  
-    <link rel="top" title="CFDEMcoupling v3.X documentation" href="index.html"/> 
-
-  
-  <script src="_static/js/modernizr.min.js"></script>
-
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
 </head>
 
-<body class="wy-body-for-nav" role="document">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
-          
-
-          
+        <div class="wy-side-nav-search" >
             <a href="CFDEMcoupling_Manual.html" class="icon icon-home"> CFDEMcoupling
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                v3.X
+                3.8.1
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -72,16 +34,9 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-                <!-- Local TOC -->
-                <div class="local-toc"><ul>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
 <li><a class="reference internal" href="#">IOModel command</a><ul>
 <li><a class="reference internal" href="#syntax">Syntax</a></li>
 <li><a class="reference internal" href="#examples">Examples</a></li>
@@ -92,141 +47,90 @@
 </li>
 </ul>
 </div>
-            
-          
         </div>
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="CFDEMcoupling_Manual.html">CFDEMcoupling</a>
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="CFDEMcoupling_Manual.html">CFDEMcoupling</a>
       </nav>
 
-
-      
       <div class="wy-nav-content">
         <div class="rst-content">
-          
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="CFDEMcoupling_Manual.html">Docs</a> &raquo;</li>
-      
-    <li>IOModel command</li>
-    <li class="wy-breadcrumbs-aside">
-      
-        
-          <a href="http://www.cfdem.com"> Website</a>
-        
-      
-    </li>
+      <li><a href="CFDEMcoupling_Manual.html" class="icon icon-home"></a> &raquo;</li>
+      <li>IOModel command</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
   </ul>
   <hr/>
-  
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="iomodel-command">
-<span id="index-0"></span><h1>IOModel command<a class="headerlink" href="#iomodel-command" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="syntax">
-<h2>Syntax<a class="headerlink" href="#syntax" title="Permalink to this headline">¶</a></h2>
+             
+  <section id="iomodel-command">
+<span id="index-0"></span><h1>IOModel command<a class="headerlink" href="#iomodel-command" title="Permalink to this headline"></a></h1>
+<section id="syntax">
+<h2>Syntax<a class="headerlink" href="#syntax" title="Permalink to this headline"></a></h2>
 <p>Defined in couplingProperties dictionary.</p>
-<div class="highlight-python"><div class="highlight"><pre>IOModel &quot;model&quot;;
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">IOModel</span> <span class="s2">&quot;model&quot;</span><span class="p">;</span>
 </pre></div>
 </div>
 <ul class="simple">
-<li>model = name of IO-model to be applied</li>
+<li><p>model = name of IO-model to be applied</p></li>
 </ul>
-</div>
-<div class="section" id="examples">
-<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
-<p>IOModel &#8220;off&#8221;;</p>
+</section>
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline"></a></h2>
+<p>IOModel “off”;</p>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">This examples list might not be complete - please look for other models (IOModel_XY) in this documentation.</p>
+<p class="admonition-title">Note</p>
+<p>This examples list might not be complete - please look for other models (IOModel_XY) in this documentation.</p>
 </div>
-</div>
-<div class="section" id="description">
-<h2>Description<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="description">
+<h2>Description<a class="headerlink" href="#description" title="Permalink to this headline"></a></h2>
 <p>The IO-model is the base class to write data (e.g. particle properties) to files within the CFD file-structure.</p>
-</div>
-<div class="section" id="restrictions">
-<h2>Restrictions<a class="headerlink" href="#restrictions" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="restrictions">
+<h2>Restrictions<a class="headerlink" href="#restrictions" title="Permalink to this headline"></a></h2>
 <p>none.</p>
-</div>
-<div class="section" id="related-commands">
-<h2>Related commands<a class="headerlink" href="#related-commands" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference internal" href="IOModel_basicIO.html"><em>basicIO</em></a>, <a class="reference internal" href="IOModel_noIO.html"><em>noIO</em></a>, <a class="reference internal" href="IOModel_sophIO.html"><em>sophIO</em></a>, <a class="reference internal" href="IOModel_trackIO.html"><em>trackIO</em></a></p>
+</section>
+<section id="related-commands">
+<h2>Related commands<a class="headerlink" href="#related-commands" title="Permalink to this headline"></a></h2>
+<p><a class="reference internal" href="IOModel_basicIO.html"><span class="doc">basicIO</span></a>, <a class="reference internal" href="IOModel_noIO.html"><span class="doc">noIO</span></a>, <a class="reference internal" href="IOModel_sophIO.html"><span class="doc">sophIO</span></a>, <a class="reference internal" href="IOModel_trackIO.html"><span class="doc">trackIO</span></a></p>
 <p><strong>Default:</strong> none.</p>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &copy; Copyright 2016, DCS Computing GmbH, JKU Linz.
-
-    </p>
+    <p>&#169; Copyright 2025, DCS Computing GmbH.</p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
-
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'v3.X',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-
-  
-
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
-
-  
-  
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(false);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

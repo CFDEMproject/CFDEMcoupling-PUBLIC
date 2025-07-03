@@ -68,13 +68,11 @@ turbulenceModelType turbulenceProperties; //OFversion30x
 
 ShirgaonkarIBProps
 {
-    velFieldName "U";
     pressureFieldName "p";
 }
 
 ArchimedesIBProps
 {
-    gravityFieldName "g";
     voidfractionFieldName "voidfractionNext";
 }
 
@@ -101,7 +99,6 @@ bigParticleProps
 {
     maxCellsPerParticle 1000;
     alphaMin 0.30;
-    scaleUpVol 1.0;
 }
 centreProps
 {
@@ -111,7 +108,7 @@ centreProps
 dividedProps
 {
     alphaMin 0.05;
-    scaleUpVol 1.2;
+    volScale ( 1.2 );
 }
 
 engineIBProps

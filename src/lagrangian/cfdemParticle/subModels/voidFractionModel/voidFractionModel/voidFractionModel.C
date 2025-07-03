@@ -87,9 +87,21 @@ voidFractionModel::voidFractionModel
     maxCellsPerParticle_(1),
     weight_(1.),
     porosity_(1.),
-    requiresSuperquadric_(false)
+    msMode_(false),
+    volScale_(0),
+    arraysAllocated_(false),
+    nMP_(labelList(101)),
+    maxNMP_(-1)
 {
-    particleCloud_.dataExchangeM().allocateArray(cellsPerParticle_,1,maxCellsPerParticle_);
+    // init nMP_ for each clump type
+    // this is overwritten by dividedVoidFractionMP (if used)
+    // there the user defines nMP per clump type
+    int maxNTypes(101); // TODO this hardcoded value is not beautiful but avoids useless communication of type for many cases
+                        // see also above construction of nMP_
+                        // see also connection to cloudMSI.H constructor
+    for(int i=0;i<maxNTypes;i++) nMP_[i]=1;
+
+    reAllocArrays();
 }
 
 
@@ -147,7 +159,7 @@ void Foam::voidFractionModel::resetVoidFractions() const
         if(mask[index][0])
         {
             // undo voidfraction cause by particle
-            label cellI = particleCloud_.cellIDs()[index][0];
+            label cellI = particleCloud_.cfdemCloud::cellIDs()[index][0];
             scalar cellVolume=voidfractionNext_.mesh().V()[cellI];
             voidfractionNext_[cellI] += particleCloud_.particleVolumes()[index][0]/cellVolume;
         }
@@ -166,25 +178,22 @@ int Foam::voidFractionModel::maxCellsPerParticle() const
 
 void Foam::voidFractionModel::reAllocArrays() const
 {
-    if(particleCloud_.numberOfParticlesChanged())
+    if(particleCloud_.numberOfParticlesChanged() || !arraysAllocated_)
     {
         // get arrays of new length
         particleCloud_.dataExchangeM().allocateArray(cellsPerParticle_,1,1);
+        arraysAllocated_ = true;
     }
 }
 
 void Foam::voidFractionModel::reAllocArrays(int nP) const
 {
-    if(particleCloud_.numberOfParticlesChanged())
+    if(particleCloud_.numberOfParticlesChanged() || !arraysAllocated_)
     {
         // get arrays of new length
         particleCloud_.dataExchangeM().allocateArray(cellsPerParticle_,1,1,nP);
+        arraysAllocated_ = true;
     }
-}
-
-bool Foam::voidFractionModel::requiresSuperquadric() const
-{
-  return requiresSuperquadric_;
 }
 
 double Foam::voidFractionModel::pointInParticle(int index, vector positionCenter, vector point, double scale) const
@@ -219,22 +228,22 @@ double Foam::voidFractionModel::minPeriodicDistance(int index,
     double f=999e32;
     vector positionCenterPeriodic;
 
-    for(  int xDir=-static_cast<int>(dirCheckRange[0]); 
-              xDir<=static_cast<int>(dirCheckRange[0]); 
+    for(  int xDir=-static_cast<int>(dirCheckRange[0]);
+              xDir<=static_cast<int>(dirCheckRange[0]);
               xDir++)
     {
         positionCenterPeriodic[0] =  positionCenter[0]
                                   + static_cast<double>(xDir)
                                   * (globalBb.max()[0]-globalBb.min()[0]);
         for(int yDir=-static_cast<int>(dirCheckRange[1]);
-                yDir<=static_cast<int>(dirCheckRange[1]); 
+                yDir<=static_cast<int>(dirCheckRange[1]);
                 yDir++)
         {
             positionCenterPeriodic[1] =  positionCenter[1]
                                       + static_cast<double>(yDir)
                                       * (globalBb.max()[1]-globalBb.min()[1]);
-            for(int zDir=-static_cast<int>(dirCheckRange[2]); 
-                    zDir<=static_cast<int>(dirCheckRange[2]); 
+            for(int zDir=-static_cast<int>(dirCheckRange[2]);
+                    zDir<=static_cast<int>(dirCheckRange[2]);
                     zDir++)
             {
                 positionCenterPeriodic[2] =  positionCenter[2]

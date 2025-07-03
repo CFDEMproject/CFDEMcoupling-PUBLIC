@@ -43,6 +43,7 @@ SourceFiles
 #define Archimedes_H
 
 #include "forceModel.H"
+#include "interpolationCellPoint.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -58,7 +59,6 @@ class Archimedes
     public forceModel
 {
 private:
-
     dictionary propsDict_;
 
     bool twoDimensional_;
@@ -71,6 +71,8 @@ private:
         const dimensionedVector& g_;    // ref to gravity
     #endif
 
+    word rhoFieldName_;
+    const volScalarField& rho_;
 
 public:
 
@@ -94,6 +96,8 @@ public:
 
     // Member Functions
         void setForce() const;
+
+        void MSinit();
 };
 
 

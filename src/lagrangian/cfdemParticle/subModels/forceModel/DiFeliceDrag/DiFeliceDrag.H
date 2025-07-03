@@ -68,7 +68,7 @@ private:
 
     const volScalarField& voidfraction_;
 
-    word UsFieldName_;   
+    word UsFieldName_;
 
     const volVectorField& UsField_;  // the average particle velocity field (for implicit/expliti force split)
 
@@ -94,6 +94,8 @@ public:
 
     // Member Functions
         void setForce() const;
+
+        void MSinit();
 };
 
 

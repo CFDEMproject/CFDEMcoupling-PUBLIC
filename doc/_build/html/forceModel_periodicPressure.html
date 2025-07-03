@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>forceModel_periodicPressure command &mdash; CFDEMcoupling 3.8.1 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="CFDEMcoupling_Manual.html" class="icon icon-home"> CFDEMcoupling
+          </a>
+              <div class="version">
+                3.8.1
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">forceModel_periodicPressure command</a><ul>
+<li><a class="reference internal" href="#syntax">Syntax</a></li>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+<li><a class="reference internal" href="#description">Description</a></li>
+<li><a class="reference internal" href="#restrictions">Restrictions</a></li>
+<li><a class="reference internal" href="#related-commands">Related commands</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="CFDEMcoupling_Manual.html">CFDEMcoupling</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="CFDEMcoupling_Manual.html" class="icon icon-home"></a> &raquo;</li>
+      <li>forceModel_periodicPressure command</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="forcemodel-periodicpressure-command">
+<span id="index-0"></span><h1>forceModel_periodicPressure command<a class="headerlink" href="#forcemodel-periodicpressure-command" title="Permalink to this headline"></a></h1>
+<section id="syntax">
+<h2>Syntax<a class="headerlink" href="#syntax" title="Permalink to this headline"></a></h2>
+<p>Defined in couplingProperties dictionary.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">forceModels</span>
+<span class="p">(</span>
+    <span class="n">periodicPressure</span>
+<span class="p">);</span>
+<span class="n">periodicPressureProps</span>
+<span class="p">{</span>
+    <span class="n">gravityFieldName</span> <span class="s2">&quot;g&quot;</span><span class="p">;</span>
+    <span class="n">voidfractionFieldName</span> <span class="s2">&quot;voidfraction&quot;</span><span class="p">;</span>
+    <span class="n">mode</span> <span class="s2">&quot;word&quot;</span><span class="p">;</span>
+    <span class="n">targetVelocity</span> <span class="n">vector1</span><span class="p">;</span>
+    <span class="n">p</span> <span class="n">scalar1</span><span class="p">;</span>
+    <span class="n">i</span> <span class="n">scalar2</span><span class="p">;</span>
+    <span class="n">avMixtureDensity</span> <span class="n">scalar3</span><span class="p">;</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><em>g</em> = name of gravity field</p></li>
+<li><p><em>voidfraction</em> = (optional, default “voidfraction”) name of voidfraction field</p></li>
+<li><p><em>word</em> = keyword for operation mode, choose “controlled” or “mixtureDensity”</p></li>
+<li><p><em>vector1</em> = target ensemble average particle velocity (for monodisperse systems) - only for mode “controlled”</p></li>
+<li><p><em>scalar1</em> = proportional constant for controller - only for mode “controlled”</p></li>
+<li><p><em>scalar2</em> = integral constant for controller - only for mode “controlled”</p></li>
+<li><p><em>scalar3</em> = average density of the mixture in the domain - only for mode “mixtureDensity”</p></li>
+</ul>
+</section>
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline"></a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">forceModels</span>
+<span class="p">(</span>
+    <span class="n">periodicPressure</span>
+<span class="p">);</span>
+<span class="n">periodicPressureProps</span>
+<span class="p">{</span>
+    <span class="n">gravityFieldName</span> <span class="s2">&quot;g&quot;</span><span class="p">;</span>
+    <span class="n">voidfractionFieldName</span> <span class="s2">&quot;voidfraction&quot;</span><span class="p">;</span>
+    <span class="n">mode</span> <span class="s2">&quot;controlled&quot;</span><span class="p">;</span>
+    <span class="n">targetVelocity</span> <span class="p">(</span><span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span><span class="p">);</span>
+    <span class="n">p</span> <span class="mi">2500</span><span class="p">;</span>
+    <span class="n">i</span> <span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="description">
+<h2>Description<a class="headerlink" href="#description" title="Permalink to this headline"></a></h2>
+<p>The force model calculates a force field following two different modi: a) “controlled” and b) “mixtureDensity”, which can be used to transform fluid pressure gradient to dynamic pressure gradient which is necessary for periodic boundaries. With modus “controlled” the force field is set in a way, that the ensemble average particle velocity reaches a target velocity. With modus “mixtureDensity”, a force field rhoMix*g*voidfraction is calculated. The force is passed to the explicitCoupleSource model via the setSourceField(..) function. For theoretical background see Radl, Girardi and Sundaresan (2012): “Effective drag law for parcel-based approaches - what can we learn from CFD-DEM?”, ECCOMAS 2012, Vienna.)</p>
+<p>The following images show a brief summary of the equations and an overview of how the force on the CFD and DEM side is calculated:</p>
+<img alt="img/forceModel_periodicPressure_1.PNG" class="align-center" src="img/forceModel_periodicPressure_1.PNG" />
+<img alt="img/forceModel_periodicPressure_2.PNG" class="align-center" src="img/forceModel_periodicPressure_2.PNG" />
+<img alt="img/forceModel_periodicPressure_3.PNG" class="align-center" src="img/forceModel_periodicPressure_3.PNG" />
+</section>
+<section id="restrictions">
+<h2>Restrictions<a class="headerlink" href="#restrictions" title="Permalink to this headline"></a></h2>
+<p>none.</p>
+</section>
+<section id="related-commands">
+<h2>Related commands<a class="headerlink" href="#related-commands" title="Permalink to this headline"></a></h2>
+<p><a class="reference internal" href="forceModel.html"><span class="doc">forceModel</span></a></p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, DCS Computing GmbH.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(false);
+      });
+  </script> 
+
+</body>
+</html>

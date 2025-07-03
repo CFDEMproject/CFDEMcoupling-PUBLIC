@@ -66,9 +66,13 @@ private:
 
     fileName writeName_;
 
-    Switch writeLast_;
+    Switch writeLastOnly_;
 
     Switch overwrite_;
+
+    label writeEvery_;
+
+    label counter_;
 
 public:
 

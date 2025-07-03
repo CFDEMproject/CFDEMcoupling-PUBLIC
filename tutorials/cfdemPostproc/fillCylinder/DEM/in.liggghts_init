@@ -59,11 +59,11 @@ compute		1 all erotate/sphere
 thermo_style	custom step atoms ke c_1 vol
 thermo		1000
 thermo_modify	lost ignore norm no
-compute_modify	thermo_temp dynamic yes
 
 #insert the first particles so that dump is not empty
 run		1
-dump		dmp all custom/vtk 1000 post/liggghts_init*.vtk id type type x y z ix iy iz vx vy vz fx fy fz omegax omegay omegaz radius 
+dump		dmp all custom/vtk 1000 post/liggghts_init*.vtk id type type x y z ix iy iz vx vy vz fx fy fz omegax omegay omegaz radius
+dump_modify dmp binary no
 
 run		3000 upto
 #write_restart 	liggghts.restart

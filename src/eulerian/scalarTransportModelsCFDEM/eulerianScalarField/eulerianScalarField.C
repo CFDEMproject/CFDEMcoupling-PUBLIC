@@ -151,51 +151,6 @@ eulerianScalarField::~eulerianScalarField()
 {}
 
 // * * * * * * * * * * * * * * * * Member Fct  * * * * * * * * * * * * * * * //
-void eulerianScalarField::pullCloudFields() const 
-{
-    //Temporary field for collecting the sources
-    volScalarField tmpSource
-    (   IOobject
-        (
-            "tmpSource",
-            particleCloud_.mesh().time().timeName(),
-            particleCloud_.mesh(),
-            IOobject::NO_READ,
-            IOobject::NO_WRITE
-        ),
-        mSource_*0.0
-    );
-
-    volScalarField tmpSourceImpl
-    (   IOobject
-        (
-            "tmpSourceImpl",
-            particleCloud_.mesh().time().timeName(),
-            particleCloud_.mesh(),
-            IOobject::NO_READ,
-            IOobject::NO_WRITE
-        ),
-        mSourceKImpl_*0.0
-    );
-
-    //reset sources, and compute the sources due to the cloud
-    //Will accumulate all sources for all force models
-    for (int iModel=0; iModel<particleCloud_.nrForceModels(); iModel++)
-    {
-        particleCloud_.forceM(iModel).manipulateScalarField(tmpSource, tmpSourceImpl, speciesID_);
-        if(iModel==0)
-        {
-            mSource_        = tmpSource;
-            mSourceKImpl_   = tmpSourceImpl;
-        }
-        else
-        {
-            mSource_       += tmpSource;
-            mSourceKImpl_  += tmpSourceImpl;
-        }
-    }
-
-}
 
 // ************************************************************
 void eulerianScalarField::update(surfaceScalarField phi, volScalarField voidfraction, volScalarField nuEff, scalar Sc, bool limitDiffusion) const 

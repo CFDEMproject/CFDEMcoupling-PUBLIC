@@ -115,19 +115,6 @@ void generalManual::createFields()
 {}
 
 // ************************************************************
-void generalManual::setSources()
-{
-    //Loop through all Eulerian fields and and set fields
-    for (int i=0;i<eulerianFieldList_.size();i++)
-            eulerianScalarF(i).pullCloudFields();
-
-    //Communicate exchange terms to DEM
-    for (int iModel=0; iModel<particleCloud_.nrForceModels(); iModel++)
-        particleCloud_.forceM(iModel).commToDEM();
-
-    //Send Sources to External Code (i.e., Lagrangian arrays handled by LIGGGHTS)
-    particleCloud_.giveUSERdata();
-}
 
 // ************************************************************
 void generalManual::evolveFields()
@@ -172,16 +159,15 @@ void generalManual::evolveFields()
     for (int i=0;i<eulerianFieldList_.size();i++)
     {
             if(eulerianScalarF(i).fieldType()=="Temperature")
-                eulerianScalarF(i).update(phi, voidfraction, particleCloud_.turbulence().nuEff(), PrT_);
+                eulerianScalarF(i).update(phi, voidfraction, particleCloud_.turbulence_.nuEff(), PrT_);
             else 
-                eulerianScalarF(i).update(phi, voidfraction, particleCloud_.turbulence().nuEff(), ScT_);
+                eulerianScalarF(i).update(phi, voidfraction, particleCloud_.turbulence_.nuEff(), ScT_);
     }
 }
 
 // ************************************************************
 void generalManual::update()
 {
-    setSources();
     evolveFields();
 }
 

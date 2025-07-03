@@ -25,5 +25,13 @@ else
     $casePath/parDEMrun.sh
 fi
 
-#- run parallel CFD-DEM in new terminal
+# keep old couplingProperties
+cp $casePath/CFD/constant/couplingProperties $casePath/CFD/constant/couplingProperties_backup
+
+# change to socket
+#changeDictionary -instance constant -dict changeDicts/changeDictionaryDict_1 -case $casePath/CFD
+
 . $casePath/parCFDDEMrun.sh
+
+# restore old couplingProperties
+mv $casePath/CFD/constant/couplingProperties_backup $casePath/CFD/constant/couplingProperties

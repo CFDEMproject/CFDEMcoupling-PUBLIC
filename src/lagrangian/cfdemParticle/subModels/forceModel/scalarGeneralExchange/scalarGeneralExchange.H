@@ -136,6 +136,7 @@ protected:
     scalarList          DMolecular_; 
 
     //information related to external register
+    mutable labelList           partDatPositionInRegister_;
     mutable int                 partHeatFluxPositionInRegister_;
     mutable std::vector<int>    partSpeciesFluxPositionInRegister_;
     mutable int                 partHeatTransCoeffPositionInRegister_;
@@ -189,8 +190,6 @@ public:
 
     // Member Functions
         void setForce() const;
-
-        void manipulateScalarField(volScalarField&, volScalarField&, int) const;
 };
 
 

@@ -233,6 +233,11 @@ void Foam::constDiffSmoothing::smoothenReferenceField(volVectorField& fieldSrc) 
 
 }
 
+dimensionedScalar Foam::constDiffSmoothing::smoothingLength() const
+{
+    return smoothingLength_;
+}
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam

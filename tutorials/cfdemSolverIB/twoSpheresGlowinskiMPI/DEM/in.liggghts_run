@@ -1,6 +1,5 @@
 echo            both
 log             ../DEM/log.liggghts
-thermo_log      ../DEM/post/thermo.txt
 
 atom_style      granular
 atom_modify     map array
@@ -82,10 +81,9 @@ compute         rke all erotate/sphere
 thermo_style    custom step atoms ke c_rke vol
 thermo          1000
 thermo_modify   lost ignore norm no
-compute_modify  thermo_temp dynamic yes
 
 # insert the first particles so that dump is not empty
-dump            dmp all custom 100 ../DEM/post/dump.liggghts_run id type x y z ix iy iz vx vy vz fx fy fz omegax omegay omegaz radius 
+dump            dmp all custom 1000 ../DEM/post/dump.liggghts_run id type x y z ix iy iz vx vy vz fx fy fz omegax omegay omegaz radius 
 
 #force : f_couple_cfd[0] f_couple_cfd[1] f_couple_cfd[2]
 #node : f_couple_cfd[6]

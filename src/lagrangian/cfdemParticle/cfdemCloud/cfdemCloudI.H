@@ -46,14 +46,30 @@ namespace Foam
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 inline void cfdemCloud::setCG(double cg) const
-{ 
+{
     cg_ = cg;
     Info << "cg is set to: " << cg_ << endl;
 };
 
-inline void cfdemCloud::setCGTypeSpecific(int type, double cg) const
+vector Foam::cfdemCloud::position(int index, bool ovr, int mp)
 {
-    if(int(cgTypeSpecific_.size())!=type)   
+    vector pos;
+    for(int i=0;i<3;i++)
+        pos[i] = positions()[index][i];
+    return pos;
+}
+
+vector Foam::cfdemCloud::velocity(int index, bool ovr, int mp)
+{
+    vector vel;
+    for(int i=0;i<3;i++)
+        vel[i] = velocities()[index][i];
+    return vel;
+}
+
+inline void cfdemCloud::setCGTypeSpecific(int type, double cg)
+{
+    if(int(cgTypeSpecific_.size())!=type)
         FatalError  << "setCGTypeSpecific attempts to set at location "
                     << int(cgTypeSpecific_.size())
                     << ", but caller requests to set at "
@@ -61,24 +77,27 @@ inline void cfdemCloud::setCGTypeSpecific(int type, double cg) const
                     << ". This is fatal. "
                     << abort(FatalError);
     cgTypeSpecific_.push_back(cg);
-    if(cg<cg_*0.99999 || cg>cg_*1.00001) cgTypeSpecificDifferent = true;
-    
+    if(cg<cg_*0.99999 || cg>cg_*1.00001)
+    {
+        cgTypeSpecificDifferent_ = true;
+        registerFieldsToDEM("type","scalar-atom",idPartTypes(),true);
+    }
     Info << "type specific cg for type " << type << " is set to: " << cg << endl;
 }
 
 inline const bool& cfdemCloud::impDEMdrag() const
-{ 
+{
     return impDEMdrag_;
 };
 
 inline const bool& cfdemCloud::impDEMdragAcc() const
-{ 
+{
     return impDEMdragAcc_;
 };
 
 inline const scalar& cfdemCloud::imExSplitFactor() const
 {
-	    return imExSplitFactor_;
+        return imExSplitFactor_;
 };
 
 inline const bool& cfdemCloud::treatVoidCellsAsExplicitForce() const
@@ -87,13 +106,20 @@ inline const bool& cfdemCloud::treatVoidCellsAsExplicitForce() const
 }
 
 inline const scalar& cfdemCloud::cg() const
-{ 
+{
     return cg_;
 };
 
-inline const scalar& cfdemCloud::cg(int type) const
-{ 
-    return cgTypeSpecific_[type];
+inline scalar cfdemCloud::cg(int index) const
+{
+    if (cgTypeSpecificDifferent_)
+        return cgTypeSpecific_[particleType(index)];
+    else if (cgParticleSpecific_)
+        // idParticleCG constains the char. diameter -> convert to cg factor
+        // on top, there may be a global cg -> apply that too
+        return 2*fieldsToDEM[idRadius()][index][0]/fieldsToDEM[idParticleCG()][index][0]*cg_;
+    else
+        return cg_;
 };
 
 inline const bool& cfdemCloud::ignore() const
@@ -104,6 +130,11 @@ inline const bool& cfdemCloud::ignore() const
 inline const bool& cfdemCloud::writeTimePassed() const
 {
     return writeTimePassed_;
+}
+
+inline void cfdemCloud::resetWriteTimePassed()
+{
+    resetWriteTimePassed_=true;
 }
 
 inline const fvMesh& cfdemCloud::mesh() const
@@ -134,22 +165,17 @@ inline const IOdictionary& cfdemCloud::couplingProperties() const
 
 inline double ** cfdemCloud::positions() const
 {
-    return positions_;
+    return fieldsToDEM[idPos()];
 }
 
 inline double ** cfdemCloud::velocities() const
 {
-    return velocities_;
-}
-
-inline double ** cfdemCloud::fluidVels() const
-{
-    return fluidVel_;
+    return fieldsToDEM[idVel()];
 }
 
 inline double ** cfdemCloud::fAccs() const
 {
-    return fAcc_;
+    return fieldsToDEM[idFacc()];
 }
 
 inline double ** cfdemCloud::impForces() const
@@ -162,19 +188,9 @@ inline double ** cfdemCloud::expForces() const
     return expForces_;
 }
 
-inline double ** cfdemCloud::DEMForces() const
-{
-    return DEMForces_;
-}
-
-inline double ** cfdemCloud::Cds() const
-{
-    return Cds_;
-}
-
 inline double ** cfdemCloud::radii() const
 {
-    return radii_;
+    return fieldsToDEM[idRadius()];
 }
 
 inline double ** cfdemCloud::voidfractions() const
@@ -187,11 +203,16 @@ inline void cfdemCloud::get_radii(double **& values) const
 //    Info << "set_radii level=" << numberOfParticles_ << endl;
     // make a copy of the array entries
 //    for (int i=0;i<numberOfParticles_;i++)
-//        radii_[0][i]=values[0][i];
-    values=radii_;
+//        fieldsToDEM[idRadius()][0][i]=values[0][i];
+    values=fieldsToDEM[idRadius()];
 }
 
-inline double ** cfdemCloud::cellIDs() const
+inline label Foam::cfdemCloud::cellID(int index, bool ovr, int mp) const
+{
+    return cellIDs_[index][0];
+}
+
+inline double ** cfdemCloud::cellIDs(bool ovr) const
 {
     return cellIDs_;
 }
@@ -219,14 +240,14 @@ inline double cfdemCloud::particleVolume(int index)
     return particleV_[index][0];
 }
 
-inline scalar cfdemCloud::radius(int index)
+inline scalar cfdemCloud::radius(int index, bool ovr)
 {
-    return radii_[index][0];
+    return fieldsToDEM[idRadius()][index][0];
 }
 
-inline double cfdemCloud::d(int index)
+inline double cfdemCloud::diameter(int index, bool ovr, int mp)
 {
-    return 2*radii_[index][0];
+    return 2*fieldsToDEM[idRadius()][index][0];
 }
 
 inline double cfdemCloud::d32(bool recalc)
@@ -238,7 +259,7 @@ inline double cfdemCloud::d32(bool recalc)
         scalar r(0);
         for(int index = 0;index <  numberOfParticles(); ++index)
         {
-            r=radii_[index][0];
+            r=fieldsToDEM[idRadius()][index][0];
             Ntot+=2*r*r*r;
             Dtot+=r*r;
         }
@@ -247,6 +268,11 @@ inline double cfdemCloud::d32(bool recalc)
     }
 
     return d32_;
+}
+
+inline int cfdemCloud::numberOfObjects(bool ovr) const
+{
+    return numberOfParticles_;
 }
 
 inline int cfdemCloud::numberOfParticles() const
@@ -261,12 +287,12 @@ inline bool cfdemCloud::numberOfParticlesChanged() const
 
 inline int cfdemCloud::numberOfClumps() const
 {
-    Warning << "cfdemCloud::numberOfClumps() is not called correctly!" << endl;
+    FatalError << "cfdemCloud::numberOfClumps() is not called correctly!" << abort(FatalError);
     return -1;
 }
 
 /*inline void cfdemCloud::setMaxCellsPerParticle(int maxCellsPerParticle) const
-{ 
+{
     maxCellsPerParticle_ = maxCellsPerParticle;
 };
 
@@ -348,21 +374,6 @@ inline const wordList& cfdemCloud::liggghtsCommandModelList() const
 inline autoPtr<liggghtsCommandModel>* cfdemCloud::liggghtsCommand() const
 {
     return liggghtsCommand_;
-}
-
-#if defined(version24Dev)
-    inline const turbulenceModel& cfdemCloud::turbulence() const
-#elif defined(version21) || defined(version16ext)
-    #ifdef compre
-        inline const compressible::turbulenceModel& cfdemCloud::turbulence() const
-    #else
-        inline const incompressible::turbulenceModel& cfdemCloud::turbulence() const
-    #endif
-#elif defined(version15)
-    inline const incompressible::RASModel& cfdemCloud::turbulence() const
-#endif
-{
-    return turbulence_;
 }
 
 inline void cfdemCloud::makeSpecific(volScalarField& field)

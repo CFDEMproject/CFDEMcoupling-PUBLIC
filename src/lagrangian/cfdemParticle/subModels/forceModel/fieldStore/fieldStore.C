@@ -67,6 +67,9 @@ fieldStore::fieldStore
     scalarFieldNames_(propsDict_.lookup("scalarFieldNames")),
     vectorFieldNames_(propsDict_.lookup("vectorFieldNames"))
 {
+    // init force sub model
+    setForceSubModels(propsDict_);
+
     // create time average scalar fields
     scalarFields_.setSize(scalarFieldNames_.size());
 
@@ -135,7 +138,7 @@ fieldStore::~fieldStore()
 
 void fieldStore::setForce() const
 {
-    if(particleCloud_.mesh().time().outputTime())
+    if(particleCloud_.writeTimePassed())
     {
         if(particleCloud_.verbose()) Info << "fieldStore.C - setForce()" << endl;
 

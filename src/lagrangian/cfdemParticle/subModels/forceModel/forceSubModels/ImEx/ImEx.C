@@ -73,6 +73,10 @@ ImEx::~ImEx()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
+void ImEx::calcXi(const scalar& ds, const scalar& voidfraction, const scalar& magUr, const scalar& nuf, scalar& Xi ) const
+{
+    forceSubModel::calcXi(ds,voidfraction,magUr,nuf,Xi);
+}
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

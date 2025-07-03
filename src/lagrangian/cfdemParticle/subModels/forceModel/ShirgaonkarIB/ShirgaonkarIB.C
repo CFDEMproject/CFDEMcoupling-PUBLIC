@@ -65,7 +65,7 @@ ShirgaonkarIB::ShirgaonkarIB
     propsDict_(dict.subDict(typeName + "Props")),
     twoDimensional_(false),
     depth_(1),
-    velFieldName_(propsDict_.lookup("velFieldName")),
+    velFieldName_(propsDict_.lookupOrDefault<word>("velFieldName","U")),
     U_(sm.mesh().lookupObject<volVectorField> (velFieldName_)),
     pressureFieldName_(propsDict_.lookup("pressureFieldName")),
     p_(sm.mesh().lookupObject<volScalarField> (pressureFieldName_)),
@@ -87,6 +87,8 @@ ShirgaonkarIB::ShirgaonkarIB
 
     if(propsDict_.found("useTorque")) useTorque_ = true;
 
+    particleCloud_.checkCG(false);
+
     // init force sub model
     setForceSubModels(propsDict_);
 
@@ -98,7 +100,9 @@ ShirgaonkarIB::ShirgaonkarIB
     for (int iFSub=0;iFSub<nrForceSubModels();iFSub++)
         forceSubM(iFSub).readSwitches();
 
-    particleCloud_.checkCG(false);
+    // setup required communication
+    for (int iFSub=0;iFSub<nrForceSubModels();iFSub++)
+        forceSubM(iFSub).setupCommunication();
 }
 
 
@@ -121,47 +125,44 @@ void ShirgaonkarIB::setForce() const
 
     #include "setupProbeModel.H"
 
-    for(int index=0; index< particleCloud_.numberOfParticles(); index++)
+    for(int index = 0;index <  particleCloud_.numberOfParticles(); index++)
     {
-        //if(mask[index][0])
-        //{
-            drag=vector::zero;
-            torque=vector::zero;
-            vector positionCenter = particleCloud_.position(index);
+        drag=vector::zero;
+        torque=vector::zero;
+        vector positionCenter = particleCloud_.cfdemCloud::position(index);
 
-            for(int subCell=0;subCell<particleCloud_.cellsPerParticle()[index][0];subCell++)
+        for(int subCell=0;subCell<particleCloud_.cellsPerParticle()[index][0];subCell++)
+        {
+            //Info << "subCell=" << subCell << endl;
+            cellI = particleCloud_.cfdemCloud::cellIDs()[index][subCell];
+
+            if (cellI > -1) // particle Found
             {
-                //Info << "subCell=" << subCell << endl;
-                cellI = particleCloud_.cellIDs()[index][subCell];
-
-                if (cellI > -1) // particle Found
-                {
-                    vector rc = particleCloud_.mesh().C()[cellI];
-                    drag   += h[cellI]*h.mesh().V()[cellI];
-                    torque += (rc - positionCenter)^h[cellI]*h.mesh().V()[cellI];
-                }
-
+                vector rc = particleCloud_.mesh().C()[cellI];
+                drag   += h[cellI]*h.mesh().V()[cellI];
+                torque += (rc - positionCenter)^h[cellI]*h.mesh().V()[cellI];
             }
 
-            // set force on particle
-            if(twoDimensional_) drag /= depth_;
+        }
 
-            //Set value fields and write the probe
-            if(probeIt_)
-            {
-                #include "setupProbeModelfields.H"
-                // Note: for other than ext one could use vValues.append(x)
-                // instead of setSize
-                vValues.setSize(vValues.size()+1, drag);           //first entry must the be the force
-                particleCloud_.probeM().writeProbe(index, sValues, vValues);
-            }
+        // set force on particle
+        if(twoDimensional_) drag /= depth_;
 
-            // write particle based data to global array
-            forceSubM(0).partToArray(index,drag,vector::zero);
+        //Set value fields and write the probe
+        if(probeIt_)
+        {
+            #include "setupProbeModelfields.H"
+            // Note: for other than ext one could use vValues.append(x)
+            // instead of setSize
+            vValues.setSize(vValues.size()+1, drag);           //first entry must the be the force
+            particleCloud_.probeM().writeProbe(index, sValues, vValues);
+        }
 
-            if(forceSubM(0).verbose()) Info << "impForces = " << impForces()[index][0]<<","<<impForces()[index][1]<<","<<impForces()[index][2] << endl;
-            if(useTorque_) for(int j=0;j<3;j++) particleCloud_.DEMTorques()[index][j] = torque[j];
-        //}
+        // write particle based data to global array
+        forceSubM(0).partToArray(index,drag,vector::zero);
+
+        if(forceSubM(0).verbose()) Info << "impForces = " << impForces()[index][0]<<","<<impForces()[index][1]<<","<<impForces()[index][2] << endl;
+        if(useTorque_) for(int j=0;j<3;j++) particleCloud_.DEMTorques()[index][j] = torque[j];
     }
 }
 

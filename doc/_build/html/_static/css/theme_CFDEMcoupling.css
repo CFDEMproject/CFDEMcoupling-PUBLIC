@@ -1,0 +1,18 @@
+/** rtd_theme improved for CFDEMcoupling **/
+
+@import 'theme.css';
+
+/* add upper roman enumerations */
+.wy-plain-list-upperroman,.rst-content .section ol,.rst-content ol.upperroman,article ol{
+list-style:upper-roman;
+line-height:24px;
+margin-bottom:24px}
+.wy-plain-list-upperroman li,.rst-content .section ol li,.rst-content ol.upperroman li,article ol li{
+list-style:upper-roman;
+margin-left:24px}
+.wy-plain-list-upperroman li p:last-child,.rst-content .section ol li p:last-child,.rst-content ol.upperroman li p:last-child,article ol li p:last-child{
+margin-bottom:0}
+.wy-plain-list-upperroman li ul,.rst-content .section ol li ul,.rst-content ol.upperroman li ul,article ol li ul{
+margin-bottom:0}
+.wy-plain-list-upperroman li ul li,.rst-content .section ol li ul li,.rst-content ol.upperroman li ul li,article ol li ul li{
+list-style:disc}

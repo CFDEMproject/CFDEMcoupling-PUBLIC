@@ -113,6 +113,8 @@ public:
 
     virtual int dumpDEMdata() const;
 
+    virtual void allocFieldsToDEM() const { /* do nothing */ };
+
     bool dumpNow() const;
 
     fileName createTimeDir(fileName) const;

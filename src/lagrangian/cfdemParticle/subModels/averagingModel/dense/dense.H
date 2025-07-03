@@ -41,6 +41,8 @@ SourceFiles
 #ifndef dense_H
 #define dense_H
 
+//#define moreAccuracy
+
 #include "averagingModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

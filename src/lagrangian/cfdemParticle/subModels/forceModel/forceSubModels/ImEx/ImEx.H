@@ -81,6 +81,8 @@ public:
     // Member Functions
 
         word myType() const{return typeName; };
+
+        void calcXi(const scalar& ds, const scalar& voidfaction, const scalar& magUr, const scalar& nuf, scalar& Xi ) const;
 };
 
 

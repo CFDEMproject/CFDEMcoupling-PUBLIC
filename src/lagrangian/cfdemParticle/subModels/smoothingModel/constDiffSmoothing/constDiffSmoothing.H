@@ -98,6 +98,8 @@ public:
 
         void smoothenReferenceField(volVectorField&) const;
 
+        dimensionedScalar smoothingLength() const;
+
 };
 
 

@@ -56,7 +56,7 @@ class forceSubModel
 {
 private:
 
-       
+
 protected:
 
     // Protected data
@@ -90,9 +90,13 @@ protected:
 
         mutable int     verboseDiskCounter_;
 
-        scalar scaleDia_;
+        scalar cg_;
 
         scalar scaleDrag_;
+
+        scalar scaleDragLocal_;
+
+        scalar scaleTorque_;
 
         scalar scaleDH_;
 
@@ -145,7 +149,7 @@ public:
 
 
     // Member Functions
-        void partToArray(const label&, const vector&, const vector&, const vector& Ufluid=vector::zero, scalar Cd=scalar(0)) const;
+        void partToArray(const label&, const vector&, const vector&, const vector& Ufluid=vector::zero, scalar Cd=scalar(0),const vector& CdExtra=vector::zero) const;
 
         //function to set anisotropic drag components for DEM side only.
         void partToArrayAnisotropic(const label&, const vector&, const vector& dragEx=vector::zero) const;
@@ -176,23 +180,33 @@ public:
 
         virtual void scaleForce(vector& force, scalar& d, int index=0) const;
 
-        virtual void scaleCoeff(scalar& coeff, scalar& d, int index=0) const;
+        virtual void scaleCoeff(scalar& coeff, scalar& d, scalar& Rep, int index=0) const;
+
+        virtual void scaleForceLocal(vector& force) const;
+
+        virtual void scaleTorque(vector& torque) const;
 
         virtual void explicitLimit(vector&, vector&, scalar&) const;
-        
+
         virtual void verboseToDiskWrite(Field<scalar>& writeValues) const {};//implement writing to disk
 
-        virtual scalar calculateCorrectedVoidage(scalar voidfraction, scalar cellDpRatio) const {return voidfraction;};
+        virtual void calculateCorrectedVoidage(
+            scalar& voidfraction, vector& Ufluid, scalar cellVolume, scalar diameter
+        ) const {};
 
         virtual void  updateField(volScalarField* scalField, volVectorField* vecField) const {};
 
         virtual void  getField(vector position, label cellI, scalar& scalVal, vector& vecVal) const {};
 
     // Access
+        inline bool treatForceExplicit() const { return switches_[0]; }
+
+        inline bool treatForceDEM() const { return switches_[1]; }
+
         inline bool implForceDEM() const { return switches_[2]; }
 
         inline bool verbose() const      { return switches_[3]; }
-        
+
         inline bool interpolation() const { return switches_[4]; }
 
         inline bool useFilteredDragModel() const { return switches_[5]; }
@@ -200,12 +214,12 @@ public:
         inline bool useParcelSizeDependentFilteredDrag() const { return switches_[6]; }
 
         inline bool verboseToDisk() const
-        { 
+        {
             verboseDiskCounter_++;
             if(verboseDiskCounter_>=verboseDiskIntervall_)
             {
                 verboseDiskCounter_=0;
-                return switches_[9]; 
+                return switches_[9];
             }
             else
                 return false;
@@ -213,7 +227,48 @@ public:
 
         virtual word myType() const=0;
 
-        inline bool useCorrectedVoidage() const { return switches_[10]; }
+        inline bool ms() const { return switches_[11]; }
+        inline bool sq() const { return switches_[25]; }
+        inline bool convex() const { return switches_[29]; }
+
+        inline bool useTorque() const { return switches_[12]; }
+
+        inline bool anisotropicDrag() const { return switches_[13]; }
+
+        inline bool pullRotation() const { return switches_[14]; }
+
+        inline bool pullOrientation() const { return switches_[15]; }
+
+        inline bool pullShape() const { return switches_[16]; }
+
+        inline bool voidageFunctionDiFelice() const { return switches_[17]; }
+
+        inline bool voidageFunctionRong() const { return switches_[18]; }
+        inline bool voidageFunctionTang() const { return switches_[23]; }
+
+        inline bool useUf() const { return switches_[19]; }
+
+        inline bool useFhydro() const { return switches_[20]; }
+
+        inline bool implTorqueDEM() const { return switches_[21]; }
+
+        inline bool useVisc() const { return switches_[22]; }
+
+        inline bool useMpData() const { return switches_[24]; }
+
+        inline bool useQuat() const { return switches_[26]; }
+
+        inline bool pushTurbulence() const { return switches_[27]; }
+
+        inline bool particleCG() const { return switches_[28]; }
+
+        inline bool pullType() const { return switches_[30]; }
+
+        inline bool pullDensity() const { return switches_[31]; }
+
+        inline bool pushConvectiveHeatFlux() const { return switches_[32]; }
+
+        inline bool pullTemp() const { return switches_[33]; }
 
         inline forceModel& myForceM() const { return forceModel_; }
 
@@ -221,11 +276,13 @@ public:
 
         inline const wordList& switchesNameList() const { return switchesNameList_; }
 
-        void setSwitchesList(label i, bool v) const { switchesList_[i] = v; }
+        void setSwitchesList(label i, bool v, bool defaultValue=false) const { switchesList_[i] = v; switches_[i]=defaultValue; }
 
         void setSwitches(label i, Switch v) const { switches_[i] = v; }
 
         virtual void readSwitches() const;
+
+        void setupCommunication() const;
 
         const label& nrDefaultSwitches() const { return nrDefaultSwitches_; }
 
@@ -239,9 +296,15 @@ public:
 
         const volVectorField& IBDragPerV(const volVectorField&,const volScalarField&) const;
 
-        const scalar& scaleDia() const {return scaleDia_;};
+        inline scalar getCG(int index=0) const { return particleCloud_.cg(index); };
 
-        const scalar& scaleDrag() const {return scaleDia_;};
+        const scalar scaleDrag(int index=0) const;
+
+        const scalar& scaleDragLocal() const {return scaleDragLocal_;};
+
+        const scalar& scaleTorque() const {return scaleTorque_;};
+
+        virtual void calcXi(const scalar& ds, const scalar& voidfaction, const scalar& magUr, const scalar& nuf, scalar& Xi ) const=0;
 };
 
 

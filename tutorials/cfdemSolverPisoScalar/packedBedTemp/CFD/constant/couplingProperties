@@ -51,7 +51,7 @@ smoothingModel off;
 forceModels
 (
     KochHillDrag
-    LaEuScalarTemp  // must be 2nd pos!
+    LaEuScalarTemp
     Archimedes
 );
 
@@ -68,9 +68,7 @@ turbulenceModelType turbulenceProperties;//OFversion30x
 
 LaEuScalarTempProps
 {
-    velFieldName "U";
     tempFieldName "T";
-    voidfractionFieldName "voidfraction";
     partTempName "Temp";
     partHeatFluxName "convectiveHeatFlux";
     lambda 0.0256;
@@ -79,39 +77,28 @@ LaEuScalarTempProps
 
 implicitCoupleProps
 {
-    velFieldName "U";
-    granVelFieldName "Us";
-    voidfractionFieldName "voidfraction";
     //KslLimit 0;  // source switched off!!!
 }
 
 KochHillDragProps
 {
-    velFieldName "U";
-    voidfractionFieldName "voidfraction";
 }
 
 DiFeliceDragProps
 {
-    velFieldName "U";
     //verbose true;
 }
 
 ArchimedesProps
 {
-    gravityFieldName "g";
 }
 gradPForceProps
 {
-    pFieldName "p";
-    voidfractionFieldName "voidfraction";
-    velocityFieldName "U";
     //interpolation true;
 }
 
 viscForceProps
 {
-    velocityFieldName "U";
     interpolation true;
 }
 
@@ -129,13 +116,11 @@ twoWayMPIProps
 
 centreProps
 {
-    alphaMin 0.1;
 }
 
 dividedProps
 {
     alphaMin 0.4;
-    scaleUpVol 1.0;
 }
 
 engineProps

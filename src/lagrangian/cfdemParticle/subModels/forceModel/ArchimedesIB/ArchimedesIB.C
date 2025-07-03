@@ -28,6 +28,7 @@ Description
     This code is designed to realize coupled CFD-DEM simulations using LIGGGHTS
     and OpenFOAM(R). Note: this code is not part of OpenFOAM(R) (see DISCLAIMER).
 \*---------------------------------------------------------------------------*/
+
 #include "error.H"
 
 #include "ArchimedesIB.H"
@@ -63,19 +64,26 @@ ArchimedesIB::ArchimedesIB
     forceModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
     twoDimensional_(false),
-    voidfractionFieldName_(propsDict_.lookup("voidfractionFieldName")), //mod by alice
+    voidfractionFieldName_(propsDict_.lookupOrDefault<word>("voidfractionFieldName","voidfraction")), //mod by alice
     voidfractions_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),//mod by alice
-    gravityFieldName_(propsDict_.lookup("gravityFieldName")),
+    gravityFieldName_(propsDict_.lookupOrDefault<word>("gravityFieldName","g")),
     #if defined(version21) || defined(version16ext)
         g_(sm.mesh().lookupObject<uniformDimensionedVectorField> (gravityFieldName_))
     #elif  defined(version15)
         g_(dimensionedVector(sm.mesh().lookupObject<IOdictionary>("environmentalProperties").lookup(gravityFieldName_)).value())
     #endif
 {
-    //Append the field names to be probed
-    particleCloud_.probeM().initialize(typeName, typeName+".logDat");
-    particleCloud_.probeM().vectorFields_.append("archimedesIBForce");  //first entry must the be the force
-    particleCloud_.probeM().writeHeader();
+    // suppress particle probe
+    if (probeIt_ && propsDict_.found("suppressProbe"))
+        probeIt_=!Switch(propsDict_.lookup("suppressProbe"));
+    if(probeIt_)
+    {
+        particleCloud_.probeM().initialize(typeName, typeName+".logDat");
+        particleCloud_.probeM().vectorFields_.append("archimedesIBForce");  //first entry must the be the force
+        particleCloud_.probeM().writeHeader();
+    }
+
+    particleCloud_.checkCG(true);
 
     if (propsDict_.found("twoDimensional"))
     {
@@ -91,14 +99,15 @@ ArchimedesIB::ArchimedesIB
 
     //set default switches (hard-coded default = false)
     forceSubM(0).setSwitches(0,true);  // enable treatExplicit, otherwise this force would be implicit in slip vel! - IMPORTANT!
+    forceSubM(0).setSwitches(1,true); // treatDEM = true
 
     // read those switches defined above, if provided in dict
-    forceSubM(0).readSwitches();
+    for (int iFSub=0;iFSub<nrForceSubModels();iFSub++)
+        forceSubM(iFSub).readSwitches();
 
-    forceSubM(0).setSwitches(1,true); // treatDEM = true
-    Info << "accounting for Archimedes only on DEM side!" << endl;
-
-    particleCloud_.checkCG(true);
+    // setup required communication
+    for (int iFSub=0;iFSub<nrForceSubModels();iFSub++)
+        forceSubM(iFSub).setupCommunication();
 }
 
 
@@ -116,12 +125,12 @@ void ArchimedesIB::setForce() const
 
     #include "setupProbeModel.H"
 
-    for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
+    for(int index = 0;index <  particleCloud_.numberOfParticles(); index++)
     {
         force=vector::zero;
         for(int subCell=0;subCell<particleCloud_.cellsPerParticle()[index][0];subCell++)
         {
-            label cellI = particleCloud_.cellIDs()[index][subCell];
+            label cellI = particleCloud_.cfdemCloud::cellIDs()[index][subCell];
             if (cellI > -1) // particle Found
             {
                 //force += -g_.value()*forceSubM(0).rhoField()[cellI]*forceSubM(0).rhoField().mesh().V()[cellI]*(1-particleCloud_.voidfractions()[index][subCell]);//mod by alice

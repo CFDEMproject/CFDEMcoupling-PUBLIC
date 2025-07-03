@@ -106,7 +106,7 @@ void IOModel::streamDataToPath(fileName path, double** array,int nPProc,word nam
 
     for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
     {
-        if (particleCloud_.cellIDs()[index][0] > -1) // particle Found
+        if (particleCloud_.cfdemCloud::cellIDs()[index][0] > -1) // particle Found
         {
             if (type=="scalar"){
                 *fileStream << array[index][0] << " \n";
@@ -133,7 +133,7 @@ void IOModel::streamDataToPath(fileName path, int** array,int nPProc,word name,w
 
     for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
     {
-        if (particleCloud_.cellIDs()[index][0] > -1) // particle Found
+        if (particleCloud_.cfdemCloud::cellIDs()[index][0] > -1) // particle Found
         {
             if (type=="scalar"){
                 *fileStream << array[index][0] << " \n";

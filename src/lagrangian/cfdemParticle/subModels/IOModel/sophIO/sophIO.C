@@ -81,13 +81,14 @@ int sophIO::dumpDEMdata() const
 
     if (dumpNow())
     {
+        int idDragExp=particleCloud_.idDragExp();
         npProcs=basicIO::dumpDEMdata();
 
         // stream data to file
         streamDataToPath(lagPath_, particleCloud_.voidfractions(),npProcs,"voidfractions","scalar","scalarField","");
         streamDataToPath(lagPath_, particleCloud_.impForces(),npProcs,"impForces","vector","vectorField","");
         streamDataToPath(lagPath_, particleCloud_.expForces(),npProcs,"expForces","vector","vectorField","");
-        streamDataToPath(lagPath_, particleCloud_.DEMForces(),npProcs,"DEMForces","vector","vectorField","");
+        streamDataToPath(lagPath_, particleCloud_.fieldsToDEM[idDragExp],npProcs,"DEMForces","vector","vectorField","");
     }
     return npProcs;
 }

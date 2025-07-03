@@ -75,7 +75,15 @@ protected:
 
         mutable scalar porosity_;
 
-        bool requiresSuperquadric_;
+        bool msMode_;
+
+        mutable scalarList volScale_;
+
+        mutable bool arraysAllocated_;
+
+        mutable labelList nMP_;
+
+        mutable int maxNMP_;
 
     // Protected member functions
 
@@ -140,8 +148,43 @@ public:
 
         inline void checkWeightNporosity(dictionary& propsDict) const
         {
-            if (propsDict.found("weight")) weight_ = readScalar(propsDict.lookup("weight"));
-            if (propsDict.found("porosity")) porosity_ = readScalar(propsDict.lookup("porosity"));
+            // read vol scale if defined, otherwise use 1 as default
+            // NOTE: default only 10 types allowed! (if more, user has to specify volScale list)
+
+            // read or default volScale
+            if (propsDict.found("volScale"))
+            {
+                volScale_ = scalarList(propsDict.lookup("volScale"));
+                Info << "  Reading volScale,... volScale = " << volScale_ << endl;
+            }
+            else
+            {
+                Info << "  Variable volScale was not specified, using default 1 for all particle templates.\n"
+                     << "  Note: for more than 10 particle templates, please specify volScale manually." << endl;
+                volScale_ = scalarList(10);
+                forAll(volScale_,i) volScale_[i] = 1.;
+            }
+
+            if (propsDict.found("porosity"))
+            {
+                porosity_ = readScalar(propsDict.lookup("porosity"));
+                Info << "The voidfraction model is using porosity = " << porosity_ << endl;
+            }
+
+            // check for deprecated
+            if (propsDict.found("scaleUpVol"))
+                    FatalError << "\n You are trying to use the deprecated keyword scaleUpVol in your voidfraction model settings."
+                               << " You might want to use the keyword volScale instead. Please consult the documentation for more information." 
+                               << abort(FatalError);
+            if (propsDict.found("weight"))
+                    FatalError << "\n You are trying to use the deprecated keyword weight in your voidfraction model settings."
+                               << " You might want to use the keyword volScale instead. Please consult the documentation for more information." 
+                               << abort(FatalError);
+
+            // TODO here we should have a sanity check (but we do not yet have a global info on nr of types)
+            //if(volScale().size()!=particleCloud_.nClumpTypes()) // sanity check for volScale
+            //    FatalError  << "volScale has " << volScale().size() 
+            //                << " entries, but there are " << particleCloud_.nClumpTypes() << " particle types." << abort(FatalError);
         };
 
         void resetVoidFractions() const;
@@ -160,8 +203,6 @@ public:
 
         virtual bool checkParticleType(label) const {return true;}; //consider all particles by default
 
-        bool requiresSuperquadric() const;
-
         virtual double minPeriodicDistance
         (
             int index,
@@ -173,6 +214,21 @@ public:
         ) const;
         virtual double pointInParticle(int index, vector positionCenter, vector point, double scale) const;
         virtual double pointInParticle(int index, vector positionCenter, vector point) const;
+
+    // MS interface functions
+        virtual void MSinit () {}; // extra init function for MS stuff
+
+        inline const scalarList& volScale() const {return volScale_;};
+
+        inline labelList nMP() const {return nMP_;};
+
+        inline int nMP(int ct) const {return nMP_[ct];};
+
+        inline void setNMP(int ct, int len) const {nMP_[ct]=len;};
+
+        inline int maxNMP() const { return maxNMP_;};
+
+        inline void setMaxNMP(int i) const { maxNMP_=i;};
 };
 
 

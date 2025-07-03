@@ -59,12 +59,13 @@ private:
 
     // Member Functions
 
+    mutable label idFieldToDEMid_;
+
 public:
 
     //- Runtime type information
     TypeName("trackIO");
 
-    mutable int **partID_;
 
     // Constructors
 
@@ -82,6 +83,8 @@ public:
 
     // Member Functions
     int dumpDEMdata() const;
+
+    void allocFieldsToDEM() const;
 };
 
 

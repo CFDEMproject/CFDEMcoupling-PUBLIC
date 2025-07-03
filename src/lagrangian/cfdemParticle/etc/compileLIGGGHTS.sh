@@ -28,6 +28,15 @@ headerText="$logfileName""-$NOW"
 #--------------------------------------------------------------------------------#
 
 #================================================================================#
+# compile LIGGGHTS dataExchange libraries (forces clean, and then compile)
+#================================================================================#
+. $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/compileLIGGGHTS_dataExchLib.sh
+
+if [ ${PIPESTATUS[0]} -ne 0 ]; then
+    exit 1
+fi
+
+#================================================================================#
 # compile LIGGGHTS libraries (forces clean, and then compile)
 #================================================================================#
 bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/compileLIGGGHTS_lib.sh 
@@ -43,14 +52,5 @@ fi
 compileLIGGGHTS $logpath $logfileName $headerText
 
 if [ ${PIPESTATUS[0]} -ne 0 ]; then         
-    exit 1
-fi
-
-#================================================================================#
-# compile LIGGGHTS dataExchange libraries (forces clean, and then compile)
-#================================================================================#
-bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/compileLIGGGHTS_dataExchLib.sh 
-
-if [ ${PIPESTATUS[0]} -ne 0 ]; then
     exit 1
 fi

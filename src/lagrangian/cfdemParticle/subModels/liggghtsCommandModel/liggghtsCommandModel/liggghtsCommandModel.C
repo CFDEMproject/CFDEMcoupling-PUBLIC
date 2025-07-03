@@ -176,7 +176,8 @@ bool liggghtsCommandModel::runThisCommand(int couplingStep)
     bool runIt=false;
     if(
        (!runEveryWriteStep_ && firstCouplingStep_  <= couplingStep && lastCouplingStep_  >= couplingStep)  ||
-       (runEveryWriteStep_  && particleCloud_.writeTimePassed())
+       (runEveryWriteStep_  && particleCloud_.mesh().time().outputTime())  ||   // classic handling for !subTS
+       (runEveryWriteStep_  && particleCloud_.writeTimePassed())                // special handling for subTS (will not allow >1 commands at writeTime)
       )
     {
         if(couplingStep >= nextRun_)
@@ -184,6 +185,8 @@ bool liggghtsCommandModel::runThisCommand(int couplingStep)
             runIt=true;
             nextRun_=couplingStep + couplingStepInterval_;
             lastRun_=couplingStep;
+
+            if(runEveryWriteStep_  && particleCloud_.writeTimePassed()) particleCloud_.resetWriteTimePassed();
         }
     }
     return runIt;

@@ -98,8 +98,6 @@ public:
 
     void                 update();
 
-    void                 setSources();
-
     void                 evolveFields();
 
     volScalarField&      sourceField(int i);

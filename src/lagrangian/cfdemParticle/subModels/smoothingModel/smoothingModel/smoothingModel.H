@@ -65,6 +65,8 @@ protected:
     void checkFields(volScalarField&) const;
     void checkFields(volVectorField&) const;
 
+    dimensionedScalar smoothingLength_;
+    
 public:
 
     //- Runtime type information
@@ -121,6 +123,8 @@ public:
         virtual void smoothenAbsolutField(volVectorField&) const; //for smoothing absolute fields (NOT per m³)
 
         virtual void smoothenReferenceField(volVectorField&) const=0;
+
+        virtual dimensionedScalar smoothingLength() const;
 };
 
 

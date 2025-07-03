@@ -108,25 +108,13 @@ protected:
 
     bool writeTimePassed_;
 
+    bool resetWriteTimePassed_;
+
     const word modelType_;
-
-    mutable double **positions_;
-
-    mutable double **velocities_;
-
-    mutable double **fluidVel_;
-
-    mutable double **fAcc_;
 
     mutable double **impForces_;
 
     mutable double **expForces_;
-
-    mutable double **DEMForces_;
-
-    mutable double **Cds_;
-
-    mutable double **radii_;
 
     mutable double **voidfractions_;
 
@@ -161,7 +149,7 @@ protected:
     mutable bool isLES_;
 
     mutable scalar cg_;
-    
+
     mutable std::vector<double> cgTypeSpecific_;
 
     bool cgOK_;
@@ -178,7 +166,7 @@ protected:
 
     mutable volScalarField ddtVoidfraction_;
 
-    //Variable used to de-activate mirroring across periodic boundary conditions 
+    //Variable used to de-activate mirroring across periodic boundary conditions
     mutable Switch checkPeriodicCells_;
     //de-activation and tolerance variables
     //if set to  (for a specific direction), the periodic check will NOT be done
@@ -200,7 +188,7 @@ protected:
     #elif defined(version15)
         const incompressible::RASModel& turbulence_;
     #endif
-  
+
     //Multiphase Turbulence (e.g., slip-induced turbulence)
     mutable volScalarField turbulenceMultiphase_;
 
@@ -263,6 +251,8 @@ public:
     friend class voidFractionModel;
     friend class forceModel;
     friend class forceSubModel;
+    friend class generalManual;
+    friend class temperatureModel;
 
 // Constructors
 
@@ -278,8 +268,10 @@ public:
 // public Member Functions
 
     // Access
+       const turbulenceModel& turbulence() {return turbulence_;};
+
        bool isLES() const {return isLES_; };
-    
+
        bool debugMode(){ return debug_;};
 
        bool allowCFDsubTimestep(){ return allowCFDsubTimestep_;};
@@ -298,9 +290,9 @@ public:
 
        label particleCell(int);
 
-       vector position(int);
+       virtual inline vector position(int, bool ovr=false, int mp=-1);
 
-       vector velocity(int);
+       virtual inline vector velocity(int, bool ovr=false, int mp=-1);
 
        vector fluidVel(int);
 
@@ -315,14 +307,16 @@ public:
        label liggghtsCommandModelIndex(word);
 
        inline void setCG(double) const;
-       
-       inline void setCGTypeSpecific(int, double) const;
 
-       mutable bool cgTypeSpecificDifferent;
+       inline void setCGTypeSpecific(int, double);
+
+       mutable bool cgParticleSpecific_;
+
+       mutable bool cgTypeSpecificDifferent_;
 
        inline const scalar& cg() const;
-       
-       inline const scalar& cg(int) const;
+
+       inline scalar cg(int index) const;
 
        inline const bool& impDEMdrag() const;
 
@@ -335,6 +329,8 @@ public:
        inline const bool& ignore() const;
 
        inline const bool& writeTimePassed() const;
+
+       inline void resetWriteTimePassed();
 
        inline const fvMesh& mesh() const;
 
@@ -360,8 +356,6 @@ public:
 
        inline double ** expForces() const;
 
-       inline double ** DEMForces() const;
-
        inline double ** Cds() const;
 
        inline double ** radii() const;
@@ -370,7 +364,9 @@ public:
 
        inline void get_radii(double**&) const;
 
-       inline double ** cellIDs() const;
+       virtual inline double ** cellIDs(bool ovr=false) const;
+
+       virtual inline label cellID(int, bool ovr=false, int mp=-1) const;
 
        inline void get_cellIDs(double**&) const;
 
@@ -380,23 +376,15 @@ public:
 
        virtual inline double particleVolume(int);
 
-       inline scalar radius(int);
+       inline scalar radius(int, bool ovr=false);
 
-       virtual inline double d(int);
+       virtual inline double diameter(int, bool ovr=false, int mp=-1);
 
        inline scalar d32(bool recalc=true);
-       virtual inline double dMin() {return -1;}
-       virtual inline double dMax() {return -1;}
-       virtual inline int minType() {return -1;}
-       virtual inline int maxType() {return -1;}
-       virtual inline bool multipleTypesDMax() {return false;}
-       virtual inline bool multipleTypesDMin() {return false;}
-       virtual inline double ** particleDensity() const {return NULL;};
-       virtual inline int ** particleTypes() const {return NULL;};
-       virtual label particleType(label index) const 
+       label particleType(label index) const
        {
-            FatalError << "cfdemCloud::particleType(index): you are attempting to get the particle type, but this array is not transferred to CFDEM for this cloud. Use a different cloud, or avoid asking for the particle type." << abort(FatalError);
-            return -1;
+            if(idPartTypes()>-1) return fieldsToDEM[idPartTypes()][index][0];
+            return 1;
        };
 
        //access to the particle's rotation and torque data
@@ -404,71 +392,76 @@ public:
        virtual inline double ** omegaArray() const {return NULL;};
        virtual vector omega(int) const {return Foam::vector(0,0,0);};
 
-       //access to the particles' orientation information
-       virtual inline double ** exArray() const {
-         FatalError << "cfdemCloud::exArray(): you are attempting to get an access to ex array for spheroids/superquadrics. This is not allowed for spheres. Recompile the code with #define anisotropicRotation in OFversion.H or enable superquadrics in LIGGGHTS (superquadrics_flag)" << abort(FatalError);
-         return NULL;
-       };
-       virtual inline double ** eyArray() const {
-         FatalError << "cfdemCloud::eyArray(): you are attempting to get an access to ey array for spheroids/superquadrics. This is not allowed for spheres. Recompile the code with #define anisotropicRotation in OFversion.H or enable superquadrics in LIGGGHTS (superquadrics_flag)" << abort(FatalError);
-         return NULL;
-       };
+//        //access to the particles' orientation information
        virtual vector ex(int) const {
-         FatalError << "cfdemCloud::ex(): you are attempting to get an access to ex array for spheroids/superquadrics. This is not allowed for spheres. Recompile the code with #define anisotropicRotation in OFversion.H or enable superquadrics in LIGGGHTS (superquadrics_flag)" << abort(FatalError);
+         FatalError << "cfdemCloud::ex(): you are attempting to get an access to ex array for spheroids/superquadrics. This is not allowed for spheres. Recompile the code with #define anisotropicRotation in OFversion.H or Are you using the correct solver?" << abort(FatalError);
          return Foam::vector(0,0,0);
        };
+
        virtual vector ey(int) const {
-         FatalError << "cfdemCloud::ey(): you are attempting to get an access to ey array for spheroids/superquadrics. This is not allowed for spheres. Recompile the code with #define anisotropicRotation in OFversion.H or enable superquadrics in LIGGGHTS (superquadrics_flag)" << abort(FatalError);
+         FatalError << "cfdemCloud::ey(): you are attempting to get an access to ey array for spheroids/superquadrics. This is not allowed for spheres. Recompile the code with #define anisotropicRotation in OFversion.H or Are you using the correct solver?" << abort(FatalError);
          return Foam::vector(0,0,0);
        };
-       virtual inline double ** shapeArray() const {
-         FatalError << "cfdemCloud::shapeArray(): you are attempting to get an access to shape array for spheroids/superquadrics. This is not allowed for spheres. Recompile the code with #define anisotropicRotation in OFversion.H or enable superquadrics in LIGGGHTS (superquadrics_flag)" << abort(FatalError);
-         return NULL;
-       };
+
        virtual vector shape(int) const {
-         FatalError << "cfdemCloud::shapeArray(): you are attempting to get an access to shape array for spheroids/superquadrics. This is not allowed for spheres. Recompile the code with #define anisotropicRotation in OFversion.H or enable superquadrics in LIGGGHTS (superquadrics_flag)" << abort(FatalError);
+         FatalError << "cfdemCloud::shapeArray(): you are attempting to get an access to shape array for spheroids/superquadrics. This is not allowed for spheres. Recompile the code with #define anisotropicRotation in OFversion.H or Are you using the correct solver?" << abort(FatalError);
          return Foam::vector(0,0,0);
        };
 
        // access to complex shape information
-       virtual inline double ** vectorArray() const {return NULL;};
        virtual scalar volume(int) const {
-         FatalError << "cfdemCloud::volume(): you are attempting to get an access to volume array for superquadrics. This is not allowed for spheres. Enable superquadrics in LIGGGHTS (superquadrics_flag)" << abort(FatalError);
+         FatalError << "cfdemCloud::volume(): you are attempting to get an access to volume array for superquadrics. This is not allowed for spheres. Are you using the correct solver?" << abort(FatalError);
          return 0;
        };
-       virtual inline double ** areaArray() const {
-         FatalError << "cfdemCloud::areaArray(): you are attempting to get an access to area array for superquadrics. This is not allowed for spheres.  Enable superquadrics in LIGGGHTS (superquadrics_flag)" << abort(FatalError);
-         return NULL;
-       };
+
        virtual scalar area(int) const {
-         FatalError << "cfdemCloud::arrea(): you are attempting to get an access to area array for superquadrics. This is not allowed for spheres. Enable superquadrics in LIGGGHTS (superquadrics_flag)" << abort(FatalError);
+         FatalError << "cfdemCloud::area(): you are attempting to get an access to area array for superquadrics. This is not allowed for spheres. Are you using the correct solver?" << abort(FatalError);
          return 0;
        };
-       virtual inline double ** quaternionArray() const {
-         FatalError << "cfdemCloud::quaternionArray(): you are attempting to get an access to quaternion array for superquadrics. This is not allowed for spheres. Enable superquadrics in LIGGGHTS (superquadrics_flag)" << abort(FatalError);
-         return NULL;
-       };
+       virtual inline scalarList& area() { static scalarList foo(0); return foo; }
+
        virtual quaternion quat(int) const {
-         FatalError << "cfdemCloud::quat(): you are attempting to get an access to quaternion array for superquadrics. This is not allowed for spheres. Enable superquadrics in LIGGGHTS (superquadrics_flag)" << abort(FatalError);
+         FatalError << "cfdemCloud::quat(): you are attempting to get an access to quaternion array for superquadrics. This is not allowed for spheres. Are you using the correct solver?" << abort(FatalError);
          return quaternion(1);
        };
-       virtual inline double ** blockinessArray() const {
-         FatalError << "cfdemCloud::blockinessArray(): you are attempting to get an access to blockiness array for superquadrics. This is not allowed for spheres. Enable superquadrics in LIGGGHTS (superquadrics_flag)" << abort(FatalError);
-         return NULL;
-       };
+
        virtual vector2D blockiness(int) const {
-         FatalError << "cfdemCloud::blockiness(): you are attempting to get an access to blockiness array for superquadrics. This is not allowed for spheres. Enable superquadrics in LIGGGHTS (superquadrics_flag)" << abort(FatalError);
+         FatalError << "cfdemCloud::blockiness(): you are attempting to get an access to blockiness array for superquadrics. This is not allowed for spheres. Are you using the correct solver?" << abort(FatalError);
          return Foam::vector2D(0,0);
        };
 
-       //Optinoal Extra arrays for implicit coupling with anisotropic drag
-       virtual inline double ** CdsExtra() const { return NULL;};       //only TWO extra components of drag coefficient
-       virtual inline double ** CdsRotation() const { return NULL;};    //three extra components of rotational drag
-       virtual inline double ** omegaFluid() const { return NULL;};     //the fluid rotation rate
+       // MS access functions
+#define ErrorMsg FatalError<<"cfdemCloud: You are attempting to use a MS interface routine. However, your solver is not compiled to use multispheres."<<abort(FatalError)
+       virtual inline int nClumpTypes() const {ErrorMsg; return 0;};
+       virtual inline int clumpType(int i) const {ErrorMsg; return 0;};
+       virtual inline double **& clumpVol() const {ErrorMsg; static double **foo = nullptr; return foo;};
+       virtual inline double **& clumpArea() const {ErrorMsg; static double **foo = nullptr; return foo;};
+       virtual inline double **& clumpDH() const {ErrorMsg; static double **foo = nullptr; return foo;};
+       virtual inline label clumpIndexOfParticle(int) {ErrorMsg; return 0;};
+       virtual inline labelList& particlesOfClumpIndex(int) {ErrorMsg; static labelList foo(0); return foo;};
+       virtual inline bool useforcePerClump() const {ErrorMsg; return false;};
+       virtual inline label nrigid(int) {ErrorMsg; return 0;};
+       virtual inline double **& impForcesCM() const {ErrorMsg; static double **foo = nullptr; return foo;};
+       virtual inline double **& expForcesCM() const {ErrorMsg; static double **foo = nullptr; return foo;};
 
-       virtual inline bool implicitDrag() const {return false;}
-       virtual inline bool implicitAnisotropicDrag() const {return false;}
-       virtual inline bool implicitRotation()        const {return false;}
+       virtual inline scalarList& DHc() {ErrorMsg; static scalarList foo(0); return foo;};
+       virtual inline void setDHc(scalarList) {FatalError << "setDHc in cfdemCloud" << abort(FatalError);};
+       virtual inline void setArea(scalarList) {FatalError << "setArea in cfdemCloud" << abort(FatalError);};
+
+       virtual inline vector resolution() {FatalError << "resolution() in cfdemCloud" << abort(FatalError); return vector(0,0,0);};
+       virtual inline void initMpData() {FatalError << "setMpData in cfdemCloud" << abort(FatalError);};
+       virtual inline void setMpData(int, int, int,  vector, vector, scalar) {/*do nothing*/};
+       virtual inline void setMpDataPoint(int, int, int, int, double) {FatalError << "setMpDataPoint in cfdemCloud" << abort(FatalError);};;
+       virtual inline word shapeTypeName() {return "sphere";};
+
+       // wrapper function for volume calculation based on particle radius
+       virtual inline scalar particleVolumeScaled(int index, const scalarList& scaleVol)
+       {
+           return 4./3.*M_PI * radius(index)*radius(index)*radius(index) * scaleVol[0];
+       };
+
+       //Optional Extra arrays for implicit coupling with anisotropic drag
+       virtual inline double ** omegaFluid() const { return NULL;};     //the fluid rotation rate
        double **dragPrev();
 
        //Detector if SRF module is enable or not
@@ -477,11 +470,13 @@ public:
        //allow handshake with refinement field
        virtual void setRefinementField(volScalarField* refine_) {};
 
+       virtual inline int numberOfObjects(bool ovr=false) const;
+
        inline int numberOfParticles() const;
 
        inline bool numberOfParticlesChanged() const;
 
-       inline int numberOfClumps() const;
+       virtual inline int numberOfClumps() const;
 
        //inline void setMaxCellsPerParticle(int) const;
 
@@ -517,18 +512,6 @@ public:
 
        inline autoPtr<liggghtsCommandModel>* liggghtsCommand() const;
 
-       #if defined(version24Dev)
-            inline const turbulenceModel& turbulence() const;
-       #elif defined(version21) || defined(version16ext)
-            #ifdef compre
-                inline const compressible::turbulenceModel& turbulence() const;
-            #else
-                inline const incompressible::turbulenceModel& turbulence() const;
-            #endif
-       #elif defined(version15)
-           inline const incompressible::RASModel& turbulence() const;
-       #endif
-
         inline void makeSpecific(volScalarField&);
 
         inline void makeSpecific(volVectorField&);
@@ -555,10 +538,12 @@ public:
     // functions
         tmp<fvVectorMatrix> divVoidfractionTau(volVectorField& ,volScalarField&) const;
 
+        tmp<fvVectorMatrix> divVoidfractionTau(volVectorField& ,volScalarField& ,volScalarField&) const;
+
         tmp<volScalarField> ddtVoidfraction() const;
 
         void calcDdtVoidfraction(volScalarField& voidfraction, volVectorField& Us) const;
-        
+
         void calcMultiphaseTurbulence();
 
         volScalarField& turbulenceMultiphase() const {return turbulenceMultiphase_;};
@@ -570,30 +555,103 @@ public:
         void resetArray(double**&,int,int,double resetVal=0.);
 
         std::vector< std::vector<double*> >* getVprobe();
-    
+
         std::vector< std::vector<double> >* getSprobe();
 
         //=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=
         // EXPERIMENAL CODE
         //SHARED GLOBAL PARTICLE Arrays (public containers for data management)
         //1-USER-defined particle fields for CFDEM-->ExternalCode transfer (e.g., to handle fluxes)
-        virtual void giveUSERdata();    //trigger hand over of USER data to ExternalCode
-        mutable std::vector<word>       namesFieldsUserCFDEMToExt;
-        mutable std::vector<double**>   particleDatFieldsUserCFDEMToExt;
+        mutable std::vector<word>       namesfieldsToDEM;                    // names of field which are communicated to DEM
+        mutable std::vector<word>       typesfieldsToDEM;                    // types of field which are communicated to DEM
+        mutable std::vector<bool>       pullfieldsToDEM;                     // types of field which are pulled (only) from DEM
+        mutable std::vector<double**>   fieldsToDEM;                         // fields which are communicated to DEM
 
-        void registerNamesFieldsUserCFDEMToExt(word fieldToRegister, int& positionInRegister);
-        bool checkAndregisterNamesFieldsUserCFDEMToExt(const wordList names, std::vector<int> & positionInRegister);
-        void allocateParticleDatFieldsUserCFDEMToExt() const;
-        void reAllocateParticleDatFieldsUserCFDEMToExt() const;
-        void zeroizeParticleDatFieldsUserCFDEMToExt();
-        void accessParticleDatFieldsUserCFDEMToExt(word fieldToAccess, double **& fieldData);
+        void registerFieldsToDEM(word name, word type, int& id, bool pull=false);
+        bool checkAndRegisterFieldsToDEM(const wordList names,const word types,std::vector<int> & id);
+        virtual void allocateFieldsToDEM(word shapeType="atom") const;
+        virtual void reAllocateFieldsToDEM(word shapeType="atom") const;
+        virtual void zeroizeFieldsToDEM(word shapeType="atom");
+        void accessFieldsToDEM(word name, double **& field);
+        int existsFieldsToDEM(word name);
+
+        mutable int idRadius_; // id of particle radius in DEM in modular data exchange framework
+        mutable int idPos_; // id of particle position in DEM in modular data exchange framework
+        mutable int idVel_; // id of particle velocity in DEM in modular data exchange framework
+        mutable int idFacc_; // id of accumulated force on particle in DEM in modular data exchange framework
+        mutable int idPartTypes_; // id of particle type in DEM in modular data exchange framework
+        mutable int idDragExp_; // id of explicit drag in DEM in modular data exchange framework
+        mutable int idKsl_; // id of implicit drag coefficient in DEM in modular data exchange framework
+        mutable int idKslExtra_; // id of implicit anisotropic drag coefficient in DEM in modular data exchange framework
+        mutable int idUf_; // id of fluid vel in DEM in modular data exchange framework
+        mutable int idTorqueExp_; // id of explicit torque in DEM in modular data exchange framework
+        mutable int idKslRotation_; // id of implicit torque coefficient in DEM in modular data exchange framework
+        mutable int idPullRotation_; // id of rotation omega in DEM in modular data exchange framework
+        mutable int idPullOrientation_; // id of orientation (ex) in DEM in modular data exchange framework
+        mutable int idPullOrientation1_; // id of orientation (ey) in DEM in modular data exchange framework
+        mutable int idPullShape_; // id of orientation in DEM in modular data exchange framework
+        mutable int idDragExpCM_; // id of explicit drag for multisphere in DEM in modular data exchange framework
+        mutable int idKslCM_; // id of implicit anisotropic drag for multisphere in DEM in modular data exchange framework
+        mutable int idKslExtraCM_; // id of implicit drag for multisphere in DEM in modular data exchange framework
+        mutable int idUfCM_; // id of fluid vel for multisphere in DEM in modular data exchange framework
+        mutable int idTorqueExpCM_; // id of explicit torque for multisphere in DEM in modular data exchange framework
+        mutable int idKslRotationCM_; // id of implicit torque coefficient for multisphere in DEM in modular data exchange framework
+        mutable int idFhydro_; // id of void fraction in DEM in modular data exchange framework
+        mutable int idVisc_; // id of fluid vel in DEM in modular data exchange framework
+        mutable int idBlockiness_; // id of sq blockiness in DEM in modular data exchange framework
+        mutable int idArea_; // id of sq area in DEM in modular data exchange framework
+        mutable int idVol_; // id of sq volume in DEM in modular data exchange framework
+        mutable int idQuat_; // id of quaternion in DEM in modular data exchange framework
+        mutable int idK_; // id of turbulence k in DEM in modular data exchange framework
+        mutable int idEpsilon_; // id of turbulence epsilon in DEM in modular data exchange framework
+        mutable int idParticleCG_; // id of particle specifig CG factor in DEM in modular data exchange framework
+        mutable int idMass_; // id of convex volume in DEM in modular data exchange framework
+        mutable int idDensity_; // id of convex volume in DEM in modular data exchange framework
+        mutable int idType_; // id of particle type in DEM in modular data exchange framework
+        mutable int idConvectiveHeatFlux_; // id of particle convectiveHeatFlux in DEM in modular data exchange framework
+        mutable int idTemp_; // id of particle convectiveHeatFlux in DEM in modular data exchange framework
+
+        int& idRadius() const {return idRadius_;};
+        int& idPos() const {return idPos_;};
+        int& idVel() const {return idVel_;};
+        int& idFacc() const {return idFacc_;};
+        int& idPartTypes() const {return idPartTypes_;};
+        int& idDragExp() const {return idDragExp_;};
+        int& idKsl() const {return idKsl_;};
+        int& idKslExtra() const {return idKslExtra_;};
+        int& idUf() const {return idUf_;};
+        int& idTorqueExp() const {return idTorqueExp_;};
+        int& idKslRotation() const {return idKslRotation_;};
+        int& idPullRotation() const {return idPullRotation_;};
+        int& idPullOrientation() const {return idPullOrientation_;};
+        int& idPullOrientation1() const {return idPullOrientation1_;};
+        int& idPullShape() const {return idPullShape_;};
+        int& idDragExpCM() const {return idDragExpCM_;};
+        int& idKslCM() const {return idKslCM_;};
+        int& idKslExtraCM() const {return idKslExtraCM_;};
+        int& idUfCM() const {return idUfCM_;};
+        int& idTorqueExpCM() const {return idTorqueExpCM_;};
+        int& idKslRotationCM() const {return idKslRotationCM_;};
+        int& idFhydro() const {return idFhydro_;};
+        int& idVisc() const {return idVisc_;};
+        int& idBlockiness() const {return idBlockiness_;};
+        int& idArea() const {return idArea_;};
+        int& idVol() const {return idVol_;};
+        int& idQuat() const {return idQuat_;};
+        int& idK() const {return idK_;};
+        int& idEpsilon() const {return idEpsilon_;};
+        int& idParticleCG() const {return idParticleCG_;};
+        int& idMass() const {return idMass_;};
+        int& idDensity() const {return idDensity_;};
+        int& idType() const {return idType_;};
+        int& idConvectiveHeatFlux() const {return idConvectiveHeatFlux_;};
+        int& idTemp() const {return idTemp_;};
         //=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=
         bool checkPeriodicCells() { return checkPeriodicCells_; }
         int  wall_periodicityCheckRange(int dir) {return static_cast<int>(wall_periodicityCheckRange_[dir]);}
         vector  wall_periodicityCheckRange() {return wall_periodicityCheckRange_;}
         bool meshHasUpdated() { return meshHasUpdated_; }
         void setMeshHasUpdatedFlag(bool hasUpdated) { meshHasUpdated_ = hasUpdated; }
-
 };
 
 

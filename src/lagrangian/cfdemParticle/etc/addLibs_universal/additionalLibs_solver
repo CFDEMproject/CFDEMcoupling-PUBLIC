@@ -1,0 +1,13 @@
+ifdef CFDEM_LIGGGHTS_MAKEFILE_POSTFIX
+  ifneq ($(CFDEM_LIGGGHTS_MAKEFILE_POSTFIX),)
+    sinclude $(CFDEM_LIGGGHTS_SRC_DIR)/MAKE/Makefile.auto.options_$(CFDEM_LIGGGHTS_MAKEFILE_POSTFIX)
+  else
+    sinclude $(CFDEM_LIGGGHTS_SRC_DIR)/MAKE/Makefile.auto.options
+  endif
+else
+  sinclude $(CFDEM_LIGGGHTS_SRC_DIR)/MAKE/Makefile.auto.options
+endif
+ifdef OPTIONS_EXTRA_RPATH
+    PFLAGS+=$(OPTIONS_EXTRA_RPATH)
+endif
+$(info OPTIONS_EXTRA_RPATH = $(OPTIONS_EXTRA_RPATH))

@@ -7,7 +7,6 @@ forceSubModels = $(path)/subModels/forceModel/forceSubModels
 forceModelsMS = $(path)/subModels/forceModelMS
 IOModels = $(path)/subModels/IOModel
 voidFractionModels = $(path)/subModels/voidFractionModel
-voidFractionModelsMS = $(path)/subModels/voidFractionModelMS
 locateModels = $(path)/subModels/locateModel
 meshMotionModels = $(path)/subModels/meshMotionModel
 momCoupleModels = $(path)/subModels/momCoupleModel
@@ -55,7 +54,6 @@ $(forceModels)/forceModel/forceModel.C
 $(forceModels)/forceModel/newForceModel.C
 $(forceModels)/GidaspowDrag/GidaspowDrag.C
 $(forceModels)/gradPForce/gradPForce.C
-$(forceModels)/interface/interface.C
 $(forceModels)/KochHillDrag/KochHillDrag.C
 $(forceModels)/LaEuScalarTemp/LaEuScalarTemp.C
 $(forceModels)/MeiLift/MeiLift.C

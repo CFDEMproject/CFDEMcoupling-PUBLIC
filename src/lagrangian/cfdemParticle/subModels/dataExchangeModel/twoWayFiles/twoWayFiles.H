@@ -119,6 +119,12 @@ public:
         ) const;
 
         word myType() const{return typeName; };
+
+        void setCG() const
+        {
+            Warning << "setCG() not used correctly here...we assume cg=1" << endl;
+            particleCloud_.setCG(1);
+        };
 };
 
 

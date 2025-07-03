@@ -44,7 +44,7 @@ SourceFiles
 
 #include "forceModel.H"
 #include "dataExchangeModel.H"
-#include "mpi.h"
+#include <mpi.h>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -76,9 +76,13 @@ private:
 
     scalar maxAccNr_;
 
+    scalar maxRelVelChange_;
+
     scalar UmaxExpected_;
 
     scalar minAllowedVcellByVparcel_;
+
+    scalar largeVcellByVparcel_;
 
     mutable int nextRun_;
 

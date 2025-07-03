@@ -136,8 +136,6 @@ public:
 
 
     // Member Functions
-    void pullCloudFields() const ;
-
     void update(surfaceScalarField, volScalarField, volScalarField, scalar Sc, bool limitDiffusion=false) const ;
 
     void bound(autoPtr<eulerianScalarField>*) const {};

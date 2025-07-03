@@ -1,6 +1,5 @@
 echo            both
 log             ../DEM/log.liggghts
-thermo_log      ../DEM/post/thermo.txt
 
 atom_style      granular
 atom_modify     map array sort 0 0
@@ -53,7 +52,7 @@ fix		ins all insert/pack seed 32452843 distributiontemplate pdd1 vel constant 0.
 
 # cfd coupling
 fix     cfd all couple/cfd couple_every 100 mpi
-fix     cfd2 all couple/cfd/force
+fix     cfd2 all couple/cfd/force/implicit
 
 variable    vx equal vx[1]
 variable    vy equal vy[1]
@@ -69,10 +68,9 @@ compute         rke all erotate/sphere
 thermo_style    custom step atoms ke c_rke vol
 thermo          1000
 thermo_modify   lost ignore norm no
-compute_modify  thermo_temp dynamic yes
 
 # insert the first particles so that dump is not empty
 run     0
-dump    dmp all custom 1000 ../DEM/post/dump.liggghts_run id type x y z ix iy iz vx vy vz fx fy fz omegax omegay omegaz radius
+dump    dmp all custom 5000 ../DEM/post/dump.liggghts_run id type x y z ix iy iz vx vy vz fx fy fz omegax omegay omegaz radius
 
 run     0 upto

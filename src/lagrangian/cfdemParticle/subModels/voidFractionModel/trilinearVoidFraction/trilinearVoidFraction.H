@@ -61,12 +61,6 @@ private:
 
         boundBox bb_;
 
-        scalar cellVol_;
-
-        scalar cellLength_;
-
-        vector nCellXYZ_;
-
 public:
 
     //- Runtime type information

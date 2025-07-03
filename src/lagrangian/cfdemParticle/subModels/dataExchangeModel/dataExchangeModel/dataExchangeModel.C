@@ -29,8 +29,9 @@ Description
     and OpenFOAM(R). Note: this code is not part of OpenFOAM(R) (see DISCLAIMER).
 \*---------------------------------------------------------------------------*/
 
-#include "error.H"
 #include "dataExchangeModel.H"
+#include "error.H"
+#include <cstring>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -55,6 +56,52 @@ void Foam::dataExchangeModel::setNumberOfParticles(int numberOfParticles) const
 void Foam::dataExchangeModel::setNumberOfClumps(int numberOfClumps) const
 {
     particleCloud_.setNumberOfClumps(numberOfClumps);
+}
+
+//====
+// double ***
+
+void Foam::dataExchangeModel::allocateArray
+(
+    double***& array,
+    double initVal,
+    int width,
+    int length,
+    int depth
+) const
+{
+    //Pout << "depth=" << depth << " length=" << length<< " width=" << width << endl;
+    // allocate and init double array
+    destroy(array, -1);
+
+    double *data = new double[width*length*depth];
+    double **plane = new double*[length*depth];
+    std::fill_n(data, width*length*depth, initVal);
+
+    array = new double**[depth];
+
+    int n = 0;
+    int m = 0;
+    for (int i=0; i<depth; i++)
+    {
+        m = i*length;
+        array[i] = &plane[m];
+        for (int j=0; j<length; j++)
+        {
+            plane[m+j] = &data[n];
+            n+=width;
+        }
+    }
+}
+
+void Foam::dataExchangeModel::destroy(double*** array,int /*len*/) const
+{
+    if (array == NULL) return;
+
+    delete [] array[0][0];
+    delete [] array[0];
+    delete [] array;
+    array = NULL;
 }
 
 //====
@@ -94,7 +141,7 @@ void Foam::dataExchangeModel::allocateArray
     if (strcmp(length,"nparticles")==0) len = particleCloud_.numberOfParticles();
     else if (strcmp(length,"nbodies")==0) len = particleCloud_.numberOfClumps();
     else FatalError<<"call allocateArray with length, nparticles or nbodies!\n" << abort(FatalError);
-    allocateArray(array,initVal,width,len);
+    allocateArray(array,initVal,width,max(1,len));
 }
 
 void Foam::dataExchangeModel::destroy(double** array,int /*len*/) const
@@ -142,7 +189,7 @@ void Foam::dataExchangeModel::allocateArray
     if (strcmp(length,"nparticles")==0) len = particleCloud_.numberOfParticles();
     else if (strcmp(length,"nbodies")==0) len = particleCloud_.numberOfClumps();
     else FatalError<<"call allocateArray with length, nparticles or nbodies!\n" << abort(FatalError);
-    allocateArray(array,initVal,width,len);
+    allocateArray(array,initVal,width,max(1,len));
 }
 
 void Foam::dataExchangeModel::destroy(int** array,int /*len*/) const
@@ -242,6 +289,11 @@ double* Foam::dataExchangeModel::getTypeVol() const
     FatalError << "ask for type volume - which is not supported for this dataExchange model" << abort(FatalError);
     return NULL;
 }
+
+//void Foam::dataExchangeModel::doDebug() const
+//{
+//    FatalError << "Foam::dataExchangeModel::doDebug() you should not be here." << abort(FatalError);
+//}
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 // Construct from components

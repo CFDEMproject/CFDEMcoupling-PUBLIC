@@ -34,8 +34,6 @@ Description
 #include "MeiLift.H"
 #include "addToRunTimeSelectionTable.H"
 
-//#include "mpi.h"
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -64,45 +62,57 @@ MeiLift::MeiLift
 :
     forceModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
-    velFieldName_(propsDict_.lookup("velFieldName")),
+    velFieldName_(propsDict_.lookupOrDefault<word>("velFieldName","U")),
     U_(sm.mesh().lookupObject<volVectorField> (velFieldName_)),
     useSecondOrderTerms_(false)
 {
     if (propsDict_.found("useSecondOrderTerms")) useSecondOrderTerms_=true;
 
+    // suppress particle probe
+    if (probeIt_ && propsDict_.found("suppressProbe"))
+        probeIt_=!Switch(propsDict_.lookup("suppressProbe"));
+    if(probeIt_)
+    {
+        particleCloud_.probeM().initialize(typeName, typeName+".logDat");
+        particleCloud_.probeM().vectorFields_.append("liftForce"); //first entry must the be the force
+        particleCloud_.probeM().vectorFields_.append("Urel");        //other are debug
+        particleCloud_.probeM().vectorFields_.append("vorticity");  //other are debug
+        particleCloud_.probeM().vectorFields_.append("omegaPart");    //particle rotation rate
+        particleCloud_.probeM().scalarFields_.append("Rep");          //other are debug
+        particleCloud_.probeM().scalarFields_.append("Rew");          //other are debug
+        particleCloud_.probeM().scalarFields_.append("J_star");       //other are debug
+        particleCloud_.probeM().writeHeader();
+    }
+
+    particleCloud_.checkCG(false);
+
     // init force sub model
     setForceSubModels(propsDict_);
+
     // define switches which can be read from dict
     forceSubM(0).setSwitchesList(0,true); // activate treatExplicit switch
     forceSubM(0).setSwitchesList(3,true); // activate search for verbose switch
     forceSubM(0).setSwitchesList(4,true); // activate search for interpolate switch
     forceSubM(0).setSwitchesList(8,true); // activate scalarViscosity switch
+    forceSubM(0).setSwitches(14,true); // pullRotation=true
 
     //set default switches (hard-coded default = false)
     forceSubM(0).setSwitches(0,true);  // enable treatExplicit, otherwise this force would be implicit in slip vel! - IMPORTANT!
 
+    // read those switches defined above, if provided in dict
     for (int iFSub=0;iFSub<nrForceSubModels();iFSub++)
         forceSubM(iFSub).readSwitches();
 
-    particleCloud_.checkCG(false);
-
-    //Append the field names to be probed
-    particleCloud_.probeM().initialize(typeName, typeName+".logDat");
-    particleCloud_.probeM().vectorFields_.append("liftForce"); //first entry must the be the force
-    particleCloud_.probeM().vectorFields_.append("Urel");        //other are debug
-    particleCloud_.probeM().vectorFields_.append("vorticity");  //other are debug
-    particleCloud_.probeM().scalarFields_.append("Rep");          //other are debug
-    particleCloud_.probeM().scalarFields_.append("Rew");          //other are debug
-    particleCloud_.probeM().scalarFields_.append("J_star");       //other are debug
-    particleCloud_.probeM().writeHeader();
+    // setup required communication
+    for (int iFSub=0;iFSub<nrForceSubModels();iFSub++)
+        forceSubM(iFSub).setupCommunication();
 }
 
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 MeiLift::~MeiLift()
-{
-}
+{}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
@@ -118,6 +128,7 @@ void MeiLift::setForce() const
     vector Ur(0,0,0);
     scalar magUr(0);
     scalar magVorticity(0);
+    scalar magOmega(0);
     scalar ds(0);
     scalar dParcel(0);
     scalar nuf(0);
@@ -132,158 +143,157 @@ void MeiLift::setForce() const
     scalar alphaStar(0);
     scalar epsilon(0);
     scalar omega_star(0);
-    vector vorticity(0,0,0);
+    vector vorticity_fluid(0,0,0);
+    vector omegaParticle(0,0,0);
     volVectorField vorticity_ = fvc::curl(U_);
 
     #include "resetVorticityInterpolator.H"
     #include "resetUInterpolator.H"
-
     #include "setupProbeModel.H"
 
     for(int index = 0;index <  particleCloud_.numberOfParticles(); index++)
     {
-        //if(mask[index][0])
-        //{
-            lift           = vector::zero;
-            label cellI = particleCloud_.cellIDs()[index][0];
+        lift        = vector::zero;
+        label cellI = particleCloud_.cfdemCloud::cellIDs()[index][0];
 
-            if (cellI > -1) // particle Found
+        if (cellI > -1) // particle Found
+        {
+            Us = particleCloud_.cfdemCloud::velocity(index);
+            for(int j=0;j<3;j++)
+                omegaParticle[j] = particleCloud_.fieldsToDEM[particleCloud_.idPullRotation()][index][j];
+
+            if( forceSubM(0).interpolation() )
             {
-                Us = particleCloud_.velocity(index);
+                position       = particleCloud_.cfdemCloud::position(index);
+                Ur               = UInterpolator_().interpolate(position,cellI)
+                                    - Us;
+//                 vorticity       = vorticityInterpolator_().interpolate(position,cellI);
+            }
+            else
+            {
+                Ur =  U_[cellI]
+                      - Us;
+//                 vorticity=vorticity_[cellI];
+            }
 
-                if( forceSubM(0).interpolation() )
+            magUr        = mag(Ur);
+//             magVorticity = mag(vorticity);
+            magOmega     = mag(omegaParticle);
+
+            if (magUr > 0 && magOmega > 0)
+            {
+                ds  = 2*particleCloud_.radius(index);
+                dParcel = ds;
+                forceSubM(0).scaleDia(ds,index); //caution: this fct will scale ds!
+                nuf = nufField[cellI];
+                rho = rhoField[cellI];
+
+                //Update any scalar or vector quantity
+                for (int iFSub=0;iFSub<nrForceSubModels();iFSub++)
+                      forceSubM(iFSub).update(  index,
+                                                cellI,
+                                                ds,
+                                                nuf,
+                                                rho,
+                                                forceSubM(0).verbose()
+                                             );
+
+
+                // calc dimensionless properties
+                Rep = ds*magUr/nuf;
+                Rew = magOmega*ds*ds/nuf;
+
+                alphaStar   = magOmega*ds/magUr/2.0;
+                epsilon     = sqrt(2.0*alphaStar /Rep );
+                omega_star=2.0*alphaStar;
+
+                //Basic model for the correction to the Saffman lift
+                //Based on McLaughlin (1991)
+                if(epsilon < 0.1)
                 {
-	                position       = particleCloud_.position(index);
-                    Ur               = UInterpolator_().interpolate(position,cellI) 
-                                        - Us;
-                    vorticity       = vorticityInterpolator_().interpolate(position,cellI);
+                    J_star = -140 *epsilon*epsilon*epsilon*epsilon*epsilon
+                                         *log( 1./(epsilon*epsilon+SMALL) );
+                }
+                else if(epsilon > 20)
+                {
+                  J_star = 1.0-0.287/(epsilon*epsilon+SMALL);
                 }
                 else
                 {
-                    Ur =  U_[cellI]
-                          - Us;
-                    vorticity=vorticity_[cellI];
+                 J_star = 0.3
+                            *(     1.0
+                                  +tanh(  2.5 * log10(epsilon)+0.191  )
+                             )
+                            *(    0.667
+                                 +tanh(  6.0 * (epsilon-0.32)  )
+                              );
                 }
+                Cl=J_star*4.11*epsilon; //multiply McLaughlin's correction to the basic Saffman model
 
-                magUr           = mag(Ur);
-                magVorticity = mag(vorticity);
-
-                if (magUr > 0 && magVorticity > 0)
+                //Second order terms given by Loth and Dorgan 2009
+                if(useSecondOrderTerms_)
                 {
-                    ds  = 2*particleCloud_.radius(index);
-                    dParcel = ds;
-                    forceSubM(0).scaleDia(ds,index); //caution: this fct will scale ds!
-                    nuf = nufField[cellI];
-                    rho = rhoField[cellI];
-
-                    //Update any scalar or vector quantity
-                    for (int iFSub=0;iFSub<nrForceSubModels();iFSub++)
-                          forceSubM(iFSub).update(  index, 
-                                                    cellI,
-                                                    ds,
-                                                    nuf,
-                                                    rho,
-                                                    forceSubM(0).verbose()
-                                                 );
-
-
-                    // calc dimensionless properties
-                    Rep = ds*magUr/nuf;
-		            Rew = magVorticity*ds*ds/nuf;
-
-                    alphaStar   = magVorticity*ds/magUr/2.0;
-                    epsilon     = sqrt(2.0*alphaStar /Rep );
-                    omega_star=2.0*alphaStar;
-
-                    //Basic model for the correction to the Saffman lift
-                    //Based on McLaughlin (1991)
-                    if(epsilon < 0.1)
-                    {
-                        J_star = -140 *epsilon*epsilon*epsilon*epsilon*epsilon 
-                                             *log( 1./(epsilon*epsilon+SMALL) );
-                    }
-                    else if(epsilon > 20)
-                    {
-                      J_star = 1.0-0.287/(epsilon*epsilon+SMALL);
-                    }
-                    else
-                    {
-                     J_star = 0.3
-                                *(     1.0
-                                      +tanh(  2.5 * log10(epsilon+0.191)  )
-                                 )
-                                *(    0.667
-                                     +tanh(  6.0 * (epsilon-0.32)  )
-                                  );
-                    }
-                    Cl=J_star*4.11*epsilon; //multiply McLaughlin's correction to the basic Saffman model
-
-                    //Second order terms given by Loth and Dorgan 2009 
-                    if(useSecondOrderTerms_)
-                    {   
-                        Omega_eq = omega_star/2.0*(1.0-0.0075*Rew)*(1.0-0.062*sqrt(Rep)-0.001*Rep);
-                        Cl_star=1.0-(0.675+0.15*(1.0+tanh(0.28*(omega_star/2.0-2.0))))*tanh(0.18*sqrt(Rep));
-                        Cl += Omega_eq*Cl_star;
-                    }
-
-                    lift =  0.125*M_PI
-                           *rho
-                           *Cl  
-                           *magUr*Ur^vorticity/magVorticity
-                           *ds*ds; //total force on all particles in parcel
-
-                    forceSubM(0).scaleForce(lift,dParcel,index);
-
-                    if (modelType_=="B")
-                    {
-                        voidfraction = particleCloud_.voidfraction(index);
-                        lift /= voidfraction;
-                    }
+                    Omega_eq = omega_star/2.0*(1.0-0.0075*Rew)*(1.0-0.062*sqrt(Rep)-0.001*Rep);
+                    Cl_star=1.0-(0.675+0.15*(1.0+tanh(0.28*(omega_star/2.0-2.0))))*tanh(0.18*sqrt(Rep));
+                    Cl += Omega_eq*Cl_star;
                 }
 
-                //**********************************        
-                //SAMPLING AND VERBOSE OUTOUT
-                if( forceSubM(0).verbose() )
-                {   
-                    Pout << "index = " << index << endl;
-                    Pout << "Us = " << Us << endl;
-                    Pout << "Ur = " << Ur << endl;
-                    Pout << "vorticity = " << vorticity << endl;
-                    Pout << "dprim = " << ds << endl;
-                    Pout << "rho = " << rho << endl;
-                    Pout << "nuf = " << nuf << endl;
-                    Pout << "Rep = " << Rep << endl;
-                    Pout << "Rew = " << Rew << endl;
-                    Pout << "alphaStar = " << alphaStar << endl;
-                    Pout << "epsilon = " << epsilon << endl;
-                    Pout << "J_star = " << J_star << endl;
-                    Pout << "lift = " << lift << endl;
-                }
+                lift =  0.125*M_PI
+                       *rho
+                       *Cl
+                       //*magUr*Ur^vorticity/magVorticity
+                       *magUr*magUr*omegaParticle^Ur/mag(omegaParticle^Ur)
+                       *ds*ds; //total force on all particles in parcel
 
-                //Set value fields and write the probe
-                if(probeIt_)
+                forceSubM(0).scaleForce(lift,dParcel,index);
+
+                if (modelType_=="B")
                 {
-                    #include "setupProbeModelfields.H"
-                    // Note: for other than ext one could use vValues.append(x)
-                    // instead of setSize
-                    vValues.setSize(vValues.size()+1, lift);           //first entry must the be the force
-                    vValues.setSize(vValues.size()+1, Ur);
-                    vValues.setSize(vValues.size()+1, vorticity); 
-                    sValues.setSize(sValues.size()+1, Rep);
-                    sValues.setSize(sValues.size()+1, Rew);
-                    sValues.setSize(sValues.size()+1, J_star);
-                    particleCloud_.probeM().writeProbe(index, sValues, vValues);
+                    voidfraction = particleCloud_.voidfraction(index);
+                    lift /= voidfraction;
                 }
-                // END OF SAMPLING AND VERBOSE OUTOUT
-                //**********************************        
-
             }
-            // write particle based data to global array
-            forceSubM(0).partToArray(index,lift,vector::zero);
-        //}
-    }
 
+            if(forceSubM(0).verbose() && index==0)
+            {
+                Pout << "cellI = " << cellI << endl;
+                Pout << "index = " << index << endl;
+                Pout << "Us = " << Us << endl;
+                Pout << "Ur = " << Ur << endl;
+//                 Pout << "vorticity = " << vorticity << endl;
+                Pout << "omega_s = " << omegaParticle << endl;
+                Pout << "dprim = " << ds << endl;
+                Pout << "rho = " << rho << endl;
+                Pout << "nuf = " << nuf << endl;
+                Pout << "Rep = " << Rep << endl;
+                Pout << "Rew = " << Rew << endl;
+                Pout << "alphaStar = " << alphaStar << endl;
+                Pout << "epsilon = " << epsilon << endl;
+                Pout << "J_star = " << J_star << endl;
+                Pout << "lift = " << lift << endl;
+            }
+
+            //Set value fields and write the probe
+            if(probeIt_)
+            {
+                #include "setupProbeModelfields.H"
+                // Note: for other than ext one could use vValues.append(x)
+                // instead of setSize
+                vValues.setSize(vValues.size()+1, lift);           //first entry must the be the force
+                vValues.setSize(vValues.size()+1, Ur);
+                vValues.setSize(vValues.size()+1, omegaParticle);
+                sValues.setSize(sValues.size()+1, Rep);
+                sValues.setSize(sValues.size()+1, Rew);
+                sValues.setSize(sValues.size()+1, J_star);
+                particleCloud_.probeM().writeProbe(index, sValues, vValues);
+            }
+        }
+
+        // write particle based data to global array
+        forceSubM(0).partToArray(index,lift,vector::zero);
+    }
 }
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

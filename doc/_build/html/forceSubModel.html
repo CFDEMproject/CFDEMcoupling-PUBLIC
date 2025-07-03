@@ -1,70 +1,32 @@
-
-
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>forceSubModel command &mdash; CFDEMcoupling v3.X documentation</title>
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>forceSubModel command &mdash; CFDEMcoupling 3.8.1 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   
-  
-
-  
-
-  
-  
-    
-
-  
-
-  
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-
-  
-
-  
-    <link rel="top" title="CFDEMcoupling v3.X documentation" href="index.html"/> 
-
-  
-  <script src="_static/js/modernizr.min.js"></script>
-
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
 </head>
 
-<body class="wy-body-for-nav" role="document">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
-          
-
-          
+        <div class="wy-side-nav-search" >
             <a href="CFDEMcoupling_Manual.html" class="icon icon-home"> CFDEMcoupling
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
-                v3.X
+                3.8.1
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -72,16 +34,9 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-                <!-- Local TOC -->
-                <div class="local-toc"><ul>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
 <li><a class="reference internal" href="#">forceSubModel command</a><ul>
 <li><a class="reference internal" href="#syntax">Syntax</a></li>
 <li><a class="reference internal" href="#examples">Examples</a></li>
@@ -92,163 +47,122 @@
 </li>
 </ul>
 </div>
-            
-          
         </div>
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="CFDEMcoupling_Manual.html">CFDEMcoupling</a>
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="CFDEMcoupling_Manual.html">CFDEMcoupling</a>
       </nav>
 
-
-      
       <div class="wy-nav-content">
         <div class="rst-content">
-          
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="CFDEMcoupling_Manual.html">Docs</a> &raquo;</li>
-      
-    <li>forceSubModel command</li>
-    <li class="wy-breadcrumbs-aside">
-      
-        
-          <a href="http://www.cfdem.com"> Website</a>
-        
-      
-    </li>
+      <li><a href="CFDEMcoupling_Manual.html" class="icon icon-home"></a> &raquo;</li>
+      <li>forceSubModel command</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
   </ul>
   <hr/>
-  
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="forcesubmodel-command">
-<span id="index-0"></span><h1>forceSubModel command<a class="headerlink" href="#forcesubmodel-command" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="syntax">
-<h2>Syntax<a class="headerlink" href="#syntax" title="Permalink to this headline">¶</a></h2>
-<p>Defined in couplingProperties sub-dictionary of the force model in use. If no force sub-model is applied ImEx is used as default. If the keyword &#8220;forceSubModels&#8221; is provided, a choice of sub model is demanded.</p>
-<div class="highlight-python"><div class="highlight"><pre>forceSubModels
-(
-    model_x
-    model_y
-);
+             
+  <section id="forcesubmodel-command">
+<span id="index-0"></span><h1>forceSubModel command<a class="headerlink" href="#forcesubmodel-command" title="Permalink to this headline"></a></h1>
+<section id="syntax">
+<h2>Syntax<a class="headerlink" href="#syntax" title="Permalink to this headline"></a></h2>
+<p>Defined in couplingProperties sub-dictionary of the force model in use. If no force sub-model is applied ImEx is used as default. If the keyword “forceSubModels” is provided, a choice of sub model is demanded.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">forceSubModels</span>
+<span class="p">(</span>
+    <span class="n">model_x</span>
+    <span class="n">model_y</span>
+<span class="p">);</span>
 </pre></div>
 </div>
 <ul class="simple">
-<li>model = name of force sub-model to be applied</li>
+<li><p>model = name of force sub-model to be applied</p></li>
 </ul>
-</div>
-<div class="section" id="examples">
-<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">forceSubModels</span>
+</section>
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline"></a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">forceSubModels</span>
 <span class="p">(</span>
     <span class="n">ImEx</span>
 <span class="p">);</span>
 </pre></div>
 </div>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">This examples list might not be complete - please look for other models (forceSubModel_XY) in this documentation.</p>
+<p class="admonition-title">Note</p>
+<p>This examples list might not be complete - please look for other models (forceSubModel_XY) in this documentation.</p>
 </div>
-</div>
-<div class="section" id="description">
-<h2>Description<a class="headerlink" href="#description" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="description">
+<h2>Description<a class="headerlink" href="#description" title="Permalink to this headline"></a></h2>
 <p>The force sub model is designed to hold the settings a force model can have. For now it handles the treatExplicit, treatDEM and implDEM option.</p>
 <p><strong>Switches:</strong></p>
 <p>Depending on the availability within the respective force model, a number of switches can be activated:</p>
-<ul class="simple">
-<li>treatForceExplicit: switch for the purely explicit consideration of the force term in the equation of motion on the CFD side (off -&gt; the force is considered semi-implicitly; default off)</li>
-<li>treatForceDEM: switch for the consideration of the forces on the DEM side only (off -&gt; calculate forces for DEM and CFD; default off)</li>
-<li>implForceDEM: If true, the fluid velocity and drag coefficient are communicated to the DEM calculation at each coupling time step and the drag force is calculated at each DEM time step, using the current particle velocity. If false, a force term is communiated to the DEM calculation at each coupling time step, the term is constant for one coupling interval. (on -&gt; DEM forces are updated every DEM step; default off)</li>
-<li>verbose: switch for debug output to screen (on -&gt; enable debug output; default off)</li>
-<li>interpolation: switch for the usage of interpolation models when getting data for the Lagrangian calculation from Eulerian fields; If false, the cell centre values are used. (default off)</li>
-<li>useFilteredDragModel: switch for using a coarse-grid version of the Beetstra drag model (takes grid-size effects into account; default = off)</li>
-<li>useParcelSizeDependentFilteredDrag: switch for using a coarse-grid version of the Beetstra drag model (takes parcel-size effects into account, will force the switch useFilteredDragModel to &#8220;on&#8221;; default = off)</li>
-<li>implForceDEMaccumulated: Can only be used in combination with implForceDEM switch, drag force values of each DEM time step are accumulated and passed on to the CFD-calculation. (default off)</li>
-<li>scalarViscosity: switch for the usage of a user-defined viscosity nu for the calculation of the drag force; The CFD calculation always uses the value of the transport model. (off -&gt; use tranportProperties nu; default off)</li>
-</ul>
-</div>
-<div class="section" id="restrictions">
-<h2>Restrictions<a class="headerlink" href="#restrictions" title="Permalink to this headline">¶</a></h2>
+<p>treatForceExplicit: switch for the purely explicit consideration of the force term in the equation of motion on the CFD side (off -&gt; the force is considered semi-implicitly; default off)
+treatForceDEM: switch for the consideration of the forces on the DEM side only (off -&gt; calculate forces for DEM and CFD; default off)
+implForceDEM: If true, the fluid velocity and drag coefficient are communicated to the DEM calculation at each coupling time step and the drag force is calculated at each DEM time step, using the current particle velocity. If false, a force term is communiated to the DEM calculation at each coupling time step, the term is constant for one coupling interval. (on -&gt; DEM forces are updated every DEM step; default off)
+implForceDEM: If true, all fields for implicit torque handling on DEM side are communicated to DEM. (default off)
+verbose: switch for debug output to screen (on -&gt; enable debug output; default off)
+interpolation: switch for the usage of interpolation models when getting data for the Lagrangian calculation from Eulerian fields; If false, the cell centre values are used. (default off)
+useFilteredDragModel: switch for using a coarse-grid version of the Beetstra drag model (takes grid-size effects into account; default = off)
+useParcelSizeDependentFilteredDrag: switch for using a coarse-grid version of the Beetstra drag model (takes parcel-size effects into account, will force the switch useFilteredDragModel to “on”; default = off)
+implForceDEMaccumulated: Can only be used in combination with implForceDEM switch, drag force values of each DEM time step are accumulated and passed on to the CFD-calculation. (default off)
+scalarViscosity: switch for the usage of a user-defined viscosity nu for the calculation of the drag force; The CFD calculation always uses the value of the transport model. (off -&gt; use tranportProperties nu; default off)
+voidageFunctionDiFelice: switch for the usage of the DiFelice voidage correction function during the drag force calculation. The correction is given by the relation
+Xi = 3.7 - 0.65 * exp(-sqr(1.5-log10(Rep))/2),
+where Rep is the particle Reynolds number.
+If switch is set to true, the voidageFunctionRong switch (or others) must be set to false if false is not the default value for the selected model.
+voidageFunctionRong: switch for the usage of the Rong voidage correction function during the drag force calculation. The correction is given by the relation
+Xi = 2.65 * (voidfraction + 1) - (5.3-3.5*voidfraction)*sqr(voidfraction)*exp(-sqr(1.5-log10(Rep))/2),
+where Rep is the particle Reynolds number.
+voidageFunctionTang: switch for the usage of the Tang voidage correction function during the drag force calculation. The correction is given by the relation
+Xi = 2 - log10(((1.5*sqrt(1-voidfraction)+1)*voidfraction^2 - (10*(voidfraction-1))/(voidfraction^2) + (0.0644*voidfraction^-4+0.169*voidfraction)*Rep^0.657 - (0.00456*Rep)*voidfraction^-4 + 0.11*(voidfraction-2)*(voidfraction-1)*Rep) / (0.2334*Rep^0.657 - 0.00456*Rep + 1)) / log10(voidfraction); (see: 2018,ChemEngSci, Mahajan et al., Non-spherical particles in a pseudo-2d fluidized bed: Modelling Study)
+,
+where Rep is the particle Reynolds number.:ul</p>
+</section>
+<section id="restrictions">
+<h2>Restrictions<a class="headerlink" href="#restrictions" title="Permalink to this headline"></a></h2>
 <p>None.</p>
-</div>
-<div class="section" id="related-commands">
-<h2>Related commands<a class="headerlink" href="#related-commands" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference internal" href="forceSubModel_ImEx.html"><em>ImEx</em></a></p>
+</section>
+<section id="related-commands">
+<h2>Related commands<a class="headerlink" href="#related-commands" title="Permalink to this headline"></a></h2>
+<p><a class="reference internal" href="forceSubModel_ImEx.html"><span class="doc">ImEx</span></a></p>
 <p><strong>Default:</strong> ImEx.</p>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &copy; Copyright 2016, DCS Computing GmbH, JKU Linz.
-
-    </p>
+    <p>&#169; Copyright 2025, DCS Computing GmbH.</p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
-
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'v3.X',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-
-  
-
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
-
-  
-  
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(false);
       });
-  </script>
-   
+  </script> 
 
 </body>
 </html>

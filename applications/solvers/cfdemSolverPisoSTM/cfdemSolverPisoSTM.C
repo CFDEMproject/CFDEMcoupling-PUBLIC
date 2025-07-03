@@ -54,9 +54,6 @@ Description
 #else
     #include "cfdemCloud.H"
 #endif
-#if defined(anisotropicRotation)
-    #include "cfdemCloudRotation.H"
-#endif
 #include "implicitCouple.H"
 #include "clockModel.H"
 #include "smoothingModel.H"
@@ -81,14 +78,10 @@ int main(int argc, char *argv[])
     // create cfdemCloud
     #include "readGravitationalAcceleration.H"
     #include "checkImCoupleM.H"
-    #if defined(anisotropicRotation)
-        cfdemCloudRotation particleCloud(mesh);
+    #ifdef MS
+        cfdemCloudMS particleCloud(mesh);
     #else
-        #ifdef MS
-            cfdemCloudMS particleCloud(mesh);
-        #else
-            cfdemCloud particleCloud(mesh);
-        #endif
+        cfdemCloud particleCloud(mesh);
     #endif
     #include "checkModelType.H"
 
@@ -118,11 +111,11 @@ int main(int argc, char *argv[])
         particleCloud.clockM().start(2,"Coupling");
         bool hasEvolved = particleCloud.evolve(voidfraction,Us,U);
 
-        if(hasEvolved)
+        if(hasEvolved && particleCloud.solveFlow())
         {
             particleCloud.smoothingM().smoothenAbsolutField(particleCloud.forceM(0).impParticleForces());
         }
-    
+
         Ksl = particleCloud.momCoupleM(particleCloud.registryM().getProperty("implicitCouple_index")).impMomSource();
         Ksl.correctBoundaryConditions();
 
@@ -132,7 +125,6 @@ int main(int argc, char *argv[])
         //Force Checks
         #include "forceCheckIm.H"
 
-        #include "solverDebugInfo.H"
         particleCloud.clockM().stop("Coupling");
 
         particleCloud.clockM().start(26,"Flow");
@@ -193,7 +185,7 @@ int main(int argc, char *argv[])
                             + rUAfvoidfraction*fvc::ddtCorr(U, phiByVoidfraction);
                     #else
                         phi = ( fvc::interpolate(U) & mesh.Sf() )
-                            + fvc::ddtPhiCorr(rUAvoidfraction, U, phiByVoidfraction);
+                            + rUAfvoidfraction*fvc::ddtCorr(U, phiByVoidfraction);
                     #endif
                     surfaceScalarField phiS(fvc::interpolate(Us) & mesh.Sf());
                     phi += rUAf*(fvc::interpolate(Ksl/rho) * phiS);
@@ -202,7 +194,7 @@ int main(int argc, char *argv[])
                         rUAvoidfraction = volScalarField("(voidfraction2|A(U))",rUA*voidfraction*voidfraction);
 
                     // Update the fixedFluxPressure BCs to ensure flux consistency
-                    #include "fixedFluxPressureHandling.H"                    
+                    #include "fixedFluxPressureHandling.H"
 
                     // Non-orthogonal pressure corrector loop
                     #if defined(version30)

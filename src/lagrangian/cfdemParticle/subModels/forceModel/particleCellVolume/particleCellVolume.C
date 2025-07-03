@@ -34,7 +34,7 @@ Description
 #include "particleCellVolume.H"
 #include "addToRunTimeSelectionTable.H"
 #include "dataExchangeModel.H"
-#include "mpi.h"
+#include <mpi.h>
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -92,8 +92,8 @@ particleCellVolume::particleCellVolume
         mesh_,
         dimensionedScalar("zero", dimensionSet(0,0,0,0,0), 0)
     ),
-    upperThreshold_(readScalar(propsDict_.lookup("upperThreshold"))),
-    lowerThreshold_(readScalar(propsDict_.lookup("lowerThreshold"))),
+    upperThreshold_(propsDict_.lookupOrDefault<scalar>("upperThreshold",1.01)),
+    lowerThreshold_(propsDict_.lookupOrDefault<scalar>("lowerThreshold",-0.01)),
     path_("postProcessing/particleCellVolume"),
     sPtr_(NULL),
     writeToFile_(propsDict_.lookupOrDefault<Switch>("writeToFile",false))

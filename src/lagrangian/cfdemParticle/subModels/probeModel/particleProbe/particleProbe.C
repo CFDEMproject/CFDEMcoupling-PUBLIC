@@ -29,12 +29,12 @@ Description
     and OpenFOAM(R). Note: this code is not part of OpenFOAM(R) (see DISCLAIMER).
 \*---------------------------------------------------------------------------*/
 
-#include "error.H"
-
 #include "particleProbe.H"
 #include "addToRunTimeSelectionTable.H"
-#include "mpi.h"
+#include "error.H"
 #include "IOmanip.H"
+#include <mpi.h>
+#include <cstring>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -338,20 +338,20 @@ void particleProbe::writeProbe(int index, Field<scalar> sValues, Field<vector> v
         //scalarFields
         if(probeDebug_)
         {
-          *sPtr << "||   ";
-           forAll(sValues, iter)
-           {
-               *sPtr << sValues[iter] << "   "; 
+            *sPtr << "||   ";
+            forAll(sValues, iter)
+            {
+                *sPtr << sValues[iter] << "   "; 
             }
         }
 
         if(includePosition_)
         {
             *sPtr << "||   ";
-             *sPtr <<     particleCloud_.position(index)[0] << "   " 
-                      <<     particleCloud_.position(index)[1] << "   "
-                      <<     particleCloud_.position(index)[2]
-                      << endl;
+            *sPtr << particleCloud_.cfdemCloud::position(index)[0] << "   " 
+                  << particleCloud_.cfdemCloud::position(index)[1] << "   "
+                  << particleCloud_.cfdemCloud::position(index)[2]
+                  << endl;
         }
         else *sPtr << endl;
     }

@@ -47,10 +47,20 @@ autoPtr<voidFractionModel> voidFractionModel::New
     cfdemCloud& sm
 )
 {
-    word voidFractionModelType
+    word read_vfm
     (
         dict.lookup("voidFractionModel")
     );
+
+    word ps
+    (
+        dict.lookupOrDefault<word>("particleShapeType", "")
+    );
+    if (ps == "superquadric")
+        ps = "Superquadric"; // NOTE: change in case
+    else
+        ps = "";
+    word voidFractionModelType(read_vfm + ps);
 
     Info<< "Selecting voidFractionModel "
          << voidFractionModelType << endl;

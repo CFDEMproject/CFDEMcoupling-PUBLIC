@@ -9,7 +9,13 @@
 
 ## The extended version of CFDEM®coupling is constantly developed and maintained by DCS Computing GmbH - you can find more information [here](https://www.aspherix-dem.com/software/cfdemcoupling-functionalities/)
 
-This repository contains older, publicly available versions of CFDEM®coupling (referred to as "CFDEM®coupling-PUBLIC") and will not be updated in the foreseeable future.
+This repository contains older, publicly available versions of CFDEM®coupling (referred to as "CFDEM®coupling-PUBLIC").
+This repository has last been updated for CFDEMcoupling-PUBLIC to be compatible with OpenFOAM-6 ensuring
+functionality on Ubuntu 22.04 and 24.04.
+While this update contains some bugfixes and improvements, the main intention of this
+update is keeping CFDEMcoupling usable also on newer systems where the compilation of
+older OpenFOAM versions may prove difficult.
+This repository will not be updated in the foreseeable future.
 
 CFDEM®coupling-PUBLIC is compatible with [LIGGGHTS-PUBLIC](https://github.com/CFDEMproject/LIGGGHTS-PUBLIC).
 

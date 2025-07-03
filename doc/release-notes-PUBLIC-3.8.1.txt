@@ -1,0 +1,17 @@
+
+===============================================================
+Release notes for PUBLIC, version 3.8.1
+
+Updated CFDEMcoupling-PUBLIC to be compatible with OpenFOAM-6 ensuring
+functionality on Ubuntu 22.04 and 24.04.
+
+This updated version and all tutorials are still compatible to LIGGGHTS-PUBLIC 3.8.0
+
+While this update contains some bugfixes and improvements, the main intention of this
+update is keeping CFDEMcoupling usable also on newer systems where the compilation of
+older OpenFOAM versions may prove difficult.
+
+Note: On Ubuntu 24.04 set / export the environment variable WM_CXX_STD=c++14
+before starting the OpenFOAM-6 compilation.
+===============================================================
+

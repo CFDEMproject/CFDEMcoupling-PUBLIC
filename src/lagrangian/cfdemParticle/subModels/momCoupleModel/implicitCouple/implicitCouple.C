@@ -63,9 +63,9 @@ implicitCouple::implicitCouple
 :
     momCoupleModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
-    velFieldName_(propsDict_.lookup("velFieldName")),
-    granVelFieldName_(propsDict_.lookup("granVelFieldName")),
-    voidfractionFieldName_(propsDict_.lookup("voidfractionFieldName")),
+    velFieldName_(propsDict_.lookupOrDefault<word>("velFieldName","U")),
+    granVelFieldName_(propsDict_.lookupOrDefault<word>("granVelFieldName","Us")),
+    voidfractionFieldName_(propsDict_.lookupOrDefault<word>("voidfractionFieldName","voidfraction")),
     U_(sm.mesh().lookupObject<volVectorField> (velFieldName_)),
     Us_(sm.mesh().lookupObject<volVectorField> (granVelFieldName_)),
     alpha_(sm.mesh().lookupObject<volScalarField> (voidfractionFieldName_)),

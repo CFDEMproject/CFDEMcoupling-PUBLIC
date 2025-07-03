@@ -65,7 +65,7 @@ GaussVoidFraction::GaussVoidFraction
 :
     voidFractionModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
-    alphaMin_(readScalar(propsDict_.lookup("alphaMin"))),
+    alphaMin_(propsDict_.lookupOrDefault<scalar>("alphaMin",0.1)),
     alphaLimited_(0)
 {
     Info << "\n\n W A R N I N G - do not use in combination with differentialRegion model! \n\n" << endl;
@@ -112,11 +112,11 @@ void GaussVoidFraction::setvoidFraction(double** const& mask,double**& voidfract
             particleV[index][0]=0;
 
             //collecting data
-            label particleCenterCellID=particleCloud_.cellIDs()[index][0];
+            label particleCenterCellID=particleCloud_.cfdemCloud::cellIDs()[index][0];
             radius = particleCloud_.radius(index);
-            volume = 4.188790205*radius*radius*radius*scaleVol;
+            volume = 4./3.*M_PI*radius*radius*radius*scaleVol;
             radius *= scaleRadius;
-            vector positionCenter=particleCloud_.position(index);
+            vector positionCenter=particleCloud_.cfdemCloud::position(index);
 	        scalar core;
 	        scalar dist;
 
@@ -142,7 +142,7 @@ void GaussVoidFraction::setvoidFraction(double** const& mask,double**& voidfract
                     cellsPerParticle_[index][0]=hashSetLength;
 
                     //making sure that the cell containing the center is the first subcell
-                    particleCloud_.cellIDs()[index][0]=particleCenterCellID;
+                    particleCloud_.cfdemCloud::cellIDs()[index][0]=particleCenterCellID;
                     //deleting the cell containing the center of the particle
                     hashSett.erase(particleCenterCellID);
 
@@ -150,7 +150,7 @@ void GaussVoidFraction::setvoidFraction(double** const& mask,double**& voidfract
                     //setting the voidfractions
 
                     // ===
-		            dist = mag(particleCloud_.mesh().C()[particleCenterCellID]-particleCloud_.position(index));
+		            dist = mag(particleCloud_.mesh().C()[particleCenterCellID]-particleCloud_.cfdemCloud::position(index));
 		            core = pow(2.0/radius/radius/M_PI,1.5)*exp(-dist*dist/2.0/radius/radius)*particleCloud_.mesh().V()[particleCenterCellID]; //TODO revise!!!
 
                     // ===
@@ -172,10 +172,10 @@ void GaussVoidFraction::setvoidFraction(double** const& mask,double**& voidfract
                     for(label i=0;i<hashSetLength-1;i++)
                     {
                         label cellI=hashSett.toc()[i];
-                        particleCloud_.cellIDs()[index][i+1]=cellI; //adding subcell represenation
+                        particleCloud_.cfdemCloud::cellIDs()[index][i+1]=cellI; //adding subcell represenation
 
                         //===
-		                dist = mag(particleCloud_.mesh().C()[cellI]-particleCloud_.position(index));
+		                dist = mag(particleCloud_.mesh().C()[cellI]-particleCloud_.cfdemCloud::position(index));
 		                core = pow(2.0/radius/radius/M_PI,1.5)*exp(-dist*dist/2.0/radius/radius)*particleCloud_.mesh().V()[cellI]; //TODO revise!!!
                         scalar occupiedVolume = volume*core;
                         //===
@@ -206,7 +206,7 @@ void GaussVoidFraction::setvoidFraction(double** const& mask,double**& voidfract
     {
         for(label subcell=0;subcell<cellsPerParticle_[index][0];subcell++)
         {
-            label cellID = particleCloud_.cellIDs()[index][subcell];
+            label cellID = particleCloud_.cfdemCloud::cellIDs()[index][subcell];
 
             if(cellID >= 0)
             {

@@ -94,14 +94,10 @@ oneWayVTKProps
 
 centreProps
 {
-    alphaMin 0.10;
 }
 
 dividedProps
 {
-    alphaMin 0.1;
-    scaleUpVol 1;
-    
 }
 
 

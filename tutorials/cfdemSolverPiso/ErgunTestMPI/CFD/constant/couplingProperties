@@ -58,7 +58,7 @@ forceModels
     KochHillDrag
     //DEMbasedDrag
     //RongDrag
-    //Archimedes
+    Archimedes
     //volWeightedAverage
     //totalMomentumExchange
     //particleCellVolume
@@ -83,7 +83,7 @@ localPSizeDiffSmoothingProps
     lowerLimit 0.1;
     upperLimit 1e10;
     dSmoothingLength 1.5e-3;
-    Csmoothing    1.0; 
+    Csmoothing    1.0;
 }
 
 constDiffSmoothingProps
@@ -95,26 +95,18 @@ constDiffSmoothingProps
 
 implicitCoupleProps
 {
-    velFieldName "U";
-    granVelFieldName "Us";
-    voidfractionFieldName "voidfraction";
 }
 
 ArchimedesProps
 {
-    gravityFieldName "g";
 }
 gradPForceProps
 {
-    pFieldName "p";
-    voidfractionFieldName "voidfraction";
-    velocityFieldName "U";
     interpolation true;
 }
 
 viscForceProps
 {
-    velocityFieldName "U";
     interpolation true;
 }
 volWeightedAverageProps
@@ -135,53 +127,34 @@ totalMomentumExchangeProps
     implicitMomExFieldName "Ksl";
     explicitMomExFieldName "none";
     fluidVelFieldName "U";
-    granVelFieldName "Us";
 }
 GidaspowDragProps
 {
     verbose true;
-    velFieldName "U";
-    voidfractionFieldName "voidfraction";
-    granVelFieldName "Us";
     interpolation true;
     phi 1;
 }
 DEMbasedDragProps
 {
-    velFieldName "U";
-    voidfractionFieldName "voidfraction";
 }
 
 DiFeliceDragProps
 {
     //verbose true;
-    velFieldName "U";
-    voidfractionFieldName "voidfraction";
-    granVelFieldName "Us";
     interpolation true;
 }
 
 KochHillDragProps
 {
     //verbose true;
-    velFieldName "U";
-    voidfractionFieldName "voidfraction";
     interpolation true;
-    //forceSubModels
-    //(
-    //    ImExCorr
-    //);
-    implForceDEM true;
     //implForceDEMaccumulated true;
     //explicitCorr true;
 }
 
 BeetstraDragProps
 {
-    velFieldName "U";
-    gravityFieldName "g";
     rhoParticle     2000.;
-    voidfractionFieldName "voidfraction";
     interpolation true;
     useFilteredDragModel ;
     useParcelSizeDependentFilteredDrag ;
@@ -193,17 +166,12 @@ BeetstraDragProps
 RongDragProps
 {
     verbose true;
-    velFieldName "U";
-    voidfractionFieldName "voidfraction";
     interpolation true;
-    implForceDEM true;
     implForceDEMaccumulated true;
-    granVelFieldName "Us";
 }
 
 virtualMassForceProps
 {
-    velFieldName "U";
 }
 
 particleCellVolumeProps
@@ -254,7 +222,6 @@ twoWayFilesProps
 
 centreProps
 {
-    alphaMin 0.1;
 }
 
 "(engineProps|turboEngineProps|turboEngineM2MProps)"
@@ -271,9 +238,6 @@ engineIBProps
 
 dividedProps
 {
-    alphaMin 0.1;
-    scaleUpVol 1.0;
-    //procBoundaryCorrection true;
 }
 
 "(twoWayMPIProps|M2MProps)"

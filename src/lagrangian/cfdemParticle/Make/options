@@ -16,18 +16,21 @@ EXE_INC = \
      $(PINC) \
     -I ./cfdemParticle \
     -I$(LIB_SRC)/finiteVolume/lnInclude \
+    -I$(LIB_SRC)/thermophysicalModels/radiation/lnInclude \
     -I$(LIB_SRC)/transportModels \
     $(CFDEM_ADD_INCOMPTURBMOD_PATHS) \
     -I$(LIB_SRC)/meshTools/lnInclude \
+    -I$(LIB_SRC)/triSurface/lnInclude \
     -I$(LIB_SRC)/lagrangian/basic/lnInclude \
     -I$(LIB_SRC)/OpenFOAM/containers/HashTables/labelHashSet \
     -I$(CFDEM_LIGGGHTS_SRC_DIR) \
-    -I$(CFDEM_SRC_DIR)/cfdTools \
+    -I$(CFDEM_SRC_DIR)/lagrangian/cfdemParticle/cfdTools \
 
 LIB_LIBS = \
      $(PLIBS) \
     -L$(CFDEM_LIB_DIR) \
     -lfiniteVolume \
+    -lradiationModels \
     $(CFDEM_ADD_INCOMPTURBMOD_LIBS) \
     -lmeshTools \
     -llagrangian \

@@ -62,18 +62,43 @@ noDrag::noDrag
 :
     forceModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
-    noDEMForce_(propsDict_.lookupOrDefault("noDEMForce",false)),
-    keepCFDForce_(propsDict_.lookupOrDefault("keepCFDForce",false))
+    noDEMForce_(propsDict_.lookupOrDefault<Switch>("noDEMForce",false)),
+    keepCFDForce_(propsDict_.lookupOrDefault<Switch>("keepCFDForce",false))
 {
+    Info << "noDragTestMe: " << noDEMForce_ << " " << keepCFDForce_ << endl;
+
+    particleCloud_.checkCG(true);
+
     // init force sub model
     setForceSubModels(propsDict_);
 
     // define switches which can be read from dict
     forceSubM(0).setSwitchesList(3,true); // activate search for verbose switch
 
+    //set default switches (hard-coded default = false)
+    //forceSubM(0).setSwitches(XXX,true);
+
     // read those switches defined above, if provided in dict
-    forceSubM(0).readSwitches();
-    particleCloud_.checkCG(true);
+    for (int iFSub=0;iFSub<nrForceSubModels();iFSub++)
+        forceSubM(iFSub).readSwitches();
+
+    // setup required communication
+    for (int iFSub=0;iFSub<nrForceSubModels();iFSub++)
+        forceSubM(iFSub).setupCommunication();
+}
+
+void noDrag::MSinit()
+{
+    // NOTE: all MS related operations need to be performed during init of MS cloud
+    if (particleCloud_.shapeTypeName() == "multisphere" && !particleBased_)
+    {
+        Info << type() << ": activating multisphere mode..." << endl;
+        forceSubM(0).setSwitches(11,true); // this is a MS model
+
+        // re-setup required communication for MS
+        for (int iFSub=0;iFSub<nrForceSubModels();iFSub++)
+            forceSubM(iFSub).setupCommunication();
+    }
 }
 
 
@@ -87,17 +112,33 @@ noDrag::~noDrag()
 
 void noDrag::setForce() const
 {
-    if(forceSubM(0).verbose())
-    {
-        Info << "noDrag::setForce:" << endl;
-        Info << "noDEMForce=" << noDEMForce_ << endl;
-        Info << "keepCFDForce=" << keepCFDForce_ << endl;
-    }
+    if (forceSubM(0).verbose())
+        Info << "noDrag::setForce:"
+             << "  noDEMForce=" << noDEMForce_
+             << "  , keepCFDForce=" << keepCFDForce_
+             << endl;
 
     label cellI=0;
-    for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
+    int idDragExp=0;
+    int idKsl=0;
+    int idUf=0;
+    if (forceSubM(0).ms())
     {
-        cellI = particleCloud_.cellIDs()[index][0];
+        idDragExp=particleCloud_.idDragExpCM();
+        idKsl=particleCloud_.idKslCM();
+        idUf=particleCloud_.idUfCM();
+    }
+    else
+    {
+        idDragExp=particleCloud_.idDragExp();
+        idKsl=particleCloud_.idKsl();
+        idUf=particleCloud_.idUf();
+    }
+
+
+    for (int index = 0;index < particleCloud_.numberOfObjects(particleBased_); index++)
+    {
+        cellI = particleCloud_.cellIDs(particleBased_)[index][0];
         if (cellI > -1) // particle Found
         {
             //==========================
@@ -106,25 +147,28 @@ void noDrag::setForce() const
             //forceSubM(0).partToArray(index,drag,dragExplicit);
             //==========================
             // set force on particle (old code)
-            if(!keepCFDForce_)
+            if (!keepCFDForce_)
             {
-                for(int j=0;j<3;j++)
+                for (int j=0;j<3;j++)
                 {
                     expForces()[index][j] = 0.;
                     impForces()[index][j] = 0.;
                 }
             }
-            if(noDEMForce_)
+            if (noDEMForce_)
             {
-                for(int j=0;j<3;j++) DEMForces()[index][j] = 0.;
-                if(particleCloud_.impDEMdrag())
+                for (int j=0;j<3;j++)
+                    particleCloud_.fieldsToDEM[idDragExp][index][j] = 0.;
+
+                if (particleCloud_.impDEMdrag())
                 {
-                    Cds()[index][0] = 0.;
-                    for(int j=0;j<3;j++) fluidVel()[index][j] = 0.;
+                    particleCloud_.fieldsToDEM[idKsl][index][0] = 0.;
+                    for (int j=0;j<3;j++)
+                        particleCloud_.fieldsToDEM[idUf][index][j] = 0.;
                 }
             }
             //==========================
-        }        
+        }
     }
 }
 

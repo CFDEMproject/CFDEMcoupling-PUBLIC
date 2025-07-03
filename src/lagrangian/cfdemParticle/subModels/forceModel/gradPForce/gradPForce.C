@@ -62,9 +62,9 @@ gradPForce::gradPForce
 :
     forceModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
-    pFieldName_(propsDict_.lookup("pFieldName")),
+    pFieldName_(propsDict_.lookupOrDefault<word>("pFieldName","p")),
     p_(sm.mesh().lookupObject<volScalarField> (pFieldName_)),
-    velocityFieldName_(propsDict_.lookup("velocityFieldName")),
+    velocityFieldName_(propsDict_.lookupOrDefault<word>("velocityFieldName","U")),
     U_(sm.mesh().lookupObject<volVectorField> (velocityFieldName_)),
     useRho_(false),
     useU_(false),
@@ -72,38 +72,6 @@ gradPForce::gradPForce
 {
     // block gradPForceModel for type B
     if (modelType_ == "B") FatalError <<"using  model gradPForce with model type B is not valid\n" << abort(FatalError);
-
-    // init force sub model
-    setForceSubModels(propsDict_);
-
-    // define switches which can be read from dict
-    forceSubM(0).setSwitchesList(0,true); // activate search for treatForceExplicit switch
-    forceSubM(0).setSwitchesList(3,true); // activate search for verbose switch
-    forceSubM(0).setSwitchesList(4,true);   // activate search for interpolate switch
-
-    //set default switches (hard-coded default = false)
-    forceSubM(0).setSwitches(0,true);       // make treatForceExplicit=true the default (is desired, otherwise this force would be implicit in slip vel!)
-    if (modelType_ == "Bfull")              // type Bfull
-        forceSubM(0).setSwitches(1,false);  // treatForceDEM = false
-    else                                    // type A
-        forceSubM(0).setSwitches(1,true);   // treatForceDEM = true
-
-    // read user defined switches
-    for (int iFSub=0;iFSub<nrForceSubModels();iFSub++)
-        forceSubM(iFSub).readSwitches();
-
-    if (propsDict_.found("useU")) useU_=true;
-    if (propsDict_.found("useAddedMass")) 
-    {
-        addedMassCoeff_ =  readScalar(propsDict_.lookup("useAddedMass"));
-        Info << "gradP will also include added mass with coefficient: " << addedMassCoeff_ << endl;
-        Info << "WARNING: use fix nve/sphere/addedMass in LIGGGHTS input script to correctly account for added mass effects!" << endl;
-    }
-
-    if(p_.dimensions()==dimensionSet(0,2,-2,0,0))
-        useRho_ = true;
-
-    particleCloud_.checkCG(true);
 
     // suppress particle probe
     if (probeIt_ && propsDict_.found("suppressProbe"))
@@ -116,6 +84,44 @@ gradPForce::gradPForce
         particleCloud_.probeM().scalarFields_.append("rho");
         particleCloud_.probeM().writeHeader();
     }
+
+    particleCloud_.checkCG(true);
+
+    // init force sub model
+    setForceSubModels(propsDict_);
+
+    // define switches which can be read from dict
+    forceSubM(0).setSwitchesList(0,true); // activate treatExplicit switch
+    forceSubM(0).setSwitchesList(3,true); // activate search for verbose switch
+    forceSubM(0).setSwitchesList(4,true); // activate search for interpolate switch
+
+    //set default switches (hard-coded default = false)
+    forceSubM(0).setSwitches(0,true);       // make treatForceExplicit=true the default (is desired, otherwise this force would be implicit in slip vel!)
+    if (modelType_ == "Bfull")              // type Bfull
+        forceSubM(0).setSwitches(1,false);  // treatForceDEM = false
+    else                                    // type A
+        forceSubM(0).setSwitches(1,true);   // treatForceDEM = true
+
+    // read those switches defined above, if provided in dict
+    for (int iFSub=0;iFSub<nrForceSubModels();iFSub++)
+        forceSubM(iFSub).readSwitches();
+
+    // setup required communication
+    for (int iFSub=0;iFSub<nrForceSubModels();iFSub++)
+        forceSubM(iFSub).setupCommunication();
+
+    if (propsDict_.found("useU")) useU_=true;
+    if (propsDict_.found("useAddedMass")) 
+    {
+        addedMassCoeff_ =  readScalar(propsDict_.lookup("useAddedMass"));
+        Info << "gradP will also include added mass with coefficient: " << addedMassCoeff_ << endl;
+        Info << "WARNING: use fix nve/sphere/addedMass in LIGGGHTS input script to correctly account for added mass effects!" << endl;
+    }
+
+    if(p_.dimensions()==dimensionSet(0,2,-2,0,0))
+        useRho_ = true;
+
+    particleCloud_.registryM().addProperty("gradPpFieldName_"+pFieldName_,0.);
 }
 
 
@@ -145,62 +151,62 @@ void gradPForce::setForce() const
     vector position;
     vector force;
     label cellI;
+    scalar rs(0);
+    const scalar  fourPiByThree(4./3.*M_PI);
 
     #include "resetGradPInterpolator.H"
     #include "setupProbeModel.H"
 
     for(int index = 0;index <  particleCloud_.numberOfParticles(); index++)
     {
-        //if(mask[index][0])
-        //{
-            force=vector(0,0,0);
-            cellI = particleCloud_.cellIDs()[index][0];
+        force=vector(0,0,0);
+        cellI = particleCloud_.cfdemCloud::cellIDs()[index][0];
 
-            if (cellI > -1) // particle Found
+        if (cellI > -1) // particle Found
+        {
+            position = particleCloud_.cfdemCloud::position(index);
+            rs = particleCloud_.radius(index);
+
+            if(forceSubM(0).interpolation()) // use intepolated values for alpha (normally off!!!)
             {
-                position = particleCloud_.position(index);
-
-                if(forceSubM(0).interpolation()) // use intepolated values for alpha (normally off!!!)
-                {
-                    gradP = gradPInterpolator_().interpolate(position,cellI);
-                }else
-                {
-                    gradP = gradP_[cellI];
-                }
-
-                Vs = particleCloud_.particleVolume(index);
-                rho = forceSubM(0).rhoField()[cellI];
-
-                // calc particle's pressure gradient force
-                if (useRho_)
-                    force = -Vs*gradP*rho*(1.0+addedMassCoeff_);
-                else
-                    force = -Vs*gradP*(1.0+addedMassCoeff_);
-
-                if(forceSubM(0).verbose() && index >=0 && index <2)
-                {
-                    Info << "index = " << index << endl;
-                    Info << "gradP = " << gradP << endl;
-                    Info << "force = " << force << endl;
-                }
-
-                //Set value fields and write the probe
-                if(probeIt_)
-                {
-                    #include "setupProbeModelfields.H"
-                    // Note: for other than ext one could use vValues.append(x)
-                    // instead of setSize
-                    vValues.setSize(vValues.size()+1, force);           //first entry must the be the force
-                    sValues.setSize(sValues.size()+1, Vs);
-                    sValues.setSize(sValues.size()+1, rho);
-                    particleCloud_.probeM().writeProbe(index, sValues, vValues);
-                }
+                gradP = gradPInterpolator_().interpolate(position,cellI);
+            }else
+            {
+                gradP = gradP_[cellI];
             }
 
-            // write particle based data to global array
-            forceSubM(0).partToArray(index,force,vector::zero);
+            Vs = particleCloud_.cfdemCloud::particleVolume(index);
+            //Vs = rs*rs*rs*fourPiByThree; //change Vs calc to this after TH is clean!
+            rho = forceSubM(0).rhoField()[cellI];
 
-        //}
+            // calc particle's pressure gradient force
+            if (useRho_)
+                force = -Vs*gradP*rho*(1.0+addedMassCoeff_);
+            else
+                force = -Vs*gradP*(1.0+addedMassCoeff_);
+
+            if(forceSubM(0).verbose() && index >=0 && index <2)
+            {
+                Info << "index = " << index << endl;
+                Info << "gradP = " << gradP << endl;
+                Info << "force = " << force << endl;
+            }
+
+            //Set value fields and write the probe
+            if(probeIt_)
+            {
+                #include "setupProbeModelfields.H"
+                // Note: for other than ext one could use vValues.append(x)
+                // instead of setSize
+                vValues.setSize(vValues.size()+1, force);           //first entry must the be the force
+                sValues.setSize(sValues.size()+1, Vs);
+                sValues.setSize(sValues.size()+1, rho);
+                particleCloud_.probeM().writeProbe(index, sValues, vValues);
+            }
+        }
+
+        // write particle based data to global array
+        forceSubM(0).partToArray(index,force,vector::zero);
     }
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

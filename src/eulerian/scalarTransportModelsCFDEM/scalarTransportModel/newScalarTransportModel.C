@@ -81,7 +81,11 @@ autoPtr<scalarTransportModel> scalarTransportModel::New
             << abort(FatalError);
     }
 
-    return autoPtr<scalarTransportModel>(cstrIter()(tempDict,sm));
+    autoPtr<scalarTransportModel> h(cstrIter()(tempDict,sm));
+
+    sm.registryM().addProperty("scalarTransportModel_"+h().type()+"_index", 0);
+
+    return h;
 }
 
 

@@ -60,7 +60,6 @@ class ArchimedesIB
     public forceModel
 {
 private:
-
     dictionary propsDict_;
 
     bool twoDimensional_;

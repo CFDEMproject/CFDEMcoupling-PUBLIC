@@ -29,10 +29,11 @@ Description
     and OpenFOAM(R). Note: this code is not part of OpenFOAM(R) (see DISCLAIMER).
 \*---------------------------------------------------------------------------*/
 
-#include "error.H"
-
 #include "twoWayFiles.H"
 #include "addToRunTimeSelectionTable.H"
+#include "error.H"
+
+#include <cstring>
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -87,8 +88,7 @@ const char* twoWayFiles::wordToChar(word& inWord) const
 
 const char* twoWayFiles::fileNameToChar(fileName& inWord) const
 {
-    string HH = string(inWord);
-    return HH.c_str();
+    return const_cast<char*>(inWord.c_str());
 }
 
 fileName twoWayFiles::getFilePath(word& name, bool in) const

@@ -90,7 +90,7 @@ void temperatureModel::update()
     const surfaceScalarField& phi(particleCloud_.mesh().lookupObject<surfaceScalarField> ("phi"));
     const volScalarField& voidfraction(particleCloud_.mesh().lookupObject<volScalarField> ("voidfraction"));
     //==============================
-    temperatureField_->update(phi, voidfraction, particleCloud_.turbulence().nuEff(), PrT_);
+    temperatureField_->update(phi, voidfraction, particleCloud_.turbulence_.nuEff(), PrT_);
 
 }
 

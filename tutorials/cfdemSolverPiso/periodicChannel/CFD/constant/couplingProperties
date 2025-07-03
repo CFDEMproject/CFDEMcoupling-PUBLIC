@@ -53,6 +53,7 @@ forceModels
     KochHillDrag
     gradPForce
     viscForce
+    Archimedes
 );
 
 momCoupleModels
@@ -68,30 +69,25 @@ turbulenceModelType turbulenceProperties;//"LESProperties";//OFversion30x
 
 implicitCoupleProps
 {
-    velFieldName "U";
-    granVelFieldName "Us";
-    voidfractionFieldName "voidfraction";
 }
 
 gradPForceProps
 {
-    pFieldName "p";
-    voidfractionFieldName "voidfraction";
-    velocityFieldName "U";
     interpolation true;
 }
 
 viscForceProps
 {
-    velocityFieldName "U";
     interpolation true;
+}
+
+ArchimedesProps
+{
 }
 
 KochHillDragProps
 {
-    velFieldName "U";
     rhoParticle 1500;
-    voidfractionFieldName "voidfraction";
     interpolation true;
 }
 
@@ -102,8 +98,6 @@ engineProps
 
 dividedProps
 {
-    alphaMin 0.1;
-    scaleUpVol 1.0;
 }
 
 twoWayMPIProps

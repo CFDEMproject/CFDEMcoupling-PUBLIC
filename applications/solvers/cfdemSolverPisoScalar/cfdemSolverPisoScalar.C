@@ -44,12 +44,13 @@ Description
 #else
     #include "turbulenceModel.H"
 #endif
+#if defined(version60)
+#include "noRadiation.H"
+#else
 #include "radiationModel.H"
+#endif
 #include "fixedFluxPressureFvPatchScalarField.H"
 #include "cfdemCloud.H"
-#if defined(anisotropicRotation)
-    #include "cfdemCloudRotation.H"
-#endif
 #include "implicitCouple.H"
 #include "clockModel.H"
 #include "smoothingModel.H"
@@ -73,12 +74,17 @@ int main(int argc, char *argv[])
     // create cfdemCloud
     #include "readGravitationalAcceleration.H"
     #include "checkImCoupleM.H"
-    #if defined(anisotropicRotation)
-        cfdemCloudRotation particleCloud(mesh);
-    #else
-        cfdemCloud particleCloud(mesh);
-    #endif
+    cfdemCloud particleCloud(mesh);
     #include "checkModelType.H"
+
+    // get ref to tempExchange models
+    labelList tempExchangeModels(0);
+    label id(particleCloud.registryM().getProperty("LaEuScalarTemp_index"));
+    if(id>=0) tempExchangeModels.append(id);
+    id = particleCloud.registryM().getProperty("LaEuScalarRadiation_index");
+    if(id>=0) tempExchangeModels.append(id);
+    // check ordering tempExchange models
+    if(tempExchangeModels.size() > 1 && tempExchangeModels[0]>tempExchangeModels[1]) FatalError <<"Please use correct order of forceModels: LaEuScalarTemp before LaEuScalarRadiation."<< abort(FatalError);
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
     Info<< "\nStarting time loop\n" << endl;
@@ -101,11 +107,11 @@ int main(int argc, char *argv[])
         particleCloud.clockM().start(2,"Coupling");
         bool hasEvolved = particleCloud.evolve(voidfraction,Us,U);
 
-        if(hasEvolved)
+        if(hasEvolved && particleCloud.solveFlow())
         {
             particleCloud.smoothingM().smoothenAbsolutField(particleCloud.forceM(0).impParticleForces());
         }
-    
+
         Info << "update Ksl.internalField()" << endl;
         Ksl = particleCloud.momCoupleM(particleCloud.registryM().getProperty("implicitCouple_index")).impMomSource();
         Ksl.correctBoundaryConditions();
@@ -116,15 +122,9 @@ int main(int argc, char *argv[])
         //Force Checks
         #include "forceCheckIm.H"
 
-        #include "solverDebugInfo.H"
         particleCloud.clockM().stop("Coupling");
 
         particleCloud.clockM().start(26,"Flow");
-
-        // get scalar source from DEM        
-        particleCloud.forceM(1).manipulateScalarField(Tsource);
-        Tsource.correctBoundaryConditions();
-        particleCloud.forceM(1).commToDEM();
 
         // solve scalar transport equation
         {
@@ -194,7 +194,7 @@ int main(int argc, char *argv[])
                             + rUAfvoidfraction*fvc::ddtCorr(U, phiByVoidfraction);
                     #else
                         phi = ( fvc::interpolate(U) & mesh.Sf() )
-                            + fvc::ddtPhiCorr(rUAvoidfraction, U, phiByVoidfraction);
+                            + rUAfvoidfraction*fvc::ddtCorr(U, phiByVoidfraction);
                     #endif
                     surfaceScalarField phiS(fvc::interpolate(Us) & mesh.Sf());
                     phi += rUAf*(fvc::interpolate(Ksl/rho) * phiS);
@@ -203,7 +203,7 @@ int main(int argc, char *argv[])
                         rUAvoidfraction = volScalarField("(voidfraction2|A(U))",rUA*voidfraction*voidfraction);
 
                     // Update the fixedFluxPressure BCs to ensure flux consistency
-                    #include "fixedFluxPressureHandling.H"                    
+                    #include "fixedFluxPressureHandling.H"
 
                     // Non-orthogonal pressure corrector loop
                     #if defined(version30)

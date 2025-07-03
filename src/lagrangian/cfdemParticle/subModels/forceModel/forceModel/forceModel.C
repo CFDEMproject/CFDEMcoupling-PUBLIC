@@ -85,14 +85,7 @@ forceModel::forceModel
     ),
     modelType_(sm.modelType()),
     probeIt_(sm.probeM().active()),
-    requiresEx_(false),
-    requiresShape_(false),
-    requiresQuaternion_(false),
-    requiresSuperquadric_(false),
-    pullPushRotation_(false),
-    implicitDrag_(false),
-    implicitAnisotropicDrag_(false),
-    implicitRotation_(false),
+    particleBased_(dict.lookupOrDefault<Switch>("particleBased", false)),
     forceSubModels_(0),
     forceSubModel_(new autoPtr<forceSubModel>[nrForceSubModels()]),
     voidfractionInterpolator_(NULL),
@@ -114,7 +107,10 @@ forceModel::forceModel
     gradPsolidInterpolator_(NULL),
     shearRateInterpolator_(NULL),
     DDtUInterpolator_(NULL),
-    divTauInterpolator_(NULL)
+    divTauInterpolator_(NULL),
+    RhoInterpolator_(NULL),
+    kInterpolator_(NULL),
+    epsilonInterpolator_(NULL)
 {}
 
 
@@ -134,35 +130,6 @@ void Foam::forceModel::applyDebugSettings(bool debug) const
     }
 }
 
-/*tmp<volScalarField> forceModel::provideScalarField()
-{
-Info << "now providing a scalar field" << endl;
-    tmp<volScalarField> tsource
-    (
-        new volScalarField
-        (
-            IOobject
-            (
-                "xxx",
-                particleCloud_.mesh().time().timeName(),
-                particleCloud_.mesh(),
-                IOobject::NO_READ,
-                IOobject::NO_WRITE
-            ),
-            particleCloud_.mesh(),
-            dimensionedScalar
-            (
-                "zero",
-                dimensionSet(0,0,0,0,0),
-                0.0
-            )
-        )
-    );
-
-    manipulateScalarField(tsource());
-    return tsource;
-};*/
-
 //Function for to add turbulence due to multiphase interaction
 void forceModel::multiphaseTurbulence(volScalarField& field, bool) const
 {
@@ -170,33 +137,13 @@ void forceModel::multiphaseTurbulence(volScalarField& field, bool) const
     field     *= 0.0;
 }
 
-//Function for simple explicit treatment of coupling terms, only for temperature
-void forceModel::manipulateScalarField(volScalarField& field) const
-{
-    // just return zero
-    field     *= 0.0;
-}
-
-//Function for explicit or implicit treatment of coupling terms, for heat and species balance equations
-void forceModel::manipulateScalarField(volScalarField& field, volScalarField& fieldImpl, int speciesID) const
-{
-    // just return zero
-    field     *= 0.0;
-    fieldImpl *= 0.0;
-}
-
-//Function for return particle based data to DEM
-void forceModel::commToDEM() const
-{
-    // do noting.
-}
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 void forceModel::repartitionImExForces() const
 {
   if(particleCloud_.imExSplitFactor()<1.0)
   {
-    Info << "Will re-partition split of implicit and explicit forces: alpha = " 
+    Info << "Will re-partition split of implicit and explicit forces: alpha = "
          << particleCloud_.imExSplitFactor() << endl;
     // Update implicit particle
     expParticleForces_ += (1.0-particleCloud_.imExSplitFactor())*impParticleForces_;
@@ -229,13 +176,43 @@ void forceModel::setForceSubModels(dictionary& dict)
     if (dict.found("forceSubModels"))
     {
         forceSubModels_ = wordList(dict.lookup("forceSubModels"));
+        if(forceSubModels_.size()==0) // empty list found
+        {
+            Info << " Found empty list of forceSubModels - setting to default forceSubModel ImEx" << endl;
+            forceSubModels_.setSize(1, "ImEx");
+        }
+        else
+        {
+            // check if an ImEx model is there
+            bool foundImEx=false;
+            forAll(forceSubModels_,i)
+            {
+                if(forceSubModels_[i]=="ImEx" || forceSubModels_[i]=="ImExCorr" || forceSubModels_[i]=="ImExDipole" || forceSubModels_[i]=="ImExFibre") foundImEx=true;
+            }
+
+            if(!foundImEx) // add ImEx if none found
+            {
+                Info << " Adding the default forceSubModel ImEx on top of your selection (as first model)." << endl;
+                wordList h(0);
+                h.setSize(1, "ImEx");
+                h.append(forceSubModels_);
+                forceSubModels_=h;
+            }
+
+            if(forceSubModels_.size()>1)
+            {
+               Warning << " You are using more than one forceSubModel: "
+                        << forceSubModels_ <<"Make sure all operations can be superposed.\n" << endl;
+            }
+        }
     }
     else if (dict.found("forceSubModel"))
     {
         FatalError << "Did you mean the forceSubModels keyword? " << abort(FatalError);
     }
-    else
+    else // use ImEx as default forceSubModel if nothing is specifed
     {
+        Info << " No forceSubModel specified - setting to default forceSubModel ImEx." << endl;
         forceSubModels_.setSize(1, "ImEx");
     }
 
@@ -250,6 +227,29 @@ void forceModel::setForceSubModels(dictionary& dict)
             *this,
             forceSubModels_[i]
         );
+        particleCloud_.registryM().addProperty(type()+"_"+forceSubModel_[i]().type()+"_index",i);
+    }
+}
+
+void forceModel::readDHcorr(dictionary& dict)
+{
+    scalarList DHc(dict.lookup("DHc"));
+    particleCloud_.setDHc(DHc);
+}
+
+void forceModel::readArea(dictionary& dict)
+{
+    scalarList area(dict.lookup("area"));
+    particleCloud_.setArea(area);
+
+    if(forceSubM(0).verbose() && area.size() > 0 &&  forceSubM(0).getCG()>1)
+    {
+        Warning << "\n\n==============================================================================\n"
+         << "       ! ! !  W A R N I N G  ! ! !\n"
+         << "  You specified area and coarse graining is active - take care you specify\n"
+         << "  area for the coarse grained particles!\n" 
+         << "       ! ! !  W A R N I N G  ! ! !\n"
+         << "==============================================================================\n\n" << endl;
     }
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -125,7 +125,8 @@ mkdir -p $logDir
                 echo "compile $LINE"
                 cd $CFDEM_POEMSLIB_PATH
                 make -f Makefile.g++ clean 2>&1 | tee -a $logpath/$logfileName
-                make -j $nProc -f Makefile.g++ lib 2>&1 | tee -a $logpath/$logfileName
+                #make -j $nProc -f Makefile.g++ lib 2>&1 | tee -a $logpath/$logfileName # I do not see where nProc would be defined here, so let us compile in serial here
+                make -f Makefile.g++ lib 2>&1 | tee -a $logpath/$logfileName
                 cd $path
             fi
 

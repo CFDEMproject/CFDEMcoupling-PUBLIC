@@ -70,7 +70,7 @@ void averagingModel::undoVectorAverage
         for(int subCell=0;subCell<particleCloud_.cellsPerParticle()[index][0];subCell++)
         {
             //Info << "subCell=" << subCell << endl;
-            cellI = particleCloud_.cellIDs()[index][subCell];
+            cellI = particleCloud_.cfdemCloud::cellIDs()[index][subCell];
 
             if (cellI >= 0)
             {
@@ -109,7 +109,7 @@ void averagingModel::undoVectorSum
         for(int subCell=0;subCell<particleCloud_.cellsPerParticle()[index][0];subCell++)
         {
             //Info << "subCell=" << subCell << endl;
-            cellI = particleCloud_.cellIDs()[index][subCell];
+            cellI = particleCloud_.cfdemCloud::cellIDs()[index][subCell];
 
             if (cellI >= 0)
             {
@@ -141,7 +141,7 @@ void averagingModel::setVectorSum
     {
             for(int subCell=0;subCell<particleCloud_.cellsPerParticle()[index][0];subCell++)
             {
-                cellI = particleCloud_.cellIDs()[index][subCell];
+                cellI = particleCloud_.cfdemCloud::cellIDs()[index][subCell];
 
                 if (cellI >= 0)
                 {
@@ -171,7 +171,7 @@ void averagingModel::setVectorSumSimple
 
     for(int index=0; index< nP; index++)
     {
-        cellI = particleCloud_.cellIDs()[index][subCell];
+        cellI = particleCloud_.cfdemCloud::cellIDs()[index][subCell];
 
         if (cellI >= 0)
         {
@@ -204,7 +204,7 @@ void averagingModel::setScalarSum
             for(int subCell=0;subCell<particleCloud_.cellsPerParticle()[index][0];subCell++)
             {
                 //Info << "subCell=" << subCell << endl;
-                cellI = particleCloud_.cellIDs()[index][subCell];
+                cellI = particleCloud_.cfdemCloud::cellIDs()[index][subCell];
 
                 if (cellI >= 0)
                 {
@@ -263,7 +263,7 @@ void averagingModel::setDSauter
         for(int subCell=0;subCell<particleCloud_.cellsPerParticle()[index][0];subCell++)
         {
 
-            cellI = particleCloud_.cellIDs()[index][subCell];
+            cellI = particleCloud_.cfdemCloud::cellIDs()[index][subCell];
             if (cellI >= 0)
             {
                 // first entry in this cell
@@ -311,7 +311,7 @@ void Foam::averagingModel::undoWeightFields(double**const& mask) const
         //if(mask[index][0])
         //{
             // undo voidfraction cause by particle
-            label cellI = particleCloud_.cellIDs()[index][0];
+            label cellI = particleCloud_.cfdemCloud::cellIDs()[index][0];
             UsWeightField_[cellI] -= particleCloud_.particleWeights()[index][0];
         //}
     }

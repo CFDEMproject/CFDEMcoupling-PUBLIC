@@ -98,7 +98,7 @@ int basicIO::dumpDEMdata() const
         // calc the number of particles on proc
         int count(0);
         for(int index = 0;index < particleCloud_.numberOfParticles(); ++index)
-            if (particleCloud_.cellIDs()[index][0] > -1) count++;
+            if (particleCloud_.cfdemCloud::cellIDs()[index][0] > -1) count++;
         nPProc_=count;
         
         // stream data to file

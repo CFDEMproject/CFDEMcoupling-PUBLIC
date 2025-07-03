@@ -80,25 +80,25 @@ compileLib()
                 echo "Please make sure to have the incompressible libraries first in the library-list.txt!"
                 cd $CFDEM_SRC_DIR/lagrangian/cfdemParticle
                 echo "changing to $PWD"
-                if [[ $WM_PROJECT_VERSION == dev || $WM_PROJECT_VERSION == 3.0.* || $WM_PROJECT_VERSION == 4.*  || $WM_PROJECT_VERSION == 5.* ]]; then
-                    wrmdep 2>&1 | tee -a $logpath/$logfileName
-                else
+                if [[ $WM_PROJECT_VERSION == v1606+ || $WM_PROJECT_VERSION == v1612+ || $WM_PROJECT_VERSION == v1706 || $WM_PROJECT_VERSION == 2.4.* || ($WM_PROJECT_VERSION == "3.2" && $WM_FORK == "extend") ]]; then
                     rmdepall 2>&1 | tee -a $logpath/$logfileName
+                else
+                    wrmdep 2>&1 | tee -a $logpath/$logfileName
                 fi
                 cd $casePath
                 echo "changing to $PWD"
             else
                 echo "Compiling a incompressible library."
         fi
-        if [[ $WM_PROJECT_VERSION == dev || $WM_PROJECT_VERSION == 3.0.* || $WM_PROJECT_VERSION == 4.*  || $WM_PROJECT_VERSION == 5.* ]]; then
-            wrmdep 2>&1 | tee -a $logpath/$logfileName
-        else
+        if [[ $WM_PROJECT_VERSION == v1606+ || $WM_PROJECT_VERSION == v1612+ || $WM_PROJECT_VERSION == v1706 || $WM_PROJECT_VERSION == 2.4.* || ($WM_PROJECT_VERSION == "3.2" && $WM_FORK == "extend") ]]; then
             rmdepall 2>&1 | tee -a $logpath/$logfileName
+        else
+            wrmdep 2>&1 | tee -a $logpath/$logfileName
         fi
         wclean 2>&1 | tee -a $logpath/$logfileName
         rm -r $casePath/Make/cfdemParticle
     #fi
-    wmake libso 2>&1 | tee -a $logpath/$logfileName
+        wmake libso 2>&1 | tee -a $logpath/$logfileName
 
     if [ ${PIPESTATUS[0]} -ne 0 ]; then 
         return 1
@@ -147,10 +147,10 @@ compileSolver()
     else
         #- wclean and wmake
         #if [ $doClean != "noClean" ]; then
-            if [[ $WM_PROJECT_VERSION == dev || $WM_PROJECT_VERSION == 3.0.* || $WM_PROJECT_VERSION == 4.*  || $WM_PROJECT_VERSION == 5.* ]]; then
-                wrmdep 2>&1 | tee -a $logpath/$logfileName
-            else
+            if [[ $WM_PROJECT_VERSION == v1606+ || $WM_PROJECT_VERSION == v1612+ || $WM_PROJECT_VERSION == v1706 || $WM_PROJECT_VERSION == 2.4.* || ($WM_PROJECT_VERSION == "3.2" && $WM_FORK == "extend") ]]; then
                 rmdepall 2>&1 | tee -a $logpath/$logfileName
+            else
+                wrmdep 2>&1 | tee -a $logpath/$logfileName
             fi
             wclean 2>&1 | tee -a $logpath/$logfileName
         #fi
@@ -267,73 +267,80 @@ compileLMPlib()
         LIG_COMP_FLAGS="${LIG_COMP_FLAGS} debug=FULL"
     fi
 
-    # Fallback if $makeFileName does not exist
-    if [[ ! -f "${makeFileName}" ]]; then
-      echo "WARNING: userdefined Makefile ${makeFileName} cannot be found in ${libraryPath}, using default Makefile.mpi"
-      makeFileName="Makefile.mpi"
-    fi
 
-    #Just check if library is there and and abort if not
-    if [[ $compilationModeSwitch == "false" ]]; then
-          if [ -d "$libraryPath" ]; then
-                    echo "lib path $libraryPath EXISTS!"
-                    libraries=$(ls ${libraryPath}/*.a 2> /dev/null | wc -l)
-                    if [[ $libraries != "0" ]]; then
-                        echo "... and contains the following libraries: "
-                        ls $libraryPath/*.a
-                        echo "Congratulations! Check passed! "
-                    else
-                        echo ""
-                        echo "ERROR!!"
-                        echo "... could not find Library!"
-                        echo "... it should contain a *.a file to be linked to the final application."
-                        echo "You need to ensure all libaries in this path are compiled."
-                        echo "$libraryPath"
-                        echo "are compiled. Therefore, you may want to use an appropriate script that compiles these libraries first. (e.g. cfdemCompLIGlibs)"
-                        read
-                    fi
-          fi
+    # check if compilation of library should be done with a separate script
+    if [[ $makeFileName == "Makefile.script" ]]; then
+        echo "use script to complile..."
+        ./compileMe.sh
     else
-        if [[ $compilationModeSwitch == "noClean" ]]; then
-            echo "compileLMPlib will skip the cleaning step!"
-            echo ""
-        else
-            #Clean and then compile library
-            #- clean up old log file
-            rm $logpath/$logfileName
+        # Fallback if $makeFileName does not exist
+        if [[ ! -f "${makeFileName}" ]]; then
+          echo "WARNING: userdefined Makefile ${makeFileName} cannot be found in ${libraryPath}, using default Makefile.mpi"
+          makeFileName="Makefile.mpi"
         fi
-        #- header
-        echo 2>&1 | tee -a $logpath/$logfileName
-        echo "//   $headerText   //" 2>&1 | tee -a $logpath/$logfileName
-        echo 2>&1 | tee -a $logpath/$logfileName
 
-        #- write path
-        pwd 2>&1 | tee -a $logpath/$logfileName
-        echo 2>&1 | tee -a $logpath/$logfileName
-
-        if [[ $makeFileName == "Makefile.Install" ]]; then
-            echo "using Install.sh"
-            bash Install.sh 0 2>&1 | tee -a $logpath/$logfileName
-            bash Install.sh 1 2>&1 | tee -a $logpath/$logfileName
+        #Just check if library is there and and abort if not
+        if [[ $compilationModeSwitch == "false" ]]; then
+              if [ -d "$libraryPath" ]; then
+                        echo "lib path $libraryPath EXISTS!"
+                        libraries=$(ls ${libraryPath}/*.a 2> /dev/null | wc -l)
+                        if [[ $libraries != "0" ]]; then
+                            echo "... and contains the following libraries: "
+                            ls $libraryPath/*.a
+                            echo "Congratulations! Check passed! "
+                        else
+                            echo ""
+                            echo "ERROR!!"
+                            echo "... could not find Library!"
+                            echo "... it should contain a *.a file to be linked to the final application."
+                            echo "You need to ensure all libaries in this path are compiled."
+                            echo "$libraryPath"
+                            echo "are compiled. Therefore, you may want to use an appropriate script that compiles these libraries first. (e.g. cfdemCompLIGlibs)"
+                            read
+                        fi
+              fi
         else
             if [[ $compilationModeSwitch == "noClean" ]]; then
                 echo "compileLMPlib will skip the cleaning step!"
                 echo ""
             else
-                #- clean up
-                echo "make clean" 2>&1 | tee -a $logpath/$logfileName
-                echo 2>&1 | tee -a $logpath/$logfileName
-                make -f $makeFileName clean 2>&1 | tee -a $logpath/$logfileName
+                #Clean and then compile library
+                #- clean up old log file
+                rm $logpath/$logfileName
             fi
-
-            #- compile
-            echo "compiling LIB with ${LIG_COMP_FLAGS}"
-            echo "make" 2>&1 | tee -a $logpath/$logfileName
+            #- header
             echo 2>&1 | tee -a $logpath/$logfileName
-            make -f $makeFileName ${LIG_COMP_FLAGS} 2>&1 | tee -a $logpath/$logfileName
+            echo "//   $headerText   //" 2>&1 | tee -a $logpath/$logfileName
+            echo 2>&1 | tee -a $logpath/$logfileName
 
-            if [ ${PIPESTATUS[0]} -ne 0 ]; then 
-                return 1
+            #- write path
+            pwd 2>&1 | tee -a $logpath/$logfileName
+            echo 2>&1 | tee -a $logpath/$logfileName
+
+            if [[ $makeFileName == "Makefile.Install" ]]; then
+                echo "using Install.sh"
+                bash Install.sh 0 2>&1 | tee -a $logpath/$logfileName
+                bash Install.sh 1 2>&1 | tee -a $logpath/$logfileName
+            else
+                if [[ $compilationModeSwitch == "noClean" ]]; then
+                    echo "compileLMPlib will skip the cleaning step!"
+                    echo ""
+                else
+                    #- clean up
+                    echo "make clean" 2>&1 | tee -a $logpath/$logfileName
+                    echo 2>&1 | tee -a $logpath/$logfileName
+                    make -f $makeFileName clean 2>&1 | tee -a $logpath/$logfileName
+                fi
+
+                #- compile
+                echo "compiling LIB with ${LIG_COMP_FLAGS}"
+                echo "make" 2>&1 | tee -a $logpath/$logfileName
+                echo 2>&1 | tee -a $logpath/$logfileName
+                make -f $makeFileName ${LIG_COMP_FLAGS} 2>&1 | tee -a $logpath/$logfileName
+
+                if [ ${PIPESTATUS[0]} -ne 0 ]; then 
+                    return 1
+                fi
             fi
         fi
     fi
@@ -386,10 +393,10 @@ cleanCFDEM()
 
             cd  $path
             echo "cleaning library $PWD"
-            if [[ $WM_PROJECT_VERSION == dev || $WM_PROJECT_VERSION == 3.0.* || $WM_PROJECT_VERSION == 4.* || $WM_PROJECT_VERSION == 5.* ]]; then
-                wrmdep
-            else
+            if [[ $WM_PROJECT_VERSION == v1606+ || $WM_PROJECT_VERSION == v1612+ || $WM_PROJECT_VERSION == v1706 || $WM_PROJECT_VERSION == 2.4.* || ($WM_PROJECT_VERSION == "3.2" && $WM_FORK == "extend") ]]; then
                 rmdepall
+            else
+                wrmdep
             fi
             wclean    
             rm -r ./Make/linux*
@@ -444,10 +451,10 @@ cleanCFDEM()
 
             cd  $path            
             echo "cleaning solver $PWD"
-            if [[ $WM_PROJECT_VERSION == dev || $WM_PROJECT_VERSION == 3.0.* || $WM_PROJECT_VERSION == 4.* || $WM_PROJECT_VERSION == 5.* ]]; then
-                wrmdep
-            else
+            if [[ $WM_PROJECT_VERSION == v1606+ || $WM_PROJECT_VERSION == v1612+ || $WM_PROJECT_VERSION == v1706 || $WM_PROJECT_VERSION == 2.4.* || ($WM_PROJECT_VERSION == "3.2" && $WM_FORK == "extend") ]]; then
                 rmdepall
+            else
+                wrmdep
             fi
             wclean    
     done
@@ -479,7 +486,7 @@ cleanCFDEMcase()
         echo "keeping CFD mesh files"
         cp -r constant/polyMesh constant/polyMesh_backup
         cleanCase
-        mv constant/polyMesh_backup/* constant/polyMesh
+        mv constant/polyMesh_backup constant/polyMesh
         rm -r constant/polyMesh_backup
     else
         echo "deleting CFD mesh files"
@@ -497,6 +504,7 @@ cleanCFDEMcase()
     rm -r $casePath/CFD/tmp.balance
     rm $casePath/CFD/callgrind.out.*
     rm -r $casePath/CFD/hpctoolkit-*
+    rm -r $casePath/CFD/warnings.liggghts
     rm  $casePath/log_*
     #DEM
     rm $casePath/DEM/post/*
@@ -509,6 +517,7 @@ cleanCFDEMcase()
     touch $casePath/DEM/post/restart/.gitignore
     rm  $casePath/DEM/tmp.lammps.variable
     rm  $casePath/DEM/log*
+    rm  $casePath/DEM/.portOffset.txt
     #ParScale
     rm $casePath/CFD/*.dat
     rm $casePath/CFD/*.pascal
@@ -589,6 +598,21 @@ DEMrun()
 #==================================#
 
 #==================================#
+#- function to detect MPI variant
+
+get_mpirun_cmd()
+{
+    is_openmpi=`mpirun -version | grep "Open MPI" | wc -l`
+    # Open MPI (version > 3) no longer allows oversubscription by default, we do want that though
+    if [[ $is_openmpi == 1 ]]; then
+        echo "mpirun -oversubscribe"
+    else
+        echo "mpirun"
+    fi
+}
+#==================================#
+
+#==================================#
 #- function to run a DEM case in parallel
 
 parDEMrun()
@@ -632,11 +656,14 @@ parDEMrun()
     pwd 2>&1 | tee -a $logpath/$logfileName
     echo 2>&1 | tee -a $logpath/$logfileName
 
+    #- detect mpi variant and set oversubscribe flag if open mpi
+    MPIRUN_CMD=`get_mpirun_cmd`
+
     #- run applictaion
     if [[ $machineFileName == "none" ]]; then
-        mpirun -np $nrProcs $debugMode $CFDEM_LIGGGHTS_EXEC -in $solverName 2>&1 | tee -a $logpath/$logfileName
+        $MPIRUN_CMD -np $nrProcs $debugMode $CFDEM_LIGGGHTS_EXEC -in $solverName 2>&1 | tee -a $logpath/$logfileName
     else
-        mpirun -machinefile $machineFileName -np $nrProcs $debugMode $CFDEM_LIGGGHTS_EXEC -in $solverName 2>&1 | tee -a $logpath/$logfileName
+        $MPIRUN_CMD -machinefile $machineFileName -np $nrProcs $debugMode $CFDEM_LIGGGHTS_EXEC -in $solverName 2>&1 | tee -a $logpath/$logfileName
     fi
 
     #- keep terminal open (if started in new terminal)
@@ -742,11 +769,14 @@ parCFDrun()
     pwd 2>&1 | tee -a $logpath/$logfileName
     echo 2>&1 | tee -a $logpath/$logfileName
 
+    #- detect mpi variant and set oversubscribe flag if open mpi
+    MPIRUN_CMD=`get_mpirun_cmd`
+
     #- run applictaion
     if [[ $machineFileName == "none" ]]; then
-        mpirun -np $nrProcs $debugMode $solverName -parallel 2>&1 | tee -a $logpath/$logfileName
+        $MPIRUN_CMD -np $nrProcs $debugMode $solverName -parallel 2>&1 | tee -a $logpath/$logfileName
     else
-        mpirun -machinefile $machineFileName -np $nrProcs $debugMode $solverName -parallel 2>&1 | tee -a $logpath/$logfileName
+        $MPIRUN_CMD -machinefile $machineFileName -np $nrProcs $debugMode $solverName -parallel 2>&1 | tee -a $logpath/$logfileName
     fi
 
     #- keep terminal open (if started in new terminal)
@@ -769,9 +799,10 @@ parCFDDEMrun()
     nrProcs="$6"
     machineFileName="$7"
     debugMode="$8"
-    reconstuctCase="$9"
-    decomposeCase=${10}
-    remoteStorageLocation=${11}
+    separateDEM="$9"
+    reconstuctCase=${10}
+    decomposeCase=${11}
+    remoteStorageLocation=${12}
     #--------------------------------------------------------------------------------#
 
     if [[ $debugMode == "on" ]]; then
@@ -821,7 +852,7 @@ parCFDDEMrun()
         echo "Decomposing case."
         decomposePar -force
 
-        if [[ $remoteStorageLocation == "" ]]; then
+        if [[ $remoteStorageLocation == "false" || $remoteStorageLocation == "" ]]; then
             echo "do nothing."
         else
             echo "do links"
@@ -849,9 +880,21 @@ parCFDDEMrun()
     #- clean up case
     rm couplingFiles/*
 
-    #- run applictaion
+    #- detect mpi variant and set oversubscribe flag if open mpi
+    MPIRUN_CMD=`get_mpirun_cmd`
+
+    #- run DEM application (if separate)
+    if [[ $separateDEM == "false" || $separateDEM == "" ]]; then
+        echo "no separate DEM run."
+    else
+        #gnome-terminal --title='separate DEM' -e "bash $casePath/DEMrun.sh"
+        #source $casePath/DEMrun.sh &
+        parDEMrun $logpath $logfileName"_DEM" $casePath $headerText $separateDEM $nrProcs $machineFileName $debugMode&
+    fi    
+
+    #- run CFD application
     if [[ $machineFileName == "none" ]]; then
-        mpirun -np $nrProcs $debugMode $solverName -parallel 2>&1 | tee -a $logpath/$logfileName
+        $MPIRUN_CMD -np $nrProcs $debugMode $solverName -parallel 2>&1 | tee -a $logpath/$logfileName
 
         #- reconstruct case
         if [[ $reconstuctCase == "true" ]]; then   
@@ -859,7 +902,7 @@ parCFDDEMrun()
             reconstructPar -noLagrangian
         fi
     else
-        mpirun -machinefile $machineFileName -np $nrProcs $debugMode $solverName -parallel 2>&1 | tee -a $logpath/$logfileName
+        $MPIRUN_CMD -machinefile $machineFileName -np $nrProcs $debugMode $solverName -parallel 2>&1 | tee -a $logpath/$logfileName
 
         #- reconstruct case
         if [[ $reconstuctCase == "true" ]]; then   
@@ -926,7 +969,7 @@ collectLogCFDEMcoupling_sol()
     LASTWORD=$(basename $LASTSTRING)
 
     # log if compilation was success  
-    if [[ $LASTWORD == $SOLVERNAME || $LASTWORD == "date." ]]; then
+    if [[ $LASTWORD == $SOLVERNAME || $LASTWORD == "date." || ${LASTWORD: -3} == ".so" ]]; then
         echo "$SOLVERNAME" >> $logpath/log_compile_results_sol_success
     else
         echo "$SOLVERNAME" >> $logpath/log_compile_results_sol_fail

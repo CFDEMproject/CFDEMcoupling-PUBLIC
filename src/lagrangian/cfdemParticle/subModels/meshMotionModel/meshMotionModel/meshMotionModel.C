@@ -87,7 +87,7 @@ tmp<volVectorField> meshMotionModel::f() const
             dimensionedVector
             (
                 "zero",
-                dimensionSet(0, 1, -1, 0, 0),
+                dimensionSet(0, 1, -2, 0, 0),
                 vector::zero
             )
         )
@@ -110,12 +110,7 @@ tmp<volScalarField> meshMotionModel::body() const
                 IOobject::NO_WRITE
             ),
             particleCloud_.mesh(),
-            dimensionedScalar
-            (
-                "zero",
-                dimensionSet(0, 1, -1, 0, 0),
-                0.
-            )
+            scalar(0)
         )
     );
     return tmp;
@@ -136,11 +131,32 @@ tmp<volScalarField> meshMotionModel::inside() const
                 IOobject::NO_WRITE
             ),
             particleCloud_.mesh(),
-            dimensionedScalar
+            scalar(0)
+        )
+    );
+    return tmp;
+}
+
+tmp<volVectorField> meshMotionModel::momentumSource() const
+{
+    tmp<volVectorField> tmp
+    (
+        new volVectorField
+        (
+            IOobject
+            (
+                "xxx",
+                particleCloud_.mesh().time().timeName(),
+                particleCloud_.mesh(),
+                IOobject::NO_READ,
+                IOobject::NO_WRITE
+            ),
+            particleCloud_.mesh(),
+            dimensionedVector
             (
                 "zero",
-                dimensionSet(0, 1, -1, 0, 0),
-                0.
+                dimensionSet(0, 1, -2, 0, 0),
+                vector::zero
             )
         )
     );

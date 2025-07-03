@@ -74,22 +74,8 @@ protected:
         const word modelType_;
 
         bool probeIt_;
-        
-        bool requiresEx_;           //requires an orientation vector
 
-        bool requiresShape_;        //requires shape information 
-
-        bool requiresQuaternion_;
-
-        bool requiresSuperquadric_;
-        
-        bool pullPushRotation_;     //will exchange rotation information
-
-        bool implicitDrag_;             //will exchange Ksl 
-        
-        bool implicitAnisotropicDrag_;  //will exchange anisotropic Ksl 
-        
-        bool implicitRotation_;         //will exchange rotational Ksl value
+        bool particleBased_;
 
         wordList forceSubModels_;
 
@@ -136,6 +122,13 @@ protected:
         mutable autoPtr<interpolation<vector> > DDtUInterpolator_;
 
         mutable autoPtr<interpolation<vector> > divTauInterpolator_;
+
+        mutable autoPtr<interpolation<scalar> > RhoInterpolator_;
+
+        mutable autoPtr<interpolation<scalar> > kInterpolator_;
+
+        mutable autoPtr<interpolation<scalar> > epsilonInterpolator_;
+
 public:
 
     //- Runtime type information
@@ -187,59 +180,29 @@ public:
 
         virtual void setForce() const = 0;
 
-        virtual void setForcesOnParticle() const {};
-        
         virtual void multiphaseTurbulence(volScalarField&, bool) const;
 
         //tmp<volScalarField> provideScalarField();
 
-        virtual void manipulateScalarField(volScalarField&) const;
-
-        virtual void manipulateScalarField(volScalarField&, volScalarField&, int) const;
-
-        virtual void commToDEM() const;
-
     // Access
         word modelType(){ return modelType_; };
+
+        bool modelIsParticleBased() {return particleBased_;};
 
         inline volVectorField& impParticleForces() const { return impParticleForces_;};
 
         inline volVectorField& expParticleForces() const { return expParticleForces_;};
 
-        inline double ** impForces() const { return particleCloud_.impForces_;};
-
-        inline double ** expForces() const { return particleCloud_.expForces_;};
-
-        inline double ** DEMForces() const { return particleCloud_.DEMForces_;};
-        
-        inline double ** DEMTorques() const { return particleCloud_.DEMTorques();};
-
-        inline double ** Cds() const { return particleCloud_.Cds_;};
-
-        inline double ** CdsExtra() const { return particleCloud_.CdsExtra();};
-
-        inline double ** CdsRotation() const { return particleCloud_.CdsRotation();};
+//         virtual inline double ** impForces() const { return particleCloud_.impForces_;};
+//
+//         virtual inline double ** expForces() const { return particleCloud_.expForces_;};
 
         inline double ** omegaFluid() const { return particleCloud_.omegaFluid();};
 
-        inline double ** fluidVel() const { return particleCloud_.fluidVel_;};
+        virtual inline bool requiresQuaternion() { return forceSubM(0).useQuat();};
 
-        virtual inline bool& requiresEx() { return requiresEx_;};
+        virtual inline bool requiresSuperquadric() { return forceSubM(0).sq();};
 
-        virtual inline bool& requiresQuaternion() { return requiresQuaternion_;};
-
-        virtual inline bool& requiresSuperquadric() { return requiresSuperquadric_;};
-
-        virtual inline bool& requiresShape() { return requiresShape_;};
-
-        virtual inline bool& pullPushRotation() {return pullPushRotation_;};
-
-        virtual inline bool& implicitDrag() {return implicitDrag_;};
-        
-        virtual inline bool& implicitAnisotropicDrag() {return implicitAnisotropicDrag_;};
-        
-        virtual inline bool& implicitRotation() {return implicitRotation_;};
-        
         void repartitionImExForces() const; //Repartition Implixit/Explicit forces
 
         void treatVoidCells() const;
@@ -251,6 +214,31 @@ public:
         inline int nrForceSubModels() const { return forceSubModels_.size(); };
 
         void setForceSubModels(dictionary& dict);
+
+    // MS member funtions
+        void readDHcorr(dictionary& dict);
+
+        void readArea(dictionary& dict);
+
+        virtual void MSinit() {}; // extra init function for MS stuff
+
+    // MS access
+        virtual inline double ** impForces() const
+        {
+            if (forceSubM(0).ms())
+                return particleCloud_.impForcesCM();
+            else
+                return particleCloud_.impForces();
+        };
+
+        virtual inline double ** expForces() const
+        {
+            if (forceSubM(0).ms())
+                return particleCloud_.expForcesCM();
+            else
+                return particleCloud_.expForces();
+        };
+
 };
 
 

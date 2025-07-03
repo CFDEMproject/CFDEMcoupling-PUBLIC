@@ -42,8 +42,8 @@ SourceFiles
 #include "fvCFD.H"
 #include "cfdemCloud.H"
 
-#include "mpi.h"
-#include "math.h"
+#include <mpi.h>
+#include <cmath>
 #include <lammps.h>
 #include <pair.h>
 #include <force.h>
@@ -164,6 +164,11 @@ public:
         ) const = 0;
 
         //====
+        // double ***
+        virtual void allocateArray(double***&, double, int, int,int) const;
+        virtual void destroy(double***,int) const;
+
+        //====
         // double **
         virtual void allocateArray(double**&, double, int, int) const;
         virtual void allocateArray(double**&, double, int, const char* ="nparticles") const;
@@ -198,7 +203,12 @@ public:
 
         inline int couplingInterval() const {return couplingInterval_;};
 
-        inline scalar couplingTime() const {return couplingInterval_*DEMts_;};
+        inline bool subTS() const {
+            if(mag(particleCloud_.mesh().time().deltaT().value()-couplingTime())>SMALL) return true;
+            else return false;
+        };
+
+        inline scalar couplingTime() const {return couplingInterval_ * DEMts_;};
 
         inline scalar TSstart() const { return particleCloud_.mesh().time().startTime().value()
                                         + (couplingStep_-1) * couplingTime();};
@@ -210,7 +220,7 @@ public:
 
         inline void checkTSsize() const
         {
-            if(particleCloud_.mesh().time().deltaT().value() >  couplingInterval_ * DEMts_ + SMALL)
+            if(particleCloud_.mesh().time().deltaT().value() >  couplingTime() + SMALL)
             {
                 Info << "particleCloud_.mesh().time().deltaT().value() = " << particleCloud_.mesh().time().deltaT().value() << endl;
                 Info << "couplingInterval_ = " << couplingInterval_ << endl;
@@ -224,9 +234,7 @@ public:
                 Info << "DEMts_ = " << DEMts_ << endl;
                 FatalError <<"\nWarning - Coupling time (= DEM time step * coupling interval) is not a multiple of  CFD time-step!\n"<< abort(FatalError);
             }
-            if(!particleCloud_.allowCFDsubTimestep())
-                if(particleCloud_.mesh().time().deltaT().value() < couplingInterval_ * DEMts_ + SMALL)
-                    FatalError<<"\nYour models require: CFD time-step = coupling interval (= DEM time step * coupling interval)! \n"<< abort(FatalError);
+            if(!particleCloud_.allowCFDsubTimestep() && subTS()) FatalError<<"\nYour models require: CFD time-step = coupling interval (= DEM time step * coupling interval)! \n"<< abort(FatalError);
 
             // warn if sub-TS
             if (particleCloud_.mesh().time().deltaT().value() < couplingTime() - SMALL)
@@ -269,7 +277,7 @@ public:
         {
             for (int i=0;i<n;i++)
                 for (int j=0;j<3;j++)
-                    particleCloud_.positions_[i][j]=pos[i*3+j];
+                    particleCloud_.fieldsToDEM[particleCloud_.idPos()][i][j]=pos[i*3+j];
         };
         inline void setCellIDs(label n,int* ID) const
         {
@@ -292,17 +300,21 @@ public:
 
         void setCGs(LAMMPS_NS::LAMMPS *lmp) const 
         { 
-            particleCloud_.setCG(lmp->force->cg(int(1e14)));
+            particleCloud_.setCG(lmp->force->cg(INT_MAX));
             
             Info << "LIGGGHTS hosts " << lmp->atom->ntypes << " atom types." << endl;
 
-            #if defined(typeSecificCG)
-            Warning << "\nYou are using untested code (type specific coarse graining)!!!\n" 
-                    << "\nThis will most probably give wrong results for most models!!!\n"<< endl;
-            for(int iTyp=1; iTyp<=lmp->atom->ntypes; iTyp++)
-                particleCloud_.setCGTypeSpecific(iTyp,lmp->force->cg(iTyp));
-            #endif
+//             if ( lmp->force->typeSpecificCG() )
+//             {
+//               Warning << "\nYou are using untested code (type specific coarse graining)!!!\n"
+//                       << "\nThis will most probably give wrong results for most models!!!\n"<< endl;
+//               for(int iTyp=1; iTyp<=lmp->atom->ntypes; iTyp++)
+//                   particleCloud_.setCGTypeSpecific(iTyp,lmp->force->cg(iTyp));
+//               lmp->force->reportCG();
+//             }
         };
+
+        //virtual void doDebug() const;
 };
 
 

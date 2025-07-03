@@ -57,7 +57,6 @@ compute         rke all erotate/sphere
 thermo_style    custom step atoms ke c_rke vol #f_heattransfer
 thermo          1000
 thermo_modify   lost ignore norm no
-compute_modify  thermo_temp dynamic yes
 
 #insert the first particles
 run             1

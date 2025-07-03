@@ -1,6 +1,5 @@
 echo            both
 log             ../DEM/log.liggghts
-thermo_log      ../DEM/post/thermo.txt
 
 atom_style	    granular
 atom_modify	    map array
@@ -51,15 +50,16 @@ fix		integr all nve/sphere
 #center of mass
 compute         centerOfMass all com
 
-#compute total dragforce
-compute		dragtotal all reduce sum f_dragforce[1] f_dragforce[2] f_dragforce[3]
+# sum of explicit and implicit drag force given from CFD to DEM
+variable    dragtotalX equal f_cfd2[1]
+variable    dragtotalY equal f_cfd2[2]
+variable    dragtotalZ equal f_cfd2[3]
 
 #screen output
 compute		1 all erotate/sphere
-thermo_style	custom step atoms ke c_1 vol c_centerOfMass[3] c_dragtotal[1] c_dragtotal[2] c_dragtotal[3]
+thermo_style	custom step atoms ke c_1 vol c_centerOfMass[3] v_dragtotalX v_dragtotalY v_dragtotalZ
 thermo		10
 thermo_modify	lost ignore norm no
-compute_modify	thermo_temp dynamic yes
 
 #insert the first particles so that dump is not empty
 dump 		myDump all stl 1 post/dump_*.stl

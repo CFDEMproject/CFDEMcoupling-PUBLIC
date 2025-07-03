@@ -34,7 +34,7 @@ Description
 #include "volWeightedAverage.H"
 #include "addToRunTimeSelectionTable.H"
 #include "dataExchangeModel.H"
-#include "mpi.h"
+#include <mpi.h>
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam

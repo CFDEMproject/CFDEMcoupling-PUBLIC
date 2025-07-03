@@ -83,7 +83,8 @@ Foam::smoothingModel::smoothingModel
         ),
         particleCloud_.mesh(),
         dimensionedScalar("zero", dimensionSet(0,0,0,0,0), 0)
-    )
+    ),
+    smoothingLength_(dimensionedScalar("zero", dimensionSet(0,0,0,0,0), 0))
 {}
 
 
@@ -157,6 +158,13 @@ void smoothingModel::smoothenAbsolutField(volVectorField& vecField) const
     //3 - Finally, make field absolute again
     particleCloud_.scaleWithVcell(vecField);
 }
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+dimensionedScalar smoothingModel::smoothingLength() const
+{
+    return smoothingLength_;
+}
+
 } // End namespace Foam
 
 // ************************************************************************* //

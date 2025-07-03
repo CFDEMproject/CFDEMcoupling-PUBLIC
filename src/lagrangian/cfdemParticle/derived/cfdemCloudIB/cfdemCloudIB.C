@@ -36,7 +36,7 @@ Description
 #include "locateModel.H"
 #include "dataExchangeModel.H"
 #include "IOModel.H"
-#include "mpi.h"
+#include <mpi.h>
 #include "IOmanip.H"
 #include "OFversion.H"
 
@@ -57,9 +57,9 @@ cfdemCloudIB::cfdemCloudIB
 :
     cfdemCloud(mesh),
     angularVelocities_(NULL),
-    DEMTorques_(NULL),
     pRefCell_(readLabel(mesh.solutionDict().subDict("PISO").lookup("pRefCell"))),
     pRefValue_(readScalar(mesh.solutionDict().subDict("PISO").lookup("pRefValue"))),
+    DEMTorques_(NULL),
     haveEvolvedOnce_(false),
     skipLagrangeToEulerMapping_(false),
     skipAfter_(false),
@@ -104,6 +104,9 @@ cfdemCloudIB::cfdemCloudIB
         if(this->couplingProperties().found("wall_periodicityCheckTolerance"))
             wall_periodicityCheckTolerance_ = readScalar (this->couplingProperties().lookup("wall_periodicityCheckTolerance"));
      }
+
+     // add flag for IB cloud --> model checks
+     registryM().addProperty("IB", 1);
 }
 
 
@@ -172,7 +175,7 @@ bool Foam::cfdemCloudIB::evolve
         dataExchangeM().couple(0);
         doCouple=true;
 
-//        Info << "skipLagrangeToEulerMapping_: " << skipLagrangeToEulerMapping_ 
+//        Info << "skipLagrangeToEulerMapping_: " << skipLagrangeToEulerMapping_
 //             << " haveEvolvedOnce_: " << haveEvolvedOnce_ << endl;
         if(!skipLagrangeToEulerMapping_ || !haveEvolvedOnce_)
         {
@@ -182,7 +185,7 @@ bool Foam::cfdemCloudIB::evolve
 
             // search cellID of particles
             if(verbose_) Info << "- findCell()" << endl;
-            locateM().findCell(NULL,positions_,cellIDs_,numberOfParticles());
+            locateM().findCell(NULL,fieldsToDEM[idPos()],cellIDs_,numberOfParticles());
             if(verbose_) Info << "findCell done." << endl;
 
             // set void fraction field
@@ -205,9 +208,9 @@ bool Foam::cfdemCloudIB::evolve
             for(int i=0;i<3;i++){
                 impForces_[index][i] = 0;
                 expForces_[index][i] = 0;
-                DEMForces_[index][i] = 0;
             }
         }
+        zeroizeFieldsToDEM();
         for (int i=0;i<nrForceModels();i++) forceM(i).setForce();
         if(verbose_) Info << "setForce done." << endl;
 
@@ -216,7 +219,7 @@ bool Foam::cfdemCloudIB::evolve
         giveDEMdata();
 
         dataExchangeM().couple(1);
-        
+
         haveEvolvedOnce_=true;
     }
     Info << "evolve done." << endl;
@@ -256,8 +259,8 @@ void Foam::cfdemCloudIB::setInterFace
                 // In this case, the particle center has to be mirrored in order to correctly
                 // evaluate the interpolation points.
                 vector minPeriodicParticlePos=ParPos;
-                voidFractionM().minPeriodicDistance(par,posC, ParPos, globalBb, 
-                                                    minPeriodicParticlePos, 
+                voidFractionM().minPeriodicDistance(par,posC, ParPos, globalBb,
+                                                    minPeriodicParticlePos,
                                                     wall_periodicityCheckRange());
 
                 ParPos = minPeriodicParticlePos;
@@ -286,11 +289,11 @@ void Foam::cfdemCloudIB::calcVelocityCorrection
     (
         fvm::laplacian(phiIB) == fvc::div(U) + fvc::ddt(voidfraction)
     );
-    if(phiIB.needReference()) 
+    if(phiIB.needReference())
     {
          phiIBEqn.setReference(pRefCell_, pRefValue_);
     }
-    
+
     phiIBEqn.solve();
 
     U=U-fvc::grad(phiIB);
@@ -317,7 +320,7 @@ void Foam::cfdemCloudIB::setParticleVelocity
     vector rVec(0,0,0);
     vector velRot(0,0,0);
     vector angVel(0,0,0);
-    
+
     for(int index=0; index < numberOfParticles(); index++)
     {
         for(int subCell=0;subCell<cellsPerParticle()[index][0];subCell++)
@@ -344,7 +347,7 @@ void Foam::cfdemCloudIB::setParticleVelocity
 vector Foam::cfdemCloudIB::angularVelocity(int index)
 {
     vector vel;
-    for(int i=0;i<3;i++) vel[i] = angularVelocities_[index][i]; 
+    for(int i=0;i<3;i++) vel[i] = angularVelocities_[index][i];
     return vel;
 }
 

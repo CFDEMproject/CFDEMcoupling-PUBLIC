@@ -48,7 +48,7 @@
         label storeInIndex=0;
         for(int i=0; i < cellsPerParticle_[index][0] ; i++)
         {
-            if(partCellId == particleCloud_.cellIDs()[index][i]) 
+            if(partCellId == particleCloud_.cfdemCloud::cellIDs()[index][i]) 
             {
                 storeInIndex = i;
                 createNew = false;
@@ -60,7 +60,7 @@
         {
             cellsPerParticle_[index][0] ++;
             storeInIndex = cellsPerParticle_[index][0]-1;
-            particleCloud_.cellIDs()[index][storeInIndex] = partCellId;
+            particleCloud_.cfdemCloud::cellIDs()[index][storeInIndex] = partCellId;
 
         }
 
@@ -68,5 +68,7 @@
         particleVolumes[index][storeInIndex] += particleVolume;
         particleV[index][0] += particleVolume;
         //====================================================//
+
+        particleCloud_.setMpData(subPoint, index, partCellId, subPosition, offset, subPointDiameter);
     }
 }

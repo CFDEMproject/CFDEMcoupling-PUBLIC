@@ -76,6 +76,8 @@ Foam::cfdemCloud::cfdemCloud
             IOobject::NO_WRITE
         )
     ),
+    cgParticleSpecific_(false),
+    cgTypeSpecificDifferent_(false),
     allowAdjustTimeStep_(couplingProperties_.lookupOrDefault<Switch>("allowAdjustTimeStep", false)),
     solveFlow_(true),
     solveScalarTransport_(true),
@@ -85,23 +87,17 @@ Foam::cfdemCloud::cfdemCloud
     allowCFDsubTimestep_(true),
     ignore_(false),
     writeTimePassed_(false),
+    resetWriteTimePassed_(false),
     modelType_(couplingProperties_.lookup("modelType")),
-    positions_(NULL),
-    velocities_(NULL),
-    fluidVel_(NULL),
-    fAcc_(NULL),
     impForces_(NULL),
     expForces_(NULL),
-    DEMForces_(NULL),
-    Cds_(NULL),
-    radii_(NULL),
     voidfractions_(NULL),
     cellIDs_(NULL),
     particleWeights_(NULL),
     particleVolumes_(NULL),
     particleV_(NULL),
     dragPrev_(NULL),
-    numberOfParticles_(0),
+    numberOfParticles_(-1),
     d32_(-1),
     numberOfParticlesChanged_(false),
     arraysReallocated_(false),
@@ -118,7 +114,7 @@ Foam::cfdemCloud::cfdemCloud
     treatVoidCellsAsExplicitForce_(false),
     useDDTvoidfraction_("off"),
     ddtVoidfraction_
-    (   
+    (
         IOobject
         (
             "ddtVoidfraction",
@@ -130,7 +126,7 @@ Foam::cfdemCloud::cfdemCloud
         mesh,
         dimensionedScalar("zero", dimensionSet(0,0,-1,0,0), 0)  // 1/s
     ),
-    checkPeriodicCells_(false),
+    checkPeriodicCells_(couplingProperties_.lookupOrDefault<Switch>("checkPeriodicCells",false)),
     wall_periodicityCheckRange_(vector(1,1,1)),
     wall_periodicityCheckTolerance_(1e-07),
     meshHasUpdated_(false),
@@ -152,7 +148,7 @@ Foam::cfdemCloud::cfdemCloud
         )
     ),
     turbulenceMultiphase_
-    (   
+    (
         IOobject
         (
             "turbulenceMultiphase",
@@ -167,7 +163,7 @@ Foam::cfdemCloud::cfdemCloud
 #else
         dimensionedScalar("zero", dimensionSet(0,2,-1,0,0), 0)  // m²/s
 #endif
-    ),    
+    ),
     locateModel_
     (
         locateModel::New
@@ -257,7 +253,42 @@ Foam::cfdemCloud::cfdemCloud
             couplingProperties_,
             *this
         )
-    )
+    ),
+    idRadius_(-1),
+    idPos_(-1),
+    idVel_(-1),
+    idFacc_(-1),
+    idPartTypes_(-1),
+    idDragExp_(-1),
+    idKsl_(-1),
+    idKslExtra_(-1),
+    idUf_(-1),
+    idTorqueExp_(-1),
+    idKslRotation_(-1),
+    idPullRotation_(-1),
+    idPullOrientation_(-1),
+    idPullOrientation1_(-1),
+    idPullShape_(-1),
+    idDragExpCM_(-1),
+    idKslCM_(-1),
+    idKslExtraCM_(-1),
+    idUfCM_(-1),
+    idTorqueExpCM_(-1),
+    idKslRotationCM_(-1),
+    idFhydro_(-1),
+    idVisc_(-1),
+    idBlockiness_(-1),
+    idArea_(-1),
+    idVol_(-1),
+    idQuat_(-1),
+    idK_(-1),
+    idEpsilon_(-1),
+    idParticleCG_(-1),
+    idMass_(-1),
+    idDensity_(-1),
+    idType_(-1),
+    idConvectiveHeatFlux_(-1),
+    idTemp_(-1)
 {
     #include "versionInfo.H"
     global buildInfo(couplingProperties_,*this);
@@ -281,7 +312,7 @@ Foam::cfdemCloud::cfdemCloud
 
     //push dummy to type-specific cg factor since types start with 1
     cgTypeSpecific_.push_back(-1);
-    cgTypeSpecificDifferent=false;
+    cgTypeSpecificDifferent_ = false;
     dataExchangeM().setCG();
 
     Info << "If BC are important, please provide volScalarFields -imp/expParticleForces-" << endl;
@@ -299,8 +330,6 @@ Foam::cfdemCloud::cfdemCloud
             FatalError  << "You have set imExSplitFactor < 0 in your couplingProperties. Must be >=0"
                        << abort(FatalError);
 
-    if (couplingProperties_.found("treatVoidCellsAsExplicitForce"))
-        treatVoidCellsAsExplicitForce_ = readBool(couplingProperties_.lookup("treatVoidCellsAsExplicitForce"));
     if (couplingProperties_.found("ignore")) ignore_=true;
     if (turbulenceModelType_=="LESProperties")
     {
@@ -312,17 +341,17 @@ Foam::cfdemCloud::cfdemCloud
     {
         useDDTvoidfraction_=word(couplingProperties_.lookup("useDDTvoidfraction"));
 
-        if(useDDTvoidfraction_==word("a") || 
+        if(useDDTvoidfraction_==word("a") ||
            useDDTvoidfraction_==word("b") ||
            useDDTvoidfraction_==word("off")
           )
             Info << "choice for ddt(voidfraction) = " << useDDTvoidfraction_ << endl;
         else
-            FatalError << "Model " << useDDTvoidfraction_ 
+            FatalError << "Model " << useDDTvoidfraction_
                        << " is not a valid choice for ddt(voidfraction). Choose a or b or off."
                        << abort(FatalError);
     }
-    else        
+    else
         Info << "ignoring ddt(voidfraction)" << endl;
 
     momCoupleModel_ = new autoPtr<momCoupleModel>[momCoupleModels_.size()];
@@ -348,12 +377,20 @@ Foam::cfdemCloud::cfdemCloud
             forceModels_[i]
         );
         forceModel_[i]().applyDebugSettings(debugMode());
+        registryM().addProperty(forceModel_[i]().type()+"_index",i);
     }
 
-    if (nrForceModels()<SMALL)
-        FatalError  << "Please use at least one forceModel ! "
-                    << "(e.g. noDrag) \n"
-                    << abort(FatalError);
+    IOM().allocFieldsToDEM();
+
+    registryM().addProperty(voidFractionM().type()+"_index", 0);
+    registryM().addProperty(dataExchangeM().type()+"_index", 0);
+
+    // Note: this check for getProperty("multisphere") does not work as the cloud is
+    // built before cloudMS which sets the property
+    //if (nrForceModels()<SMALL && registryM().getProperty("multisphere")<1)
+    //    FatalError  << "Please use at least one forceModel ! "
+    //                << "(e.g. noDrag) \n"
+    //                << abort(FatalError);
 
     // run liggghts commands from cfdem
     liggghtsCommand_ = new autoPtr<liggghtsCommandModel>[liggghtsCommandModelList_.size()];
@@ -366,65 +403,10 @@ Foam::cfdemCloud::cfdemCloud
             liggghtsCommandModelList_[i],
             i
         );
+        registryM().addProperty(liggghtsCommand_[i]().type()+"_index",i);
     }
 
-    Switch cgWarnOnly_(couplingProperties_.lookupOrDefault<Switch>("cgWarnOnly", false));
-    if (!cgOK_ && cg_ > 1)
-    {
-        if(cgWarnOnly_)
-            Warning<< "at least one of your models is not fit for cg !!!"<< endl; 
-        else
-            FatalError<< "at least one of your models is not fit for cg !!!"<< abort(FatalError); 
-    }
-
-    // check if sim is fully peridic box
-    const polyBoundaryMesh& patches = mesh_.boundaryMesh();
-    int nPatchesCyclic(0);
-    int nPatchesNonCyclic(0);
-    forAll(patches, patchI)
-    {
-        const polyPatch& pp = patches[patchI];
-        #if defined(versionExt32)
-        if (isA<cyclicPolyPatch>(pp))
-            nPatchesCyclic++;
-        else if (!isA<processorPolyPatch>(pp))
-            nPatchesNonCyclic++;
-        #else
-        if (isA<cyclicPolyPatch>(pp) || isA<cyclicAMIPolyPatch>(pp))
-            nPatchesCyclic++;
-        else if (!isA<processorPolyPatch>(pp))
-            nPatchesNonCyclic++;
-        #endif
-    }
-    if(nPatchesNonCyclic==0)
-        checkPeriodicCells_=true;
-
-    //hard set checkperiodic cells if wished
-    if(this->couplingProperties().found("checkPeriodicCells"))
-        checkPeriodicCells_ = couplingProperties().lookupOrDefault<Switch>("checkPeriodicCells", checkPeriodicCells_);
-
-    if(nPatchesCyclic>0 && nPatchesNonCyclic>0)
-    {
-        if(verbose_) Info << "nPatchesNonCyclic=" << nPatchesNonCyclic << ", nPatchesCyclic=" << nPatchesCyclic << endl;
-        Warning << "Periodic handing is disabled because the domain is not fully periodic!\n" << endl;
-    }
-
-    //Check if user attempts to change fluid time step
-    if( mesh_.time().controlDict().lookupOrDefault<Switch>("adjustTimeStep", false) && !allowAdjustTimeStep_ )
-    {
-        FatalError << "cfdemCloud:: you want to adjustTimeStep in controlDict. This is not allowed in this version of CFDEM."
-                   << abort(FatalError);
-    }
-
-    //Check if mesh is empty (decomposition error)
-    if(mesh_.cells().size() < 1) 
-    {
-        int nprocs;
-        MPI_Comm_size(MPI_COMM_WORLD,&nprocs);
-        if(nprocs > 2)  FatalError << endl << "cfdemCloud:: local mesh has zero cells. Please check the mesh and the decomposition!" << abort(FatalError);
-        
-        Pout << "WARNING: cfdemCloud:: local mesh has zero cells. Please check the mesh and the decomposition!" << endl;
-    }
+    #include "sanityChecks/level0_Cloud.H"
 }
 
 // * * * * * * * * * * * * * * * * Destructors  * * * * * * * * * * * * * * //
@@ -432,15 +414,8 @@ Foam::cfdemCloud::~cfdemCloud()
 {
     clockM().evalPar();
     clockM().normHist();
-    dataExchangeM().destroy(positions_,3);
-    dataExchangeM().destroy(velocities_,3);
-    dataExchangeM().destroy(fluidVel_,3);
-    dataExchangeM().destroy(fAcc_,3);
     dataExchangeM().destroy(impForces_,3);
     dataExchangeM().destroy(expForces_,3);
-    dataExchangeM().destroy(DEMForces_,3);
-    dataExchangeM().destroy(Cds_,1);
-    dataExchangeM().destroy(radii_,1);
     dataExchangeM().destroy(voidfractions_,1);
     dataExchangeM().destroy(cellIDs_,1);
     dataExchangeM().destroy(particleWeights_,1);
@@ -449,13 +424,23 @@ Foam::cfdemCloud::~cfdemCloud()
 
     //=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=
     int iUser=0;
-    for( std::vector<double**>::iterator 
-         it  = particleDatFieldsUserCFDEMToExt.begin(); 
-         it != particleDatFieldsUserCFDEMToExt.end(); 
+    for( std::vector<double**>::iterator
+         it  = fieldsToDEM.begin();
+         it != fieldsToDEM.end();
        ++it)
     {
-        Info << "cfdemCloud destroys UserCFDEM data: " << namesFieldsUserCFDEMToExt[iUser++] << endl;
-        dataExchangeM().destroy((*it),1);
+        Info << "cfdemCloud destroys UserCFDEM data: " << namesfieldsToDEM[iUser++] << endl;
+        int id = std::distance(fieldsToDEM.begin(), it);
+        if(typesfieldsToDEM[id]=="scalar-atom" || typesfieldsToDEM[id]=="scalar-multisphere")
+            dataExchangeM().destroy((*it),1);
+        else if(typesfieldsToDEM[id]=="vector-atom" || typesfieldsToDEM[id]=="vector-multisphere")
+            dataExchangeM().destroy((*it),3);
+        else if(typesfieldsToDEM[id]=="vector2D-atom" || typesfieldsToDEM[id]=="vector2D-multisphere")
+            dataExchangeM().destroy((*it),2);
+        else if(typesfieldsToDEM[id]=="quaternion-atom" || typesfieldsToDEM[id]=="quaternion-multisphere")
+            dataExchangeM().destroy((*it),4);
+        else
+            FatalError << "cfdemCloud::~cfdemCloud(): unknown data type "<<  typesfieldsToDEM[id] << " to destroy." << abort(FatalError);
     }
     //=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=
 }
@@ -463,48 +448,53 @@ Foam::cfdemCloud::~cfdemCloud()
 void Foam::cfdemCloud::getDEMdata()
 {
     if(verbose_) Info << "Foam::cfdemCloud::getDEMdata()" << endl;
-    dataExchangeM().getData("radius","scalar-atom",radii_);
-    dataExchangeM().getData("x","vector-atom",positions_);
-    dataExchangeM().getData("v","vector-atom",velocities_);
-
-    if(impDEMdragAcc_)
-        dataExchangeM().getData("dragAcc","vector-atom",fAcc_); // array is used twice - might be necessary to clean it first
-
+    for(std::vector<word>::iterator it = namesfieldsToDEM.begin(); it != namesfieldsToDEM.end(); ++it)
+    {
+        int id = std::distance(namesfieldsToDEM.begin(), it);
+        if(pullfieldsToDEM[id])
+        {
+            Info << "get field with name '" << *it << "' at position: " << id << endl;
+            if(namesfieldsToDEM[id]=="shapetype" || namesfieldsToDEM[id]=="type" || namesfieldsToDEM[id]=="body" || namesfieldsToDEM[id]=="id") //type is of type int and we do not yet have fieldsToDEM for int
+            {
+                int** h=NULL;
+                dataExchangeM().allocateArray(h,0.,1);
+                dataExchangeM().getData(namesfieldsToDEM[id],typesfieldsToDEM[id],h);
+                for(int i=0;i<numberOfParticles_;i++)
+                {
+                    fieldsToDEM[id][i][0]=h[i][0];
+                    if(namesfieldsToDEM[id]=="shapetype") fieldsToDEM[id][i][0] += 1; // conversion to clumpType convention
+                }
+            }
+            else if(namesfieldsToDEM[id]=="clumptype" || namesfieldsToDEM[id]=="nrigid" || namesfieldsToDEM[id]=="id_multisphere")
+            {
+                int** h=NULL;
+                dataExchangeM().allocateArray(h,0.,1);
+                dataExchangeM().getData(namesfieldsToDEM[id],typesfieldsToDEM[id],h);
+                for(int i=0;i<numberOfClumps();i++)
+                {
+                    fieldsToDEM[id][i][0]=h[i][0];
+                }
+            }
+            else
+                dataExchangeM().getData(namesfieldsToDEM[id],typesfieldsToDEM[id],fieldsToDEM[id]);
+        }
+    }
     if(verbose_) Info << "Foam::cfdemCloud::getDEMdata() - done." << endl;
 }
 
 void Foam::cfdemCloud::giveDEMdata()
 {
-
-    dataExchangeM().giveData("dragforce","vector-atom",DEMForces_);
-
-    if(impDEMdrag_)
+    for(std::vector<word>::iterator it = namesfieldsToDEM.begin(); it != namesfieldsToDEM.end(); ++it)
     {
-        if(verbose_) Info << "sending Ksl and uf" << endl;
-        dataExchangeM().giveData("Ksl","scalar-atom",Cds_);
-        dataExchangeM().giveData("uf","vector-atom",fluidVel_);
+        int id = std::distance(namesfieldsToDEM.begin(), it);
+        if(!pullfieldsToDEM[id])
+        {
+            Info << "giveData field with name '" << *it << "' at position: " << id << endl;
+            dataExchangeM().giveData(namesfieldsToDEM[id],typesfieldsToDEM[id],fieldsToDEM[id]);
+        }
     }
     if(verbose_) Info << "giveDEMdata done." << endl;
 }
-
-//=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=
-// * * *   write top level fields   * * * //
-void Foam::cfdemCloud::giveUSERdata()
-{
-    //Handover USER-defined data 
-    for(std::vector<word>::iterator it = namesFieldsUserCFDEMToExt.begin(); it != namesFieldsUserCFDEMToExt.end(); ++it) 
-    {
-        int positionInRegister = std::distance(namesFieldsUserCFDEMToExt.begin(), it);
-        dataExchangeM().giveData(namesFieldsUserCFDEMToExt[positionInRegister],"scalar-atom",
-                                 particleDatFieldsUserCFDEMToExt[positionInRegister]
-                                );
-        Info << "giveData field with name '" << *it << "' at position: " << positionInRegister << endl;
-    }
-    if(verbose_) Info << "giveUSERdata done." << endl;
-}
-
-// * * *   write top level fields   * * * //
-//=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=
 
 // * * * * * * * * * * * * * * * protected Member Functions  * * * * * * * * * * * * * //
 
@@ -534,23 +524,18 @@ void Foam::cfdemCloud::setCellIDsCM(label n,int* ID)
 
 void Foam::cfdemCloud::findCells()
 {
-    locateM().findCell(NULL,positions_,cellIDs_,numberOfParticles());
+    locateM().findCell(NULL,fieldsToDEM[idPos()],cellIDs_,numberOfParticles());
 }
 
 void Foam::cfdemCloud::setForces()
 {
-    resetArray(fluidVel_,numberOfParticles(),3);
     resetArray(impForces_,numberOfParticles(),3);
     resetArray(expForces_,numberOfParticles(),3);
-    resetArray(DEMForces_,numberOfParticles(),3);
-    resetArray(Cds_,numberOfParticles(),1);
 
-    //=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=
-    //reset all USER-defined particle fields
-    zeroizeParticleDatFieldsUserCFDEMToExt();
-    //=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=
+    cfdemCloud::zeroizeFieldsToDEM();
 
-    for (int i=0;i<cfdemCloud::nrForceModels();i++) cfdemCloud::forceM(i).setForce();
+    for (int i=0;i<cfdemCloud::nrForceModels();i++)
+        cfdemCloud::forceM(i).setForce();
 }
 
 void Foam::cfdemCloud::setVoidFraction()
@@ -588,11 +573,11 @@ void Foam::cfdemCloud::setParticleForceField()
 
 void Foam::cfdemCloud::setVectorAverages()
 {
-    if(verbose_) Info << "- setVectorAverage(Us,velocities_,weights_)" << endl;
+    if(verbose_) Info << "- setVectorAverage(Us,fieldsToDEM[idVel()],weights_)" << endl;
     averagingM().setVectorAverage
     (
         averagingM().UsNext(),
-        velocities_,
+        fieldsToDEM[idVel()],
         particleWeights_,
         averagingM().UsWeightField(),
         NULL, //mask
@@ -612,7 +597,7 @@ void Foam::cfdemCloud::setPos(double**& pos)
     for(int index = 0;index <  numberOfParticles(); ++index)
     {
         for(int i=0;i<3;i++){
-            positions_[index][i] = pos[index][i];
+            fieldsToDEM[idPos()][index][i] = pos[index][i];
         }
     }
 }
@@ -622,27 +607,6 @@ label Foam::cfdemCloud::particleCell(int index)
 {
     label cellI = cellIDs()[index][0];
     return cellI;
-}
-
-vector Foam::cfdemCloud::position(int index)
-{
-    vector pos;
-    for(int i=0;i<3;i++) pos[i] = positions()[index][i];
-    return pos;
-}
-
-vector Foam::cfdemCloud::velocity(int index)
-{
-    vector vel;
-    for(int i=0;i<3;i++) vel[i] = velocities()[index][i];
-    return vel;
-}
-
-vector Foam::cfdemCloud::fluidVel(int index)
-{
-    vector vel;
-    for(int i=0;i<3;i++) vel[i] = fluidVels()[index][i];
-    return vel;
 }
 
 const forceModel& Foam::cfdemCloud::forceM(int i)
@@ -717,7 +681,7 @@ bool Foam::cfdemCloud::evolve
             clockM().start(16,"resetVolFields");
             if(verbose_)
             {
-                Info << "couplingStep:" << dataExchangeM().couplingStep() 
+                Info << "couplingStep:" << dataExchangeM().couplingStep()
                      << "\n- resetVolFields()" << endl;
             }
             averagingM().resetVectorAverage(averagingM().UsPrev(),averagingM().UsNext(),false);
@@ -755,21 +719,21 @@ bool Foam::cfdemCloud::evolve
             setVectorAverages();
 
 
-            //Smoothen "next" fields            
+            //Smoothen "next" fields
             smoothingM().dSmoothing();
             smoothingM().smoothen(voidFractionM().voidFractionNext());
 
             //only smoothen if we use implicit force coupling in cells void of particles
-            //because we need unsmoothened Us field to detect cells for explicit 
+            //because we need unsmoothened Us field to detect cells for explicit
             //force coupling
             if(!treatVoidCellsAsExplicitForce())
                 smoothingM().smoothenReferenceField(averagingM().UsNext());
-            
+
             clockM().stop("setVectorAverage");
         }
-        
+
         //============================================
-        //CHECK JUST TIME-INTERPOATE ALREADY SMOOTHENED VOIDFRACTIONNEXT AND UsNEXT FIELD 
+        //CHECK JUST TIME-INTERPOATE ALREADY SMOOTHENED VOIDFRACTIONNEXT AND UsNEXT FIELD
         //      IMPLICIT FORCE CONTRIBUTION AND SOLVER USE EXACTLY THE SAME AVERAGED
         //      QUANTITIES AT THE GRID!
         Info << "\n timeStepFraction() = " << dataExchangeM().timeStepFraction() << endl;
@@ -835,35 +799,35 @@ bool Foam::cfdemCloud::evolve
         IOM().dumpDEMdata();
         clockM().stop("dumpDEMdata");
 
+        if(resetWriteTimePassed_)
+        {
+            writeTimePassed_=false;
+            resetWriteTimePassed_=false;
+        }
+
     }//end ignore
     return doCouple;
 }
 
 bool Foam::cfdemCloud::reAllocArrays() const
 {
+    if(verbose_) Info << "cfdemCloud::reAllocArrays()" << endl;
     if(numberOfParticlesChanged_ && !arraysReallocated_)
     {
         // get arrays of new length
-        dataExchangeM().allocateArray(positions_,0.,3);
-        dataExchangeM().allocateArray(velocities_,0.,3);
-        dataExchangeM().allocateArray(fluidVel_,0.,3);
-        dataExchangeM().allocateArray(fAcc_,0.,3);
         dataExchangeM().allocateArray(impForces_,0.,3);
         dataExchangeM().allocateArray(expForces_,0.,3);
-        dataExchangeM().allocateArray(DEMForces_,0.,3);
-        dataExchangeM().allocateArray(Cds_,0.,1);
-        dataExchangeM().allocateArray(radii_,0.,1);
         dataExchangeM().allocateArray(voidfractions_,1.,voidFractionM().maxCellsPerParticle());
         dataExchangeM().allocateArray(cellIDs_,-1.,voidFractionM().maxCellsPerParticle());
         dataExchangeM().allocateArray(particleWeights_,0.,voidFractionM().maxCellsPerParticle());
         dataExchangeM().allocateArray(particleVolumes_,0.,voidFractionM().maxCellsPerParticle());
         dataExchangeM().allocateArray(particleV_,0.,1);
-        
+
         //=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=
-        if(namesFieldsUserCFDEMToExt.size()!=particleDatFieldsUserCFDEMToExt.size())
-            allocateParticleDatFieldsUserCFDEMToExt();
+        if(namesfieldsToDEM.size()!=fieldsToDEM.size())
+            cfdemCloud::allocateFieldsToDEM();
         else
-            reAllocateParticleDatFieldsUserCFDEMToExt();
+            cfdemCloud::reAllocateFieldsToDEM();
         //=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=
 
         arraysReallocated_ = true;
@@ -877,24 +841,18 @@ bool Foam::cfdemCloud::reAllocArrays(int nP, bool forceRealloc) const
     if( (numberOfParticlesChanged_ && !arraysReallocated_) || forceRealloc)
     {
         // get arrays of new length
-        dataExchangeM().allocateArray(positions_,0.,3,nP);
-        dataExchangeM().allocateArray(velocities_,0.,3,nP);
-        dataExchangeM().allocateArray(fluidVel_,0.,3,nP);
         dataExchangeM().allocateArray(impForces_,0.,3,nP);
         dataExchangeM().allocateArray(expForces_,0.,3,nP);
-        dataExchangeM().allocateArray(DEMForces_,0.,3,nP);
-        dataExchangeM().allocateArray(Cds_,0.,1,nP);
-        dataExchangeM().allocateArray(radii_,0.,1,nP);
         dataExchangeM().allocateArray(voidfractions_,1.,voidFractionM().maxCellsPerParticle(),nP);
         dataExchangeM().allocateArray(cellIDs_,0.,voidFractionM().maxCellsPerParticle(),nP);
         dataExchangeM().allocateArray(particleWeights_,0.,voidFractionM().maxCellsPerParticle(),nP);
         dataExchangeM().allocateArray(particleVolumes_,0.,voidFractionM().maxCellsPerParticle(),nP);
 
         //=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=
-        if(namesFieldsUserCFDEMToExt.size()!=particleDatFieldsUserCFDEMToExt.size())
-            allocateParticleDatFieldsUserCFDEMToExt();
+        if(namesfieldsToDEM.size()!=fieldsToDEM.size())
+            cfdemCloud::allocateFieldsToDEM();
         else
-            reAllocateParticleDatFieldsUserCFDEMToExt();
+            cfdemCloud::reAllocateFieldsToDEM();
         //=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=
         arraysReallocated_ = true;
         return true;
@@ -908,6 +866,15 @@ tmp<fvVectorMatrix> cfdemCloud::divVoidfractionTau(volVectorField& U,volScalarFi
     (
       - fvm::laplacian(voidfractionNuEff(voidfraction), U)
       - fvc::div(voidfractionNuEff(voidfraction)*dev2(fvc::grad(U)().T()))
+    );
+}
+
+tmp<fvVectorMatrix> cfdemCloud::divVoidfractionTau(volVectorField& U,volScalarField& voidfraction,volScalarField& rho) const
+{
+    return
+    (
+      - fvm::laplacian(rho*voidfractionNuEff(voidfraction), U)
+      - fvc::div(rho*voidfractionNuEff(voidfraction)*dev2(fvc::grad(U)().T()))
     );
 }
 
@@ -970,7 +937,7 @@ void cfdemCloud::calcMultiphaseTurbulence()
 /*tmp<fvVectorMatrix> cfdemCloud::ddtVoidfractionU(volVectorField& U,volScalarField& voidfraction) const
 {
     if (dataExchangeM().couplingStep() <= 2) return fvm::ddt(U);
-    
+
     return fvm::ddt(voidfraction,U);
 }*/
 
@@ -981,13 +948,13 @@ tmp<volScalarField> cfdemCloud::voidfractionNuEff(volScalarField& voidfraction) 
         return tmp<volScalarField>
         (
             #ifdef compre
-                new volScalarField("viscousTerm", (  turbulence_.mut()  
-                                                   + turbulence_.mu() 
+                new volScalarField("viscousTerm", (  turbulence_.mut()
+                                                   + turbulence_.mu()
                                                    + turbulenceMultiphase_
                                                   )
                                   )
             #else
-                new volScalarField("viscousTerm", (  turbulence_.nut() 
+                new volScalarField("viscousTerm", (  turbulence_.nut()
                                                    + turbulence_.nu()
                                                    + turbulenceMultiphase_
                                                   )
@@ -1000,13 +967,13 @@ tmp<volScalarField> cfdemCloud::voidfractionNuEff(volScalarField& voidfraction) 
         return tmp<volScalarField>
         (
             #ifdef compre
-                new volScalarField("viscousTerm", voidfraction*(  turbulence_.mut() 
+                new volScalarField("viscousTerm", voidfraction*(  turbulence_.mut()
                                                                 + turbulence_.mu()
                                                                 + turbulenceMultiphase_
                                                                )
                                   )
             #else
-                new volScalarField("viscousTerm", voidfraction*(  turbulence_.nut() 
+                new volScalarField("viscousTerm", voidfraction*(  turbulence_.nut()
                                                                 + turbulence_.nu()
                                                                 + turbulenceMultiphase_
                                                                )
@@ -1031,28 +998,29 @@ double **cfdemCloud::dragPrev()
 }
 // * * * * * * * * * * * * * * * *  IOStream operators * * * * * * * * * * * //
 //=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=
-void cfdemCloud::registerNamesFieldsUserCFDEMToExt(word fieldToRegister, int& positionInRegister)
+void cfdemCloud::registerFieldsToDEM(word name, word type, int& id, bool pull)
 {
     //check if field is available
-    Info << "cfdemCloud is registering field '" << fieldToRegister <<"'" << endl;
+    Info << "cfdemCloud is registering field '" << name <<"', and type '" << type << "' ..." << endl;
     std::vector<word>::iterator it;
-    it = std::find(namesFieldsUserCFDEMToExt.begin(), namesFieldsUserCFDEMToExt.end(), fieldToRegister);
-    if ( it != namesFieldsUserCFDEMToExt.end() )
+    it = std::find(namesfieldsToDEM.begin(), namesfieldsToDEM.end(), name);
+    if ( it != namesfieldsToDEM.end() )
     {
-        positionInRegister = std::distance(namesFieldsUserCFDEMToExt.begin(), it);
-        Info << "cfdemCloud found field '" << fieldToRegister << "' at position: " << positionInRegister << endl;
+        id = std::distance(namesfieldsToDEM.begin(), it);
+        Info << "cfdemCloud already found field '" << name << "' at position: " << id << endl;
     }
     else
     {
-        //if not, add to list of names
-        Info << "cfdemCloud COULD NOT find field '" << fieldToRegister <<"', will push to end." << endl;
-        namesFieldsUserCFDEMToExt.push_back(fieldToRegister);
-        positionInRegister = namesFieldsUserCFDEMToExt.size()-1;
+        Info << "cfdemCloud adds field '" << name <<"' at end of list." << endl;
+        namesfieldsToDEM.push_back(name);
+        typesfieldsToDEM.push_back(type);
+        pullfieldsToDEM.push_back(pull);
+        id = namesfieldsToDEM.size()-1;
     }
 }
 
 //****************************************
-bool cfdemCloud::checkAndregisterNamesFieldsUserCFDEMToExt(const wordList names, std::vector<int> & positionInRegister)
+bool cfdemCloud::checkAndRegisterFieldsToDEM(const wordList names, const word type, std::vector<int> & id)
 {
     bool validFieldName=false;
     forAll(names,i)    {
@@ -1060,75 +1028,157 @@ bool cfdemCloud::checkAndregisterNamesFieldsUserCFDEMToExt(const wordList names,
         if(names[i]!="none")
         {
             validFieldName = true;
-            registerNamesFieldsUserCFDEMToExt(names[i], tempPosition);
+            registerFieldsToDEM(names[i], type, tempPosition);
         }
-        positionInRegister.push_back(tempPosition);
+        id.push_back(tempPosition);
     }
     return validFieldName;
 }
 
 //****************************************
-void cfdemCloud::allocateParticleDatFieldsUserCFDEMToExt() const
+void cfdemCloud::allocateFieldsToDEM(word shapeType) const
 {
-    if(particleDatFieldsUserCFDEMToExt.size()>0)
-        FatalError << "cfdemCloud::allocateParticleDatFieldsUserCFDEMToExt(): you are attempting to allocate fields in a container that already contains elements. This is not allowed, please clear container." << abort(FatalError);
+    if(verbose_) Info << "cfdemCloud::allocateFieldsToDEM()" << endl;
+    if(fieldsToDEM.size()>0)
+        FatalError << "cfdemCloud::allocateFieldsToDEM(): you are attempting to allocate fields in a container that already contains elements. This is not allowed, please clear container." << abort(FatalError);
     //Go through list and allocate
-    for(std::vector<word>::const_iterator it = namesFieldsUserCFDEMToExt.begin(); it != namesFieldsUserCFDEMToExt.end(); ++it) 
+    for(std::vector<word>::iterator it = namesfieldsToDEM.begin(); it != namesfieldsToDEM.end(); ++it)
     {
-        Info << "allocating field with name '" << *it << "'" << endl;
-        particleDatFieldsUserCFDEMToExt.push_back(NULL); //Must be NULL, otherwise this might confuse external code
-        dataExchangeM().allocateArray(particleDatFieldsUserCFDEMToExt.back(),0.0,1);
+        int id = std::distance(namesfieldsToDEM.begin(), it);
+
+        fieldsToDEM.push_back(NULL); //Must be NULL, otherwise this might confuse external code
+
+        word type(typesfieldsToDEM[id]);
+        int len(-1);
+        if(type=="scalar-" + shapeType)
+            len=1;
+        else if(type=="vector-" + shapeType)
+            len=3;
+        else if(type=="vector2D-" + shapeType)
+            len=2;
+        else if(type=="quaternion-" + shapeType)
+            len=4;
+//         else
+//             FatalError << "cfdemCloud::allocateFieldsToDEM -- unknown array shape: "
+//                 << type << abort(FatalError);
+
+        if(len>0)
+        {
+            if(verbose_) Info << "cfdemCloud::allocateFieldsToDEM() allocating field with name '" << *it << "'" << endl;
+            dataExchangeM().allocateArray(fieldsToDEM.back(),0.0,len);
+        }
     }
 }
 
 //****************************************
-void cfdemCloud::reAllocateParticleDatFieldsUserCFDEMToExt() const
+void cfdemCloud::reAllocateFieldsToDEM(word shapeType) const
 {
+    if(verbose_) Info << "cfdemCloud::reAllocateFieldsToDEM()" << endl;
     //Go through list and allocate
-    for(std::vector<word>::iterator it = namesFieldsUserCFDEMToExt.begin(); it != namesFieldsUserCFDEMToExt.end(); ++it) 
+    for(std::vector<word>::iterator it = namesfieldsToDEM.begin(); it != namesfieldsToDEM.end(); ++it)
     {
-        int positionInRegister = std::distance(namesFieldsUserCFDEMToExt.begin(), it);
-        if(verbose_)
-            Info << "reAllocating field with name '" << *it << "' at position: " << positionInRegister << endl;
-        dataExchangeM().allocateArray(particleDatFieldsUserCFDEMToExt[positionInRegister],0.0,1);
+        int id = std::distance(namesfieldsToDEM.begin(), it);
+
+        word type(typesfieldsToDEM[id]);
+        int len(-1);
+        if(type=="scalar-" + shapeType)
+            len=1;
+        else if(type=="vector-" + shapeType)
+            len=3;
+        else if(type=="vector2D-" + shapeType)
+            len=2;
+        else if(type=="quaternion-" + shapeType)
+            len=4;
+//         else
+//             FatalError << "cfdemCloud::reAllocateFieldsToDEM -- unknown array shape: "
+//                 << type << abort(FatalError);
+
+
+        if(len>0)
+        {
+            if(verbose_) Info << "cfdemCloud::reAllocateFieldsToDEM() reAllocating field with name '" << *it << "' at position: " << id << endl;
+            dataExchangeM().allocateArray(fieldsToDEM[id],0.0,len);
+        }
     }
 }
 
 //****************************************
-void cfdemCloud::zeroizeParticleDatFieldsUserCFDEMToExt()
+void cfdemCloud::zeroizeFieldsToDEM(word shapeType)
 {
     //Go through list and set zero
-    for(std::vector<word>::iterator it = namesFieldsUserCFDEMToExt.begin(); it != namesFieldsUserCFDEMToExt.end(); ++it) 
+    for(std::vector<word>::iterator it = namesfieldsToDEM.begin(); it != namesfieldsToDEM.end(); ++it)
     {
-        int positionInRegister = std::distance(namesFieldsUserCFDEMToExt.begin(), it);
-        if(verbose_)
-            Info << "Zeroizing field with name '" << *it << "' at position: " << positionInRegister << endl;
-        resetArray(particleDatFieldsUserCFDEMToExt[positionInRegister],numberOfParticles(),1);
+        int id = std::distance(namesfieldsToDEM.begin(), it);
+        if(!pullfieldsToDEM[id])
+        {
+            if(typesfieldsToDEM[id]=="scalar-" + shapeType)
+            {
+                //if(verbose_)
+                Info << "Zeroizing field with name '" << *it
+                     << "' at position: " << id
+                     << " with type " << typesfieldsToDEM[id] << endl;
+                resetArray(fieldsToDEM[id],numberOfParticles(),1);
+            }
+            else if(typesfieldsToDEM[id]=="vector-" + shapeType)
+            {
+                //if(verbose_)
+                Info << "Zeroizing field with name '" << *it
+                     << "' at position: " << id
+                     << " with type " << typesfieldsToDEM[id] << endl;
+                resetArray(fieldsToDEM[id],numberOfParticles(),3);
+            }
+        }
     }
-
 }
 
 //****************************************
-void cfdemCloud::accessParticleDatFieldsUserCFDEMToExt(word fieldToAccess, double **& fieldData)
+void cfdemCloud::accessFieldsToDEM(word name, double **& field)
 {
     //set pointer to correct location in the memory
     if(verbose_)
-        Info << "cfdemCloud is accessing field '" << fieldToAccess << "'" << endl;
+        Info << "cfdemCloud is accessing field '" << name << "'" << endl;
     std::vector<word>::iterator it;
-    it = std::find(namesFieldsUserCFDEMToExt.begin(), namesFieldsUserCFDEMToExt.end(), fieldToAccess);
-    if ( it != namesFieldsUserCFDEMToExt.end() )
+    it = std::find(namesfieldsToDEM.begin(), namesfieldsToDEM.end(), name);
+    if ( it != namesfieldsToDEM.end() )
     {
-        int positionInRegister = std::distance(namesFieldsUserCFDEMToExt.begin(), it);
+        int id = std::distance(namesfieldsToDEM.begin(), it);
         if(verbose_)
-            Info << "cfdemCloud found field '" << fieldToAccess << "' at position: " << positionInRegister << endl;
-        fieldData = particleDatFieldsUserCFDEMToExt[positionInRegister];
+            Info << "cfdemCloud found field '" << name << "' at position: " << id << endl;
+        field = fieldsToDEM[id];
     }
     else
-            FatalError << "field " << fieldToAccess 
+            FatalError << "field " << name
                        << " not found."
                        << abort(FatalError);
 }
+//****************************************
+int cfdemCloud::existsFieldsToDEM(word name)
+{
+    //set pointer to correct location in the memory
+    if(verbose_)
+        Info << "cfdemCloud is testing existence field '" << name << "'" << endl;
+
+    int id(-1);
+    std::vector<word>::iterator it;
+    it = std::find(namesfieldsToDEM.begin(), namesfieldsToDEM.end(), name);
+    if ( it != namesfieldsToDEM.end() )
+    {
+        id = std::distance(namesfieldsToDEM.begin(), it);
+        if(verbose_)
+        {
+            if(pullfieldsToDEM[id]) Info << "  cfdemCloud found the pull field '" << name << "' at position: " << id << endl;
+            else  Info << "  cfdemCloud found the push field '" << name << "' at position: " << id << endl;
+        }
+    }
+    else
+    {
+        if(verbose_)
+            Info << "  cfdemCloud could not fine field '" << name << "'" << endl;
+    }
+    return id;
+}
 //=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=
+
 // * * * * * * * * * * * * * * * *  IOStream operators * * * * * * * * * * * //
 
 #include "cfdemCloudIO.C"

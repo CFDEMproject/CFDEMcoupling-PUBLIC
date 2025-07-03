@@ -83,6 +83,8 @@ public:
 
     // Member Functions
         void setForce() const;
+
+        void MSinit();
 };
 
 

@@ -45,7 +45,7 @@ averagingModel dense;//dilute;//
 
 clockModel off; //standardClock;//
 
-smoothingModel  constDiffSmoothing; //off;//
+smoothingModel  off; //constDiffSmoothing; //off;//
 
 //useDDTvoidfraction;
 
@@ -81,51 +81,41 @@ constDiffSmoothingProps
 
 implicitCoupleProps
 {
-    velFieldName "U";
-    granVelFieldName "Us";
-    voidfractionFieldName "voidfraction";
 }
 
 DiFeliceDragProps
 {
-    velFieldName "U";
-    voidfractionFieldName "voidfraction";
-    granVelFieldName "Us";
     verbose true;
     
     //- use of scalar viscosity for drag
     //scalarViscosity true;
     //nu nu [ 0 2 -1 0 0 0 0 ] 1e-04;
+
+    implForceDEM false; // corresponds to couple/cfd/force force explicit
 }
 
 SchillerNaumannDragProps
 {
-    velFieldName "U";
     densityFieldName "rho";
 }
 
 KochHillDragProps
 {
-    velFieldName "U";
     densityFieldName "rho";
-    voidfractionFieldName "voidfraction";
 }
 
 MeiLiftProps
 {
-    velFieldName "U";
     densityFieldName "rho";
 }
 
 ArchimedesProps
 {
     densityFieldName "rho";
-    gravityFieldName "g";
 }
 
 virtualMassForceProps
 {
-    velFieldName "U";
     densityFieldName "rho";
 }
 
@@ -154,14 +144,12 @@ centreProps
 dividedProps
 {
     alphaMin 0.3;
-    scaleUpVol 1.0;
 }
 
 bigParticleProps
 {
     maxCellsPerParticle 1000;
     alphaMin 0.30;
-    scaleUpVol 1.0;
 }
 
 "(engineProps|turboEngineM2MProps)"

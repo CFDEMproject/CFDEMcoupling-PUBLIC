@@ -59,7 +59,7 @@ forceSubModel::forceSubModel
     dict_(dict),
     particleCloud_(sm),
     forceModel_(fm),
-    nrDefaultSwitches_(11),                                          // !!!
+    nrDefaultSwitches_(34),                                          // !!!
     switchesNameList_(wordList(nrDefaultSwitches_)),
     switchesList_(List<Switch>(nrDefaultSwitches_)),
     switches_(List<Switch>(nrDefaultSwitches_)),
@@ -119,8 +119,10 @@ forceSubModel::forceSubModel
     rho_(sm.mesh().lookupObject<volScalarField> (densityFieldName_)),
     verboseDiskIntervall_(1),
     verboseDiskCounter_(0),
-    scaleDia_(dict_.lookupOrDefault<scalar>("scale",1.)),
+    cg_(dict_.lookupOrDefault<scalar>("scale",1.)),
     scaleDrag_(dict_.lookupOrDefault<scalar>("scaleDrag",1.)),
+    scaleDragLocal_(dict_.lookupOrDefault<scalar>("scaleDragLocal",1.)),
+    scaleTorque_(dict_.lookupOrDefault<scalar>("scaleTorque",1.)),
     scaleDH_(dict_.lookupOrDefault<scalar>("scaleDH",1.))
 {
     // init standard switch list
@@ -132,10 +134,33 @@ forceSubModel::forceSubModel
     switchesNameList_[iCounter]="interpolation";iCounter++;         //4
     switchesNameList_[iCounter]="useFilteredDragModel";iCounter++;  //5
     switchesNameList_[iCounter]="useParcelSizeDependentFilteredDrag";iCounter++;  //6
-	switchesNameList_[iCounter]="implForceDEMaccumulated";iCounter++;             //7
-	switchesNameList_[iCounter]="scalarViscosity";iCounter++;                     //8
-	switchesNameList_[iCounter]="verboseToDisk";iCounter++;                       //9
+    switchesNameList_[iCounter]="implForceDEMaccumulated";iCounter++;             //7
+    switchesNameList_[iCounter]="scalarViscosity";iCounter++;                     //8
+    switchesNameList_[iCounter]="verboseToDisk";iCounter++;                       //9
     switchesNameList_[iCounter]="useCorrectedVoidage";iCounter++;                 //10
+    switchesNameList_[iCounter]="multisphere";iCounter++;                         //11
+    switchesNameList_[iCounter]="useTorque";iCounter++;                           //12
+    switchesNameList_[iCounter]="anisotropicDrag";iCounter++;                     //13
+    switchesNameList_[iCounter]="pullRotation";iCounter++;                        //14
+    switchesNameList_[iCounter]="pullOrientation";iCounter++;                     //15
+    switchesNameList_[iCounter]="pullShape";iCounter++;                           //16
+    switchesNameList_[iCounter]="voidageFunctionDiFelice";iCounter++;             //17
+    switchesNameList_[iCounter]="voidageFunctionRong";iCounter++;                 //18
+    switchesNameList_[iCounter]="useUf";iCounter++;                               //19
+    switchesNameList_[iCounter]="useFhydro";iCounter++;                           //20
+    switchesNameList_[iCounter]="implTorqueDEM";iCounter++;                       //21
+    switchesNameList_[iCounter]="useVisc";iCounter++;                             //22
+    switchesNameList_[iCounter]="voidageFunctionTang";iCounter++;                 //23
+    switchesNameList_[iCounter]="useMpData";iCounter++;                           //24
+    switchesNameList_[iCounter]="superquadric";iCounter++;                        //25
+    switchesNameList_[iCounter]="useQuaternion";iCounter++;                       //26
+    switchesNameList_[iCounter]="pushTurbulence";iCounter++;                      //27
+    switchesNameList_[iCounter]="particleSpecificCG";iCounter++;                  //28
+    switchesNameList_[iCounter]="convex";iCounter++;                              //29
+    switchesNameList_[iCounter]="pullType";iCounter++;                            //30
+    switchesNameList_[iCounter]="pullDensity";iCounter++;                         //31
+    switchesNameList_[iCounter]="pushConvectiveHeatFlux";iCounter++;              //32
+    switchesNameList_[iCounter]="pullTemp";iCounter++;                            //33
 
     // should be done by default
     //for(int i=0;i<switchesList_.size();i++)
@@ -149,12 +174,12 @@ forceSubModel::forceSubModel
         FatalError<< "please check the nr of switches defined in forceSubModel class." << abort(FatalError);
 
     // info about scaleDia being used
-    if (scaleDia_ != 1)
-        Info << "using scale = " << scaleDia_ << endl;
+    if (cg_ != 1)
+        Info << "using scale = " << cg_ << endl;
     else if (particleCloud_.cg() != 1)
     {
-        scaleDia_=particleCloud_.cg();
-        Info << "using scale from liggghts cg = " << scaleDia_ << endl;
+        cg_=particleCloud_.cg();
+        Info << "using scale from liggghts cg = " << cg_ << endl;
     }
 
     // info about scaleDrag being used
@@ -165,6 +190,20 @@ forceSubModel::forceSubModel
        FatalError<< "scaleDrag > 0 required" << abort(FatalError);
 
     particleCloud_.registryM().addProperty("scaleDrag",scaleDrag_);
+
+    // info about scaleDrag being used
+    if (scaleDragLocal_ != 1.)
+        Info << "using scaleDragLocal = " << scaleDragLocal_ << endl;
+
+    if (scaleDragLocal_ < SMALL)
+       FatalError<< "scaleDragLocal > 0 required" << abort(FatalError);
+
+    // info about scaleTorque being used
+    if (scaleTorque_ != 1.)
+        Info << "using scaleTorque = " << scaleTorque_ << endl;
+
+    if (scaleTorque_ < SMALL)
+       FatalError<< "scaleTorque > 0 required" << abort(FatalError);
 
     // info about scaleDH being used
     if (scaleDH_ != 1)
@@ -184,21 +223,22 @@ void forceSubModel::partToArray
     const vector& dragTot,
     const vector& dragEx,
     const vector& Ufluid,
-    scalar Cd
+    scalar Cd,
+    const vector& CdExtra
 ) const
 {
     // forces for CFD
-    if(!switches_[1])// !treatForceDEM
+    if(!treatForceDEM())
     {
-        if(switches_[0]) // treatForceExplicit
+        if(treatForceExplicit())
         {
             for(int j=0;j<3;j++)
                 myForceM().expForces()[index][j] += dragTot[j];
-        }    
+        }
         else   //implicit treatment, taking explicit force contribution into account
         {
-            for(int j=0;j<3;j++) 
-            { 
+            for(int j=0;j<3;j++)
+            {
                 myForceM().impForces()[index][j] += dragTot[j] - dragEx[j];
                 myForceM().expForces()[index][j] += dragEx[j];
             }
@@ -206,45 +246,55 @@ void forceSubModel::partToArray
     }
 
     // forces for DEM
-    if(switches_[2]) // implForceDEM
+    if(implForceDEM())
     {
-        for(int j=0;j<3;j++)
-            myForceM().fluidVel()[index][j]=Ufluid[j];
-
-        myForceM().Cds()[index][0]=Cd;
-    }
-    else
-    {
-        for(int j=0;j<3;j++) 
-            myForceM().DEMForces()[index][j] += dragTot[j];
-    }
-}
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-void forceSubModel::partToArrayAnisotropic
-(
-    const label& index,
-    const vector& CdExtra,
-    const vector& dragEx //this is the remaining explictit drag
-) const
-{
-
-    if(switches_[2]) // implForceDEM
-    {
-        for(int iDir=0;iDir<3;iDir++)
+        if(ms())
         {
-            myForceM().CdsExtra()[index][iDir]   = CdExtra[iDir];
-            myForceM().DEMForces()[index][iDir] += dragEx[iDir];
+            for(int j=0;j<3;j++)
+                particleCloud_.fieldsToDEM[particleCloud_.idUfCM()][index][j] = Ufluid[j];
+
+            if(anisotropicDrag())
+            {
+                for(int j=0;j<3;j++)
+                    particleCloud_.fieldsToDEM[particleCloud_.idKslExtraCM()][index][j] = CdExtra[j];
+
+                for(int j=0;j<3;j++)
+                    particleCloud_.fieldsToDEM[particleCloud_.idDragExpCM()][index][j] += dragEx[j];
+            }
+            else
+                particleCloud_.fieldsToDEM[particleCloud_.idKslCM()][index][0] = Cd;
         }
-        if(switches_[3]) Pout << "*********forceSubModel::partToArrayAnisotropic: CdExtra: " 
-                              << CdExtra 
-                              << ", dragEx: " << dragEx << endl;
+        else
+        {
+            for(int j=0;j<3;j++)
+                particleCloud_.fieldsToDEM[particleCloud_.idUf()][index][j] = Ufluid[j];
+
+            if(anisotropicDrag())
+            {
+                for(int j=0;j<3;j++)
+                    particleCloud_.fieldsToDEM[particleCloud_.idKslExtra()][index][j] = CdExtra[j];
+
+                for(int j=0;j<3;j++)
+                    particleCloud_.fieldsToDEM[particleCloud_.idDragExp()][index][j] += dragEx[j];
+            }
+            else
+                particleCloud_.fieldsToDEM[particleCloud_.idKsl()][index][0] = Cd;
+        }
     }
     else
-         FatalError<< "You are not using 'implForceDEM', but you want to update anisotropic drag data. This will not work." << abort(FatalError);   
-    
+    {
+        if(ms())
+        {
+            for(int j=0;j<3;j++)
+                particleCloud_.fieldsToDEM[particleCloud_.idDragExpCM()][index][j] += dragTot[j];
+        }
+        else
+        {
+            for(int j=0;j<3;j++)
+                particleCloud_.fieldsToDEM[particleCloud_.idDragExp()][index][j] += dragTot[j];
+        }
+    }
 }
-
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 void forceSubModel::partToArrayAnisotropicTorque
@@ -255,21 +305,42 @@ void forceSubModel::partToArrayAnisotropicTorque
 ) const
 {
 
-    if(switches_[2]) // implForceDEM - also implies implicit torque!
+    if(useTorque())
     {
-        for(int iDir=0;iDir<3;iDir++)
+        if(implTorqueDEM())
         {
-            myForceM().CdsRotation()[index][iDir]   = CdTorque[iDir];
-            myForceM().DEMTorques()[index][iDir]   += torqueTotal[iDir];
-           
+            if(ms())
+            {
+                for(int iDir=0;iDir<3;iDir++)
+                {
+                    particleCloud_.fieldsToDEM[particleCloud_.idKslRotationCM()][index][iDir] = CdTorque[iDir];
+                    particleCloud_.fieldsToDEM[particleCloud_.idTorqueExpCM()][index][iDir] += torqueTotal[iDir];
+                }
+                /*if(verbose()) Pout << "*********forceSubModel::partToArrayAnisotropic: CdTorque: "
+                                      << CdTorque
+                                      << ", torqueTotal: " << torqueTotal << endl;*/
+            }
+            else
+            {
+                for(int iDir=0;iDir<3;iDir++)
+                {
+                    particleCloud_.fieldsToDEM[particleCloud_.idKslRotation()][index][iDir] = CdTorque[iDir];
+                    particleCloud_.fieldsToDEM[particleCloud_.idTorqueExp()][index][iDir] += torqueTotal[iDir];
+                }
+            }
         }
-        if(switches_[3]) Pout << "*********forceSubModel::partToArrayAnisotropic: CdTorque: " 
-                              << CdTorque 
-                              << ", torqueTotal: " << torqueTotal << endl;
+        else
+        {
+            for(int iDir=0;iDir<3;iDir++)
+                particleCloud_.fieldsToDEM[particleCloud_.idTorqueExpCM()][index][iDir] += torqueTotal[iDir];
+        }
+
     }
     else
-         FatalError<< "You are not using 'implForceDEM', but you want to update anisotropic torque data. This will not work." << abort(FatalError);   
-    
+    {
+        if(index==0) Info << "forceSubModel::partToArrayAnisotropicTorque, useTorque=false" << endl;
+    }
+
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -283,20 +354,20 @@ void forceSubModel::explicitCorr
     vector& Us,
     const vector& UsCell,
     bool verbose,
-    label index    
+    label index
 ) const
 {
     dragExplicit=vector::zero;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-void forceSubModel::explicitCorrScalar(scalar& sourceKImplicit, 
-                                       scalar& sourceExplicit, 
-                                       scalar& areaTimesTransferCoefficient, 
-                                       scalar& fluidProperty, 
-                                       const   scalar& fluidPropertyCell, 
-                                       scalar& particleProperty, 
-                                       bool    verbose, 
+void forceSubModel::explicitCorrScalar(scalar& sourceKImplicit,
+                                       scalar& sourceExplicit,
+                                       scalar& areaTimesTransferCoefficient,
+                                       scalar& fluidProperty,
+                                       const   scalar& fluidPropertyCell,
+                                       scalar& particleProperty,
+                                       bool    verbose,
                                        label   index) const
 {
 
@@ -308,11 +379,11 @@ void forceSubModel::explicitCorrScalar(scalar& sourceKImplicit,
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-void forceSubModel::update( label    particleI, 
+void forceSubModel::update( label    particleI,
                             label    cellI,
                             scalar&  d,
-                            scalar&  scalToUpdate1, 
-                            scalar&  scalToUpdate2, 
+                            scalar&  scalToUpdate1,
+                            scalar&  scalToUpdate2,
                             bool     verbose
                           ) const
 {
@@ -335,37 +406,46 @@ void forceSubModel::update( label    particleI,
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 void forceSubModel::scaleDia(scalar& d, int index) const
 {
-    if(particleCloud_.cgTypeSpecificDifferent)
-        d /= particleCloud_.cg(particleCloud_.particleType(index));
+    if (particleCG() || particleCloud_.cgTypeSpecificDifferent_)
+        d /= particleCloud_.cg(index) / scaleDH_;
     else
-        d /= scaleDia_ / scaleDH_;
+        d /= cg_ / scaleDH_;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 void forceSubModel::scaleForce(vector& force, scalar& d, int index) const
 {
-    if(particleCloud_.cgTypeSpecificDifferent)
-    {
-        double cgCurr = particleCloud_.cg(particleCloud_.particleType(index));
-        force *= cgCurr*cgCurr*cgCurr;
-    }
+    if (particleCG() || particleCloud_.cgTypeSpecificDifferent_)
+        force *= getCG(index)*getCG(index)*getCG(index);
     else
-        force *= scaleDia_*scaleDia_*scaleDia_;
-           
+        force *= cg_*cg_*cg_;
+
     force *= scaleDrag_;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-void forceSubModel::scaleCoeff(scalar& coeff, scalar& d, int index) const
+void forceSubModel::scaleCoeff(scalar& coeff, scalar& d, scalar& Rep, int index) const
 {
-    if(particleCloud_.cgTypeSpecificDifferent)
-    {
-        double cgCurr = particleCloud_.cg(particleCloud_.particleType(index));
-        coeff *= cgCurr*cgCurr*cgCurr;
-    }
+    if (particleCG() || particleCloud_.cgTypeSpecificDifferent_)
+        coeff *= getCG(index)*getCG(index)*getCG(index);
     else
-        coeff *= scaleDia_*scaleDia_*scaleDia_;
-        
+        coeff *= cg_*cg_*cg_;
+
     coeff *= scaleDrag_;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+void forceSubModel::scaleForceLocal(vector& force) const
+{
+    force *= scaleDragLocal_;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+void forceSubModel::scaleTorque(vector& torque) const
+{
+    torque *= scaleTorque_;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+const scalar forceSubModel::scaleDrag(int index) const
+{
+    return particleCloud_.cg(index);
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 void forceSubModel::explicitLimit
@@ -391,20 +471,24 @@ void forceSubModel::readSwitches() const
             {
                 Info << " reading switches:" << endl;
                 first = false;
-            }    
+            }
             Info << "  looking for " << switchesNameList_[i] << " ... ";
             if (dict_.found(switchesNameList_[i]))
             {
                 Info << " found in dict. " ;
                 switches_[i]=Switch(dict_.lookup(switchesNameList_[i]));
-            }else Info << " not found in dict, using default. " ;
-                
+            }else
+            {
+                Info << " not found in dict, using default. " ;
+                if(i==2) Warning << "\n You are using the default value for 'implForceDEM' - beware that in CFDEMcoupling versions newer than 3.8.0 this default value has changed from (previously) false to (now) true!" << endl;
+            }
+
             // user set treatForceExplicit to true && no explicitCouple model is defined && treatForceDEM=false(i.e. it will go to f) && modelType != "none"
             if(i==0 && switches_[0] > 0+SMALL && particleCloud_.registryM().getProperty("explicitCouple_index") < 0 && switches_[1] < 0+SMALL && particleCloud_.modelType() != "none")
                 FatalError <<  "You are using treatForceExplicit=true here, this requres having an explicit momentum couple model!" << abort(FatalError);
             else
                 Info << switchesNameList_[i] << " = " << switches_[i] << endl;
-        } 
+        }
     }
     Info << endl;
 
@@ -424,11 +508,11 @@ void forceSubModel::readSwitches() const
         if(switchesList_[i] < 0+SMALL) //check if switch is NOT read from dict but exists
         {
             Info << "\t" << switchesNameList_[i] << " = " << switches_[i] << endl;
-        }      
+        }
     }
     Info << endl;*/
 
-    if(switches_[2]) // implForceDEM=true
+    if(implForceDEM()) // implForceDEM=true
     {
         // communicate implForceDEM to particleCloud
         particleCloud_.impDEMdrag_=true;
@@ -439,7 +523,7 @@ void forceSubModel::readSwitches() const
         /*
         if(switches_[0]) // treatExplicit=true
         {
-            FatalError << "Please check your settings, treatExplicit together with implForceDEM does not work!." 
+            FatalError << "Please check your settings, treatExplicit together with implForceDEM does not work!."
                        << abort(FatalError);
         }
         */
@@ -496,49 +580,181 @@ void forceSubModel::readSwitches() const
         }*/
     }
 
+    if(anisotropicDrag() && !implForceDEM())
+        FatalError<< "You have set 'implForceDEM' to false, but 'anisotropicDrag' to true."<< abort   (FatalError);
+
     // read extra variables
     dict_.readIfPresent("verboseDiskIntervall", verboseDiskIntervall_);
 
     // look for old nomenclature
     if (dict_.found("treatExplicit") || dict_.found("treatDEM") || dict_.found("implDEM"))
         FatalError<< "You are using an old nomenclature for force model settings, please have a look at the forceSubModel doc." << abort(FatalError);
-        
+
     // look for old nomenclature
     if (dict_.found("verbose"))
         Warning<< "Please make sure you use the new nomenclature for verbose force model settings, please have a look at the forceSubModel doc." << endl;
+}
 
-    //if (dict_.found("interpolation"))
-    //    FatalError<< "Please make sure you use the new nomenclature for interpolation in force model settings, please have a look at the forceSubModel doc." << endl;
+void forceSubModel::setupCommunication() const
+{
+    particleCloud_.registerFieldsToDEM("radius","scalar-atom",particleCloud_.idRadius(),true);
+    particleCloud_.registerFieldsToDEM("x","vector-atom",particleCloud_.idPos(),true);
+    particleCloud_.registerFieldsToDEM("v","vector-atom",particleCloud_.idVel(),true);
+
+    if(particleCloud_.impDEMdragAcc())
+        particleCloud_.registerFieldsToDEM("dragAcc","vector-atom",particleCloud_.idFacc(),true);
+
+    if(ms())
+    {
+        if(implForceDEM())
+        {
+            if(anisotropicDrag())
+                particleCloud_.registerFieldsToDEM("Ksl_Extra_cm","vector-multisphere",particleCloud_.idKslExtraCM());
+            else
+                particleCloud_.registerFieldsToDEM("Ksl_cm","scalar-multisphere",particleCloud_.idKslCM());
+
+            particleCloud_.registerFieldsToDEM("uf_cm","vector-multisphere",particleCloud_.idUfCM());
+        }
+        else
+        {
+            particleCloud_.registerFieldsToDEM("dragforce_cm","vector-multisphere",particleCloud_.idDragExpCM());
+        }
+        if(useTorque())
+        {
+            if(implTorqueDEM())
+            {
+                particleCloud_.registerFieldsToDEM("KslRotation","vector-multisphere",particleCloud_.idKslRotationCM()); // TODO: this should have other name on DEM side (is ambigous with MS version)
+            }
+            particleCloud_.registerFieldsToDEM("hdtorque_cm","vector-multisphere",particleCloud_.idTorqueExpCM());
+        }
+    }
+    else
+    {
+        if(implForceDEM())
+        {
+            if(anisotropicDrag())
+                particleCloud_.registerFieldsToDEM("KslExtra","vector-atom",particleCloud_.idKslExtra());
+            else
+                particleCloud_.registerFieldsToDEM("Ksl","scalar-atom",particleCloud_.idKsl());
+
+            particleCloud_.registerFieldsToDEM("uf","vector-atom",particleCloud_.idUf());
+        }
+        else
+        {
+            particleCloud_.registerFieldsToDEM("dragforce","vector-atom",particleCloud_.idDragExp());
+        }
+        if(useTorque())
+        {
+            if(implTorqueDEM())
+            {
+                particleCloud_.registerFieldsToDEM("KslRotation","vector-atom",particleCloud_.idKslRotation());
+            }
+            particleCloud_.registerFieldsToDEM("hdtorque","vector-atom",particleCloud_.idTorqueExp());
+        }
+    }
+
+
+    if(pullRotation())
+        particleCloud_.registerFieldsToDEM("omega","vector-atom",particleCloud_.idPullRotation(),true);
+
+    if(pullOrientation())
+    {
+        if(ms())
+        {
+            particleCloud_.registerFieldsToDEM("ex_space","vector-multisphere",particleCloud_.idPullOrientation(),true);
+            particleCloud_.registerFieldsToDEM("ey_space","vector-multisphere",particleCloud_.idPullOrientation1(),true);
+        }
+        else
+        {
+            particleCloud_.registerFieldsToDEM("ex","vector-atom",particleCloud_.idPullOrientation(),true);
+        }
+    }
+    if(pullShape())
+        particleCloud_.registerFieldsToDEM("shape","vector-atom",particleCloud_.idPullShape(),true);
+    if(useUf())
+        particleCloud_.registerFieldsToDEM("uf","vector-atom",particleCloud_.idUf());
+    if(useFhydro())
+        particleCloud_.registerFieldsToDEM("Fhydro","vector-atom",particleCloud_.idFhydro(),true);
+    if(useVisc())
+        particleCloud_.registerFieldsToDEM("muf","scalar-atom",particleCloud_.idVisc());
+
+    if(sq())
+    {
+        particleCloud_.registerFieldsToDEM("area","scalar-atom",particleCloud_.idArea(),true);
+        particleCloud_.registerFieldsToDEM("volume","scalar-atom",particleCloud_.idVol(),true);
+        particleCloud_.registerFieldsToDEM("blockiness","vector2D-atom",particleCloud_.idBlockiness(),true);
+    }
+    if(convex())
+    {
+        particleCloud_.registerFieldsToDEM("rmass","scalar-atom",particleCloud_.idMass(),true);
+        particleCloud_.registerFieldsToDEM("density","scalar-atom",particleCloud_.idDensity(),true);
+        particleCloud_.registerFieldsToDEM("shapetype","scalar-atom",particleCloud_.idType(),true);
+    }
+    if(pullType())
+    {
+        word nameForType;
+        if(particleCloud_.shapeTypeName()=="convex")
+            nameForType=word("shapetype");
+        else
+        {
+            nameForType=word("type");
+            Warning <<"\n  Using (material) type to distinguish types (e.g. scaleVol).\n"
+                    <<"  You might use separate material types if you want to scale them separately." << endl;
+        }
+        //TODO use e.g. group to identify different sq types and use groups for SQ templates
+        //if(particleCloud_.shapeTypeName()=="superquadric")
+        particleCloud_.registerFieldsToDEM(nameForType,"scalar-atom",particleCloud_.idType(),true);
+    }
+    if(pullDensity())
+        particleCloud_.registerFieldsToDEM("density","scalar-atom",particleCloud_.idDensity(),true);
+    if(pushConvectiveHeatFlux())
+        particleCloud_.registerFieldsToDEM("convectiveHeatFlux","scalar-atom",particleCloud_.idConvectiveHeatFlux());
+    if(pullTemp())
+        particleCloud_.registerFieldsToDEM("Temp","scalar-atom",particleCloud_.idTemp(),true);
+    if(useQuat())
+        particleCloud_.registerFieldsToDEM("quaternion","quaternion-atom",particleCloud_.idQuat(),true);
+
+    if(pushTurbulence())
+    {
+        particleCloud_.registerFieldsToDEM("k","scalar-atom",particleCloud_.idK());
+        particleCloud_.registerFieldsToDEM("epsilon","scalar-atom",particleCloud_.idEpsilon());
+    }
+
+    if (particleCG())
+    {
+        particleCloud_.registerFieldsToDEM("dSauter", "scalar-atom", particleCloud_.idParticleCG(), true);
+        particleCloud_.cgParticleSpecific_ = true;
+    }
 }
 
 const volScalarField& forceSubModel::nuField() const
 {
     #ifdef compre
-        nu_=particleCloud_.turbulence().mu() / rho_;
+        nu_=particleCloud_.turbulence_.mu() / rho_;
         return nu_;
     #else
         if(switches_[8]) // scalarViscosity=true
             return nu_;
         else
-            return particleCloud_.turbulence().nu();
+            return particleCloud_.turbulence_.nu();
     #endif
 }
 
 const volScalarField& forceSubModel::muField() const
 {
     #ifdef compre
-        return particleCloud_.turbulence().mu();
+        return particleCloud_.turbulence_.mu();
     #else
         if(switches_[8]) // scalarViscosity=true
         {
             // usage of constant mu_ is still commented, as not tested
-            // particleCloud_.turbulence().nu()*rho_ does not work properly
+            // particleCloud_.turbulence_.nu()*rho_ does not work properly
             FatalError<< "implementation not complete!" << abort(FatalError);
             //return mu_; // to be used with above code to set mu_ in readSwitches()
 
-            return particleCloud_.turbulence().nu()*rho_;// for now just to have a return
+            return particleCloud_.turbulence_.nu()*rho_;// for now just to have a return
         }else
-            return particleCloud_.turbulence().nu()*rho_;
+            return particleCloud_.turbulence_.nu()*rho_;
     #endif
 }
 
@@ -570,6 +786,51 @@ const volVectorField& forceSubModel::IBDragPerV(const volVectorField& U,const vo
         IBDragPerV_ = rhoField()*(nuField()*fvc::laplacian(U)-fvc::grad(p));
     #endif
     return IBDragPerV_;
+}
+
+void forceSubModel::calcXi(const scalar& ds, const scalar& voidfraction, const scalar& magUr, const scalar& nuf, scalar& Xi ) const
+{
+    if(!(voidageFunctionDiFelice() || voidageFunctionRong() || voidageFunctionTang()))
+    {
+        Xi = 2;
+    } else if(!(voidageFunctionDiFelice() ^ voidageFunctionRong() ^ voidageFunctionTang() ))
+    { //triple XOR, "There can be only one!"
+        FatalError<< "Only one drag correction function permitted, please select either voidageFunctionDiFelice OR voidageFunctionRong!" << abort(FatalError);
+    } else if (voidageFunctionDiFelice())
+    {
+        // calc DiFelice drag correction
+
+        // calc particle Re number
+        scalar Rep = ds*voidfraction*magUr/(nuf+SMALL);
+
+        // calc Xi
+        if(Rep < SMALL)
+            Xi = 3.7;
+        else
+            Xi = 3.7 - 0.65 * exp(-sqr(1.5-log10(Rep))/2);
+
+    } else if (voidageFunctionRong())
+    {
+        // calculate Rong drag correction
+
+        scalar Rep = ds*voidfraction*magUr/(nuf+SMALL);
+        if(Rep < SMALL)
+            Xi = 2.65 * (voidfraction + 1.0);
+        else
+            Xi = 2.65 * (voidfraction + 1.0) - (5.3-3.5*voidfraction)*voidfraction*voidfraction*exp(-sqr(1.5-Foam::log10(Rep))/2.0);
+    } else if (voidageFunctionTang())
+    {
+        // calculate Tang drag correction
+        scalar Rep = ds*voidfraction*magUr/(nuf+SMALL);
+        if(Rep < SMALL || 1 - voidfraction < SMALL)
+            Xi = 2;
+        else
+            Xi = 2 -
+            Foam::log10(((1.5*sqrt(1-voidfraction)+1)*voidfraction*voidfraction - (10*(voidfraction-1))/(voidfraction*voidfraction) +
+             (0.0644*pow(voidfraction,-4)+0.169*voidfraction)*pow(Rep,0.657) - (0.00456*Rep)*pow(voidfraction,-4) + 0.11*(voidfraction-2)*(voidfraction-1)*Rep)
+             / (0.2334*pow(Rep,0.657) - 0.00456*Rep + 1))
+            / Foam::log10(voidfraction);
+    }
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

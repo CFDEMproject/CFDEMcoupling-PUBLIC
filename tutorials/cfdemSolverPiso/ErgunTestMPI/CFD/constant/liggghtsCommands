@@ -27,6 +27,7 @@ liggghtsCommandModels
 (
     runLiggghts
     writeLiggghts
+    //execute
 );
 // ************************************************************************* //
 
@@ -37,8 +38,42 @@ liggghtsCommandModels
 
 writeLiggghtsProps
 {
-    writeLast off;
-    //path "../DEM"; // optional setting
-    writeName "post/restart/liggghts.restartCFDEM";
-    overwrite on;
+    // path and name:
+    path "../DEM/post/restart"; // optional setting (default "../DEM")
+    //writeName "liggghts.restartCFDEM"; // optional setting (default "liggghts.restartCFDEM")
+    overwrite on; // optional setting (default off)
+    writeLastOnly off; // optional setting (default on)
+    //verbose; // optional setting (default off)
+}
+
+//EXAMPLE:
+//execute "write_restart ../DEM/post/restart/liggghts.restartRareCFDEM_XYZ",
+//where XYZ is the simulation time,
+//every 0.02s, starting after 0.04s
+executeProps2
+{
+    startTime 0.04;
+    endTime 100;
+    timeInterval 40; // interval related to coupling time (e.g. 40(=timeInterval)*1e-5s(=deltaTDEM)*50(=couplingInterval)=0.02s)
+    command
+    (
+        write_restart
+        noBlanks
+        dotdot
+        slash
+        DEM
+        slash
+        post
+        slash
+        restart
+        slash
+        liggghts
+        dot
+        restartRareCFDEM_
+        timeStamp
+    );
+    runFirst off;
+    runLast off;
+    runEveryCouplingStep off;
+    runEveryWriteStep off;
 }

@@ -59,8 +59,6 @@ private:
 
     scalar startTime_;
 
-    mutable scalar scaleDia_;
-
     mutable fileName path_;
 
     mutable OFstream* sPtr_;

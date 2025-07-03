@@ -65,7 +65,7 @@ noVoidFraction::noVoidFraction
                                // here we assume voidFractionModelMS is dividedMS
                                // better solution: maxCellsPerParticle_ lives in cloud
 
-    Warning <<"Please use 'noVoidFraction' in combination with a voidFractionModelMS dividedMS.\n" << endl;
+//     Warning <<"Please use 'noVoidFraction' in combination with a voidFractionModelMS dividedMS.\n" << endl;
 
     // avoid that this model dumps Prev and Next fields
     voidfractionPrev_.writeOpt() = IOobject::NO_WRITE;

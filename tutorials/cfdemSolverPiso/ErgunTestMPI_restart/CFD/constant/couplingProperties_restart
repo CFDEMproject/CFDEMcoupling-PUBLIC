@@ -56,7 +56,7 @@ forceModels
     KochHillDrag
     gradPForce
     viscForce
-    //Archimedes
+    Archimedes
     //volWeightedAverage
     //totalMomentumExchange
     //particleCellVolume
@@ -90,26 +90,18 @@ constDiffSmoothingProps
 
 implicitCoupleProps
 {
-    velFieldName "U";
-    granVelFieldName "Us";
-    voidfractionFieldName "voidfraction";
 }
 
 ArchimedesProps
 {
-    gravityFieldName "g";
 }
 gradPForceProps
 {
-    pFieldName "p";
-    voidfractionFieldName "voidfraction";
-    velocityFieldName "U";
     //interpolation true;
 }
 
 viscForceProps
 {
-    velocityFieldName "U";
     interpolation true;
 }
 volWeightedAverageProps
@@ -130,34 +122,24 @@ totalMomentumExchangeProps
     implicitMomExFieldName "Ksl";
     explicitMomExFieldName "none";
     fluidVelFieldName "U";
-    granVelFieldName "Us";
 }
 GidaspowDragProps
 {
     verbose;
-    velFieldName "U";
-    voidfractionFieldName "voidfraction";
     phi 1;
 }
 DiFeliceDragProps
 {
-    velFieldName "U";
-    voidfractionFieldName "voidfraction";
 }
 
 KochHillDragProps
 {
     //verbose;
-    velFieldName "U";
-    voidfractionFieldName "voidfraction";
 }
 
 BeetstraDragProps
 {
-    velFieldName "U";
-    gravityFieldName "g";
     rhoParticle     2000.;
-    voidfractionFieldName "voidfraction";
     interpolation ;
     useFilteredDragModel ;
     useParcelSizeDependentFilteredDrag ;
@@ -168,7 +150,6 @@ BeetstraDragProps
 
 virtualMassForceProps
 {
-    velFieldName "U";
 }
 
 particleCellVolumeProps
@@ -191,7 +172,6 @@ twoWayFilesProps
 
 centreProps
 {
-    alphaMin 0.10;
 }
 
 engineProps
@@ -202,7 +182,6 @@ engineProps
 dividedProps
 {
     alphaMin 0.01;
-    scaleUpVol 1.0;
 }
 
 twoWayMPIProps

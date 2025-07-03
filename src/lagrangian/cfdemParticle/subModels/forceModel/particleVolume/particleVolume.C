@@ -33,7 +33,7 @@ Description
 #include "particleVolume.H"
 #include "addToRunTimeSelectionTable.H"
 #include "dataExchangeModel.H"
-#include "mpi.h"
+#include <mpi.h>
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -63,7 +63,6 @@ particleVolume::particleVolume
     forceModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
     startTime_(propsDict_.lookupOrDefault<scalar>("startTime",0.)),
-    scaleDia_(1.),
     path_("postProcessing/particleVolume"),
     sPtr_(NULL),
     writeToFile_(propsDict_.lookupOrDefault<Switch>("writeToFile",false))
@@ -76,9 +75,6 @@ particleVolume::particleVolume
 
     // read those switches defined above, if provided in dict
     forceSubM(0).readSwitches();
-
-    if (propsDict_.found("scale"))
-        scaleDia_=scalar(readScalar(propsDict_.lookup("scale")));
 
     particleCloud_.checkCG(true);
 
@@ -104,25 +100,20 @@ void particleVolume::setForce() const
 {
     if(particleCloud_.mesh().time().value() >= startTime_)
     {
-        if (scaleDia_ > 1)
-            Info << typeName << " using scale = " << scaleDia_ << endl;
-        else if (particleCloud_.cg() > 1){
-            scaleDia_=particleCloud_.cg();
-            Info << typeName << " using scale from liggghts cg = " << scaleDia_ << endl;
-        }
 
         if(forceSubM(0).verbose()) Info << "particleVolume.C - setForce()" << endl;
 
-        scalar ds(0);
+        scalar rs(0);
         scalar VsTot(0);
-        scalar fpth=4.188790204786390525;//4./3.*pi;
+        const scalar fpth=(4./3.*M_PI);//4.188790204786390525;//4./3.*pi;
         
         for(int index = 0;index <  particleCloud_.numberOfParticles(); ++index)
         {
-            if(particleCloud_.cellIDs()[index][0] >= 0)
+            if(particleCloud_.cfdemCloud::cellIDs()[index][0] >= 0)
             {
-                ds = 2*particleCloud_.radius(index)/scaleDia_;
-                VsTot += ds*ds*ds*fpth;
+                rs = particleCloud_.radius(index);
+                forceSubM(0).scaleDia(rs,index); //caution: this fct will scale ds!
+                VsTot += rs*rs*rs*fpth;
             }
         }
 

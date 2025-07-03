@@ -55,7 +55,7 @@ forceModels
     //KochHillDrag
     gradPForce
     viscForce
-    //Archimedes
+    Archimedes
     //volWeightedAverage
     //totalMomentumExchange
 );
@@ -73,26 +73,18 @@ turbulenceModelType turbulenceProperties;//"LESProperties";//OFversion30x
 
 implicitCoupleProps
 {
-    velFieldName "U";
-    granVelFieldName "Us";
-    voidfractionFieldName "voidfraction";
 }
 
 ArchimedesProps
 {
-    gravityFieldName "g";
 }
 gradPForceProps
 {
-    pFieldName "p";
-    voidfractionFieldName "voidfraction";
-    velocityFieldName "U";
     //interpolation true;
 }
 
 viscForceProps
 {
-    velocityFieldName "U";
     interpolation true;
 }
 volWeightedAverageProps
@@ -113,28 +105,20 @@ totalMomentumExchangeProps
     implicitMomExFieldName "Ksl";
     explicitMomExFieldName "none";
     fluidVelFieldName "U";
-    granVelFieldName "Us";
 }
 GidaspowDragProps
 {
-    velFieldName "U";
 }
 DiFeliceDragProps
 {
-    velFieldName "U";
-    voidfractionFieldName "voidfraction";
-    granVelFieldName "Us";
 }
 
 KochHillDragProps
 {
-    velFieldName "U";
-    voidfractionFieldName "voidfraction";
 }
 
 virtualMassForceProps
 {
-    velFieldName "U";
 }
 
 oneWayVTKProps
@@ -150,7 +134,6 @@ twoWayFilesProps
 
 centreProps
 {
-    alphaMin 0.10;
 }
 
 engineProps
@@ -160,8 +143,6 @@ engineProps
 
 dividedProps
 {
-    alphaMin 0.1;
-    scaleUpVol 1.0;
 }
 
 twoWayMPIProps

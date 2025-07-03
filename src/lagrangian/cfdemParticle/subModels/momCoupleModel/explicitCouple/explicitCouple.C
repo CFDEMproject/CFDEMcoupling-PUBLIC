@@ -108,6 +108,9 @@ explicitCouple::explicitCouple
         fLimit_=vector(propsDict_.lookup ("fLimit"));
         Info << "explicit momentum exchange field is limited to : " << fLimit_ << endl;
     }
+    bool treatVoidCellsAsExplicitForce = propsDict_.lookupOrDefault<Switch>("treatVoidCellsAsExplicitForce", true);
+    if (treatVoidCellsAsExplicitForce) particleCloud_.registryM().addProperty("treatVoidCellsAsExplicitForce",1);
+    else particleCloud_.registryM().addProperty("treatVoidCellsAsExplicitForce",0);
 }
 
 

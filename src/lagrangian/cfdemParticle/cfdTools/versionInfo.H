@@ -35,7 +35,7 @@ Description
 
 word CFDEMversion="cfdem-3.8.1";
 word compatibleLIGGGHTSversion="3.8.0";
-word OFversion="5.x-commit-538044ac05c4672b37c7df607dca1116fa88df88";
+word OFversion="6-commit-af7d7f427be78e9b9beb6aceca8fe7d5d4636876";
 
 Info << "\nCFDEMcoupling version: " << CFDEMversion <<  endl;
 Info << ", compatible to LIGGGHTS version: " << compatibleLIGGGHTSversion <<  endl;

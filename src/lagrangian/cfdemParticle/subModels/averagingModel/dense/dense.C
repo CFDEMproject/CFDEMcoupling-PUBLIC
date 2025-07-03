@@ -35,7 +35,6 @@ Description
 #include "addToRunTimeSelectionTable.H"
 #include "voidFractionModel.H"
 
-//#include "mpi.h"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -89,6 +88,11 @@ void dense::setScalarAverage
     scalar valueScal;
     scalar weightP;
 
+    #if defined(moreAccuracy)
+    List <long double> sum(field.size());
+    for(int i=0;i<sum.size();i++) sum[i] = 0.;
+    #endif
+
     if(weightWithWeight2) 
         FatalError << "dense::setScalarAverage: attempt to weight with weight2, which is not implemented" << abort(FatalError);
 
@@ -99,13 +103,18 @@ void dense::setScalarAverage
         for(int subCell=0;subCell<particleCloud_.cellsPerParticle()[index][0];subCell++)
         {
             //Info << "subCell=" << subCell << endl;
-            cellI = particleCloud_.cellIDs()[index][subCell];
+            cellI = particleCloud_.cfdemCloud::cellIDs()[index][subCell];
 
             if (cellI >= 0)
             {
                 valueScal = value[index][0];
                 weightP = weight[index][0];
 
+                #if defined(moreAccuracy)
+                // build sum
+                sum[cellI] += valueScal*weightP;
+                weightField[cellI] += weightP;
+                #else
                 // first entry in this cell
                 if(weightField[cellI] == 0)
                 {
@@ -117,9 +126,15 @@ void dense::setScalarAverage
                     field[cellI] = (field[cellI]*weightField[cellI]+valueScal*weightP)/(weightField[cellI]+weightP);
                     weightField[cellI] += weightP;
                 }
+                #endif
             }
         }
     }
+
+    // build average
+    #if defined(moreAccuracy)
+    forAll(field,cellI) if(weightField[cellI] > SMALL) field[cellI] = sum[cellI]/weightField[cellI];
+    #endif
 
     // correct cell values to patches
     field.correctBoundaryConditions();
@@ -140,6 +155,18 @@ void dense::setVectorAverage
     vector valueVec;
     scalar weightP;
 
+    #if defined(moreAccuracy)
+    List <long double> sumX(field.size());
+    List <long double> sumY(field.size());
+    List <long double> sumZ(field.size());
+    for(int i=0;i<sumX.size();i++)
+    {
+        sumX[i] = 0.;
+        sumY[i] = 0.;
+        sumZ[i] = 0.;
+    }
+    #endif
+
     //====================
     // debug
     /*for(int index=0; index< particleCloud_.numberOfParticles(); index++)
@@ -147,7 +174,7 @@ void dense::setVectorAverage
         Pout << "--index=" << index << endl;
         for(int subCell=0;subCell<particleCloud_.cellsPerParticle()[index][0];subCell++)
         {
-            cellI = particleCloud_.cellIDs()[index][subCell];
+            cellI = particleCloud_.cfdemCloud::cellIDs()[index][subCell];
 
             if (cellI >= 0)
             {
@@ -168,13 +195,20 @@ void dense::setVectorAverage
 
         for(int subCell=0;subCell<particleCloud_.cellsPerParticle()[index][0];subCell++)
         {
-            cellI = particleCloud_.cellIDs()[index][subCell];
+            cellI = particleCloud_.cfdemCloud::cellIDs()[index][subCell];
 
             if (cellI >= 0)
             {
                 for(int i=0;i<3;i++) valueVec[i] = value[index][i];
                 weightP = weight[index][subCell]*weight2[index][subCell];
 
+                #if defined(moreAccuracy)
+                // build sum
+                sumX[cellI] += valueVec[0]*weightP;
+                sumY[cellI] += valueVec[1]*weightP;
+                sumZ[cellI] += valueVec[2]*weightP;
+                weightField[cellI] += weightP;
+                #else
                 // first entry in this cell
                 if(weightField[cellI] == 0)
                 {
@@ -186,6 +220,7 @@ void dense::setVectorAverage
                     field[cellI] = (field[cellI]*weightField[cellI]+valueVec*weightP)/(weightField[cellI]+weightP); //Running average calc. style
                     weightField[cellI] += weightP;
                 }
+                #endif
             }
         }//forAllSubPoints
     }
@@ -196,13 +231,20 @@ void dense::setVectorAverage
 
         for(int subCell=0;subCell<particleCloud_.cellsPerParticle()[index][0];subCell++)
         {
-            cellI = particleCloud_.cellIDs()[index][subCell];
+            cellI = particleCloud_.cfdemCloud::cellIDs()[index][subCell];
 
             if (cellI >= 0)
             {
                 for(int i=0;i<3;i++) valueVec[i] = value[index][i];
                 weightP = weight[index][subCell];
 
+                #if defined(moreAccuracy)
+                // build sum
+                sumX[cellI] += valueVec[0]*weightP;
+                sumY[cellI] += valueVec[1]*weightP;
+                sumZ[cellI] += valueVec[2]*weightP;
+                weightField[cellI] += weightP;
+                #else
                 // first entry in this cell
                 if(weightField[cellI] == 0)
                 {
@@ -214,10 +256,24 @@ void dense::setVectorAverage
                     field[cellI] = (field[cellI]*weightField[cellI]+valueVec*weightP)/(weightField[cellI]+weightP); //Running average calc. style
                     weightField[cellI] += weightP;
                 }
+                #endif
             }
         }//forAllSubPoints
     }
 
+    #if defined(moreAccuracy)
+    // build average
+    forAll(field,cellI)
+    {
+        if(weightField[cellI] > SMALL)
+        {
+            scalar w=weightField[cellI];
+            field[cellI][0] = sumX[cellI]/w;
+            field[cellI][1] = sumY[cellI]/w;
+            field[cellI][2] = sumZ[cellI]/w;
+        }
+    }
+    #endif
     // correct cell values to patches
     field.correctBoundaryConditions();
 }

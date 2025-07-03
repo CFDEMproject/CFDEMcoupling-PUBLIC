@@ -42,8 +42,8 @@ fix     zwalls2 all wall/gran model hertz tangential history primitive type 1 zp
 fix         gravi all gravity 9.81 vector 0.0 0.0 -1.0
 
 # heat transfer
-fix         ftco all property/global thermalConductivity peratomtype 5.
-fix         ftca all property/global thermalCapacity peratomtype 10.
+fix         ftco all property/global thermalConductivity peratomtype 5. # lambda in [W/(K*m)]
+fix         ftca all property/global thermalCapacity peratomtype 10.    # cp in [J/(kg*K)]
 fix         heattransfer all heat/gran initial_temperature 263.
 
 # particle distributions and insertion
@@ -61,11 +61,10 @@ compute         rke all erotate/sphere
 thermo_style    custom step atoms ke c_rke f_heattransfer vol
 thermo          1000
 thermo_modify   lost ignore norm no
-compute_modify  thermo_temp dynamic yes
 
 #insert the first particles
 run             1
-dump            dmp all custom 1000 post/dump.liggghts_init id type x y z ix iy iz vx vy vz fx fy fz omegax omegay omegaz radius f_heattransfer[0] f_heatFlux[0]
+dump            dmp all custom 50000 post/dump.liggghts_init id type x y z ix iy iz vx vy vz fx fy fz omegax omegay omegaz radius f_heattransfer[0] f_heatFlux[0]
 
 run             150000
 

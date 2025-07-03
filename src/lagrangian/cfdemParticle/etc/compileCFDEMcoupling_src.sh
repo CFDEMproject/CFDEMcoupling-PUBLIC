@@ -50,7 +50,8 @@ fi
 while [ $COUNT -lt $NLINES ]
 do
         let COUNT++  
-        LINE=`head -n $COUNT $whitelist | tail -1`
+        LINE=$( head -n $COUNT $whitelist | tail -1 )
+        LINE=$( eval echo $LINE )
 
         # white lines
         if [[ "$LINE" == "" ]]; then
@@ -80,7 +81,8 @@ echo
 while [ $COUNT -lt $NLINES ]
 do
         let COUNT++  
-        LINE=`head -n $COUNT $whitelist | tail -1`
+        LINE=$( head -n $COUNT $whitelist | tail -1 )
+        LINE=$( eval echo $LINE )
 
         # white lines
         if [[ "$LINE" == "" ]]; then

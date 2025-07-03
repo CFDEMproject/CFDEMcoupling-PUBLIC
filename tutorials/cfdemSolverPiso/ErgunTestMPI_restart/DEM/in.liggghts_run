@@ -1,6 +1,5 @@
 # Pour granular particles into chute container, then induce flow
 log             ../DEM/log.liggghts
-thermo_log      ../DEM/post/thermo.txt
 
 atom_style      granular
 atom_modify     map array
@@ -42,7 +41,7 @@ set     group all density 2000
 
 # cfd coupling
 fix     cfd all couple/cfd couple_every 100 mpi
-fix     cfd2 all couple/cfd/force
+fix     cfd2 all couple/cfd/force/implicit
 
 # apply nve integration to all particles that are inserted as single particles
 fix     integr all nve/sphere
@@ -58,7 +57,6 @@ compute         rke all erotate/sphere
 thermo_style    custom step atoms ke c_rke vol c_centerOfMass[3] c_dragtotal[1] c_dragtotal[2] c_dragtotal[3]
 thermo          10
 thermo_modify   lost ignore norm no
-compute_modify  thermo_temp dynamic yes
 
 dump        dmp all custom 5000 ../DEM/post/dump*.liggghts_restart id type x y z vx vy vz fx fy fz f_dragforce[1] f_dragforce[2] f_dragforce[3] radius 
 

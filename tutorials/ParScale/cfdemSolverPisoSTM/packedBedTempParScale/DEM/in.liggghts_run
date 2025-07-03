@@ -1,6 +1,5 @@
 echo            both
 log             ../DEM/log.liggghts
-thermo_log      ../DEM/post/thermo.txt
 
 #######################################################
 # variables                                           #
@@ -51,7 +50,7 @@ fix     zwalls2 all wall/gran model hertz tangential history primitive type 1 zp
 
 # cfd coupling
 fix         cfd all couple/cfd couple_every 100 mpi
-fix         cfd2 all couple/cfd/force
+fix         cfd2 all couple/cfd/force/implicit
 
 
 # heat transfer
@@ -88,7 +87,6 @@ compute         rke all erotate/sphere
 thermo_style    custom step atoms ke c_rke vol
 thermo          1000
 thermo_modify   lost ignore norm no
-compute_modify  thermo_temp dynamic yes
 
 dump        dmp all custom 20000 ../DEM/post/dump*.liggghts_run id type x y z ix iy iz vx vy vz fx fy fz omegax omegay omegaz radius f_Temp[0] f_heatFlux[0] #f_speciesC[0] f_speciesCFlux[0]
 

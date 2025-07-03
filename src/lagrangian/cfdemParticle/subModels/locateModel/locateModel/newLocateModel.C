@@ -47,14 +47,23 @@ autoPtr<locateModel> locateModel::New
     cfdemCloud& sm
 )
 {
-    word locateModelType
+    word read_lfm
     (
         dict.lookup("locateModel")
     );
 
+    word ps
+    (
+        dict.lookupOrDefault<word>("particleShapeType", "")
+    );
+    if (ps == "superquadric")
+        ps = "Superquadric"; // NOTE: change in case
+    else
+        ps = "";
+    word locateModelType(read_lfm + ps);
+
     Info<< "Selecting locateModel "
          << locateModelType << endl;
-
 
     dictionaryConstructorTable::iterator cstrIter =
         dictionaryConstructorTablePtr_->find(locateModelType);

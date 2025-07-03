@@ -36,7 +36,7 @@ Description
 #include "addToRunTimeSelectionTable.H"
 #include "mathematicalConstants.H"
 
-#include "mpi.h"
+#include <mpi.h>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -65,8 +65,8 @@ engineSearchIB::engineSearchIB
 )
 :
     engineSearch(dict,sm,typeName),
-    zSplit_(readLabel(propsDict_.lookup("zSplit"))),
-    xySplit_(readLabel(propsDict_.lookup("xySplit"))),
+    zSplit_(propsDict_.lookupOrDefault<scalar>("zSplit",8)),
+    xySplit_(propsDict_.lookupOrDefault<scalar>("xySplit",16)),
     coef_(2.0),
     verbose_(propsDict_.lookupOrDefault<Switch>("verbose", false)),
     numberOfSatellitePoints_((zSplit_-1)*xySplit_ + 2)
@@ -244,7 +244,7 @@ vector engineSearchIB::generateSatellitePoint(int countPoints) const
 vector engineSearchIB::getSatellitePoint(int index, int countPoints) const
 {
     double radius=particleCloud_.radius(index);
-    vector position = particleCloud_.position(index);
+    vector position = particleCloud_.cfdemCloud::position(index);
     vector pos = radius*satellitePoints_[countPoints] + position;
     return pos;
 }

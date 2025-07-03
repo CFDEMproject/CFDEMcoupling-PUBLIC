@@ -33,7 +33,7 @@ Description
 
 #include "noProbe.H"
 #include "addToRunTimeSelectionTable.H"
-#include "mpi.h"
+#include <mpi.h>
 #include "IOmanip.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

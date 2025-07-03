@@ -80,8 +80,6 @@ particleProbeProps
 scalarGeneralExchangeProps
 {
 /*    verbose                 true;*/
-    velFieldName            "U";
-    voidfractionFieldName   "voidfraction";
     tempFieldName           "T";
     partTempName            "Temp";
     partHeatFluxName        "convectiveHeatFlux";
@@ -122,9 +120,6 @@ scalarGeneralExchangeProps
 
 implicitCoupleProps
 {
-    velFieldName "U";
-    granVelFieldName "Us";
-    voidfractionFieldName "voidfraction";
     //KslLimit 0;  // source switched off!!!
 }
 
@@ -135,31 +130,23 @@ explicitCoupleProps
 
 KochHillDragProps
 {
-    velFieldName "U";
-    voidfractionFieldName "voidfraction";
 }
 
 DiFeliceDragProps
 {
-    velFieldName "U";
     //verbose true;
 }
 
 ArchimedesProps
 {
-    gravityFieldName "g";
 }
 gradPForceProps
 {
-    pFieldName "p";
-    voidfractionFieldName "voidfraction";
-    velocityFieldName "U";
     //interpolation true;
 }
 
 viscForceProps
 {
-    velocityFieldName "U";
     interpolation true;
 }
 
@@ -171,13 +158,11 @@ twoWayMPIProps
 
 centreProps
 {
-    alphaMin 0.1;
 }
 
 dividedProps
 {
     alphaMin 0.4;
-    scaleUpVol 1.0;
 }
 
 engineProps

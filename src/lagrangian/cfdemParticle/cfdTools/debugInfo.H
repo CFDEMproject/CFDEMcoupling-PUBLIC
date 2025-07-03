@@ -13,7 +13,7 @@
   vector meanUs_field(0,0,0);      // mean solid velocity based on field Us
   scalar meanAlpha_field=0;        // mean voidfraction
   vector meanU_field(0,0,0);       // mean fluid velocity based on field U
-  scalar fpth=4.188790204786390525;// 4.*pi/3.
+  scalar fpth=4./3.*M_PI;// 4.*pi/3.
   //========================================================================//
 
   // get particle based data
@@ -21,10 +21,10 @@
   {
       for(int i=0;i<3;i++){
           totalForce_array[i] += impForces_[index][i]; // in giveDEMdata() exp imp and DEM are summed
-          meanUs_array[i] += velocities_[index][i];
+          meanUs_array[i] += fieldsToDEM[idVel()][index][i];
       }
-      meanR_array += radii_[index][0];
-      particleVolume_radius += radii_[index][0]*radii_[index][0]*radii_[index][0]*fpth;
+      meanR_array += fieldsToDEM[idRadius()][index][0];
+      particleVolume_radius += fieldsToDEM[idRadius()][index][0]*fieldsToDEM[idRadius()][index][0]*fieldsToDEM[idRadius()][index][0]*fpth;
       
       // loop subCells
       for(int subCell=0;subCell<cellsPerParticle()[index][0];subCell++)

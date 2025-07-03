@@ -77,9 +77,6 @@ void generalPhaseChange::createFields()
 // ************************************************************
 void generalPhaseChange::update()
 {
-    //Re-set the sources due to particle-fluid interactions
-    generalManual::setSources();
-
     //Apply the phaseChange operation (loop through list of models)
     //phaseChangeModels must ADD any sources to the eulerianScalarFields 
     //(since there might be sources due to particle-fluid interactions)

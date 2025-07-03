@@ -62,10 +62,11 @@ centreVoidFraction::centreVoidFraction
 :
     voidFractionModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
-    alphaMin_(readScalar(propsDict_.lookup("alphaMin"))),
+    alphaMin_(propsDict_.lookupOrDefault<scalar>("alphaMin",0.1)),
     alphaLimited_(0)
 {
     checkWeightNporosity(propsDict_);
+
     if(porosity()!=1) FatalError << "porosity not used in centreVoidFraction" << abort(FatalError);
 }
 
@@ -82,11 +83,8 @@ void centreVoidFraction::setvoidFraction(double** const& mask,double**& voidfrac
 {
     reAllocArrays();
 
-    scalar radius(-1);
     scalar volume(0);
     scalar cellVol(0);
-    scalar scaleVol= weight();
-
     for(int index=0; index< particleCloud_.numberOfParticles(); index++)
     {
         //if(mask[index][0])
@@ -95,13 +93,12 @@ void centreVoidFraction::setvoidFraction(double** const& mask,double**& voidfrac
             particleWeights[index][0]=0;
             cellsPerParticle_[index][0]=1;
 
-            label cellI = particleCloud_.cellIDs()[index][0];
+            label cellI = particleCloud_.cfdemCloud::cellIDs()[index][0];
 
             if (cellI >= 0)  // particel centre is in domain
             {
                 cellVol = voidfractionNext_.mesh().V()[cellI];
-                radius = particleCloud_.radius(index);
-                volume = 4.188790205*radius*radius*radius*scaleVol;
+                volume = particleCloud_.particleVolumeScaled(index, volScale());
 
                 // store volume for each particle
                 particleVolumes[index][0] = volume;
@@ -123,6 +120,15 @@ void centreVoidFraction::setvoidFraction(double** const& mask,double**& voidfrac
                 // store cellweight for each particle  - this should not live here
                 particleWeights[index][0] = 1;
 
+                //===
+                label subPoint(0);
+                label partCellId=cellI;
+                vector subPosition=particleCloud_.cfdemCloud::position(index);
+                vector offset(0,0,0);
+                scalar subPointDiameter=particleCloud_.diameter(index); // this is different than radius for convex as d is calculated from volume
+                particleCloud_.setMpData(subPoint, index, partCellId, subPosition, offset, subPointDiameter);
+                //===
+
                 /*//OUTPUT
                 if (index==0)
                 {
@@ -132,7 +138,7 @@ void centreVoidFraction::setvoidFraction(double** const& mask,double**& voidfrac
                     for(int i=0;i<cellsPerParticle_[index][0];i++)
                     {
                        if(i==0)Info << "cellids, voidfractions, particleWeights, : \n";
-                       Info << particleCloud_.cellIDs()[index][i] << " ," << endl;
+                       Info << particleCloud_.cfdemCloud::cellIDs()[index][i] << " ," << endl;
                        Info << voidfractions[index][i] << " ," << endl;
                        Info << particleWeights[index][i] << " ," << endl;
                      }
@@ -145,7 +151,7 @@ void centreVoidFraction::setvoidFraction(double** const& mask,double**& voidfrac
     // bring voidfraction from Eulerian Field to particle array
     for(int index=0; index< particleCloud_.numberOfParticles(); index++)
     {
-        label cellID = particleCloud_.cellIDs()[index][0];
+        label cellID = particleCloud_.cfdemCloud::cellIDs()[index][0];
 
         if(cellID >= 0)
         {

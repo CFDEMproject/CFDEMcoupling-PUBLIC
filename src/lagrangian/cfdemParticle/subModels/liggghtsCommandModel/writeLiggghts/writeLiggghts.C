@@ -66,20 +66,24 @@ writeLiggghts::writeLiggghts
     command_("write_restart"),
     path_(word("..")/word("DEM")),
     writeName_("liggghts.restartCFDEM"),
-    writeLast_(true),
-    overwrite_(false)
+    writeLastOnly_(false),
+    overwrite_(false),
+    writeEvery_(1),
+    counter_(-1)
 {
     if (dict.found(typeName + "Props"))    
     {
+        Info << "   Found a dictionary " << word(typeName + "Props") << ", reading user defined values (if specified):" << endl;
         propsDict_=dictionary(dict.subDict(typeName + "Props"));
 
         // check if verbose
         if (propsDict_.found("verbose")) verbose_=true;
 
-        if(propsDict_.found("writeLast"))
+        if(propsDict_.found("writeLastOnly"))
         {
-            writeLast_=Switch(propsDict_.lookup("writeLast"));
+            writeLastOnly_=Switch(propsDict_.lookup("writeLastOnly"));
         }
+        if(propsDict_.found("writeLast")) FatalError<<"You are using the old style variable name <writeLast> - this keyword has changed to <writeLastOnly>." << abort(FatalError);
 
         if (propsDict_.found("path"))
         {
@@ -87,7 +91,7 @@ writeLiggghts::writeLiggghts
             if (!checkPath(path_))
                 FatalError<<"The path you provided in writeLiggghtsProps is incorrect: " << path_ << "\n" << abort(FatalError);
             else
-                Info << "Using user defined path to write LIGGGHTS restart file: " << path_ << endl;
+                Info << "   Using user defined path to write LIGGGHTS restart file: " << path_ << endl;
         }
 
         if(propsDict_.found("writeName"))
@@ -95,13 +99,20 @@ writeLiggghts::writeLiggghts
             propsDict_.lookup("writeName") >> writeName_;
         }
 
-        if (!writeLast_ && propsDict_.found("overwrite"))
+        if(propsDict_.found("writeEvery"))
         {
-            overwrite_=Switch(propsDict_.lookup("overwrite"));
+            propsDict_.lookup("writeEvery") >> writeEvery_;
+            if(writeEvery_<1) FatalError << "writeEvery must be chosen > 0" << abort(FatalError);
         }
 
+        overwrite_=Switch(propsDict_.lookup("overwrite"));
     }
-    if(writeLast_)
+    else
+    {
+        Info << "   Did not find a dictionary " << word(typeName + "Props") << ", using default values:" << endl;
+    }
+
+    if(writeLastOnly_)
         runLast_=true;
     else
     {
@@ -109,14 +120,21 @@ writeLiggghts::writeLiggghts
         runEveryWriteStep_=true;
     }    
 
-
     command_ += " " + path_ + "/" + writeName_;
     if(overwrite_)
         strCommand_=string(command_);
     else
         command_ += "_";
 
-    Info << "writeLiggghts: A restart file writeName_"<< command_ <<" is written." << endl;
+    // output for user
+    Info << "     overwrite = " << Switch(overwrite_) << endl;
+    Info << "     path = " << path_ << endl;
+    if(overwrite_) Info << "     writeName = " << writeName_ << " (Restart file is written to " << command_ << " ." << endl;
+    else Info << "     writeName = " << writeName_ << " (Restart file is written to " << command_ << "<timeStamp> ." << endl;
+    Info << "     writeLastOnly = " << writeLastOnly_ << endl;
+    Info << "     writeEvery = " << writeEvery_ << " (Restart file is written every " << writeEvery_ 
+         << " CFD's writeInterval.)" << endl;
+    Info << "     verbose = " << Switch(verbose_) << endl;
 
     checkTimeSettings(dict_);
 }
@@ -138,7 +156,11 @@ const char* writeLiggghts::command(int commandLine)
 bool writeLiggghts::runCommand(int couplingStep)
 {
     if(!overwrite_) strCommand_=addTimeStamp(command_);
-    return runThisCommand(couplingStep);
+    if(particleCloud_.writeTimePassed()) counter_ = counter_+1;
+    label writeInterval = counter_ % writeEvery_;
+    bool a=runThisCommand(couplingStep); // needs to be called as it triggers resetWriteTimePassed()
+    if(writeInterval == 0) return a;
+    else return 0;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

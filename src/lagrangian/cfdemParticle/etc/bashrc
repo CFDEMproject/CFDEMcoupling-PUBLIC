@@ -45,6 +45,8 @@
 #- export environment variables (adapt to your paths)
 #------------------------------------------------------------------------------
 
+if [[ $CFDEM_SCHEMEMODE == "" ]]; then export CFDEM_SCHEMEMODE=robust; fi
+
 ## small function defs
 addPath()
 {
@@ -82,6 +84,8 @@ setVar CFDEM_SOLVER_DIR $CFDEM_PROJECT_DIR/applications/solvers
 setVar CFDEM_DOC_DIR $CFDEM_PROJECT_DIR/doc
 setVar CFDEM_UT_DIR $CFDEM_PROJECT_DIR/applications/utilities
 setVar CFDEM_TUT_DIR $CFDEM_PROJECT_DIR/tutorials
+setVar CFDEM_RHEO_DIR $WM_PROJECT_DIR/../ViscoElastic/of60
+setVar CFDEM_RHEO_LIB_DIR $FOAM_USER_LIBBIN
 
 #check if default lammps lib path should be used
 setVar CFDEM_LAMMPS_LIB_DIR $CFDEM_LIGGGHTS_SRC_DIR/../lib
@@ -107,6 +111,7 @@ if [[ ${WM_COMPILE_OPTION} == "Debug" ]] && [[ $CFDEM_LIGGGHTS_MAKEFILE_NAME == 
 fi
 
 #- LIGGGHTS lib path
+setVar CFDEM_LIGGGHTS_MAKEFILE_NAME "auto"
 setVar CFDEM_LIGGGHTS_LIB_PATH $CFDEM_LIGGGHTS_SRC_DIR
 
 #- LIGGGHTS executable
@@ -136,11 +141,15 @@ export CFDEM_Many2ManyLIB_MAKEFILENAME=$CFDEM_LIGGGHTS_MAKEFILE_NAME
 
 #- LMP M2M lib path and makefile
 export CFDEM_M2MLIB_PATH=$CFDEM_SRC_DIR/lagrangian/cfdemParticle/subModels/dataExchangeModel/M2M/library
-export CFDEM_M2MLIB_MAKEFILENAME=$CFDEM_LIGGGHTS_MAKEFILE_NAME
+setVar CFDEM_M2MLIB_MAKEFILENAME $CFDEM_LIGGGHTS_MAKEFILE_NAME
 
 #- LMP M2MMS lib path and makefile
 export CFDEM_M2MMSLIB_PATH=$CFDEM_SRC_DIR/lagrangian/cfdemParticle/subModels/dataExchangeModel/M2M/library
 export CFDEM_M2MMSLIB_MAKEFILENAME=$CFDEM_LIGGGHTS_MAKEFILE_NAME
+
+#- socketLib lib path and makefile
+export CFDEM_socketLibLIB_PATH=$CFDEM_SRC_DIR/CoSimProtocols/socketLib
+export CFDEM_socketLibLIB_MAKEFILENAME=script
 
 #- LMP POEMS lib default path
 export CFDEM_POEMSLIB_PATH=$CFDEM_LAMMPS_LIB_DIR/poems
@@ -256,6 +265,10 @@ alias cfdemRefreshLigLink='ln -sf $CFDEM_LIGGGHTS_LIB_PATH/lib$CFDEM_LIGGGHTS_LI
 cfdemChangeTutOFversion() { bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/OFVersionChange/shellScripts/cfdemChangeTutOFversion_all.sh $1; }
 export -f cfdemChangeTutOFversion
 
+#- shortcut to use script for changing integrator and force coupling syntax
+integratorAndCouplingStyleChange() { bash $CFDEM_SRC_DIR/lagrangian/cfdemParticle/etc/OFVersionChange/shellScripts/integratorAndCouplingStyleChange.sh; }
+export -f integratorAndCouplingStyleChange
+
 #- shortcut to visualize the clock model data
 alias vizClock='python $CFDEM_UT_DIR/vizClock/matPlot.py'
 
@@ -268,6 +281,12 @@ export -f cfdemLiggghts
 
 #- shortcut to run liggghts in parallel
 cfdemLiggghtsPar() { mpirun -np $2 $CFDEM_LIGGGHTS_EXEC -in $1; }
+is_openmpi=`mpirun -version | grep "Open MPI" | wc -l`
+# Open MPI (version > 3) no longer allows oversubscription by default, we do want that though
+if [[ $is_openmpi == 1 ]]; then
+    cfdemLiggghtsPar() { mpirun -oversubscribe -np $2 $CFDEM_LIGGGHTS_EXEC -in $1; }
+fi
+unset is_openmpi
 export -f cfdemLiggghtsPar
 
 #- shortcut to open files including a pattern
@@ -280,7 +299,7 @@ cfdemListFiles() { find $1 > listOfFiles.txt; }                     #keep the di
 export -f cfdemListFiles
 
 #- function to unload environment, everything starting with CFDEM_ and containing cfdem
-cfdemUnsetEnv() { unset cfdemLiggghts cfdemLiggghtsPar cfdemGrep cfdemListFiles cfdemChangeTutOFversion cfdemUnsetEnv;
+cfdemUnsetEnv() { unset cfdemLiggghts cfdemLiggghtsPar cfdemGrep cfdemListFiles cfdemChangeTutOFversion cfdemUnsetEnv integratorAndCouplingStyleChange;
                   cfdemDirs="$CFDEM_PROJECT_DIR $CFDEM_LIB_DIR $CFDEM_USER_LIB_DIR $CFDEM_APP_DIR $CFDEM_USER_APP_DIR";
                   foamClean=$WM_PROJECT_DIR/bin/foamCleanPath;
                   cleaned=$($foamClean "$PATH" "$cfdemDirs") && PATH="$cleaned";
@@ -313,15 +332,27 @@ else
         fi
 fi
 
+# set thermophysical library version to 6, overwrite if OF5
+setVar CFDEM_THERMOPHYSICAL_VERSION 6
+
 # detect OF version
-if [[ $WM_PROJECT_VERSION == 5.* ]]; then
+if [[ $WM_PROJECT_VERSION == 6 ]]; then
+    export CFDEM_WM_PROJECT_VERSION=60
+elif [[ $WM_PROJECT_VERSION == 5.* ]]; then
     export CFDEM_WM_PROJECT_VERSION=50
+    cfdemecho "************************************"
+    cfdemecho "WARNING from your CFDEM code!"
+    cfdemecho "WARNING: Coupling with your OpenFOAM(R) version is not officially supported!"
+    cfdemecho "In doubt switch to OpenFOAM(R) 6."
+    cfdemecho "************************************"
+    setVar CFDEM_THERMOPHYSICAL_VERSION 5.x
+    sleep 1.5
 elif [[ $WM_PROJECT_VERSION == 4.* ]]; then
     export CFDEM_WM_PROJECT_VERSION=40
     cfdemecho "************************************"
     cfdemecho "WARNING from your CFDEM code!"
     cfdemecho "WARNING: Coupling with your OpenFOAM(R) version is not officially supported!"
-    cfdemecho "In doubt switch to OpenFOAM(R) 5.x."
+    cfdemecho "In doubt switch to OpenFOAM(R) 6."
     cfdemecho "************************************"
     sleep 1.5
 elif [[ $WM_PROJECT_VERSION == 3.0.* ]]; then
@@ -329,7 +360,7 @@ elif [[ $WM_PROJECT_VERSION == 3.0.* ]]; then
     cfdemecho "************************************"
     cfdemecho "WARNING from your CFDEM code!"
     cfdemecho "WARNING: Coupling with your OpenFOAM(R) version is not officially supported!"
-    cfdemecho "In doubt switch to OpenFOAM(R) 5.x."
+    cfdemecho "In doubt switch to OpenFOAM(R) 6."
     cfdemecho "************************************"
     sleep 1.5
 elif [[ $WM_PROJECT_VERSION == v1606+ ]]; then 
@@ -337,7 +368,7 @@ elif [[ $WM_PROJECT_VERSION == v1606+ ]]; then
     cfdemecho "************************************"
     cfdemecho "WARNING from your CFDEM code!"
     cfdemecho "WARNING: Coupling with your OpenFOAM(R) version is not officially supported!"
-    cfdemecho "In doubt switch to OpenFOAM(R) 5.x."
+    cfdemecho "In doubt switch to OpenFOAM(R) 6."
     cfdemecho "************************************"
     sleep 1.5
 elif [[ $WM_PROJECT_VERSION == v1612+ ]]; then 
@@ -345,7 +376,7 @@ elif [[ $WM_PROJECT_VERSION == v1612+ ]]; then
     cfdemecho "************************************"
     cfdemecho "WARNING from your CFDEM code!"
     cfdemecho "WARNING: Coupling with your OpenFOAM(R) version is not officially supported!"
-    cfdemecho "In doubt switch to OpenFOAM(R) 5.x."
+    cfdemecho "In doubt switch to OpenFOAM(R) 6."
     cfdemecho "************************************"
     sleep 1.5
 elif [[ $WM_PROJECT_VERSION == v1706 ]]; then 
@@ -353,7 +384,7 @@ elif [[ $WM_PROJECT_VERSION == v1706 ]]; then
     cfdemecho "************************************"
     cfdemecho "WARNING from your CFDEM code!"
     cfdemecho "WARNING: Coupling with your OpenFOAM(R) version is not officially supported!"
-    cfdemecho "In doubt switch to OpenFOAM(R) 5.x."
+    cfdemecho "In doubt switch to OpenFOAM(R) 6."
     cfdemecho "************************************"
     sleep 1.5
 elif [[ $WM_PROJECT_VERSION == 2.4.* ]]; then
@@ -361,7 +392,7 @@ elif [[ $WM_PROJECT_VERSION == 2.4.* ]]; then
     cfdemecho "************************************"
     cfdemecho "WARNING from your CFDEM code!"
     cfdemecho "WARNING: Coupling with your OpenFOAM(R) version is not officially supported!"
-    cfdemecho "In doubt switch to OpenFOAM(R) 5.x."
+    cfdemecho "In doubt switch to OpenFOAM(R) 6."
     cfdemecho "************************************"
     sleep 1.5
 elif [[ $WM_PROJECT_VERSION == "3.2" && $WM_FORK == "extend" ]]; then
@@ -369,7 +400,7 @@ elif [[ $WM_PROJECT_VERSION == "3.2" && $WM_FORK == "extend" ]]; then
     cfdemecho "************************************"
     cfdemecho "WARNING from your CFDEM code!"
     cfdemecho "WARNING: Coupling with your OpenFOAM(R) version is not officially supported!"
-    cfdemecho "In doubt switch to OpenFOAM(R) 5.x."
+    cfdemecho "In doubt switch to OpenFOAM(R) 6."
     cfdemecho "************************************"
     sleep 1.5
 else

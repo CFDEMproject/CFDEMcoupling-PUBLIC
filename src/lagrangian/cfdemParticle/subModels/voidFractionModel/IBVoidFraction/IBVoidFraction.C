@@ -36,7 +36,7 @@ Description
 #include "locateModel.H"
 #include "dataExchangeModel.H"
 
-#include "mpi.h"
+#include <mpi.h>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -66,7 +66,7 @@ IBVoidFraction::IBVoidFraction
 :
     voidFractionModel(dict,sm),
     propsDict_(dict.subDict(typeName + "Props")),
-    alphaMin_(readScalar(propsDict_.lookup("alphaMin"))),
+    alphaMin_(propsDict_.lookupOrDefault<scalar>("alphaMin",0.1)),
     alphaLimited_(0),
     scaleUpVol_(readScalar(propsDict_.lookup("scaleUpVol"))),
     sqrtThree_(sqrt(3.0))
@@ -116,9 +116,9 @@ void IBVoidFraction::setvoidFraction(double** const& mask,double**& voidfraction
             particleV[index][0]=0;
 
             //collecting data
-            label particleCenterCellID = particleCloud_.cellIDs()[index][0];
+            label particleCenterCellID = particleCloud_.cfdemCloud::cellIDs()[index][0];
             scalar radius = particleCloud_.radius(index);
-            vector positionCenter = particleCloud_.position(index);
+            vector positionCenter = particleCloud_.cfdemCloud::position(index);
 
             if (particleCenterCellID >= 0)
             {
@@ -267,7 +267,7 @@ void IBVoidFraction::setvoidFraction(double** const& mask,double**& voidfraction
 
                   for(label i=0;i<hashSetLength-1;i++) {
                     label cellI=hashSett.toc()[i];
-                    particleCloud_.cellIDs()[index][i+1]=cellI; //adding subcell represenation
+                    particleCloud_.cfdemCloud::cellIDs()[index][i+1]=cellI; //adding subcell represenation
                   }
                 }//end cells found on this proc
             }// end found cells
@@ -276,7 +276,7 @@ void IBVoidFraction::setvoidFraction(double** const& mask,double**& voidfraction
 
     for(label index=0; index < particleCloud_.numberOfParticles(); index++) {
       for(label subcell=0;subcell<cellsPerParticle_[index][0];subcell++) {
-        label cellID = particleCloud_.cellIDs()[index][subcell];
+        label cellID = particleCloud_.cfdemCloud::cellIDs()[index][subcell];
 
         if(cellID >= 0) {
           if(voidfractionNext_[cellID] < 0.0)

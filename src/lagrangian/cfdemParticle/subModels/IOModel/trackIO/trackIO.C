@@ -61,15 +61,14 @@ trackIO::trackIO
 )
 :
     sophIO(dict,sm),
-    partID_(NULL)
+    idFieldToDEMid_(-1)
 {}
+
 
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 trackIO::~trackIO()
-{
-        particleCloud_.dataExchangeM().destroy(partID_,-1);
-}
+{}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
@@ -84,15 +83,16 @@ int trackIO::dumpDEMdata() const
     {
         npProcs=sophIO::dumpDEMdata();
 
-
-        // get id data from liggghts
-        particleCloud_.dataExchangeM().allocateArray(partID_,0.,1);
-        particleCloud_.dataExchangeM().getData("id","scalar-atom",partID_);
-
         // stream data to file
-        streamDataToPath(lagPath_, partID_,npProcs,"id","scalar","scalarField","");
+        streamDataToPath(lagPath_, particleCloud_.fieldsToDEM[idFieldToDEMid_],npProcs,"id","scalar","scalarField","");
     }
     return npProcs;
+}
+
+void trackIO::allocFieldsToDEM() const
+{
+    // register data to be communicated
+    particleCloud_.registerFieldsToDEM("id","scalar-atom",idFieldToDEMid_,true);
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 // Private Member Functions

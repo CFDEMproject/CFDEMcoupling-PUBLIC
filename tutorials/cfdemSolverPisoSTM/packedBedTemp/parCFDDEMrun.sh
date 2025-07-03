@@ -22,6 +22,7 @@ solverName="cfdemSolverPisoSTM"
 nrProcs="2"
 machineFileName="none"   # yourMachinefileName | none
 debugMode="off"          # on | off| strict
+separateDEM="" #"in.liggghts_run_socket"                   # use for socket variation only!
 testHarnessPath="$CFDEM_TEST_HARNESS_PATH"
 runOctave="true"
 postproc="false"
@@ -29,7 +30,7 @@ cleanup="true"
 #--------------------------------------------------------------------------------#
 
 #- call function to run a parallel CFD-DEM case
-parCFDDEMrun $logpath $logfileName $casePath $headerText $solverName $nrProcs $machineFileName $debugMode
+parCFDDEMrun $logpath $logfileName $casePath $headerText $solverName $nrProcs $machineFileName $debugMode $separateDEM
 
 #------------------------------#
 if [ $runOctave == "true" ]
@@ -87,7 +88,7 @@ fi
 if [ $cleanup == "true" ]
   then
     #- clean up case
-    keepDEMrestart="false"
+    keepDEMrestart="true"
     cleanCFDEMcase $casePath/CFD $keepDEMrestart
 fi
 

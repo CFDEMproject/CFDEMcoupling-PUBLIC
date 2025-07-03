@@ -54,7 +54,7 @@ SourceFiles
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "mpi.h"
+#include <mpi.h>
 #include <lammps.h>         // these are LAMMPS include files
 #include <input.h>
 #include <atom.h>

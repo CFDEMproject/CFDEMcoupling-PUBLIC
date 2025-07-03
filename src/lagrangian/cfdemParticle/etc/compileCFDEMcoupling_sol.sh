@@ -106,8 +106,15 @@ else
                 #--------------------------------------------------------------------------------#
                 #- define variables
                 #logpath="$(dirname "$(readlink -f ${BASH_SOURCE[0]})")/$logDir"
-                logfileName="log_compileCFDEMcoupling""_$LINE" 
-                casePath="$CFDEM_SOLVER_DIR/$LINE"
+                if [[ ${LINE:0:6} = "Course" ]] 
+                then
+                    LINE=$(basename $LINE)
+                    logfileName="log_compileCFDEMcoupling""_$LINE" 
+                    casePath="$CFDEM_SOLVER_DIR/Course/$LINE"
+                else
+                    logfileName="log_compileCFDEMcoupling""_$LINE" 
+                    casePath="$CFDEM_SOLVER_DIR/$LINE"
+                fi
                 headerText="$logfileName""_$LINE""-$NOW"
                 parallel="true"
                 #--------------------------------------------------------------------------------#
@@ -169,8 +176,15 @@ else
             #--------------------------------------------------------------------------------#
             #- define variables
             #logpath="$(dirname "$(readlink -f ${BASH_SOURCE[0]})")/$logDir"
-            logfileName="log_compileCFDEMcoupling""_$LINE" 
-            casePath="$CFDEM_SOLVER_DIR/$LINE"
+            if [[ ${LINE:0:6} = "Course" ]] 
+            then
+                LINE=$(basename $LINE)
+                logfileName="log_compileCFDEMcoupling""_$LINE" 
+                casePath="$CFDEM_SOLVER_DIR/Course/$LINE"
+            else
+                logfileName="log_compileCFDEMcoupling""_$LINE" 
+                casePath="$CFDEM_SOLVER_DIR/$LINE"
+            fi
             #--------------------------------------------------------------------------------#            
             collectLogCFDEMcoupling_sol $logpath $logfileName $casePath
         done

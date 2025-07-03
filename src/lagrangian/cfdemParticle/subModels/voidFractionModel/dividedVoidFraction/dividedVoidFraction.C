@@ -64,18 +64,18 @@ dividedVoidFraction::dividedVoidFraction
     propsDict_(dict.subDict(typeName + "Props")),
     verbose_(false),
     procBoundaryCorrection_(propsDict_.lookupOrDefault<Switch>("procBoundaryCorrection", false)),
-    alphaMin_(readScalar(propsDict_.lookup("alphaMin"))),
+    alphaMin_(propsDict_.lookupOrDefault<scalar>("alphaMin",0.1)),
     alphaLimited_(0),
     tooMuch_(0.0),
-    interpolation_(false),
+    interpolation_(propsDict_.lookupOrDefault<Switch>("interpolation",false)),
     cfdemUseOnly_(false)
 {
     maxCellsPerParticle_ = 29;
     //particleCloud_.setMaxCellsPerParticle(29);
 
-    if(alphaMin_ > 1 || alphaMin_ < 0.01){ FatalError<< "alphaMin should be < 1 and > 0.01 !!!" << abort(FatalError); }
-    if (propsDict_.found("interpolation")){
-        interpolation_=true;
+    if (alphaMin_ > 1 || alphaMin_ < 0.01)
+        FatalError<< "alphaMin should be < 1 and > 0.01 !" << abort(FatalError);
+    if (interpolation_==true){
         Warning << "interpolation for dividedVoidFraction does not yet work correctly!" << endl;
         Info << "Using interpolated voidfraction field - do not use this in combination with interpolation in drag model!"<< endl;
     }
@@ -97,7 +97,9 @@ dividedVoidFraction::dividedVoidFraction
             FatalError << typeName << ": You are requesting procBoundaryCorrection, this requires the use of engineIB!\n"
                        << abort(FatalError);
         }
-    } else {
+    }
+    else
+    {
         if(particleCloud_.locateM().type()=="engineIB")
         {
             FatalError << typeName << ": You are using engineIB, this requires using procBoundaryCorrection=true!\n"
@@ -107,16 +109,31 @@ dividedVoidFraction::dividedVoidFraction
             //procBoundaryCorrection_ = true;
         }
     }
-    //generate marker points
-    int m = 0;
-    offsets[m][0] = offsets[m][1] = offsets[m][2] = 0.0;
-    m ++;
 
+    //generate marker points
     // for 2 different radii
     double r1 = cbrt(1.0/29.0);
     double r2 = cbrt(15.0/29.0);
     scalar r[] = { 0.75* (r2*r2*r2*r2 - r1*r1*r1*r1)/(r2*r2*r2 - r1*r1*r1),
                    0.75* (1.0 - r2*r2*r2*r2)/(1.0 - r2*r2*r2) };
+
+    initOffsets(r);
+}
+
+void dividedVoidFraction::MSinit()
+{
+    Info << type() << ": activating multisphere mode..." << endl;
+    if(particleCloud_.shapeTypeName() == "multisphere") msMode_ = true;
+
+    scalar r[] = { 0.623926, 0.623926 + 0.293976 };
+    initOffsets(r);
+}
+
+void dividedVoidFraction::initOffsets(const scalar *r)
+{
+    int m = 0;
+    offsets[m][0] = offsets[m][1] = offsets[m][2] = 0.0;
+    m ++;
 
     for(label ir = 0; ir <= 1; ir += 1)
     {
@@ -161,7 +178,14 @@ dividedVoidFraction::~dividedVoidFraction()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfractions,double**& particleWeights,double**& particleVolumes, double**& particleV) const
+void dividedVoidFraction::setvoidFraction
+(
+    double** const& mask,
+    double**& voidfractions,
+    double**& particleWeights,
+    double**& particleVolumes,
+    double**& particleV
+) const
 {
     if(cfdemUseOnly_)
         reAllocArrays(particleCloud_.numberOfParticles());
@@ -173,8 +197,11 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
     scalar radius(-1.);
     scalar volume(0.);
     scalar cellVol(0.);
-    scalar scaleVol= weight();
-    scalar scaleRadius = cbrt(porosity());
+    scalar scaleRadius(0);
+    if (msMode_)
+        scaleRadius = 1;
+    else
+        scaleRadius = cbrt(porosity());
     const boundBox& globalBb = particleCloud_.mesh().bounds();
 
     for(int index=0; index< particleCloud_.numberOfParticles(); index++)
@@ -191,12 +218,22 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
                 particleVolumes[index][subcell] = 0.;
             }
             particleV[index][0] = 0.;
-
             cellsPerParticle_[index][0] = 1.;
-            position = particleCloud_.position(index);
-            cellID = particleCloud_.cellIDs()[index][0];
-            radius = particleRadius(index);//particleCloud_.radius(index);
-            volume = Vp(index,radius,scaleVol);
+
+            if (msMode_)
+            {
+                label clumpID = particleCloud_.clumpIndexOfParticle(index);
+                if (clumpID < 0)
+                    continue;
+                label clumpType = particleCloud_.clumpType(clumpID);
+                if (clumpType <= 0) //clump does not exist
+                    continue;
+            }
+
+            position = particleCloud_.cfdemCloud::position(index);
+            cellID = particleCloud_.cfdemCloud::cellIDs()[index][0];
+            radius = particleCloud_.radius(index);
+            volume = particleCloud_.particleVolumeScaled(index, volScale());
             radius *= scaleRadius;
             cellVol = 0.;
 
@@ -211,18 +248,21 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
             {
                 // switch off cellIDs for force calc if steming from parallel search success
                 cellWithCenter = particleCloud_.locateM().findSingleCell(position,cellID);
-                particleCloud_.cellIDs()[index][0] = cellWithCenter;
+                particleCloud_.cfdemCloud::cellIDs()[index][0] = cellWithCenter;
             }
 
             if (cellID >= 0)  // particle centre is in domain
             {
                 cellVol = particleCloud_.mesh().V()[cellID];
+                int subPoint=0;
+                scalar subPointDiameter(0);
                 for(int i = 0; i < numberOfMarkerPoints; i++)
                 {
                     if((i == 0 && procBoundaryCorrection_) || i > 0)
                     {
                         offset = radius*offsets[i];
                         #include "setWeightedSource.H"   // set source terms at position+offset
+                        subPoint++;
                     }
                 }
 
@@ -237,7 +277,8 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
                     scalar centreWeight = 1./nPoints*(nPoints-cellsSet);
                     // update voidfraction for each particle read
                     scalar newAlpha = voidfractionNext_[cellID]- volume*centreWeight/cellVol;
-                    if(newAlpha > alphaMin_) voidfractionNext_[cellID] = newAlpha;
+                    if(newAlpha > alphaMin_)
+                        voidfractionNext_[cellID] = newAlpha;
                     else
                     {
                         voidfractionNext_[cellID] = alphaMin_;
@@ -259,7 +300,7 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
                     for(int i=0;i<cellsPerParticle_[index][0];i++)
                     {
                        if(i==0)Info << "cellids, voidfractions, particleWeights, : \n";
-                       Info << particleCloud_.cellIDs()[index][i] << " ," << endl;
+                       Info << particleCloud_.cfdemCloud::cellIDs()[index][i] << " ," << endl;
                        Info << voidfractions[index][i] << " ," << endl;
                        Info << particleWeights[index][i] << " ," << endl;
                      }
@@ -281,18 +322,18 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
     {
         /*if(interpolation_)
         {
-            label cellI = particleCloud_.cellIDs()[index][0];
+            label cellI = particleCloud_.cfdemCloud::cellIDs()[index][0];
             if(cellI >= 0)
             {
-                position = particleCloud_.position(index);
+                position = particleCloud_.cfdemCloud::position(index);
                 voidfractionAtPos=voidfractionInterpolator_.interpolate(position,cellI);
             }else{
                 voidfractionAtPos=-1;
             }
-    
+
             for(int subcell=0;subcell<cellsPerParticle_[index][0];subcell++)
             {
-                label cellID = particleCloud_.cellIDs()[index][subcell];
+                label cellID = particleCloud_.cfdemCloud::cellIDs()[index][subcell];
 
                 if(cellID >= 0)
                 {
@@ -300,7 +341,7 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
                         voidfractions[index][subcell] = voidfractionAtPos;
                     else
                         voidfractions[index][subcell] = voidfractionNext_[cellID];
-                } 
+                }
                 else
                 {
                     voidfractions[index][subcell] = -1.;
@@ -311,12 +352,12 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
         {
             for(int subcell=0;subcell<cellsPerParticle_[index][0];subcell++)
             {
-                label cellID = particleCloud_.cellIDs()[index][subcell];
+                label cellID = particleCloud_.cfdemCloud::cellIDs()[index][subcell];
 
                 if(cellID >= 0)
                 {
                     voidfractions[index][subcell] = voidfractionNext_[cellID];
-                } 
+                }
                 else
                 {
                     voidfractions[index][subcell] = -1.;
@@ -324,11 +365,6 @@ void dividedVoidFraction::setvoidFraction(double** const& mask,double**& voidfra
             }
         }
     }
-}
-
-inline double dividedVoidFraction::particleRadius(label index) const
-{
-    return particleCloud_.radius(index);
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

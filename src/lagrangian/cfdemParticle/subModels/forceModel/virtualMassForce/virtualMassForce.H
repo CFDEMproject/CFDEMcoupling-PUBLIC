@@ -67,7 +67,9 @@ private:
 
     const surfaceScalarField& phi_;
 
-    mutable double **UrelOld_;
+    word UrelOldName_;
+
+    mutable label UrelOldFieldToDEMid_;
 
     mutable bool splitUrelCalculation_;    //indicator to split calculation of Urel between CFDEM and LIGGGHTS
                                            //requires the integration fix to take dv/dt into account!
@@ -97,8 +99,6 @@ public:
 
     // Member Functions
         void setForce() const;
-
-        void reAllocArrays() const;
 };
 
 
